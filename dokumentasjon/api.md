@@ -62,11 +62,14 @@ HTTP 201
 ### Request
 PUT /uttak/{behandlingId}
 
-Samme som ved opprettelse med noen verdier kan ikke endres;
+Samme request som ved opprettelse,
 
-- aktørId på søker
-- aktørId på barn
+men noen verdier som ikke vil hensyntas om de skulle sendes;
+
 - sakId
+- behandlingId (ettersom det hentes fra pathen)
+- aktørId på søker (ettersom det ikke kan endres)
+- aktørId på barn (ettersom det ikke kan endres)
 
 Og visse ting kan være i tillegg til opprettelsen;
 
