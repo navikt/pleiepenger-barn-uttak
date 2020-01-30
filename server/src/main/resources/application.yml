@@ -1,0 +1,27 @@
+server:
+  port: ${PORT:8080}
+
+management:
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+  health :
+    diskspace:
+      enabled: false
+  endpoint:
+    health:
+      show-details : always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus
+      base-path: /internal/actuator
+
+springdoc:
+  api-docs:
+    path: /internal/api-docs
+  swagger-ui:
+    path: /internal/swagger
