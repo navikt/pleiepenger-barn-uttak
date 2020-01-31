@@ -4,7 +4,8 @@
 - 'sakId' ikke brukt til noe funksjonelt i uttak, kun for 
 - 'aktuelleBehandlinger' er et sett med andre id på andre behandlingsIder som skal hensyntas ved beregning av uttaket. Alle uttak som hensyntas må være knyttet til det samme barnet.
 - 'fødselsdato' på 'søker' for å kunne håndheve at Det ytes ikke stønad til medlem som er fylt 70 år.
-- 'tilsynbehov' på 'barn' inneholder periodiserte maksrammer for uttaket på tvers av omsorgspersoner for barnet. Det er kun disse verdiene som vil hensyntas i beregningen av uttaket, ikke tilsvarende verdier som ligger i 'aktuelleBehandlinger'. 
+- 'tilsynbehov' på 'barn' inneholder periodiserte maksrammer for uttaket på tvers av omsorgspersoner for barnet. Det er kun disse verdiene som vil hensyntas i beregningen av uttaket, ikke tilsvarende verdier som ligger i 'aktuelleBehandlinger'.
+- 'arbeidsforholdId' settes når det finnes flere arbeidsforhold hos samme orgnr. 
 
 
 ### Request
@@ -37,6 +38,7 @@ POST /uttak
     "arbeid": {
         "arbeidstaker": [{
             "organisasjonsnummer": "999999999",
+            "arbeidsforholdId": null,
             "norskIdentitetsnummer": null,
             "perioder": {
                 "2018-10-10/2018-12-29": {
@@ -45,6 +47,7 @@ POST /uttak
             }
         }, {
             "organisasjonsnummer": null,
+            "arbeidsforholdId": null,
             "norskIdentitetsnummer": "29099012345",
             "perioder": {
                 "2018-11-10/2018-12-29": {
@@ -81,25 +84,37 @@ Og visse ting kan være i tillegg til opprettelsen;
 ### Request
 GET /uttak?behandlingId=123&behandlingId=456
 ### Response
+- grad - angir prosent uttak av pleiepenger.
+- resultat_type - INNVILGET, AVSLÅTT eller UAVKLART periode.
+- årsak - årsak til at perioder ble INNVILGET eller AVSLÅTT. Ikke satt dersom perioden er UAVKLART.
+
 ```json
 {
     "123": {
         "perioder": {
             "2018-10-10/2018-12-29": {
-                "grad": 50.0
+                "grad": 50.0,
+                "resultat_type": "INNVILGET",
+                "årsak": "§..."
             },
             "2018-10-10/2018-12-30": {
-                "grad": 73.5
+                "grad": 73.5,
+                "resultat_type": "AVSLÅTT",
+                "årsak": "§..."
             }
         }
     },
     "456": {
         "perioder": {
             "2018-10-10/2018-12-29": {
-                "grad": 50.0
+                "grad": 50.0,
+                "resultat_type": "INNVILGET",
+                "årsak": "§..."
             },
             "2018-10-10/2018-12-30": {
-                "grad": 73.5
+                "grad": 73.5,
+                "resultat_type": "INNVILGET",
+                "årsak": "§..."
             }
         }
     }
