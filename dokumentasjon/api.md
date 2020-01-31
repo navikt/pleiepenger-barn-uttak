@@ -6,6 +6,7 @@
 - 'fødselsdato' på 'søker' for å kunne håndheve at Det ytes ikke stønad til medlem som er fylt 70 år.
 - 'tilsynbehov' på 'barn' inneholder periodiserte maksrammer for uttaket på tvers av omsorgspersoner for barnet. Det er kun disse verdiene som vil hensyntas i beregningen av uttaket, ikke tilsvarende verdier som ligger i 'aktuelleBehandlinger'. 
 
+
 ### Request
 POST /uttak
 
