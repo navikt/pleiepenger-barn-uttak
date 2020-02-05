@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -7,5 +8,7 @@ import org.springframework.boot.runApplication
 class App
 
 fun main(args: Array<String>) {
-    runApplication<App>(*args)
+    runApplication<App>(*args) {
+        setBannerMode(Banner.Mode.OFF)
+    }
 }

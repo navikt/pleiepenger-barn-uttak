@@ -13,6 +13,7 @@
 
     <properties>
         <springdoc.version>1.2.29</springdoc.version>
+        <logback.logstash.version>6.3</logback.logstash.version>
     </properties>
 
     <dependencies>
@@ -80,6 +81,13 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logback.logstash.version}</version>
         </dependency>
     </dependencies>
 
