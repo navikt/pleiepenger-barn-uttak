@@ -83,11 +83,15 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- Logging -->
+        <!-- Monitorering -->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logback.logstash.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
     </dependencies>
 
