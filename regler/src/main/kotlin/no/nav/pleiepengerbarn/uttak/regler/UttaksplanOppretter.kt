@@ -5,12 +5,12 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 object UttaksplanOppretter {
 
-    fun opprettUttaksperioder(søknad: Søknad): Uttaksplan {
+    fun opprettUttaksperioder(avklarteFakta: AvklarteFakta): Uttaksplan {
         val perioder = mutableListOf<Uttaksperiode>()
-        for (p in søknad.oppgittePerioder.søktePerioder) {
+        for (p in avklarteFakta.søktePerioder) {
             perioder.add(Uttaksperiode(fom = p.fom, tom =  p.tom))
         }
-        return Uttaksplan(søknad.saksnummer, søknad.behandlingId, perioder)
+        return Uttaksplan(perioder)
     }
 
 

@@ -1,5 +1,5 @@
 package no.nav.pleiepengerbarn.uttak.validering
-
+/*
 import io.konform.validation.Validation
 import no.nav.pleiepengerbarn.uttak.kontrakter.Periode
 import no.nav.pleiepengerbarn.uttak.kontrakter.PeriodeInnhold
@@ -12,3 +12,4 @@ val validerUttak = Validation<Uttak> {
         }
     }
 }
+*/

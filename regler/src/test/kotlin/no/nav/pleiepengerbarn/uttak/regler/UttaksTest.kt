@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Periode
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt

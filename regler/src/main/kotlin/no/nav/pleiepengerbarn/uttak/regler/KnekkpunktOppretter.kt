@@ -1,18 +1,15 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Knekkpunkt
-import no.nav.pleiepengerbarn.uttak.kontrakter.KnekkpunktType
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.OppgittePerioder
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 
 object KnekkpunktOppretter {
 
 
-    fun finnKnekkpunkter(oppgittePerioder: OppgittePerioder): List<Knekkpunkt> {
+    fun finnKnekkpunkter(avklarteFakta: AvklarteFakta): List<Knekkpunkt> {
         val knekkpunkter = mutableListOf<Knekkpunkt>()
 
-        knekkpunkter.addAll(finnKnekkpunkterForFerie(oppgittePerioder.ferier))
+        knekkpunkter.addAll(finnKnekkpunkterForFerie(avklarteFakta.ferier))
 
         return knekkpunkter
     }
