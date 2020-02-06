@@ -6,10 +6,10 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 object KnekkpunktOppretter {
 
 
-    fun finnKnekkpunkter(avklarteFakta: AvklarteFakta): List<Knekkpunkt> {
+    fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): List<Knekkpunkt> {
         val knekkpunkter = mutableListOf<Knekkpunkt>()
 
-        knekkpunkter.addAll(finnKnekkpunkterForFerie(avklarteFakta.ferier))
+        knekkpunkter.addAll(finnKnekkpunkterForFerie(regelGrunnlag.ferier))
 
         return knekkpunkter
     }

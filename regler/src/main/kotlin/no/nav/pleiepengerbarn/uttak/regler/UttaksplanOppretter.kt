@@ -5,9 +5,9 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 object UttaksplanOppretter {
 
-    fun opprettUttaksperioder(avklarteFakta: AvklarteFakta): Uttaksplan {
+    fun opprettUttaksperioder(regelGrunnlag: RegelGrunnlag): Uttaksplan {
         val perioder = mutableListOf<Uttaksperiode>()
-        for (p in avklarteFakta.søktePerioder) {
+        for (p in regelGrunnlag.søktePerioder) {
             perioder.add(Uttaksperiode(fom = p.fom, tom =  p.tom))
         }
         return Uttaksplan(perioder)

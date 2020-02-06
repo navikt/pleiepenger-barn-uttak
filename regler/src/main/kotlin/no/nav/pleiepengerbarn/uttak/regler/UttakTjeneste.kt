@@ -1,17 +1,15 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.AvklarteFakta
-import no.nav.pleiepengerbarn.uttak.kontrakter.BehandlingId
-import no.nav.pleiepengerbarn.uttak.kontrakter.Søknad
+import no.nav.pleiepengerbarn.uttak.kontrakter.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 
 object UttakTjeneste {
 
-    fun uttaksplan(avklarteFakta: AvklarteFakta): Uttaksplan {
-        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(avklarteFakta)
-        val knekkpunkter = KnekkpunktOppretter.finnKnekkpunkter(avklarteFakta)
+    fun uttaksplan(regelGrunnlag: RegelGrunnlag): Uttaksplan {
+        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(regelGrunnlag)
+        val knekkpunkter = KnekkpunktOppretter.finnKnekkpunkter(regelGrunnlag)
         //TODO bruk knekkpunkt på uttaksplan
-        val avklartUttaksplan = UttaksplanRegler.kjørRegler(uttaksplan)
+        val avklartUttaksplan = UttaksplanRegler.fastsettUttaksplan(uttaksplan,regelGrunnlag.arbeidsforhold.keys)
         return avklartUttaksplan
     }
 
