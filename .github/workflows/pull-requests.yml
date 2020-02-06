@@ -1,0 +1,17 @@
+name: Pull request bygg
+
+on: [pull_request]
+
+jobs:
+  docker-and-nais-deploy:
+    name: Bygge app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hente kode
+        uses: actions/checkout@v2
+      - name: Sette opp Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - name: Bygge JAR
+        run: ./mvnw clean package
