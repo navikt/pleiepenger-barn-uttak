@@ -3,7 +3,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month
 
@@ -29,12 +28,16 @@ class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplan(avklarteFakta)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        val innvilgetPeriode = uttaksplan.perioder[0]
-        assertEquals(helePerioden.fom, innvilgetPeriode.fom)
-        assertEquals(helePerioden.tom, innvilgetPeriode.tom)
-        assertNotNull(innvilgetPeriode.uttaksperiodeResultat)
-        assertEquals(BigDecimal(100), innvilgetPeriode.uttaksperiodeResultat?.utbetalingsgrad)
-        assertNull(innvilgetPeriode.uttaksperiodeResultat?.avslåttPeriodeÅrsak)
+        sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
+    }
+
+
+    fun sjekkInnvilget(uttaksperiode: Uttaksperiode, forventetPeriode:LukketPeriode, utbetalingsgrad:Prosent) {
+        assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
+        assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
+        assertNotNull(uttaksperiode.uttaksperiodeResultat)
+        assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat?.utbetalingsgrad)
+        assertNull(uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsak)
 
     }
 

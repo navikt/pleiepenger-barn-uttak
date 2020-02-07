@@ -6,7 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import java.math.BigDecimal
 
 
-object UttaksplanRegler {
+internal object UttaksplanRegler {
 
     private val FULL_UTBETALING = BigDecimal(100)
 

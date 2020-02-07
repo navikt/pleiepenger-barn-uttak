@@ -3,15 +3,23 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 
-object UttaksplanOppretter {
+internal object UttaksplanOppretter {
 
-    fun opprettUttaksperioder(regelGrunnlag: RegelGrunnlag): Uttaksplan {
+    fun opprettUttaksperioder(regelGrunnlag: RegelGrunnlag, knekkpunkter: List<Knekkpunkt>): Uttaksplan {
         val perioder = mutableListOf<Uttaksperiode>()
-        for (p in regelGrunnlag.søktePerioder) {
-            perioder.add(Uttaksperiode(fom = p.fom, tom =  p.tom))
+        regelGrunnlag.søktePerioder.forEach { p ->
+            perioder.add(Uttaksperiode(LukketPeriode(p.fom, p.tom)))
         }
-        return Uttaksplan(perioder)
+
+        return Uttaksplan(knekkUttaksperioder(knekkpunkter, perioder))
     }
 
+    private fun knekkUttaksperioder(knekkpunkter: List<Knekkpunkt>, perioder:List<Uttaksperiode>):List<Uttaksperiode> {
+        val knektePerioder = mutableListOf<Uttaksperiode>()
+        perioder.forEach {
+            knektePerioder.addAll(it.knekk(knekkpunkter))
+        }
+        return knektePerioder
+    }
 
 }

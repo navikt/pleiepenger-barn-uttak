@@ -5,6 +5,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
 
 internal fun ValidationBuilder<Uttaksperiode>.gyldigPeriode() {
     addConstraint("tilOgMed må være etter fraOgMed") {
-        it.tom.isAfter(it.fom)
+        it.periode.tom.isAfter(it.periode.fom)
     }
 }

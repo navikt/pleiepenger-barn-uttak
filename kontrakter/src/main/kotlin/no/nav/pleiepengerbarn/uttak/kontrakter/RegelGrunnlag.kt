@@ -5,5 +5,5 @@ data class RegelGrunnlag(
         val arbeidsforhold: Map<Arbeidsforhold, List<Arbeid>>,
         val søktePerioder:List<LukketPeriode>,
         val ferier:List<LukketPeriode> = listOf(),
-        val andrePartersUttaksplam: List<Uttaksplan> = listOf()
+        val andrePartersUttaksplan: List<Uttaksplan> = listOf()
 )
