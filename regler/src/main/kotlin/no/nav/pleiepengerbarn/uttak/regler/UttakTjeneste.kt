@@ -8,8 +8,7 @@ object UttakTjeneste {
     fun uttaksplan(regelGrunnlag: RegelGrunnlag): Uttaksplan {
         val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(regelGrunnlag)
         val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(regelGrunnlag, knekkpunkter)
-        val avklartUttaksplan = UttaksplanRegler.fastsettUttaksplan(uttaksplan, regelGrunnlag.arbeidsforhold.keys)
-        return avklartUttaksplan
+        return UttaksplanRegler.fastsettUttaksplan(uttaksplan, regelGrunnlag.arbeidsforhold.keys)
     }
 
 }

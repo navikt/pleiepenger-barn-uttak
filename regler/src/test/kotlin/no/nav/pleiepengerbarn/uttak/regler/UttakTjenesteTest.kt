@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
 
-class UttakTjenesteTest {
+internal class UttakTjenesteTest {
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789")
 
     @Test
     fun `enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
-        val avklarteFakta = RegelGrunnlag(
+        val grunnlag = RegelGrunnlag(
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
                 ),
@@ -25,7 +25,7 @@ class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(avklarteFakta)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
