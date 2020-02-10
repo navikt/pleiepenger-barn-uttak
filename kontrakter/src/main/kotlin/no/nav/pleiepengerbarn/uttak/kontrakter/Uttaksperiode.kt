@@ -3,7 +3,7 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 data class Uttaksperiode(
         val periode:LukketPeriode,
         val knekkpunktTyper:Set<KnekkpunktType> = setOf(),
-        var uttaksperiodeResultat: UttaksperiodeResultat? = null
+        val uttaksperiodeResultat: UttaksperiodeResultat = UttaksperiodeResultat(utbetalingsgrad = Prosent(0))
 
 ) {
     fun knekk(knekkpunktListe: List<Knekkpunkt>): List<Uttaksperiode>{

@@ -1,3 +1,3 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-data class UttaksperiodeResultat(val arbeidsforhold: Arbeidsforhold, val utbetalingsgrad:Prosent, val avslåttPeriodeÅrsak: AvslåttPeriodeÅrsak? = null)
+data class UttaksperiodeResultat(val utbetalingsgrad:Prosent, val avslåttPeriodeÅrsaker: Set<AvslåttPeriodeÅrsak> = setOf())

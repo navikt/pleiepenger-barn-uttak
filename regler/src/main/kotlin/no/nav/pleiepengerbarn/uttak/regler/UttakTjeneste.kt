@@ -5,10 +5,10 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 
 object UttakTjeneste {
 
-    fun uttaksplan(regelGrunnlag: RegelGrunnlag): Uttaksplan {
-        val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(regelGrunnlag)
-        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(regelGrunnlag, knekkpunkter)
-        return UttaksplanRegler.fastsettUttaksplan(uttaksplan, regelGrunnlag.arbeidsforhold.keys)
+    fun uttaksplan(grunnlag: RegelGrunnlag): Uttaksplan {
+        val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(grunnlag)
+        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(grunnlag, knekkpunkter)
+        return UttaksplanRegler.fastsettUttaksplan(uttaksplan, grunnlag)
     }
 
 }
