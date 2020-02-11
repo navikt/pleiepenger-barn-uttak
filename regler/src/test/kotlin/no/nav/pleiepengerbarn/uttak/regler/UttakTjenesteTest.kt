@@ -62,7 +62,7 @@ internal class UttakTjenesteTest {
         assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
         assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
         assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat?.utbetalingsgrad)
+        assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat?.grad)
         assertTrue(uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker!!.isEmpty())
 
     }
@@ -71,7 +71,7 @@ internal class UttakTjenesteTest {
         assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
         assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
         assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        assertEquals(BigDecimal.ZERO, uttaksperiode.uttaksperiodeResultat?.utbetalingsgrad)
+        assertEquals(BigDecimal.ZERO, uttaksperiode.uttaksperiodeResultat?.grad)
         assertEquals(årsaker, uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker)
     }
 }

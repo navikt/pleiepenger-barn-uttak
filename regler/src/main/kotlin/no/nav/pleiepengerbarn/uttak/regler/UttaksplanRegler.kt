@@ -28,10 +28,10 @@ internal object UttaksplanRegler {
 
     private fun oppdaterUtbetalingsgrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Uttaksperiode {
         if (uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty()) {
-            //TODO: Finn utbetalingsgrad, antar 100% i mellomtiden
-            return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(utbetalingsgrad = FULL_UTBETALING))
+            var grad = GradBeregner.beregnGrad(uttaksperiode, grunnlag)
+            return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = grad))
         }
-        return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(utbetalingsgrad = INGEN_UTBETALING))
+        return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING))
     }
 
 }
