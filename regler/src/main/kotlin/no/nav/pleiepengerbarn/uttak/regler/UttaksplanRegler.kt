@@ -2,11 +2,11 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
+import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 
 internal object UttaksplanRegler {
 
     private val INGEN_UTBETALING = Prosent.ZERO
-    private val FULL_UTBETALING = Prosent(100)
 
     fun fastsettUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag):Uttaksplan {
         val resultatPerioder = mutableListOf<Uttaksperiode>()
@@ -22,13 +22,14 @@ internal object UttaksplanRegler {
     private fun kjørAlleRegler(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):UttaksperiodeResultat {
 
         var oppdatertResultat = FerieRegel().kjør(uttaksperiode, grunnlag, uttaksperiode.uttaksperiodeResultat)
+        oppdatertResultat = TilsynsbehovRegel().kjør(uttaksperiode, grunnlag, oppdatertResultat)
 
         return oppdatertResultat
     }
 
     private fun oppdaterUtbetalingsgrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Uttaksperiode {
         if (uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty()) {
-            var grad = GradBeregner.beregnGrad(uttaksperiode, grunnlag)
+            val grad = GradBeregner.beregnGrad(uttaksperiode, grunnlag)
             return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = grad))
         }
         return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING))
