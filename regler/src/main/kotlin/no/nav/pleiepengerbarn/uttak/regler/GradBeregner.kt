@@ -59,7 +59,7 @@ object GradBeregner {
     }
 
     private fun max(a:Prosent, b:Prosent):Prosent {
-        if (b < a) {
+        if (b > a) {
             return b
         }
         return a
