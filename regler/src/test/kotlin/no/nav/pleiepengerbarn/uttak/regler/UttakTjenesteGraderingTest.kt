@@ -1,9 +1,9 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month
 
@@ -77,20 +77,4 @@ internal class UttakTjenesteGraderingTest {
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
     }
 
-    fun sjekkInnvilget(uttaksperiode: Uttaksperiode, forventetPeriode:LukketPeriode, utbetalingsgrad:Prosent) {
-        assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
-        assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
-        assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat?.grad)
-        assertTrue(uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker!!.isEmpty())
-
-    }
-
-    fun sjekkAvslått(uttaksperiode: Uttaksperiode, forventetPeriode: LukketPeriode, årsaker:Set<AvslåttPeriodeÅrsak>) {
-        assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
-        assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
-        assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        assertEquals(BigDecimal.ZERO, uttaksperiode.uttaksperiodeResultat?.grad)
-        assertEquals(årsaker, uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker)
-    }
 }

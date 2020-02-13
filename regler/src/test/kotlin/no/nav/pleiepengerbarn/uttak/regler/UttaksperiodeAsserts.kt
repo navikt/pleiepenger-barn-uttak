@@ -5,7 +5,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
 import org.junit.jupiter.api.Assertions
-import java.math.BigDecimal
 
 object UttaksperiodeAsserts {
 
@@ -13,8 +12,8 @@ object UttaksperiodeAsserts {
         Assertions.assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
         Assertions.assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
         Assertions.assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        Assertions.assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat?.grad)
-        Assertions.assertTrue(uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker!!.isEmpty())
+        Assertions.assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat.grad)
+        Assertions.assertTrue(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty())
 
     }
 
@@ -22,8 +21,8 @@ object UttaksperiodeAsserts {
         Assertions.assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
         Assertions.assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
         Assertions.assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        Assertions.assertEquals(BigDecimal.ZERO, uttaksperiode.uttaksperiodeResultat?.grad)
-        Assertions.assertEquals(årsaker, uttaksperiode.uttaksperiodeResultat?.avslåttPeriodeÅrsaker)
+        Assertions.assertEquals(Prosent.ZERO, uttaksperiode.uttaksperiodeResultat.grad)
+        Assertions.assertEquals(årsaker, uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker)
     }
 
 }
