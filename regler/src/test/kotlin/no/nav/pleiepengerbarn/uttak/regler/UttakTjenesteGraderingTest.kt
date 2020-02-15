@@ -49,7 +49,6 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold1,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(25),
                                         inntekt = Beløp(1000)
@@ -81,7 +80,6 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold1,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(25),
                                         inntekt = Beløp(1000)
@@ -109,7 +107,6 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold1,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(35),
                                         inntekt = Beløp(1000)
@@ -140,7 +137,6 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold1,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(25),
                                         inntekt = Beløp(1000)
@@ -170,7 +166,6 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold1,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(40),
                                         inntekt = Beløp(2000)
@@ -178,7 +173,6 @@ internal class UttakTjenesteGraderingTest {
                         ),
                         arbeidsforhold2 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold2,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(20),
                                         inntekt = Beløp(1500)
@@ -186,7 +180,6 @@ internal class UttakTjenesteGraderingTest {
                         ),
                         arbeidsforhold3 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold3,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(80),
                                         inntekt = Beløp(500)
@@ -194,7 +187,6 @@ internal class UttakTjenesteGraderingTest {
                         ),
                         arbeidsforhold4 to listOf(
                                 Arbeid(
-                                        arbeidsforhold = arbeidsforhold4,
                                         periode = helePerioden,
                                         arbeidsprosent = Prosent(0),
                                         inntekt = Beløp(1000)
