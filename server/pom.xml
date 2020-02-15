@@ -18,6 +18,18 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>no.nav.pleiepengerbarn.uttak</groupId>
+            <artifactId>kontrakter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.nav.pleiepengerbarn.uttak</groupId>
+            <artifactId>regler</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Kotlin -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
