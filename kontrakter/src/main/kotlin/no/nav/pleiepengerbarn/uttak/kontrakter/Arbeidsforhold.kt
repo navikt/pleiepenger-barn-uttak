@@ -3,7 +3,13 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 import java.lang.IllegalArgumentException
 import java.util.*
 
-data class Arbeidsforhold(val arbeidstype:Arbeidstype, val organisasjonsnummer: Organisasjonsnummer? = null, val fødselsnummer: Fødselsnummer? = null, val arbeidsforholdId: UUID? = null) {
+data class Arbeidsforhold(
+        val arbeidstype:Arbeidstype,
+        val organisasjonsnummer: Organisasjonsnummer? = null,
+        val fødselsnummer: Fødselsnummer? = null,
+        val arbeidsforholdId: UUID? = null
+) {
+
     init {
         if (arbeidstype == Arbeidstype.ARBEIDSGIVER) {
             if (organisasjonsnummer == null && fødselsnummer == null) {
@@ -16,4 +22,5 @@ data class Arbeidsforhold(val arbeidstype:Arbeidstype, val organisasjonsnummer: 
             throw IllegalArgumentException("Bare arbeidsgiver kan ha arbeidsforholdId")
         }
     }
+
 }

@@ -4,25 +4,28 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.AvslåttPeriodeÅrsak
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
-import org.junit.jupiter.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import java.math.RoundingMode
 
 object UttaksperiodeAsserts {
 
     internal fun sjekkInnvilget(uttaksperiode: Uttaksperiode, forventetPeriode: LukketPeriode, utbetalingsgrad:Prosent) {
-        Assertions.assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
-        Assertions.assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
-        Assertions.assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        Assertions.assertEquals(utbetalingsgrad, uttaksperiode.uttaksperiodeResultat.grad)
-        Assertions.assertTrue(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty())
+        sjekkPeriode(uttaksperiode, forventetPeriode)
+        assertThat(uttaksperiode.uttaksperiodeResultat.grad).isEqualByComparingTo(utbetalingsgrad.setScale(2, RoundingMode.HALF_EVEN))
+        assertThat(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker).isEmpty()
 
     }
 
     internal fun sjekkAvslått(uttaksperiode: Uttaksperiode, forventetPeriode: LukketPeriode, årsaker:Set<AvslåttPeriodeÅrsak>) {
-        Assertions.assertEquals(forventetPeriode.fom, uttaksperiode.periode.fom)
-        Assertions.assertEquals(forventetPeriode.tom, uttaksperiode.periode.tom)
-        Assertions.assertNotNull(uttaksperiode.uttaksperiodeResultat)
-        Assertions.assertEquals(Prosent.ZERO, uttaksperiode.uttaksperiodeResultat.grad)
-        Assertions.assertEquals(årsaker, uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker)
+        sjekkPeriode(uttaksperiode, forventetPeriode)
+        assertThat(uttaksperiode.uttaksperiodeResultat.grad).isEqualByComparingTo(Prosent.ZERO.setScale(2, RoundingMode.HALF_EVEN))
+        assertThat(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker).isEqualTo(årsaker)
     }
 
+    private fun sjekkPeriode(uttaksperiode: Uttaksperiode, forventetPeriode: LukketPeriode) {
+        assertThat(uttaksperiode.periode.fom).isEqualTo(forventetPeriode.fom)
+        assertThat(uttaksperiode.periode.tom).isEqualTo(forventetPeriode.tom)
+        assertThat(uttaksperiode.uttaksperiodeResultat).isNotNull
+
+    }
 }

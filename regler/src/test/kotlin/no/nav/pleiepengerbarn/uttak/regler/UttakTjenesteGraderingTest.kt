@@ -43,7 +43,14 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(Arbeid(arbeidsforhold1, helePerioden, Prosent(25)))
+                        arbeidsforhold1 to listOf(
+                                Arbeid(
+                                        arbeidsforhold = arbeidsforhold1,
+                                        periode = helePerioden,
+                                        arbeidsprosent = Prosent(25),
+                                        inntekt = Beløp(1000)
+                                )
+                        )
                 )
         )
 
@@ -64,7 +71,14 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(Arbeid(arbeidsforhold1, helePerioden, Prosent(25)))
+                        arbeidsforhold1 to listOf(
+                                Arbeid(
+                                        arbeidsforhold = arbeidsforhold1,
+                                        periode = helePerioden,
+                                        arbeidsprosent = Prosent(25),
+                                        inntekt = Beløp(1000)
+                                )
+                        )
                 ),
                 tilsynPerioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(30))
@@ -76,5 +90,40 @@ internal class UttakTjenesteGraderingTest {
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
     }
+
+
+    @Test
+    fun `En uttaksperiode med gradering mot arbeids for overlappende arbeidsperiode og overlappende tilsyn så skal tilsynsgrad overstyre arbeidsgradgrad dersom tilsynsgrad er større enn arbeidsgrad`() {
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = listOf(
+                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søktePerioder = listOf(
+                        helePerioden
+                ),
+                arbeidsforhold = mapOf(
+                        arbeidsforhold1 to listOf(
+                                Arbeid(
+                                        arbeidsforhold = arbeidsforhold1,
+                                        periode = helePerioden,
+                                        arbeidsprosent = Prosent(25),
+                                        inntekt = Beløp(1000)
+                                )
+                        )
+                ),
+                tilsynPerioder = listOf(
+                        Tilsyn(periode = helePerioden, grad = Prosent(30))
+                )
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertTrue(uttaksplan.perioder.size == 1)
+        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
+    }
+
+
+
 
 }

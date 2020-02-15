@@ -7,3 +7,4 @@ typealias BehandlingId = String
 typealias Fødselsnummer = String
 typealias Organisasjonsnummer = String
 typealias Prosent = BigDecimal
+typealias Beløp = BigDecimal
