@@ -11,7 +11,7 @@ import java.time.LocalDate
 class UttaksTest {
     @Test
     fun `manuelle tidslinjer`() {
-        var start = LocalDate.parse("2020-02-04")
+        val start = LocalDate.parse("2020-02-04")
         val slutt = start.plusDays(15)
 
         TidslinjeAsciiArt.printTidslinje(linkedSetOf(

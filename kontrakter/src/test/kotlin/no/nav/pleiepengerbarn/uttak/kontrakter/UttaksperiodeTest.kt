@@ -7,7 +7,7 @@ import java.time.Month
 
 internal class UttaksperiodeTest {
 
-    val periode = Uttaksperiode(periode = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)))
+    private val periode = Uttaksperiode(periode = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)))
 
 
     @Test

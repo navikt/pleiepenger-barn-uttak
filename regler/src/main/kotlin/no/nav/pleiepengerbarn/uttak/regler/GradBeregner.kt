@@ -33,8 +33,8 @@ object GradBeregner {
 
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         var sumAndreParter = Prosent.ZERO
-        grunnlag.andrePartersUttaksplan.forEach {
-            val annenPartsPeriode = it.perioder.find { overlapper(it.periode, periode) }
+        grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
+            val annenPartsPeriode = uttaksplan.perioder.find { overlapper(it.periode, periode) }
             if (annenPartsPeriode != null) {
                 sumAndreParter += annenPartsPeriode.uttaksperiodeResultat.grad
             }
