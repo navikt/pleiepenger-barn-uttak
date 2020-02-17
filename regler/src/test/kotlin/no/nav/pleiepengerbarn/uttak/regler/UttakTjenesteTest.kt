@@ -27,7 +27,7 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
@@ -49,7 +49,7 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
@@ -68,13 +68,18 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
         sjekkAvslått(uttaksplan.perioder[1], LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
     }
 
+    private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
+        return uttaksplan
+    }
 
 
 }

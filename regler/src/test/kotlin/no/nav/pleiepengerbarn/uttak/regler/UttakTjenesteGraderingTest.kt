@@ -31,7 +31,7 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(80))
@@ -57,7 +57,7 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(75))
@@ -88,7 +88,7 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(60))
@@ -118,7 +118,7 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
@@ -148,7 +148,7 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
@@ -198,10 +198,16 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplan = kjørRegler(grunnlag)
 
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(60))
 
+    }
+
+    private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
+        return uttaksplan
     }
 
 

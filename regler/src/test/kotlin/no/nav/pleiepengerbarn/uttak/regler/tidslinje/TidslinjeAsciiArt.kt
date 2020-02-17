@@ -57,12 +57,12 @@ internal object TidslinjeAsciiArt {
 
     private fun LocalDate.erHverdag() = dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY
 
-    private fun Grad.padded() = df.format(this).padEnd(5, '-')
+    private fun Prosent.padded() = df.format(this).padEnd(5, '-')
 
-    private fun Periode.print(grad: Grad?) {
-        var current = fraOgMed
+    private fun LukketPeriode.print(grad: Prosent?) {
+        var current = fom
         var print = ""
-        while(current.isBefore(tilOgMed) || current.isEqual(tilOgMed)) {
+        while(current.isBefore(tom) || current.isEqual(tom)) {
             if (current.erHverdag()) print += "------"
             current = current.plusDays(1)
         }
@@ -88,19 +88,19 @@ internal object TidslinjeAsciiArt {
         return current
     }
 
-    private fun Periode.antallHverdagerMellom(inkluderFraOgMed: Boolean = false) : Int {
+    private fun LukketPeriode.antallHverdagerMellom(inkluderFraOgMed: Boolean = false) : Int {
         var antall = 0
-        val førsteHverdag = fraOgMed.førsteHverdag()
+        val førsteHverdag = fom.førsteHverdag()
         val andreHverdag = førsteHverdag.plusDays(1).førsteHverdag()
         var current = if (inkluderFraOgMed) førsteHverdag else andreHverdag
-        while (current.isBefore(tilOgMed)) {
+        while (current.isBefore(tom)) {
             if (current.erHverdag()) antall++
             current = current.plusDays(1)
         }
         return antall
     }
 
-    private fun Periode.tomPeriode(inkluderFraOgMed: Boolean = false) {
+    private fun LukketPeriode.tomPeriode(inkluderFraOgMed: Boolean = false) {
         val antallHverdager = antallHverdagerMellom(inkluderFraOgMed)
         if (antallHverdager == 0) return
         var print = ""
@@ -113,13 +113,13 @@ internal object TidslinjeAsciiArt {
         printDivider()
     }
 
-    private fun Map<Periode, Grad?>.print(førsteDato: LocalDate) {
+    private fun Map<LukketPeriode, Prosent?>.print(førsteDato: LocalDate) {
         var current = førsteDato
         printDivider()
         forEach { periode, grad ->
-            Periode(current, periode.fraOgMed).tomPeriode(current.isEqual(førsteDato))
+            LukketPeriode(current, periode.fom).tomPeriode(current.isEqual(førsteDato))
             periode.print(grad)
-            current = periode.tilOgMed
+            current = periode.tom
         }
     }
 }
@@ -128,8 +128,8 @@ private fun LinkedHashSet<Tidslinje>.førsteDato(): LocalDate {
     var førsteDato = LocalDate.MAX
     forEach {
         it.perioder.forEach { (periode, _) ->
-            if (periode.fraOgMed.isBefore(førsteDato)) {
-                førsteDato = periode.fraOgMed
+            if (periode.fom.isBefore(førsteDato)) {
+                førsteDato = periode.fom
             }
         }
     }
@@ -139,8 +139,8 @@ private fun LinkedHashSet<Tidslinje>.sisteDato(): LocalDate {
     var sisteDato = LocalDate.MIN
     forEach {
         it.perioder.forEach { (periode, _) ->
-            if (periode.tilOgMed.isAfter(sisteDato)) {
-                sisteDato = periode.tilOgMed
+            if (periode.tom.isAfter(sisteDato)) {
+                sisteDato = periode.tom
             }
         }
     }
