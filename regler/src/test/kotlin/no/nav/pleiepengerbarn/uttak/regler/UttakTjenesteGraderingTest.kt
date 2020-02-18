@@ -23,7 +23,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 tilsynsperioder = listOf(
@@ -43,7 +43,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
@@ -69,7 +69,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(Uttaksplan(perioder = listOf(
@@ -101,7 +101,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
@@ -131,7 +131,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
@@ -160,7 +160,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(

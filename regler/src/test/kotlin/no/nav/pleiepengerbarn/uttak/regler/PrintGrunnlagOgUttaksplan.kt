@@ -4,7 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt
 
-class PrintGrunnlagOgUttaksplan(val grunnlag: RegelGrunnlag, val uttaksplan: Uttaksplan) {
+class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val uttaksplan: Uttaksplan) {
 
 
 
@@ -48,7 +48,7 @@ class PrintGrunnlagOgUttaksplan(val grunnlag: RegelGrunnlag, val uttaksplan: Utt
 
     private fun søknadsperioder():Tidslinje {
         val søknadsperioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.søktePerioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(100) }
+        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(100) }
         return Tidslinje("Søknadsperioder", søknadsperioder)
     }
 

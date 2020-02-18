@@ -7,7 +7,7 @@ internal object UttaksplanOppretter {
 
     fun opprettUttaksperioder(regelGrunnlag: RegelGrunnlag, knekkpunkter: List<Knekkpunkt>): Uttaksplan {
         val perioder = mutableListOf<Uttaksperiode>()
-        regelGrunnlag.søktePerioder.forEach { p ->
+        regelGrunnlag.søknadsperioder.forEach { p ->
             perioder.add(Uttaksperiode(LukketPeriode(p.fom, p.tom)))
         }
 

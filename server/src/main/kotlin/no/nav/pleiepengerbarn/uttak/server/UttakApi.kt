@@ -18,9 +18,9 @@ class UttakApi {
 
         val uttaksplan = UttakTjeneste.uttaksplan(RegelGrunnlag(
                 tilsynsbehov = uttakInput.tilsynsbehov,
-                søktePerioder = uttakInput.søktePerioder,
+                søknadsperioder = uttakInput.søknadsperioder,
                 arbeidsforhold = uttakInput.arbeidsforhold,
-                tilsynsperioder = uttakInput.tilsynPerioder,
+                tilsynsperioder = uttakInput.tilsynsperioder,
                 ferier = uttakInput.ferier,
                 andrePartersUttaksplan = listOf() //TODO andre uttaksplaner skal her
             )

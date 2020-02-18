@@ -19,7 +19,7 @@ internal class UttakTjenesteTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
@@ -41,7 +41,7 @@ internal class UttakTjenesteTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 ),
                 ferier = listOf(
@@ -63,7 +63,7 @@ internal class UttakTjenesteTest {
                 tilsynsbehov = listOf(
                         Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
                 )
         )
@@ -85,7 +85,7 @@ internal class UttakTjenesteTest {
                 tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden.copy(fom = helePerioden.fom.plusDays(15)), grad = Prosent(85))
                 ),
-                søktePerioder = listOf(
+                søknadsperioder = listOf(
                         helePerioden
                 )
         )
