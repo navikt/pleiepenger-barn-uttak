@@ -35,7 +35,7 @@ internal class UttakTjenesteTest {
 
 
     @Test
-    fun `En uttaksperioder som delvis overlapper med ferie`() {
+    fun `En uttaksperiode som delvis overlapper med ferie`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = listOf(
@@ -57,7 +57,7 @@ internal class UttakTjenesteTest {
     }
 
     @Test
-    fun `En uttaksperioder som fortsetter etter slutt på tilsynsbehov perioden, skal avslås fra slutt på tilsynsbehov perioden`() {
+    fun `En uttaksperiode som fortsetter etter slutt på tilsynsbehov perioden, skal avslås fra slutt på tilsynsbehov perioden`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = listOf(
@@ -73,6 +73,28 @@ internal class UttakTjenesteTest {
         assertTrue(uttaksplan.perioder.size == 2)
         sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
         sjekkAvslått(uttaksplan.perioder[1], LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
+    }
+
+    @Test
+    fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for lav prosent`() {
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = listOf(
+                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                tilsynsperioder = listOf(
+                        Tilsyn(periode = helePerioden.copy(fom = helePerioden.fom.plusDays(15)), grad = Prosent(85))
+                ),
+                søktePerioder = listOf(
+                        helePerioden
+                )
+        )
+
+        val uttaksplan = kjørRegler(grunnlag)
+
+        assertTrue(uttaksplan.perioder.size == 2)
+        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
+        sjekkAvslått(uttaksplan.perioder[1], helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
     }
 
     private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {

@@ -20,6 +20,7 @@ internal object KnekkpunktUtleder {
         finnForFerie(knekkpunkMap, regelGrunnlag.ferier)
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.tilsynsbehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
+        finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeidsforhold)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
@@ -30,12 +31,16 @@ internal object KnekkpunktUtleder {
         return knekkpunkter
     }
 
+    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsynPerioder: List<Tilsyn>) {
+        tilsynPerioder.forEach { finnForPeriode(knekkpunkMap, it.periode, KnekkpunktType.TILSYNSPERIODE) }
+    }
+
     private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.FERIE)}
     }
 
     private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehovListe: List<Tilsynsbehov>) {
-        tilsynsbehovListe.forEach {finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.TILSYNSPERIODE)}
+        tilsynsbehovListe.forEach {finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.TILSYNSBEHOV)}
     }
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {

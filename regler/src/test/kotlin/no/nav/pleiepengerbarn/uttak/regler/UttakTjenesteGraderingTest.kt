@@ -26,7 +26,7 @@ internal class UttakTjenesteGraderingTest {
                 søktePerioder = listOf(
                         helePerioden
                 ),
-                tilsynPerioder = listOf(
+                tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(20))
                 )
         )
@@ -113,7 +113,7 @@ internal class UttakTjenesteGraderingTest {
                                 )
                         )
                 ),
-                tilsynPerioder = listOf(
+                tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(30))
                 )
         )
@@ -143,7 +143,7 @@ internal class UttakTjenesteGraderingTest {
                                 )
                         )
                 ),
-                tilsynPerioder = listOf(
+                tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(30))
                 )
         )
@@ -193,7 +193,7 @@ internal class UttakTjenesteGraderingTest {
                                 )
                         )
                 ),
-                tilsynPerioder = listOf(
+                tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(40))
                 )
         )

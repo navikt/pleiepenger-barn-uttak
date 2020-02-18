@@ -7,6 +7,8 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 internal object UttaksplanRegler {
 
     private val INGEN_UTBETALING = Prosent.ZERO
+    private val NEDRE_GRENSE_FOR_UTTAK = Prosent(20)
+
 
     fun fastsettUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag):Uttaksplan {
         val resultatPerioder = mutableListOf<Uttaksperiode>()
@@ -30,6 +32,12 @@ internal object UttaksplanRegler {
     private fun oppdaterUtbetalingsgrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Uttaksperiode {
         if (uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty()) {
             val grad = GradBeregner.beregnGrad(uttaksperiode, grunnlag)
+            if (grad < NEDRE_GRENSE_FOR_UTTAK) {
+                val årsaker = mutableSetOf<AvslåttPeriodeÅrsak>()
+                årsaker.addAll(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker)
+                årsaker.add(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD)
+                return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING, avslåttPeriodeÅrsaker = årsaker))
+            }
             return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = grad))
         }
         return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING))

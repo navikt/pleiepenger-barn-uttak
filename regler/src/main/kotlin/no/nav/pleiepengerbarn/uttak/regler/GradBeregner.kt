@@ -65,7 +65,7 @@ object GradBeregner {
     }
 
     private fun finnTilsyn(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsyn = grunnlag.tilsynPerioder.find { overlapper(it.periode, periode) }
+        val tilsyn = grunnlag.tilsynsperioder.find { overlapper(it.periode, periode) }
         if (tilsyn != null) {
             return tilsyn.grad.setScale(2, RoundingMode.HALF_EVEN)
         }

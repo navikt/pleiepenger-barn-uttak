@@ -20,7 +20,7 @@ class UttakApi {
                 tilsynsbehov = uttakInput.tilsynsbehov,
                 søktePerioder = uttakInput.søktePerioder,
                 arbeidsforhold = uttakInput.arbeidsforhold,
-                tilsynPerioder = uttakInput.tilsynPerioder,
+                tilsynsperioder = uttakInput.tilsynPerioder,
                 ferier = uttakInput.ferier,
                 andrePartersUttaksplan = listOf() //TODO andre uttaksplaner skal her
             )
