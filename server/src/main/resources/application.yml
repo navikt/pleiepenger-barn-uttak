@@ -1,6 +1,16 @@
 server:
   port: ${PORT:8080}
 
+no.nav:
+  navn: 'Pleiepenger Barn Uttak'
+  versjon: '@project.version@'
+  beskrivelse: 'Håndterer uttak av pleiepenger barn på tvers av omsorgspersoner.'
+  security:
+    jwt:
+      issuer:
+        azure:
+          accepted_audience: 'pleiepenger-barn-uttak'
+
 management:
   metrics:
     web:
