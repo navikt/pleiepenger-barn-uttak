@@ -6,30 +6,41 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.net.URI
+import org.springframework.web.util.UriComponentsBuilder
 import java.time.LocalDate
 import java.time.Month
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
-class UttakApi {
+class UttakplanApi {
 
-    @PostMapping("/uttaksplan",
-            consumes = [MediaType.APPLICATION_JSON_VALUE],
-            produces = [MediaType.APPLICATION_JSON_VALUE])
+    private companion object {
+        private const val Path = "/uttaksplan"
+        private const val BehandlingId = "behandlingId"
+    }
+
+    @PostMapping(Path, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
-            @RequestBody uttakInput: Uttaksgrunnlag<BehandlingId>): ResponseEntity<Uttaksplan> {
+            @RequestBody uttaksgrunnlag: Uttaksgrunnlag<BehandlingId>,
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
         //TODO hent uttaksplan for andre parter
         //TODO lagre uttaksplan
 
-        return ResponseEntity.created(URI.create("http://localhost:8080")).body(dummyUttaksplan())
+        val uri = uriComponentsBuilder
+                .path(Path)
+                .queryParam(BehandlingId, uttaksgrunnlag.behandlingId)
+                .build()
+                .toUri()
+
+        return ResponseEntity
+                .created(uri)
+                .body(dummyUttaksplan())
     }
 
 
-    @GetMapping("/uttaksplan",
-            produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(Path, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
     fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
 
