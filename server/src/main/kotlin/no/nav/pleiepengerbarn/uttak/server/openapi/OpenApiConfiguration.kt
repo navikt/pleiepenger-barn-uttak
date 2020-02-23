@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 internal class OpenApiConfiguration {
+
+    @Bean 
+    internal fun modelConverter() = CustomModelConverter()
+
     @Bean
     internal fun openApi(
             @Value("\${no.nav.navn}") navn: String,
