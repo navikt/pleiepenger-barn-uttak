@@ -1,14 +1,20 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.Month
 
 @RestController
+@Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
 class UttakApi {
 
     @PostMapping("/uttaksplan")
@@ -30,17 +36,21 @@ class UttakApi {
     }
 
 
-    @GetMapping("/uttaksplan")
-    fun hentUttaksplan(behandingId:BehandlingId):Uttaksplan {
+    @GetMapping("/uttaksplan", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
+    fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
         //TODO fjern mock kode
-        return Uttaksplan(listOf(
-                Uttaksperiode(
-                        periode = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)),
-                        uttaksperiodeResultat = UttaksperiodeResultat(
-                                grad = Prosent(100)
+        val uttaksplaner = Uttaksplaner(
+                uttaksplaner = mapOf(behandlingId.first() to Uttaksplan(listOf(
+                        Uttaksperiode(
+                                periode = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)),
+                                uttaksperiodeResultat = UttaksperiodeResultat(
+                                        grad = Prosent(100)
+                                )
                         )
                 )
-            )
-        )
+                )))
+
+        return ResponseEntity.ok(uttaksplaner)
     }
 }
