@@ -24,3 +24,19 @@ data class Arbeidsforhold(
     }
 
 }
+
+data class ArbeidsforholdV2(
+        val organisasjonsnummer: Organisasjonsnummer? = null,
+        val fødselsnummer: Fødselsnummer? = null,
+        val perioder: Map<LukketPeriode, ArbeidsforholdPeriodeInfo>
+) {
+    init {
+        require(!(organisasjonsnummer == null && fødselsnummer == null)) { "Arbeidsgiver må ha enten organisasjonsnummer eller fødselsnummer" }
+        require(!(organisasjonsnummer != null && fødselsnummer != null)) { "Arbeidsgiver kan ikke ha både organisasjonsnummer og fødselsnummer" }
+    }
+}
+
+data class ArbeidsforholdPeriodeInfo(
+        val inntekt:Beløp,
+        val arbeidsprosent: Prosent = Prosent.ZERO
+)
