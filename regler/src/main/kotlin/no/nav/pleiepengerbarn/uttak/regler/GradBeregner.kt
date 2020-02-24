@@ -7,14 +7,12 @@ import java.math.RoundingMode
 
 object GradBeregner {
 
-
     fun beregnGrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Prosent {
         val tilsynsbehov = finnTilsynsbehov(uttaksperiode.periode, grunnlag)
         val andreParter = finnSumAndreParter(uttaksperiode.periode, grunnlag)
 
         val sumForventetInntekt = finnSumForventetInntekt(uttaksperiode.periode, grunnlag)
         val sumFaktiskInntekt = finnSumFaktiskInntekt(uttaksperiode.periode, grunnlag)
-
 
         var fårJobbetProsent = BigDecimal.ZERO
         if (sumForventetInntekt.compareTo(BigDecimal.ZERO) != 0) {
@@ -45,10 +43,13 @@ object GradBeregner {
 
     private fun finnSumForventetInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
         var sumForventetInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeidsforhold.forEach { (_, arbeidListe) ->
-            val arbeid = arbeidListe.find { overlapper(it.periode, periode) }
-            if (arbeid != null) {
-                sumForventetInntekt += arbeid.inntekt
+        grunnlag.arbeidsforhold.forEach { arbeidsforhold ->
+            val overlappendePeriode = arbeidsforhold.perioder.keys.find { overlapper(it, periode)}
+            if (overlappendePeriode != null) {
+                val inntekt = arbeidsforhold.perioder[overlappendePeriode]?.inntekt
+                if (inntekt != null) {
+                    sumForventetInntekt += inntekt
+                }
             }
         }
         return sumForventetInntekt
@@ -56,10 +57,13 @@ object GradBeregner {
 
     private fun finnSumFaktiskInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
         var sumFaktiskInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeidsforhold.forEach { (_, arbeidListe) ->
-            val arbeid = arbeidListe.find { overlapper(it.periode, periode) }
-            if (arbeid != null) {
-                sumFaktiskInntekt += arbeid.arbeidsprosent.setScale(2, RoundingMode.HALF_EVEN)*arbeid.inntekt
+        grunnlag.arbeidsforhold.forEach { arbeidsforhold ->
+            val overlappendePeriode = arbeidsforhold.perioder.keys.find { overlapper(it, periode)}
+            if (overlappendePeriode != null) {
+                val arbeidsforholdPeriodeInfo = arbeidsforhold.perioder[overlappendePeriode]
+                if (arbeidsforholdPeriodeInfo != null) {
+                    sumFaktiskInntekt += arbeidsforholdPeriodeInfo.arbeidsprosent.setScale(2, RoundingMode.HALF_EVEN)*arbeidsforholdPeriodeInfo.inntekt
+                }
             }
         }
         return sumFaktiskInntekt

@@ -47,14 +47,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(25),
-                                        inntekt = Beløp(1000)
-                                )
-                        )
+                arbeidsforhold = listOf(
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 )
         )
 
@@ -78,14 +72,8 @@ internal class UttakTjenesteGraderingTest {
                                 grad = Prosent(40)
                         ))
                 ))),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(25),
-                                        inntekt = Beløp(1000)
-                                )
-                        )
+                arbeidsforhold = listOf(
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 )
         )
 
@@ -105,14 +93,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(35),
-                                        inntekt = Beløp(1000)
-                                )
-                        )
+                arbeidsforhold = listOf(
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35))))
                 ),
                 tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(30))
@@ -135,14 +117,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(25),
-                                        inntekt = Beløp(1000)
-                                )
-                        )
+                arbeidsforhold = listOf(
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 ),
                 tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(30))
@@ -164,35 +140,11 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(40),
-                                        inntekt = Beløp(2000)
-                                )
-                        ),
-                        arbeidsforhold2 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(20),
-                                        inntekt = Beløp(1500)
-                                )
-                        ),
-                        arbeidsforhold3 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(80),
-                                        inntekt = Beløp(500)
-                                )
-                        ),
-                        arbeidsforhold4 to listOf(
-                                Arbeid(
-                                        periode = helePerioden,
-                                        arbeidsprosent = Prosent(0),
-                                        inntekt = Beløp(1000)
-                                )
-                        )
+                arbeidsforhold = listOf(
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(2000), arbeidsprosent = Prosent(40)))),
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1500), arbeidsprosent = Prosent(20)))),
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80)))),
+                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0))))
                 ),
                 tilsynsperioder = listOf(
                         Tilsyn(periode = helePerioden, grad = Prosent(40))
