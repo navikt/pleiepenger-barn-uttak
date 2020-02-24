@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler.domene
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.GradBeregner
 import no.nav.pleiepengerbarn.uttak.regler.KnekkpunktUtleder
+import no.nav.pleiepengerbarn.uttak.regler.PeriodeKnekker
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
@@ -20,24 +21,7 @@ internal data class UttaksplanBuilder(
     }
 
     private val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(grunnlag)
-    private val knektePerioder = knekk()
-
-    private fun knekk() : Map<LukketPeriode, Set<KnekkpunktType>> {
-        val knektePerioder = mutableMapOf<LukketPeriode, MutableSet<KnekkpunktType>>()
-        grunnlag.søknadsperioder.forEach { søknadsperiode ->
-            var rest = søknadsperiode
-            knekkpunkter.forEach { knekkpunkt ->
-                val dato = knekkpunkt.knekk
-                if (!dato.isEqual(søknadsperiode.fom) && !dato.isBefore(søknadsperiode.fom) && !dato.isAfter(søknadsperiode.tom)) {
-                    val periode = LukketPeriode(fom = søknadsperiode.fom, tom = knekkpunkt.knekk.minusDays(1))
-                    knektePerioder.putIfAbsent(periode, mutableSetOf())
-                    knektePerioder[periode]!!.addAll(knekkpunkt.typer)
-                    rest = LukketPeriode(fom = dato, tom = rest.tom)
-                }
-            }
-        }
-        return knektePerioder
-    }
+    private val knektePerioder = PeriodeKnekker.knekk(grunnlag, knekkpunkter)
 
     fun build() : UttaksplanV2 {
         val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()

@@ -7,18 +7,20 @@ import java.math.RoundingMode
 
 object GradBeregner {
 
-    fun beregnGrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsynsbehov = finnTilsynsbehov(uttaksperiode.periode, grunnlag)
-        val andreParter = finnSumAndreParter(uttaksperiode.periode, grunnlag)
+    fun beregnGrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Prosent = beregnGrad(uttaksperiode.periode, grunnlag)
 
-        val sumForventetInntekt = finnSumForventetInntekt(uttaksperiode.periode, grunnlag)
-        val sumFaktiskInntekt = finnSumFaktiskInntekt(uttaksperiode.periode, grunnlag)
+    fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
+        val tilsynsbehov = finnTilsynsbehov(periode, grunnlag)
+        val andreParter = finnSumAndreParter(periode, grunnlag)
+
+        val sumForventetInntekt = finnSumForventetInntekt(periode, grunnlag)
+        val sumFaktiskInntekt = finnSumFaktiskInntekt(periode, grunnlag)
 
         var fårJobbetProsent = BigDecimal.ZERO
         if (sumForventetInntekt.compareTo(BigDecimal.ZERO) != 0) {
             fårJobbetProsent = sumFaktiskInntekt / sumForventetInntekt
         }
-        val tilsynProsent = finnTilsyn(uttaksperiode.periode, grunnlag)
+        val tilsynProsent = finnTilsyn(periode, grunnlag)
 
         val gjenværendeTilsynsbehovProsent = tilsynsbehov - andreParter
 

@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.UttaksplanBuilder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -118,6 +119,8 @@ internal class UttakTjenesteTest {
 
     private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplanV2 = UttaksplanBuilder(grunnlag).build()
+        assertEquals(uttaksplan.perioder.size, uttaksplanV2.perioder.size)
         PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
         return uttaksplan
     }
