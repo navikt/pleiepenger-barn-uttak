@@ -99,7 +99,7 @@ internal class UttakTjenesteTest {
     }
 
     @Test
-    fun `Kun medlem i begynnelsen av søknadsperioden`() {
+    fun `Kun medlem i slutten av søknadsperioden`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25");
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = listOf(
@@ -112,7 +112,8 @@ internal class UttakTjenesteTest {
         val uttaksplan = kjørRegler(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
-
+        sjekkAvslått(uttaksplan.perioder[0], LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
+        sjekkInnvilget(uttaksplan.perioder[1], LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
     }
 
     private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
