@@ -1,4 +1,6 @@
-package no.nav.pleiepengerbarn.uttak.kontrakter
+package no.nav.pleiepengerbarn.uttak.regler.domene
+
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class RegelGrunnlag(
         val tilsynsbehov: List<Tilsynsbehov>,

@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -73,9 +74,9 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(Uttaksplan(perioder = listOf(
-                    Uttaksperiode(periode = helePerioden, uttaksperiodeResultat = UttaksperiodeResultat(
-                            grad = Prosent(40)
-                    ))
+                        Uttaksperiode(periode = helePerioden, uttaksperiodeResultat = UttaksperiodeResultat(
+                                grad = Prosent(40)
+                        ))
                 ))),
                 arbeidsforhold = mapOf(
                         arbeidsforhold1 to listOf(

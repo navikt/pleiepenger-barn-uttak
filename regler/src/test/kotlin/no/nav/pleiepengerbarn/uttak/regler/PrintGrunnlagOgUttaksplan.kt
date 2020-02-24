@@ -1,12 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt
 
 class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val uttaksplan: Uttaksplan) {
-
-
 
     fun print() {
         val tidslinjer = LinkedHashSet<Tidslinje>()
@@ -20,7 +19,6 @@ class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val
         tidslinjer.add(uttaksplan())
 
         TidslinjeAsciiArt.printTidslinje(tidslinjer)
-
     }
 
     private fun tilsynsbehovTidslinje():Tidslinje {

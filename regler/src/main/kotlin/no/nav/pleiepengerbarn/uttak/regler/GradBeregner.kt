@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.math.BigDecimal
 import java.math.RoundingMode
 

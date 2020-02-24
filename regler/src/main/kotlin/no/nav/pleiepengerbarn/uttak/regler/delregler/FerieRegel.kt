@@ -1,13 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.AvslåttPeriodeÅrsak
-import no.nav.pleiepengerbarn.uttak.kontrakter.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
 import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeResultat
 
 class FerieRegel : Regel {
 
-    override fun kjør(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag,uttaksperiodeResultat: UttaksperiodeResultat):UttaksperiodeResultat {
+    override fun kjør(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag, uttaksperiodeResultat: UttaksperiodeResultat):UttaksperiodeResultat {
 
         val ferieSomOverlapperMedPeriode = grunnlag.ferier.find {
             (it.fom == uttaksperiode.periode.fom || it.fom.isBefore(uttaksperiode.periode.fom)) &&
