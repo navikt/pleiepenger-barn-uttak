@@ -23,8 +23,8 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = mapOf(
-                        arbeidsforhold1 to listOf()
+                arbeidsforhold = listOf(
+                        arbeidsforhold1
                 )
         )
 

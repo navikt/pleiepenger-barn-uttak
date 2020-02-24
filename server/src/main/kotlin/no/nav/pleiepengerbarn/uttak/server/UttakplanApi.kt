@@ -22,7 +22,7 @@ class UttakplanApi {
     @PostMapping(Path, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
-            @RequestBody uttaksgrunnlag: Uttaksgrunnlag<BehandlingId>,
+            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
         //TODO hent uttaksplan for andre parter
