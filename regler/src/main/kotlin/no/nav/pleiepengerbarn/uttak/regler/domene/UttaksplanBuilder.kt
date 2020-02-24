@@ -22,8 +22,7 @@ internal data class UttaksplanBuilder(
 
     private val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(grunnlag)
     private val knektePerioder = PeriodeKnekker.knekk(grunnlag, knekkpunkter)
-
-    fun build() : UttaksplanV2 {
+    internal fun build() : UttaksplanV2 {
         val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
@@ -60,6 +59,4 @@ internal data class UttaksplanBuilder(
                 perioder = perioder.toMap()
         )
     }
-
-
 }

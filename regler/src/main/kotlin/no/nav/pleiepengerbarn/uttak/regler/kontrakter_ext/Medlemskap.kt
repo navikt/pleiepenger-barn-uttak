@@ -9,5 +9,3 @@ internal fun Map<LukketPeriode, MedlemskapPeriodeInfo>.ikkeMedlem(
     val uttaksperiode = søknadsperioder.overordnetPeriode()
     return uttaksperiode.perioderSomIkkeInngårI(this)
 }
-
-

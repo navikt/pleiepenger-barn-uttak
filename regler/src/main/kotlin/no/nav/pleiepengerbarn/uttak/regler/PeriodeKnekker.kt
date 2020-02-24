@@ -9,7 +9,6 @@ internal object PeriodeKnekker {
     internal fun knekk(
             grunnlag: RegelGrunnlag,
             knekkpunkter: List<Knekkpunkt>) : Map<LukketPeriode, Set<KnekkpunktType>> {
-
         val resultat = mutableMapOf<LukketPeriode, MutableSet<KnekkpunktType>>()
         grunnlag.søknadsperioder.forEach { søknadsperiode ->
             var rest = PeriodeMedKnekkpunkttyper(

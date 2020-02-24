@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
 
+import org.assertj.core.api.Assertions.assertThat
+
 internal class UttakTjenesteTest {
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789")
@@ -119,8 +121,13 @@ internal class UttakTjenesteTest {
 
     private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplanPerioder = uttaksplan.perioder.map { it.periode }.toSet()
         val uttaksplanV2 = UttaksplanBuilder(grunnlag).build()
-        assertEquals(uttaksplan.perioder.size, uttaksplanV2.perioder.size)
+        val uttaksplanV2Perioder = uttaksplanV2.perioder.keys
+
+        assertThat(uttaksplanPerioder.size).isEqualTo(uttaksplanV2Perioder.size)
+        assertThat(uttaksplanPerioder).containsAll(uttaksplanV2Perioder)
+        assertEquals(uttaksplan.perioder.map { it.periode }.size, uttaksplanV2.perioder.size)
         PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
         return uttaksplan
     }
