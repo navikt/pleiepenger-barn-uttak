@@ -72,7 +72,9 @@ internal fun LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode,*
     return inngårIkke.toList()
 }
 
-internal fun List<LukketPeriode>.overlappendePeriode(uttaksperiode: Uttaksperiode) = find {
-    (it.fom == uttaksperiode.periode.fom || it.fom.isBefore(uttaksperiode.periode.fom)) &&
-    (it.tom == uttaksperiode.periode.tom || it.tom.isAfter(uttaksperiode.periode.tom))
+internal fun List<LukketPeriode>.overlappendePeriode(uttaksperiode: Uttaksperiode) = overlappendePeriode(uttaksperiode.periode)
+
+internal fun List<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
+    (it.fom == periode.fom || it.fom.isBefore(periode.fom)) &&
+    (it.tom == periode.tom || it.tom.isAfter(periode.tom))
 }
