@@ -11,6 +11,7 @@ class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val
         val tidslinjer = LinkedHashSet<Tidslinje>()
 
         tidslinjer.add(tilsynsbehovTidslinje())
+        tidslinjer.add(ikkeMedlem())
         tidslinjer.addAll(andrePartesUttak())
         tidslinjer.add(søknadsperioder())
         tidslinjer.add(tilsynTidsplinje())
@@ -19,6 +20,13 @@ class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val
         tidslinjer.add(uttaksplan())
 
         TidslinjeAsciiArt.printTidslinje(tidslinjer)
+    }
+
+    private fun ikkeMedlem(): Tidslinje {
+        val ikkeMedlemPerioder = mutableMapOf<LukketPeriode, Prosent?>()
+        grunnlag.ikkeMedlem.forEach { ikkeMedlemPerioder[it] = null }
+        return Tidslinje("Ikke Medlem", ikkeMedlemPerioder.toMap())
+
     }
 
     private fun tilsynsbehovTidslinje():Tidslinje {

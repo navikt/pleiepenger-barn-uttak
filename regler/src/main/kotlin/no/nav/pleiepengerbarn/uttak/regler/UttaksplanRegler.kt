@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
+import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 
@@ -26,6 +27,7 @@ internal object UttaksplanRegler {
 
         var oppdatertResultat = FerieRegel().kjør(uttaksperiode, grunnlag, uttaksperiode.uttaksperiodeResultat)
         oppdatertResultat = TilsynsbehovRegel().kjør(uttaksperiode, grunnlag, oppdatertResultat)
+        oppdatertResultat = MedlemskapRegel().kjør(uttaksperiode, grunnlag, oppdatertResultat)
 
         return oppdatertResultat
     }

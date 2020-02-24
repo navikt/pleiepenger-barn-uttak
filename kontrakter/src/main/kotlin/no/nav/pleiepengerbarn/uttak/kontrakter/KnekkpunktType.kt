@@ -5,5 +5,6 @@ enum class KnekkpunktType {
     TILSYNSBEHOV,
     TILSYNSPERIODE,
     ANNEN_PARTS_UTTAK,
-    ARBEID
+    ARBEID,
+    IKKE_MEDLEM
 }

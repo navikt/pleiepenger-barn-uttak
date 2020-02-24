@@ -12,5 +12,6 @@ data class Uttaksgrunnlag<BehandlingType> (
         val arbeidsforhold: List<ArbeidsforholdV2>,
         val tilsynsbehov: Periodisert<TilsynsbehovPeriodeInfo>,
         val lovbestemtFerie: Periodisert<Any>,
-        val tilsyn: Periodisert<TilsynPeriodeInfo>
+        val tilsyn: Periodisert<TilsynPeriodeInfo>,
+        val medlemskap: Periodisert<MedlemskapPeriodeInfo>
 )
