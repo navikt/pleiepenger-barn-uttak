@@ -7,7 +7,7 @@ object UttakTjeneste {
 
     fun uttaksplan(grunnlag: RegelGrunnlag): Uttaksplan {
         val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(grunnlag)
-        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(grunnlag, knekkpunkter)
+        val uttaksplan = UttaksplanOppretter.opprettUttaksperioder(grunnlag, knekkpunkter.toList())
         return UttaksplanRegler.fastsettUttaksplan(uttaksplan, grunnlag)
     }
 
