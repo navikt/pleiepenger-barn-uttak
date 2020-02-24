@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
 import java.time.LocalDate
 
 internal fun LukketPeriode.overlapper(periode: LukketPeriode) : Boolean {
@@ -71,3 +72,7 @@ internal fun LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode,*
     return inngårIkke.toList()
 }
 
+internal fun List<LukketPeriode>.overlappendePeriode(uttaksperiode: Uttaksperiode) = find {
+    (it.fom == uttaksperiode.periode.fom || it.fom.isBefore(uttaksperiode.periode.fom)) &&
+    (it.tom == uttaksperiode.periode.tom || it.tom.isAfter(uttaksperiode.periode.tom))
+}

@@ -98,6 +98,23 @@ internal class UttakTjenesteTest {
         sjekkAvslått(uttaksplan.perioder[1], helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
     }
 
+    @Test
+    fun `Kun medlem i begynnelsen av søknadsperioden`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25");
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = listOf(
+                        Tilsynsbehov(søknadsperiode, TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(søknadsperiode),
+                ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15"))
+        )
+
+        val uttaksplan = kjørRegler(grunnlag)
+
+        assertTrue(uttaksplan.perioder.size == 2)
+
+    }
+
     private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
         PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
