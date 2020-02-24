@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.time.LocalDate
 
 internal typealias KnekkpunktMap = MutableMap<LocalDate, MutableSet<KnekkpunktType>>
@@ -13,7 +14,7 @@ internal object KnekkpunktUtleder {
      * @param regelGrunnlag alle grunnlagsdata som skal brukes for uttak
      * @return sortert liste med knekkpunkter
      */
-    fun finnKnekkpunkter(regelGrunnlag:RegelGrunnlag): List<Knekkpunkt> {
+    fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): List<Knekkpunkt> {
 
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 

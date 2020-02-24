@@ -1,6 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 
 object UttakTjeneste {

@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -23,7 +24,7 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeidsforhold = mapOf(
-                    arbeidsforhold1 to listOf()
+                        arbeidsforhold1 to listOf()
                 )
         )
 
