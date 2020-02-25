@@ -21,14 +21,14 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                tilsynsperioder = listOf(
-                        Tilsyn(periode = helePerioden, grad = Prosent(20))
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(Prosent(20))
                 )
         )
 
@@ -41,8 +41,8 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -61,8 +61,8 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -85,8 +85,8 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -94,8 +94,8 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = listOf(
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35))))
                 ),
-                tilsynsperioder = listOf(
-                        Tilsyn(periode = helePerioden, grad = Prosent(30))
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(Prosent(30))
                 )
         )
 
@@ -109,8 +109,8 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -118,8 +118,8 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold = listOf(
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 ),
-                tilsynsperioder = listOf(
-                        Tilsyn(periode = helePerioden, grad = Prosent(30))
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(Prosent(30))
                 )
         )
 
@@ -132,8 +132,8 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -144,8 +144,8 @@ internal class UttakTjenesteGraderingTest {
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80)))),
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0))))
                 ),
-                tilsynsperioder = listOf(
-                        Tilsyn(periode = helePerioden, grad = Prosent(40))
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(Prosent(40))
                 )
         )
 

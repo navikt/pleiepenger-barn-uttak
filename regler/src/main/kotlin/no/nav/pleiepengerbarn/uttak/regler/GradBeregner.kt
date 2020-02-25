@@ -74,16 +74,16 @@ internal object GradBeregner {
     }
 
     private fun finnTilsyn(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsyn = grunnlag.tilsynsperioder.find { overlapper(it.periode, periode) }
+        val tilsyn = grunnlag.tilsynsperioder.entries.find { overlapper(it.key, periode) }
         if (tilsyn != null) {
-            return tilsyn.grad.setScale(2, RoundingMode.HALF_EVEN)
+            return tilsyn.value.grad.setScale(2, RoundingMode.HALF_EVEN)
         }
         return Prosent.ZERO.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     private fun finnTilsynsbehov(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsynsbehovSomOverlapperMedPeriode = grunnlag.tilsynsbehov.find { overlapper(it.periode, periode) }
-        return when (tilsynsbehovSomOverlapperMedPeriode?.tilsynsbehovStørrelse) {
+        val tilsynsbehovSomOverlapperMedPeriode = grunnlag.tilsynsbehov.entries.find { overlapper(it.key, periode) }
+        return when (tilsynsbehovSomOverlapperMedPeriode?.value?.prosent) {
             TilsynsbehovStørrelse.PROSENT_100 -> Prosent(100)
             TilsynsbehovStørrelse.PROSENT_200 -> Prosent(200)
             else -> Prosent.ZERO

@@ -6,10 +6,5 @@ enum class TilsynsbehovStørrelse {
 }
 
 data class Tilsynsbehov(
-        val periode: LukketPeriode,
-        val tilsynsbehovStørrelse: TilsynsbehovStørrelse
-)
-
-data class TilsynsbehovPeriodeInfo(
         val prosent: TilsynsbehovStørrelse
 )

@@ -3,6 +3,8 @@ package no.nav.pleiepengerbarn.uttak.server
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
+import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -26,6 +28,8 @@ class UttakplanApi {
         //TODO hent uttaksplan for andre parter
         //TODO lagre uttaksplan
 
+        val uttaksplan = UttakTjeneste.uttaksplan(GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf()))
+
         val uri = uriComponentsBuilder
                 .path(Path)
                 .queryParam(BehandlingId, uttaksgrunnlag.behandlingId)
@@ -34,7 +38,7 @@ class UttakplanApi {
 
         return ResponseEntity
                 .created(uri)
-                .body(dummyUttaksplan())
+                .body(uttaksplan)
     }
 
 
