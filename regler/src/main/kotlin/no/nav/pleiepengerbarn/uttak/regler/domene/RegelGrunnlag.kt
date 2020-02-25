@@ -8,6 +8,6 @@ data class RegelGrunnlag(
         val arbeidsforhold: List<Arbeidsforhold> = listOf(),
         val tilsynsperioder:List<Tilsyn> = listOf(),
         val ferier:List<LukketPeriode> = listOf(),
-        val andrePartersUttaksplan: List<UttaksplanV2> = listOf(),
+        val andrePartersUttaksplan: List<Uttaksplan> = listOf(),
         val ikkeMedlem: List<LukketPeriode> = listOf()
 )

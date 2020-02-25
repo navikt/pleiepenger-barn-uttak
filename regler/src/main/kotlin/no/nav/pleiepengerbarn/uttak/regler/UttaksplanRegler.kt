@@ -19,7 +19,7 @@ internal object UttaksplanRegler {
 
     internal fun fastsettUtaksplan(
             grunnlag: RegelGrunnlag,
-            knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : UttaksplanV2 {
+            knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : Uttaksplan {
 
         val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
 
@@ -52,6 +52,6 @@ internal object UttaksplanRegler {
                 }
             }
         }
-        return UttaksplanV2(perioder = perioder)
+        return Uttaksplan(perioder = perioder)
     }
 }

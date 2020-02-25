@@ -6,7 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt
 
 
-internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : UttaksplanV2 {
+internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : Uttaksplan {
     val uttaksplan = uttaksplan(grunnlag)
     PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
     return uttaksplan
@@ -15,7 +15,7 @@ internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : Uttakspl
 
 private class PrintGrunnlagOgUttaksplan(
         private val grunnlag: RegelGrunnlag,
-        private val uttaksplan: UttaksplanV2) {
+        private val uttaksplan: Uttaksplan) {
 
     internal fun print() {
         val tidslinjer = LinkedHashSet<Tidslinje>()

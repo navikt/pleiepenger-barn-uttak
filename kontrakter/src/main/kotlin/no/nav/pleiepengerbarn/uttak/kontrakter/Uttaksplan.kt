@@ -1,10 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, UttaksplanV2>)
+data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
 
-typealias UttaksperiodeV2 = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
+typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
 
-data class UttaksplanV2(
+data class Uttaksplan(
         val perioder: Map<LukketPeriode, UttaksPeriodeInfo>
 )
 

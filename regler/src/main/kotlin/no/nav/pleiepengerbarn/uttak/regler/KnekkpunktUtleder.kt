@@ -49,7 +49,7 @@ internal object KnekkpunktUtleder {
         tilsynsbehovListe.forEach {finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.TILSYNSBEHOV)}
     }
 
-    private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<UttaksplanV2>) {
+    private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {
         andrePartersUttaksplan.forEach { uttaksplan ->
             uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.ANNEN_PARTS_UTTAK)}
         }

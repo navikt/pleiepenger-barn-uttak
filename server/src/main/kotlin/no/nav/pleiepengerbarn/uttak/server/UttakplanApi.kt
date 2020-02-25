@@ -21,7 +21,7 @@ class UttakplanApi {
     @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
-            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<UttaksplanV2> {
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
         //TODO hent uttaksplan for andre parter
         //TODO lagre uttaksplan
@@ -52,7 +52,7 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplaner)
     }
 
-    private fun dummyUttaksplan() = UttaksplanV2(
+    private fun dummyUttaksplan() = Uttaksplan(
             perioder = mapOf(
                     LukketPeriode("2020-01-01/2020-01-31") to InnvilgetPeriode(
                             grad = Prosent(100),

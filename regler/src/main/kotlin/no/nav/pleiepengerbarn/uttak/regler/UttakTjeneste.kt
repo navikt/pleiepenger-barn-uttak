@@ -1,11 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksplanV2
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 
 object UttakTjeneste {
 
-    fun uttaksplan(grunnlag: RegelGrunnlag): UttaksplanV2 {
+    fun uttaksplan(grunnlag: RegelGrunnlag): Uttaksplan {
         val knekkpunkter = KnekkpunktUtleder.finnKnekkpunkter(
                 regelGrunnlag = grunnlag
         )
