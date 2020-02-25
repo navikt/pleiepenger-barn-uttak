@@ -33,9 +33,13 @@ internal object GradBeregner {
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         var sumAndreParter = Prosent.ZERO
         grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
-            val annenPartsPeriode = uttaksplan.perioder.find { overlapper(it.periode, periode) }
+            val annenPartsPeriode = uttaksplan.perioder
+                    .filter { overlapper(it.key, periode) }
+                    .filter { it.value is InnvilgetPeriode }
+                    .values.firstOrNull() as InnvilgetPeriode?
+
             if (annenPartsPeriode != null) {
-                sumAndreParter += annenPartsPeriode.uttaksperiodeResultat.grad
+                sumAndreParter += annenPartsPeriode.grad
             }
         }
         return sumAndreParter

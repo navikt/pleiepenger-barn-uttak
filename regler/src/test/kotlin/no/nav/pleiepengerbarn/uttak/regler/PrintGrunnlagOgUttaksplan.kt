@@ -56,7 +56,7 @@ private class PrintGrunnlagOgUttaksplan(
         val tidslinjer = mutableListOf<Tidslinje>()
         grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
             val uttaksperioder = mutableMapOf<LukketPeriode, Prosent>()
-            uttaksplan.perioder.forEach {periode -> uttaksperioder[periode.periode] = periode.uttaksperiodeResultat.grad }
+            uttaksplan.perioder.forEach { (periode, uttaksPeriodeInfo) -> uttaksperioder[periode] = uttaksPeriodeInfo.gradTilTidslinje() }
             tidslinjer.add(Tidslinje("Annen part", uttaksperioder))
         }
         return tidslinjer

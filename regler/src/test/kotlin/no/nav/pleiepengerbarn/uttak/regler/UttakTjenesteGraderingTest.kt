@@ -67,10 +67,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                andrePartersUttaksplan = listOf(Uttaksplan(perioder = listOf(
-                        Uttaksperiode(periode = helePerioden, uttaksperiodeResultat = UttaksperiodeResultat(
-                                grad = Prosent(40)
-                        ))
+                andrePartersUttaksplan = listOf(
+                        UttaksplanV2(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
                 ))),
                 arbeidsforhold = listOf(
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
