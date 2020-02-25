@@ -24,7 +24,6 @@
 	<modules>
 		<module>server</module>
 		<module>kontrakter</module>
-		<module>validering</module>
 		<module>regler</module>
 	</modules>
 
