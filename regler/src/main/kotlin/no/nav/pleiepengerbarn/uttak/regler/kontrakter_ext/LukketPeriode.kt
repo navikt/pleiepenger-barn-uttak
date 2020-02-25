@@ -30,8 +30,8 @@ internal fun Map<LukketPeriode, *>.overordnetPeriode() : LukketPeriode {
     return LukketPeriode(fom!!, tom!!)
 }
 
-internal fun Map<LukketPeriode, *>.sortertPåFom() = toSortedMap(compareBy { it.fom })
-internal fun Map<LukketPeriode, *>.sortertPåTom() = toSortedMap(compareBy { it.tom })
+internal fun <T> Map<LukketPeriode, T>.sortertPåFom() = toSortedMap(compareBy { it.fom })
+internal fun <T> Map<LukketPeriode, T>.sortertPåTom() = toSortedMap(compareBy { it.tom })
 
 internal fun LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode,*>) : List<LukketPeriode> {
     if (perioder.isEmpty()) return listOf(this)

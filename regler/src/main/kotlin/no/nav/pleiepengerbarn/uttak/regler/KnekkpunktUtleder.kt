@@ -37,16 +37,16 @@ internal object KnekkpunktUtleder {
         ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM) }
     }
 
-    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsynPerioder: List<Tilsyn>) {
-        tilsynPerioder.forEach { finnForPeriode(knekkpunkMap, it.periode, KnekkpunktType.TILSYNSPERIODE) }
+    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Tilsyn>) {
+        tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 
     private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.FERIE)}
     }
 
-    private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehovListe: List<Tilsynsbehov>) {
-        tilsynsbehovListe.forEach {finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.TILSYNSBEHOV)}
+    private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>) {
+        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.TILSYNSBEHOV)}
     }
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {

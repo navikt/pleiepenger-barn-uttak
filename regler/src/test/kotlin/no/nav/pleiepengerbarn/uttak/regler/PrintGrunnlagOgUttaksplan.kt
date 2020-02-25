@@ -41,13 +41,13 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun tilsynsbehovTidslinje():Tidslinje {
         val tilsynbehovPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsbehov.forEach {tilsynsbehov ->
-            val grad = if (tilsynsbehov.tilsynsbehovStørrelse == TilsynsbehovStørrelse.PROSENT_200) {
+        grunnlag.tilsynsbehov.forEach {periode, tilsynsbehov ->
+            val grad = if (tilsynsbehov.prosent == TilsynsbehovStørrelse.PROSENT_200) {
                 Prosent(200)
             } else {
                 Prosent(100)
             }
-            tilsynbehovPerioder[tilsynsbehov.periode] = grad
+            tilsynbehovPerioder[periode] = grad
         }
         return Tidslinje("Tilsynsbehov", tilsynbehovPerioder)
     }
@@ -70,7 +70,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun tilsynTidsplinje():Tidslinje {
         val tilsynPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsperioder.forEach { tilsyn ->  tilsynPerioder[tilsyn.periode] = tilsyn.grad }
+        grunnlag.tilsynsperioder.forEach { (periode, tilsyn) ->  tilsynPerioder[periode] = tilsyn.grad }
         return Tidslinje("Tilsyn", tilsynPerioder)
     }
 

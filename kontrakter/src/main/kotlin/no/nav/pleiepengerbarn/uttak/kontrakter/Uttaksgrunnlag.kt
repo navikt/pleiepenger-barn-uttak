@@ -10,8 +10,8 @@ data class Uttaksgrunnlag (
         val søknadsperioder: List<LukketPeriode>,
         val andrePartersBehandlinger: List<BehandlingId>,
         val arbeidsforhold: List<Arbeidsforhold>,
-        val tilsynsbehov: Periodisert<TilsynsbehovPeriodeInfo>,
+        val tilsynsbehov: Periodisert<Tilsynsbehov>,
         val lovbestemtFerie: List<LukketPeriode>,
-        val tilsyn: Periodisert<TilsynPeriodeInfo>,
+//TODO løses senere:        val tilsyn: Periodisert<TilsynPeriodeInfo>,
         val medlemskap: Periodisert<MedlemskapPeriodeInfo>
 )

@@ -7,7 +7,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
 
 internal class TilsynsbehovRegel : Regel {
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Utfall {
-        grunnlag.tilsynsbehov.map { it.periode }.overlappendePeriode(periode)?.apply {
+        grunnlag.tilsynsbehov.entries.map { it.key }.overlappendePeriode(periode)?.apply {
             return TilBeregningAvGrad()
         }
         return Avslått(avslagsÅrsak = AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV)

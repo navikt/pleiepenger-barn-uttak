@@ -17,8 +17,8 @@ internal class UttakTjenesteTest {
     fun `Enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -39,8 +39,8 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som delvis overlapper med ferie`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -61,8 +61,8 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som fortsetter etter slutt på tilsynsbehov perioden, skal avslås fra slutt på tilsynsbehov perioden`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_200)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
                 ),
                 søknadsperioder = listOf(
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
@@ -80,11 +80,11 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for lav prosent`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(helePerioden, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                tilsynsperioder = listOf(
-                        Tilsyn(periode = helePerioden.copy(fom = helePerioden.fom.plusDays(15)), grad = Prosent(85))
+                tilsynsperioder = mapOf(
+                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Tilsyn(Prosent(85))
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -102,8 +102,8 @@ internal class UttakTjenesteTest {
     fun `Kun medlem i slutten av søknadsperioden`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25");
         val grunnlag = RegelGrunnlag(
-                tilsynsbehov = listOf(
-                        Tilsynsbehov(søknadsperiode, TilsynsbehovStørrelse.PROSENT_100)
+                tilsynsbehov = mapOf(
+                        søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(søknadsperiode),
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15"))
