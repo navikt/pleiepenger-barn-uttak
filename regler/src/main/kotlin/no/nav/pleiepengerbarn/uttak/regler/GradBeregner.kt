@@ -5,11 +5,9 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-object GradBeregner {
+internal object GradBeregner {
 
-    fun beregnGrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Prosent = beregnGrad(uttaksperiode.periode, grunnlag)
-
-    fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
+    internal fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         val tilsynsbehov = finnTilsynsbehov(periode, grunnlag)
         val andreParter = finnSumAndreParter(periode, grunnlag)
 

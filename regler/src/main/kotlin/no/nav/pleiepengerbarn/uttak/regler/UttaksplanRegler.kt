@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
@@ -8,42 +9,49 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 
 internal object UttaksplanRegler {
 
-    private val INGEN_UTBETALING = Prosent.ZERO
     private val NEDRE_GRENSE_FOR_UTTAK = Prosent(20)
 
+    private val Regler = linkedSetOf(
+            MedlemskapRegel(),
+            FerieRegel(),
+            TilsynsbehovRegel()
+    )
 
-    fun fastsettUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag):Uttaksplan {
-        val resultatPerioder = mutableListOf<Uttaksperiode>()
-        uttaksplan.perioder.forEach { periode ->
-                val resultat = kjørAlleRegler(uttaksperiode = periode, grunnlag = grunnlag)
-                var oppdatertPeriode = periode.copy(uttaksperiodeResultat = resultat)
-                oppdatertPeriode = oppdaterUtbetalingsgrad(oppdatertPeriode, grunnlag)
-                resultatPerioder.add(oppdatertPeriode)
-        }
-        return uttaksplan.copy(perioder = resultatPerioder)
-    }
+    internal fun fastsettUtaksplan(
+            grunnlag: RegelGrunnlag,
+            knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : UttaksplanV2 {
 
-    private fun kjørAlleRegler(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):UttaksperiodeResultat {
+        val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
 
-        var oppdatertResultat = FerieRegel().kjør(uttaksperiode, grunnlag, uttaksperiode.uttaksperiodeResultat)
-        oppdatertResultat = TilsynsbehovRegel().kjør(uttaksperiode, grunnlag, oppdatertResultat)
-        oppdatertResultat = MedlemskapRegel().kjør(uttaksperiode, grunnlag, oppdatertResultat)
-
-        return oppdatertResultat
-    }
-
-    private fun oppdaterUtbetalingsgrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Uttaksperiode {
-        if (uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker.isEmpty()) {
-            val grad = GradBeregner.beregnGrad(uttaksperiode, grunnlag)
-            if (grad < NEDRE_GRENSE_FOR_UTTAK) {
-                val årsaker = mutableSetOf<AvslåttPeriodeÅrsak>()
-                årsaker.addAll(uttaksperiode.uttaksperiodeResultat.avslåttPeriodeÅrsaker)
-                årsaker.add(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD)
-                return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING, avslåttPeriodeÅrsaker = årsaker))
+        knektePerioder.forEach { (periode, knekkpunktTyper) ->
+            val avslagsÅrsaker = mutableSetOf<AvslåttPeriodeÅrsak>()
+            Regler.forEach { regel ->
+                val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
+                if (utfall is Avslått) {
+                    avslagsÅrsaker.add(utfall.avslagsÅrsak)
+                }
             }
-            return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = grad))
-        }
-        return uttaksperiode.copy(uttaksperiodeResultat = uttaksperiode.uttaksperiodeResultat.copy(grad = INGEN_UTBETALING))
-    }
+            if (avslagsÅrsaker.isNotEmpty()) {
+                perioder[periode] = AvslåttPeriode(
+                        knekkpunktTyper = knekkpunktTyper,
+                        avslagsÅrsaker = avslagsÅrsaker.toSet()
+                )
+            } else {
+                val grad = GradBeregner.beregnGrad(periode, grunnlag)
 
+                if (grad < NEDRE_GRENSE_FOR_UTTAK) {
+                    perioder[periode] = AvslåttPeriode(
+                            knekkpunktTyper = knekkpunktTyper,
+                            avslagsÅrsaker = setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD)
+                    )
+                } else {
+                    perioder[periode] = InnvilgetPeriode(
+                            knekkpunktTyper = knekkpunktTyper,
+                            grad = grad
+                    )
+                }
+            }
+        }
+        return UttaksplanV2(perioder = perioder)
+    }
 }

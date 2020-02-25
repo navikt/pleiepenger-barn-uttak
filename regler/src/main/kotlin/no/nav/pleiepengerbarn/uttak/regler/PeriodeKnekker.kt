@@ -3,15 +3,15 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Knekkpunkt
 import no.nav.pleiepengerbarn.uttak.kontrakter.KnekkpunktType
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import java.util.*
+import java.util.SortedSet
 
 internal object PeriodeKnekker {
     internal fun knekk(
-            grunnlag: RegelGrunnlag,
+            søknadsperioder: List<LukketPeriode>,
             knekkpunkter: SortedSet<Knekkpunkt>) : Map<LukketPeriode, Set<KnekkpunktType>> {
         val resultat = mutableMapOf<LukketPeriode, MutableSet<KnekkpunktType>>()
-        grunnlag.søknadsperioder.forEach { søknadsperiode ->
+
+        søknadsperioder.forEach { søknadsperiode ->
             var rest = PeriodeMedKnekkpunkttyper(
                     periode = søknadsperiode
             )

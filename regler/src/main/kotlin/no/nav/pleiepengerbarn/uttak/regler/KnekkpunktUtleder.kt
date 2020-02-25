@@ -15,7 +15,7 @@ internal object KnekkpunktUtleder {
      * @param regelGrunnlag alle grunnlagsdata som skal brukes for uttak
      * @return sortert set med knekkpunkter
      */
-    fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): SortedSet<Knekkpunkt> {
+    internal fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): SortedSet<Knekkpunkt> {
 
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 

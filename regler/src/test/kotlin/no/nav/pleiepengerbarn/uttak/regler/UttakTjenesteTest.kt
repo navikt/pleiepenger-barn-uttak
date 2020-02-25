@@ -4,13 +4,10 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.domene.UttaksplanBuilder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
-
-import org.assertj.core.api.Assertions.assertThat
 
 internal class UttakTjenesteTest {
 
@@ -31,10 +28,10 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(100))
     }
 
 
@@ -53,11 +50,11 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
-        sjekkAvslått(uttaksplan.perioder[1], helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
+        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
     }
 
     @Test
@@ -72,11 +69,11 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(100))
-        sjekkAvslått(uttaksplan.perioder[1], LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(100))
+        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
     }
 
     @Test
@@ -94,11 +91,11 @@ internal class UttakTjenesteTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
-        sjekkAvslått(uttaksplan.perioder[1], helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
+        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
     }
 
     @Test
@@ -112,25 +109,10 @@ internal class UttakTjenesteTest {
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15"))
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 2)
-        sjekkAvslått(uttaksplan.perioder[0], LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
-        sjekkInnvilget(uttaksplan.perioder[1], LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
+        sjekkAvslått(uttaksplan.perioder.entries.first(), LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
+        sjekkInnvilget(uttaksplan.perioder.entries.elementAt(1), LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
     }
-
-    private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
-        val uttaksplanPerioder = uttaksplan.perioder.map { it.periode }.toSet()
-        val uttaksplanV2 = UttaksplanBuilder(grunnlag).build()
-        val uttaksplanV2Perioder = uttaksplanV2.perioder.keys
-
-        assertThat(uttaksplanPerioder.size).isEqualTo(uttaksplanV2Perioder.size)
-        assertThat(uttaksplanPerioder).containsAll(uttaksplanV2Perioder)
-        assertEquals(uttaksplan.perioder.map { it.periode }.size, uttaksplanV2.perioder.size)
-        PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
-        return uttaksplan
-    }
-
-
 }
