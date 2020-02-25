@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.time.LocalDate
+import java.util.*
 
 internal typealias KnekkpunktMap = MutableMap<LocalDate, MutableSet<KnekkpunktType>>
 
@@ -12,9 +13,9 @@ internal object KnekkpunktUtleder {
      * Finner alle aktuelle knekkpunkter for uttak.
      *
      * @param regelGrunnlag alle grunnlagsdata som skal brukes for uttak
-     * @return sortert liste med knekkpunkter
+     * @return sortert set med knekkpunkter
      */
-    fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): List<Knekkpunkt> {
+    internal fun finnKnekkpunkter(regelGrunnlag: RegelGrunnlag): SortedSet<Knekkpunkt> {
 
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
@@ -29,8 +30,7 @@ internal object KnekkpunktUtleder {
         knekkpunkMap.forEach { (key, value) ->
             knekkpunkter.add(Knekkpunkt(key, value))
         }
-        knekkpunkter.sortBy {it.knekk}
-        return knekkpunkter
+        return knekkpunkter.toSortedSet(compareBy { it.knekk })
     }
 
     private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
@@ -51,7 +51,7 @@ internal object KnekkpunktUtleder {
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {
         andrePartersUttaksplan.forEach { uttaksplan ->
-            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.ANNEN_PARTS_UTTAK)}
+            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.ANNEN_PARTS_UTTAK)}
         }
     }
 

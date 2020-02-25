@@ -5,9 +5,19 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt
 
-class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val uttaksplan: Uttaksplan) {
 
-    fun print() {
+internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : Uttaksplan {
+    val uttaksplan = uttaksplan(grunnlag)
+    PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
+    return uttaksplan
+}
+
+
+private class PrintGrunnlagOgUttaksplan(
+        private val grunnlag: RegelGrunnlag,
+        private val uttaksplan: Uttaksplan) {
+
+    internal fun print() {
         val tidslinjer = LinkedHashSet<Tidslinje>()
 
         tidslinjer.add(tilsynsbehovTidslinje())
@@ -46,7 +56,7 @@ class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val
         val tidslinjer = mutableListOf<Tidslinje>()
         grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
             val uttaksperioder = mutableMapOf<LukketPeriode, Prosent>()
-            uttaksplan.perioder.forEach {periode -> uttaksperioder[periode.periode] = periode.uttaksperiodeResultat.grad }
+            uttaksplan.perioder.forEach { (periode, uttaksPeriodeInfo) -> uttaksperioder[periode] = uttaksPeriodeInfo.gradTilTidslinje() }
             tidslinjer.add(Tidslinje("Annen part", uttaksperioder))
         }
         return tidslinjer
@@ -80,10 +90,11 @@ class PrintGrunnlagOgUttaksplan(private val grunnlag: RegelGrunnlag, private val
         return tidslinjer
     }
 
-    private fun uttaksplan():Tidslinje {
+    private fun uttaksplan(): Tidslinje {
         val uttaksperioder = mutableMapOf<LukketPeriode, Prosent>()
-        uttaksplan.perioder.forEach {periode ->  uttaksperioder[periode.periode] = periode.uttaksperiodeResultat.grad}
+        uttaksplan.perioder.forEach { (periode, uttaksPeriodeInfo) ->  uttaksperioder[periode] = uttaksPeriodeInfo.gradTilTidslinje()}
         return Tidslinje("Uttaksplan", uttaksperioder)
     }
 
+    private fun UttaksPeriodeInfo.gradTilTidslinje() = if (this is InnvilgetPeriode) grad else Prosent(0)
 }

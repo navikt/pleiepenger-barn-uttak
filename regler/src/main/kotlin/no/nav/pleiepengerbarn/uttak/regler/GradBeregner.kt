@@ -5,20 +5,20 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-object GradBeregner {
+internal object GradBeregner {
 
-    fun beregnGrad(uttaksperiode: Uttaksperiode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsynsbehov = finnTilsynsbehov(uttaksperiode.periode, grunnlag)
-        val andreParter = finnSumAndreParter(uttaksperiode.periode, grunnlag)
+    internal fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
+        val tilsynsbehov = finnTilsynsbehov(periode, grunnlag)
+        val andreParter = finnSumAndreParter(periode, grunnlag)
 
-        val sumForventetInntekt = finnSumForventetInntekt(uttaksperiode.periode, grunnlag)
-        val sumFaktiskInntekt = finnSumFaktiskInntekt(uttaksperiode.periode, grunnlag)
+        val sumForventetInntekt = finnSumForventetInntekt(periode, grunnlag)
+        val sumFaktiskInntekt = finnSumFaktiskInntekt(periode, grunnlag)
 
         var fårJobbetProsent = BigDecimal.ZERO
         if (sumForventetInntekt.compareTo(BigDecimal.ZERO) != 0) {
             fårJobbetProsent = sumFaktiskInntekt / sumForventetInntekt
         }
-        val tilsynProsent = finnTilsyn(uttaksperiode.periode, grunnlag)
+        val tilsynProsent = finnTilsyn(periode, grunnlag)
 
         val gjenværendeTilsynsbehovProsent = tilsynsbehov - andreParter
 
@@ -33,9 +33,13 @@ object GradBeregner {
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         var sumAndreParter = Prosent.ZERO
         grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
-            val annenPartsPeriode = uttaksplan.perioder.find { overlapper(it.periode, periode) }
+            val annenPartsPeriode = uttaksplan.perioder
+                    .filter { overlapper(it.key, periode) }
+                    .filter { it.value is InnvilgetPeriode }
+                    .values.firstOrNull() as InnvilgetPeriode?
+
             if (annenPartsPeriode != null) {
-                sumAndreParter += annenPartsPeriode.uttaksperiodeResultat.grad
+                sumAndreParter += annenPartsPeriode.grad
             }
         }
         return sumAndreParter

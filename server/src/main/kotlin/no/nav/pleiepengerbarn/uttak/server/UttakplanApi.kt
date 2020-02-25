@@ -7,8 +7,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.time.LocalDate
-import java.time.Month
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
@@ -54,14 +52,13 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplaner)
     }
 
-
-    private fun dummyUttaksplan() = Uttaksplan(listOf(
-            Uttaksperiode(
-                    periode = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)),
-                    uttaksperiodeResultat = UttaksperiodeResultat(
-                            grad = Prosent(100)
+    private fun dummyUttaksplan() = Uttaksplan(
+            perioder = mapOf(
+                    LukketPeriode("2020-01-01/2020-01-31") to InnvilgetPeriode(
+                            grad = Prosent(100),
+                            knekkpunktTyper = setOf()
                     )
             )
-    ))
+    )
 }
 

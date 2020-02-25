@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
 import java.time.LocalDate
 
 internal fun LukketPeriode.overlapper(periode: LukketPeriode) : Boolean {
@@ -31,8 +30,8 @@ internal fun Map<LukketPeriode, *>.overordnetPeriode() : LukketPeriode {
     return LukketPeriode(fom!!, tom!!)
 }
 
-internal fun Map<LukketPeriode, *>.sortertPåFom() = toSortedMap(compareBy { it.fom.toEpochDay() })
-internal fun Map<LukketPeriode, *>.sortertPåTom() = toSortedMap(compareBy { it.tom.toEpochDay() })
+internal fun Map<LukketPeriode, *>.sortertPåFom() = toSortedMap(compareBy { it.fom })
+internal fun Map<LukketPeriode, *>.sortertPåTom() = toSortedMap(compareBy { it.tom })
 
 internal fun LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode,*>) : List<LukketPeriode> {
     if (perioder.isEmpty()) return listOf(this)
@@ -72,7 +71,7 @@ internal fun LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode,*
     return inngårIkke.toList()
 }
 
-internal fun List<LukketPeriode>.overlappendePeriode(uttaksperiode: Uttaksperiode) = find {
-    (it.fom == uttaksperiode.periode.fom || it.fom.isBefore(uttaksperiode.periode.fom)) &&
-    (it.tom == uttaksperiode.periode.tom || it.tom.isAfter(uttaksperiode.periode.tom))
+internal fun List<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
+    (it.fom == periode.fom || it.fom.isBefore(periode.fom)) &&
+    (it.tom == periode.tom || it.tom.isAfter(periode.tom))
 }

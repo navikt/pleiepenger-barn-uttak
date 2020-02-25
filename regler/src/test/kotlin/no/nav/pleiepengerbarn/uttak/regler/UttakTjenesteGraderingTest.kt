@@ -32,10 +32,10 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(80))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(80))
     }
 
     @Test
@@ -52,10 +52,10 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(75))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(75))
     }
 
     @Test
@@ -67,20 +67,18 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                andrePartersUttaksplan = listOf(Uttaksplan(perioder = listOf(
-                        Uttaksperiode(periode = helePerioden, uttaksperiodeResultat = UttaksperiodeResultat(
-                                grad = Prosent(40)
-                        ))
+                andrePartersUttaksplan = listOf(
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
                 ))),
                 arbeidsforhold = listOf(
                         arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(60))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(60))
     }
 
 
@@ -101,10 +99,10 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
     }
 
 
@@ -125,10 +123,10 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
     }
 
     @Test
@@ -151,17 +149,9 @@ internal class UttakTjenesteGraderingTest {
                 )
         )
 
-        val uttaksplan = kjørRegler(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        sjekkInnvilget(uttaksplan.perioder[0], helePerioden, Prosent(60))
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(60))
 
     }
-
-    private fun kjørRegler(grunnlag: RegelGrunnlag):Uttaksplan {
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
-        PrintGrunnlagOgUttaksplan(grunnlag, uttaksplan).print()
-        return uttaksplan
-    }
-
-
 }
