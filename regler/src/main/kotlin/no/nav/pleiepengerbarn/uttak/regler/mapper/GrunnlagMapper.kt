@@ -4,21 +4,23 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.ikkeMedlem
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 
 object GrunnlagMapper {
 
     fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:List<Uttaksplan>): RegelGrunnlag {
 
+        val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
         return RegelGrunnlag(
                 tilsynsbehov = uttaksgrunnlag.tilsynsbehov.perioder.sortertPåFom(),
-                søknadsperioder = uttaksgrunnlag.søknadsperioder.sortertPåFom(),
+                søknadsperioder = søknadsperioderSortert,
                 arbeidsforhold = uttaksgrunnlag.arbeidsforhold.sorterteArbeidsforhold(),
                 //TODO tilsynsperioder = uttaksgrunnlag.tilsyn.perioder.sortertPåFom(),
                 tilsynsperioder = mapOf(),
                 ferier = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
-                andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner()
-                //TODO ikkeMedlem = uttaksgrunnlag.medlemskap.perioder....
+                andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner(),
+                ikkeMedlem = uttaksgrunnlag.medlemskap.perioder.ikkeMedlem(søknadsperioderSortert)
         )
     }
 

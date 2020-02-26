@@ -4,7 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.MedlemskapPeriodeInfo
 
 internal fun Map<LukketPeriode, MedlemskapPeriodeInfo>.ikkeMedlem(
-        søknadsperioder: Map<LukketPeriode, *>
+        søknadsperioder: List<LukketPeriode>
 ) : List<LukketPeriode> {
     val uttaksperiode = søknadsperioder.overordnetPeriode()
     return uttaksperiode.perioderSomIkkeInngårI(this)
