@@ -12,10 +12,10 @@ internal class MedlemskapTest {
     @Test
     internal fun `Utlede perioder man ikke er medlem`() {
 
-        val søknadsperioder = mapOf(
-                LukketPeriode(fom = LocalDate.parse("2020-03-14"), tom = LocalDate.parse("2020-03-25")) to true,
-                LukketPeriode(fom = LocalDate.parse("2020-02-24"), tom = LocalDate.parse("2020-02-29")) to true,
-                LukketPeriode(fom = LocalDate.parse("2020-03-05"), tom = LocalDate.parse("2020-03-10")) to true
+        val søknadsperioder = listOf(
+                LukketPeriode(fom = LocalDate.parse("2020-03-14"), tom = LocalDate.parse("2020-03-25")),
+                LukketPeriode(fom = LocalDate.parse("2020-02-24"), tom = LocalDate.parse("2020-02-29")),
+                LukketPeriode(fom = LocalDate.parse("2020-03-05"), tom = LocalDate.parse("2020-03-10"))
         )
 
         val medlem = mapOf(
@@ -43,14 +43,16 @@ internal class MedlemskapTest {
 
     @Test
     internal fun `Utlende perioder man ikke er medlem uten noen perioder som medlem`() {
-        val søknadsperioder = mapOf(
-                LukketPeriode(fom = LocalDate.parse("2020-03-14"), tom = LocalDate.parse("2020-03-25")) to true,
-                LukketPeriode(fom = LocalDate.parse("2020-02-24"), tom = LocalDate.parse("2020-02-29")) to true,
-                LukketPeriode(fom = LocalDate.parse("2020-03-05"), tom = LocalDate.parse("2020-03-10")) to true
+        val søknadsperioder = listOf(
+                LukketPeriode(fom = LocalDate.parse("2020-03-14"), tom = LocalDate.parse("2020-03-25")),
+                LukketPeriode(fom = LocalDate.parse("2020-02-24"), tom = LocalDate.parse("2020-02-29")),
+                LukketPeriode(fom = LocalDate.parse("2020-03-05"), tom = LocalDate.parse("2020-03-10"))
         )
+
         val medlem = emptyMap<LukketPeriode, MedlemskapPeriodeInfo>()
 
         val faktiskePerioderIkkeMedlem = medlem.ikkeMedlem(søknadsperioder)
+
         val forventedePerioderIkkeMedlem = listOf(
                 LukketPeriode(fom = LocalDate.parse("2020-02-24"), tom = LocalDate.parse("2020-03-25"))
         )
