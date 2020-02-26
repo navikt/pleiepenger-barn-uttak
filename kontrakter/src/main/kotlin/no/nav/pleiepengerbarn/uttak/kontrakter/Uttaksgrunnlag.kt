@@ -8,6 +8,6 @@ data class Uttaksgrunnlag (
         val arbeidsforhold: List<Arbeidsforhold>,
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val lovbestemtFerie: List<LukketPeriode> = listOf(),
-//TODO løses senere:        val tilsyn: Periodisert<TilsynPeriodeInfo>,
-        val medlemskap: Map<LukketPeriode, MedlemskapPeriodeInfo>
+        val tilsynsperioder: Map<LukketPeriode, Tilsyn> = mapOf(),
+        val medlemskap: Map<LukketPeriode, Medlemskap>
 )

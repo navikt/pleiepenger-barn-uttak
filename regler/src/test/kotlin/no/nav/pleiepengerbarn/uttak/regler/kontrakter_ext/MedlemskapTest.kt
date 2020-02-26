@@ -1,7 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.MedlemskapPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.Medlemskap
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -19,12 +19,12 @@ internal class MedlemskapTest {
         )
 
         val medlem = mapOf(
-                LukketPeriode(fom = LocalDate.parse("2020-02-25"), tom = LocalDate.parse("2020-02-27")) to MedlemskapPeriodeInfo(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-12"), tom = LocalDate.parse("2020-03-15")) to MedlemskapPeriodeInfo(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-08"), tom = LocalDate.parse("2020-03-10")) to MedlemskapPeriodeInfo(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-02-28"), tom = LocalDate.parse("2020-03-01")) to MedlemskapPeriodeInfo(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-17"), tom = LocalDate.parse("2020-03-18")) to MedlemskapPeriodeInfo(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-19"), tom = LocalDate.parse("2020-03-20")) to MedlemskapPeriodeInfo(frivilligMedlem = true)
+                LukketPeriode(fom = LocalDate.parse("2020-02-25"), tom = LocalDate.parse("2020-02-27")) to Medlemskap(frivilligMedlem = true),
+                LukketPeriode(fom = LocalDate.parse("2020-03-12"), tom = LocalDate.parse("2020-03-15")) to Medlemskap(frivilligMedlem = true),
+                LukketPeriode(fom = LocalDate.parse("2020-03-08"), tom = LocalDate.parse("2020-03-10")) to Medlemskap(frivilligMedlem = true),
+                LukketPeriode(fom = LocalDate.parse("2020-02-28"), tom = LocalDate.parse("2020-03-01")) to Medlemskap(frivilligMedlem = true),
+                LukketPeriode(fom = LocalDate.parse("2020-03-17"), tom = LocalDate.parse("2020-03-18")) to Medlemskap(frivilligMedlem = true),
+                LukketPeriode(fom = LocalDate.parse("2020-03-19"), tom = LocalDate.parse("2020-03-20")) to Medlemskap(frivilligMedlem = true)
         )
 
         val forventedePerioderIkkeMedlem = listOf(
@@ -49,7 +49,7 @@ internal class MedlemskapTest {
                 LukketPeriode(fom = LocalDate.parse("2020-03-05"), tom = LocalDate.parse("2020-03-10"))
         )
 
-        val medlem = emptyMap<LukketPeriode, MedlemskapPeriodeInfo>()
+        val medlem = emptyMap<LukketPeriode, Medlemskap>()
 
         val faktiskePerioderIkkeMedlem = medlem.ikkeMedlem(søknadsperioder)
 

@@ -16,8 +16,7 @@ object GrunnlagMapper {
                 tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeidsforhold = uttaksgrunnlag.arbeidsforhold.sorterteArbeidsforhold(),
-                //TODO tilsynsperioder = uttaksgrunnlag.tilsyn.perioder.sortertPåFom(),
-                tilsynsperioder = mapOf(),
+                tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 ferier = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
                 andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner(),
                 ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
