@@ -13,14 +13,14 @@ object GrunnlagMapper {
 
         val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
         return RegelGrunnlag(
-                tilsynsbehov = uttaksgrunnlag.tilsynsbehov.perioder.sortertPåFom(),
+                tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeidsforhold = uttaksgrunnlag.arbeidsforhold.sorterteArbeidsforhold(),
                 //TODO tilsynsperioder = uttaksgrunnlag.tilsyn.perioder.sortertPåFom(),
                 tilsynsperioder = mapOf(),
                 ferier = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
                 andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner(),
-                ikkeMedlem = uttaksgrunnlag.medlemskap.perioder.ikkeMedlem(søknadsperioderSortert)
+                ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
         )
     }
 
