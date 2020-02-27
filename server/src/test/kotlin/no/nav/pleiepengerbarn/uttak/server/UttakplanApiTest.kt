@@ -1,6 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import no.nav.pleiepengerbarn.uttak.kontrakter.InnvilgetPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,6 +15,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.test.context.ActiveProfiles
 import java.net.URI
+import java.time.LocalDate
+import java.time.Month
 
 private const val UTTAKSPLAN_PATH = "/uttaksplan"
 
@@ -60,9 +67,20 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
 
 
-        val response = restTemplate.exchange(request, Void::class.java)
+        val response = restTemplate.exchange(request, Uttaksplan::class.java)
+        val uttaksplan = response.body
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        assertThat(uttaksplan).isNotNull()
+        assertThat(uttaksplan?.perioder?.keys).hasSize(1)
+        val periode = uttaksplan?.perioder?.keys?.first()
+        val info = uttaksplan?.perioder?.get(periode)
+        assertThat(periode).isEqualTo(LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.MARCH, 31)))
+        assertThat(info?.knekkpunktTyper()).isEmpty()
+        assertTrue(info is InnvilgetPeriode)
+        val innvilgetPeriode = info as InnvilgetPeriode
+        assertThat(innvilgetPeriode.grad).isEqualByComparingTo(Prosent(100))
     }
 
 }

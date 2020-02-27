@@ -8,7 +8,7 @@ data class LukketPeriode (
         val fom: LocalDate,
         val tom: LocalDate) {
     @get:JsonValue
-    val iso8601: String = "$tom/$tom"
+    val iso8601: String = "$fom/$tom"
 
     private companion object {
         private fun fom(iso8601: String) = LocalDate.parse(iso8601.split("/")[0])
