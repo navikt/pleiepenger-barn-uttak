@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
+import no.nav.pleiepengerbarn.uttak.regler.delregler.SøkersDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 
@@ -15,6 +16,10 @@ internal object UttaksplanRegler {
             MedlemskapRegel(),
             FerieRegel(),
             TilsynsbehovRegel()
+    )
+
+    private val UttaksplanRegler = linkedSetOf(
+            SøkersDødRegel()
     )
 
     internal fun fastsettUtaksplan(
@@ -52,6 +57,14 @@ internal object UttaksplanRegler {
                 }
             }
         }
-        return Uttaksplan(perioder = perioder)
+        var uttaksplan = Uttaksplan(perioder = perioder)
+
+        UttaksplanRegler.forEach {uttaksplanRegler ->
+            uttaksplan = uttaksplanRegler.kjør(
+                    uttaksplan = uttaksplan,
+                    grunnlag = grunnlag
+            )
+        }
+        return uttaksplan
     }
 }
