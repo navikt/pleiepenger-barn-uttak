@@ -44,6 +44,9 @@ internal class SøkersDødRegelTest {
                 grunnlag = grunnlag
         )
 
+
+        assertEquals(4, uttaksplan.perioder.size)
+
         uttaksplan.print(grunnlag)
 
         sjekkInnvilget(
