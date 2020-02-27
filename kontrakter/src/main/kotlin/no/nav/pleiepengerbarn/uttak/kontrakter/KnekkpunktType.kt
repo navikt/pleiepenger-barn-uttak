@@ -6,5 +6,6 @@ enum class KnekkpunktType {
     TILSYNSPERIODE,
     ANNEN_PARTS_UTTAK,
     ARBEID,
-    IKKE_MEDLEM
+    IKKE_MEDLEM,
+    SØKERS_DØDSFALL
 }
