@@ -11,7 +11,7 @@ internal object UttaksplanRegler {
 
     private val NEDRE_GRENSE_FOR_UTTAK = Prosent(20)
 
-    private val Regler = linkedSetOf(
+    private val PeriodeRegler = linkedSetOf(
             MedlemskapRegel(),
             FerieRegel(),
             TilsynsbehovRegel()
@@ -25,7 +25,7 @@ internal object UttaksplanRegler {
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
             val avslagsÅrsaker = mutableSetOf<AvslåttPeriodeÅrsak>()
-            Regler.forEach { regel ->
+            PeriodeRegler.forEach { regel ->
                 val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
                 if (utfall is Avslått) {
                     avslagsÅrsaker.add(utfall.avslagsÅrsak)
