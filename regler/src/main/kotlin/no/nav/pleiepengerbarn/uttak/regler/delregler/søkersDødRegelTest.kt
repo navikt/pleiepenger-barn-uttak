@@ -47,7 +47,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     put(periodeFremTilDødsfall, uttaksperiode.value)
 
     // Andre delen av perioden avslås.
-    // Om periden allerede var avlsått får den en ny avslagsårsak - SØKERS_DØDSFALL
+    // Legges til en ny avslagsårsak - SØKERS_DØDSFALL
     // Får alltid et nytt knekkpukt - SØKERS_DØDSFALL
     val periodeEtterDødsfall = LukketPeriode(
             fom = dødsdato.plusDays(1),
@@ -73,8 +73,8 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
         dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, periodeInfo) ->
         /*
-            1. Avslåtte perioder forblir avslåtte, men det blir lagt til en ny avslagsårsak (SØKERS_DØDSFALL)
-            2. Innnvilgede perioder blir avslått med avslagsårsak SØKERS_DØDSFALL
+            1. Avslåtte perioder forblir avslåtte, men det blir lagt til en ny avslagsårsak - SØKERS_DØDSFALL
+            2. Innnvilgede perioder blir avslått med avslagsårsak - SØKERS_DØDSFALL
          */
         if (periodeInfo is AvslåttPeriode) {
             val avslagsÅrsaker = periodeInfo
