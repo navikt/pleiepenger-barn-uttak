@@ -7,33 +7,16 @@ import java.math.RoundingMode
 
 internal object GradBeregner {
 
-    internal fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
-        val tilsynsbehov = finnTilsynsbehov(periode, grunnlag)
-        val andreParter = finnSumAndreParter(periode, grunnlag)
+    internal fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent{
 
-        val sumForventetInntekt = finnSumForventetInntekt(periode, grunnlag)
-        val sumFaktiskInntekt = finnSumFaktiskInntekt(periode, grunnlag)
-
-        var fårJobbetProsent = BigDecimal.ZERO
-        if (sumForventetInntekt.compareTo(BigDecimal.ZERO) != 0) {
-            fårJobbetProsent = sumFaktiskInntekt / sumForventetInntekt
-        }
-        val tilsynProsent = finnTilsyn(periode, grunnlag)
-
-        val gjenværendeTilsynsbehovProsent = tilsynsbehov - andreParter
-
-
-        val utbetalingsgrad = Prosent(100) - max(fårJobbetProsent, tilsynProsent)
-        if (utbetalingsgrad > gjenværendeTilsynsbehovProsent) {
-            return gjenværendeTilsynsbehovProsent
-        }
-        return utbetalingsgrad
+        return Prosent(100)
     }
 
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         var sumAndreParter = Prosent.ZERO
         grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
-            val annenPartsPeriode = uttaksplan.perioder
+
+        val annenPartsPeriode = uttaksplan.perioder
                     .filter { overlapper(it.key, periode) }
                     .filter { it.value is InnvilgetPeriode }
                     .values.firstOrNull() as InnvilgetPeriode?
@@ -45,33 +28,6 @@ internal object GradBeregner {
         return sumAndreParter
     }
 
-    private fun finnSumForventetInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
-        var sumForventetInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeid.forEach { arbeidsforholdOgPerioder ->
-            val overlappendePeriode = arbeidsforholdOgPerioder.perioder.keys.find { overlapper(it, periode)}
-            if (overlappendePeriode != null) {
-                val inntekt = arbeidsforholdOgPerioder.perioder[overlappendePeriode]?.inntekt
-                if (inntekt != null) {
-                    sumForventetInntekt += inntekt
-                }
-            }
-        }
-        return sumForventetInntekt
-    }
-
-    private fun finnSumFaktiskInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
-        var sumFaktiskInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeid.forEach { arbeidsforholdOgPerioder ->
-            val overlappendePeriode = arbeidsforholdOgPerioder.perioder.keys.find { overlapper(it, periode)}
-            if (overlappendePeriode != null) {
-                val arbeidsforholdPeriodeInfo = arbeidsforholdOgPerioder.perioder[overlappendePeriode]
-                if (arbeidsforholdPeriodeInfo != null) {
-                    sumFaktiskInntekt += arbeidsforholdPeriodeInfo.arbeidsprosent.setScale(2, RoundingMode.HALF_EVEN)*arbeidsforholdPeriodeInfo.inntekt
-                }
-            }
-        }
-        return sumFaktiskInntekt
-    }
 
     private fun finnTilsyn(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         val tilsyn = grunnlag.tilsynsperioder.entries.find { overlapper(it.key, periode) }

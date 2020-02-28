@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
+import java.time.Duration
 import java.util.*
 
 data class Arbeidsforhold(
@@ -19,6 +20,10 @@ data class ArbeidsforholdOgArbeidsperioder(val arbeidsforhold: Arbeidsforhold, v
 
 
 data class ArbeidInfo(
-        val inntekt:Beløp,
-        val arbeidsprosent: Prosent = Prosent.ZERO
-)
+        val jobberNormalt: Duration,
+        val skalJobbe: Prosent
+) {
+    fun arbeidsprosent(): Prosent {
+        return skalJobbe
+    }
+}

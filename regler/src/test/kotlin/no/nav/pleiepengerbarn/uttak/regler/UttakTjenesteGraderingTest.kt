@@ -4,12 +4,17 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
 import java.util.*
 
+@Disabled
 internal class UttakTjenesteGraderingTest {
+
+    private companion object {val FULL_UKE = Duration.ofHours(37).plusMinutes(30)}
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID())
     private val arbeidsforhold2 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID())
@@ -48,7 +53,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 )
         )
 
@@ -71,7 +76,7 @@ internal class UttakTjenesteGraderingTest {
                         Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
                 ))),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 )
         )
 
@@ -92,7 +97,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(35))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -116,7 +121,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -139,11 +144,11 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(40)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(20)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(80)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(0))))
 
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(2000), arbeidsprosent = Prosent(40)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1500), arbeidsprosent = Prosent(20)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(40))

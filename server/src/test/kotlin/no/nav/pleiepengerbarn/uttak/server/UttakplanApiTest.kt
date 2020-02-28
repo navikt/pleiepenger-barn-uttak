@@ -26,7 +26,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     fun `Opprett uttaksplan`() {
-
         val requestBody = """
             {
                 "sakId": "123",
@@ -43,8 +42,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         },
                         "perioder": {
                             "2020-01-01/2020-03-31": {
-                                "inntekt": 1000,
-                                "arbeidsprosent": 0
+                                "jobberNormalt": "PT7H30M",
+                                "skalJobbe": "0"
                             }
                         }
                     }
@@ -61,6 +60,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 }
             }
         """.trimIndent()
+
 
         val request = RequestEntity
                 .post(URI.create(UTTAKSPLAN_PATH))

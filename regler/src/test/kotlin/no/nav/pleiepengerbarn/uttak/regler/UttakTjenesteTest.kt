@@ -5,10 +5,12 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
 
+@Disabled
 internal class UttakTjenesteTest {
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789")
