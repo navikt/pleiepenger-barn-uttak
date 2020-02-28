@@ -12,6 +12,7 @@ object GrunnlagMapper {
 
         val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
         return RegelGrunnlag(
+                søker = uttaksgrunnlag.søker,
                 tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeid = uttaksgrunnlag.arbeid,

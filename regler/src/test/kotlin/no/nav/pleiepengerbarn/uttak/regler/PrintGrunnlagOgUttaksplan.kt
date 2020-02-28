@@ -12,6 +12,10 @@ internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : Uttakspl
     return uttaksplan
 }
 
+internal fun Uttaksplan.print(grunnlag: RegelGrunnlag) {
+    PrintGrunnlagOgUttaksplan(grunnlag, this).print()
+}
+
 
 private class PrintGrunnlagOgUttaksplan(
         private val grunnlag: RegelGrunnlag,

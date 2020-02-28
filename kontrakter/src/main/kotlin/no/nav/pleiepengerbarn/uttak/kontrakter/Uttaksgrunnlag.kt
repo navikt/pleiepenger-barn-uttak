@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 data class Uttaksgrunnlag (
+        val søker: Søker = Søker(),
         val sakId: SakId,
         val behandlingId: BehandlingId,
         val søknadsperioder: List<LukketPeriode>,
