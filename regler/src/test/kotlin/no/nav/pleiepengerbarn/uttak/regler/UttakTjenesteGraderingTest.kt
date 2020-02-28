@@ -48,7 +48,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25)))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 )
         )
 
@@ -71,7 +71,7 @@ internal class UttakTjenesteGraderingTest {
                         Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
                 ))),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25)))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 )
         )
 
@@ -92,7 +92,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35)))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -116,7 +116,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25)))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -140,10 +140,10 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = listOf(
 
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(2000), arbeidsprosent = Prosent(40))))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1500), arbeidsprosent = Prosent(20))))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80))))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, Arbeid(mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0)))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(2000), arbeidsprosent = Prosent(40)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1500), arbeidsprosent = Prosent(20)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(helePerioden to ArbeidInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(40))

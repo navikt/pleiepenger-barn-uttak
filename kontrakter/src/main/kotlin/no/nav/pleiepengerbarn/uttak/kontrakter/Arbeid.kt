@@ -15,14 +15,10 @@ data class Arbeidsforhold(
     }
 }
 
-data class Arbeid(
-        val perioder: Map<LukketPeriode, ArbeidsforholdPeriodeInfo> = mapOf()
-)
-
-data class ArbeidsforholdOgArbeidsperioder(val arbeidsforhold: Arbeidsforhold, val arbeid:Arbeid = Arbeid())
+data class ArbeidsforholdOgArbeidsperioder(val arbeidsforhold: Arbeidsforhold, val perioder: Map<LukketPeriode, ArbeidInfo> = mapOf())
 
 
-data class ArbeidsforholdPeriodeInfo(
+data class ArbeidInfo(
         val inntekt:Beløp,
         val arbeidsprosent: Prosent = Prosent.ZERO
 )

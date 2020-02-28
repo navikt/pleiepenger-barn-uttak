@@ -1,6 +1,5 @@
 package no.nav.pleiepengerbarn.uttak.regler.mapper
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeid
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -22,10 +21,6 @@ object GrunnlagMapper {
                 ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
         )
     }
-
-    private fun List<Arbeid>.sorterteArbeidsforhold() = map { it.copy(
-            perioder = it.perioder.sortertPåFom()
-    )}
 
     private fun List<Uttaksplan>.sorterteUttaksplaner() = map { it.copy(
             perioder = it.perioder.sortertPåFom()
