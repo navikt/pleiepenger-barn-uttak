@@ -23,8 +23,8 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1)
                 )
         )
 
@@ -100,7 +100,7 @@ internal class UttakTjenesteTest {
 
     @Test
     fun `Kun medlem i slutten av søknadsperioden`() {
-        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25");
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25")
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
                         søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)

@@ -47,10 +47,10 @@ internal object GradBeregner {
 
     private fun finnSumForventetInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
         var sumForventetInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeidsforhold.forEach { arbeidsforhold ->
-            val overlappendePeriode = arbeidsforhold.perioder.keys.find { overlapper(it, periode)}
+        grunnlag.arbeid.forEach { arbeidsforholdOgPerioder ->
+            val overlappendePeriode = arbeidsforholdOgPerioder.arbeid.perioder.keys.find { overlapper(it, periode)}
             if (overlappendePeriode != null) {
-                val inntekt = arbeidsforhold.perioder[overlappendePeriode]?.inntekt
+                val inntekt = arbeidsforholdOgPerioder.arbeid.perioder[overlappendePeriode]?.inntekt
                 if (inntekt != null) {
                     sumForventetInntekt += inntekt
                 }
@@ -61,10 +61,10 @@ internal object GradBeregner {
 
     private fun finnSumFaktiskInntekt(periode:LukketPeriode, grunnlag: RegelGrunnlag):Beløp {
         var sumFaktiskInntekt = Beløp.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-        grunnlag.arbeidsforhold.forEach { arbeidsforhold ->
-            val overlappendePeriode = arbeidsforhold.perioder.keys.find { overlapper(it, periode)}
+        grunnlag.arbeid.forEach { arbeidsforholdOgPerioder ->
+            val overlappendePeriode = arbeidsforholdOgPerioder.arbeid.perioder.keys.find { overlapper(it, periode)}
             if (overlappendePeriode != null) {
-                val arbeidsforholdPeriodeInfo = arbeidsforhold.perioder[overlappendePeriode]
+                val arbeidsforholdPeriodeInfo = arbeidsforholdOgPerioder.arbeid.perioder[overlappendePeriode]
                 if (arbeidsforholdPeriodeInfo != null) {
                     sumFaktiskInntekt += arbeidsforholdPeriodeInfo.arbeidsprosent.setScale(2, RoundingMode.HALF_EVEN)*arbeidsforholdPeriodeInfo.inntekt
                 }
