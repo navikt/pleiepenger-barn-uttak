@@ -58,7 +58,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     val knekkpunktTyper = uttaksPeriodeInfo
             .knekkpunktTyper()
             .toMutableSet()
-            .apply { this.add(KnekkpunktType.SØKERS_DØDSFALL) }
+            .also { it.add(KnekkpunktType.SØKERS_DØDSFALL) }
 
     val avslagsÅrsaker = (if (uttaksPeriodeInfo is AvslåttPeriode) uttaksPeriodeInfo.avslagsÅrsaker.toMutableSet() else mutableSetOf()).also {
         it.add(AvslåttPeriodeÅrsak.SØKERS_DØDSFALL)
