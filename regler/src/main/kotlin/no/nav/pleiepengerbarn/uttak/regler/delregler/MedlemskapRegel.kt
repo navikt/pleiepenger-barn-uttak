@@ -5,7 +5,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
 
-internal class MedlemskapRegel : Regel {
+internal class MedlemskapRegel : PeriodeRegel {
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Utfall {
         grunnlag.ikkeMedlem.overlappendePeriode(periode)?.apply {
             return Avslått(avslagsÅrsak = AvslåttPeriodeÅrsak.IKKE_MEDLEM)
