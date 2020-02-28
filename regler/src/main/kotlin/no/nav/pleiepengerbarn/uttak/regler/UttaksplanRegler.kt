@@ -47,7 +47,9 @@ internal object UttaksplanRegler {
                 } else {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            grad = grad
+                            grad = grad,
+                            utbetalingsgrader = listOf() //TODO
+
                     )
                 }
             }

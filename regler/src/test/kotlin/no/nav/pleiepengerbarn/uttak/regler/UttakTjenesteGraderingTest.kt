@@ -73,7 +73,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40), utbetalingsgrader = listOf(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold1, Prosent(40))))
                 ))),
                 arbeid = listOf(
                         ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
