@@ -37,9 +37,9 @@ internal object UttaksplanRegler {
                         avslagsÅrsaker = avslagsÅrsaker.toSet()
                 )
             } else {
-                val grad = GradBeregner.beregnGrad(periode, grunnlag)
+                val grader = GradBeregner.beregnGrader(periode, grunnlag)
 
-                if (grad < NEDRE_GRENSE_FOR_UTTAK) {
+                if (grader.grad < NEDRE_GRENSE_FOR_UTTAK) {
                     perioder[periode] = AvslåttPeriode(
                             knekkpunktTyper = knekkpunktTyper,
                             avslagsÅrsaker = setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD)
@@ -47,8 +47,8 @@ internal object UttaksplanRegler {
                 } else {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            grad = grad,
-                            utbetalingsgrader = listOf() //TODO
+                            grad = grader.grad,
+                            utbetalingsgrader = konverter(grader.utbetalingsgrader)
 
                     )
                 }
@@ -56,4 +56,13 @@ internal object UttaksplanRegler {
         }
         return Uttaksplan(perioder = perioder)
     }
+
+    private fun konverter(utbetalingsgrader: Map<Arbeidsforhold, Prosent>):List<ArbeidsforholdOgUtbetalingsgrad> {
+        val arbeidsforholdOgUtbetalingsgrader = mutableListOf<ArbeidsforholdOgUtbetalingsgrad>()
+        utbetalingsgrader.forEach { (arbeidsforhold, grad) ->
+            arbeidsforholdOgUtbetalingsgrader.add(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold, grad))
+        }
+        return arbeidsforholdOgUtbetalingsgrader
+    }
+
 }

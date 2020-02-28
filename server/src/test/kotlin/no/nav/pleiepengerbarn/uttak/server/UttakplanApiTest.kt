@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,6 +25,7 @@ private const val UTTAKSPLAN_PATH = "/uttaksplan"
 @ActiveProfiles("test")
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
+    @Disabled
     @Test
     fun `Opprett uttaksplan`() {
         val requestBody = """

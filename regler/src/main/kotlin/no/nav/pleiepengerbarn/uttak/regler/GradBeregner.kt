@@ -2,14 +2,65 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.DayOfWeek
+import java.time.Duration
 
+/**
+ * https://confluence.adeo.no/display/SIF/Beskrivelse+av+uttakskomponenten
+ */
 internal object GradBeregner {
 
-    internal fun beregnGrad(periode: LukketPeriode, grunnlag: RegelGrunnlag):Prosent{
+    private val TilsynsGrad = Prosent(0)
+    private val TakForYtelsePåGrunnAvTilsyn = Prosent(100)
+    private val GraderingsfaktorPåGrunnAvTilsynIPerioden = Prosent(100)
+    private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
-        return Prosent(100)
+    internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
+        val fraværsGrader = mutableMapOf<Arbeidsforhold, Prosent>()
+        var sumAvFraværIPerioden: Duration = Duration.ZERO
+
+
+        val antallVirketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
+        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager()) //TODO ta hensyn til tilsyn
+
+        grunnlag.arbeid.forEach { arbeidsforholdOgArbeidsperioder ->
+            arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
+                it.key.overlapper(periode)
+            }?.apply {
+                val fraværIPerioden = this.value.fraværIPerioden()
+                sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
+                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = Prosent(fraværIPerioden.dividedBy(this.value.jobberNormalt) * 100)
+            }
+        }
+
+        return Grader(
+                grad = beregnGrad(TakForYtelsePåGrunnAvTilsyn, TilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden),
+                utbetalingsgrader = fraværsGrader.onEach {
+                    it.value * GraderingsfaktorPåGrunnAvTilsynIPerioden / Prosent(100)
+                }
+        )
+
+    }
+
+
+    private fun beregnGrad(takForYtelsePåGrunnAvTilsyn:Prosent, tilsynsGradIPerioden:Prosent, sumAvFraværIPerioden:Duration, antallVirketimerIPerioden:Duration, maksimaltAntallVirketimerViKanGiYtelseForIPerioden:Duration):Prosent {
+        if (tilsynsGradIPerioden > Prosent(80)) {
+            return Prosent(0)
+        }
+        if (sumAvFraværIPerioden < antallVirketimerIPerioden) {
+            if (sumAvFraværIPerioden < maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
+                return BigDecimal(sumAvFraværIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+            } else {
+                return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+            }
+
+        } else {
+            return takForYtelsePåGrunnAvTilsyn
+        }
+
     }
 
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
@@ -60,3 +111,25 @@ internal object GradBeregner {
 
 
 }
+
+private fun LukketPeriode.antallVirkedager(): Long {
+    var nåværende = fom
+    var antall = 0L
+    while (!nåværende.isAfter(tom)) {
+        if (!(nåværende.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))) {
+            antall++
+        }
+        nåværende = nåværende.plusDays(1)
+    }
+    return antall
+}
+
+private fun ArbeidInfo.fraværIPerioden(): Duration {
+    val millis = skalJobbe.longValueExact() * jobberNormalt.toMillis() / 100
+    return if (millis < 0) Duration.ZERO else Duration.ofMillis(millis)
+}
+
+data class Grader(
+        val grad: Prosent,
+        val utbetalingsgrader: Map<Arbeidsforhold, Prosent>
+)
