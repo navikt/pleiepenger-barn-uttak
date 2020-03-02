@@ -11,7 +11,6 @@ import java.time.LocalDate
 import java.time.Month
 import java.util.*
 
-@Disabled
 internal class UttakTjenesteGraderingTest {
 
     private companion object {val FULL_UKE = Duration.ofHours(37).plusMinutes(30)}
@@ -23,6 +22,7 @@ internal class UttakTjenesteGraderingTest {
 
     private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
 
+    @Disabled
     @Test
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
@@ -111,6 +111,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
 
+    @Disabled
     @Test
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
@@ -134,6 +135,7 @@ internal class UttakTjenesteGraderingTest {
         sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
     }
 
+    @Disabled
     @Test
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot tilsyn`() {
         val grunnlag = RegelGrunnlag(

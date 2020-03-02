@@ -25,7 +25,6 @@ private const val UTTAKSPLAN_PATH = "/uttaksplan"
 @ActiveProfiles("test")
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
-    @Disabled
     @Test
     fun `Opprett uttaksplan`() {
         val requestBody = """

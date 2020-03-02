@@ -30,14 +30,16 @@ internal object GradBeregner {
             arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
-                val fraværIPerioden = this.value.fraværIPerioden()
+                val fraværIPerioden = this.value.fraværIPerioden(periode)
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
-                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = Prosent(fraværIPerioden.dividedBy(this.value.jobberNormalt) * 100)
+                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = Prosent(fraværIPerioden.dividedBy(antallVirketimerIPerioden) * 100)
             }
         }
 
+        val uavkortetGrad = beregnGrad(TakForYtelsePåGrunnAvTilsyn, TilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden)
+        val avkortetGrad = finnAvkortetGrad(periode, grunnlag, uavkortetGrad)
         return Grader(
-                grad = beregnGrad(TakForYtelsePåGrunnAvTilsyn, TilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden),
+                grad = avkortetGrad,
                 utbetalingsgrader = fraværsGrader.onEach {
                     it.value * GraderingsfaktorPåGrunnAvTilsynIPerioden / Prosent(100)
                 }
@@ -52,7 +54,7 @@ internal object GradBeregner {
         }
         if (sumAvFraværIPerioden < antallVirketimerIPerioden) {
             if (sumAvFraværIPerioden < maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
-                return BigDecimal(sumAvFraværIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+                return Prosent.valueOf(100) - BigDecimal(sumAvFraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
             } else {
                 return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
             }
@@ -62,6 +64,19 @@ internal object GradBeregner {
         }
 
     }
+
+    private fun finnAvkortetGrad(periode:LukketPeriode, grunnlag: RegelGrunnlag, uavkortetGrad:Prosent):Prosent {
+        val tilsynsbehov = finnTilsynsbehov(periode, grunnlag)
+        val sumAndreParter =  finnSumAndreParter(periode, grunnlag)
+        val tilgjengeligRestGrad = tilsynsbehov - sumAndreParter
+        if (tilgjengeligRestGrad < Prosent(0)) {
+            return Prosent(0)
+        }
+        if (uavkortetGrad >= tilgjengeligRestGrad) {
+            return tilgjengeligRestGrad }
+        return uavkortetGrad
+    }
+
 
     private fun finnSumAndreParter(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         var sumAndreParter = Prosent.ZERO
@@ -124,8 +139,10 @@ private fun LukketPeriode.antallVirkedager(): Long {
     return antall
 }
 
-private fun ArbeidInfo.fraværIPerioden(): Duration {
-    val millis = skalJobbe.longValueExact() * jobberNormalt.toMillis() / 100
+private fun ArbeidInfo.fraværIPerioden(periode:LukketPeriode): Duration {
+    val jobberNormaltPerVirkedag = jobberNormalt.dividedBy(5)
+    val kunneJobbetIPerioden = jobberNormaltPerVirkedag.multipliedBy(periode.antallVirkedager())
+    val millis = skalJobbe.longValueExact() * kunneJobbetIPerioden.toMillis() / 100
     return if (millis < 0) Duration.ZERO else Duration.ofMillis(millis)
 }
 
