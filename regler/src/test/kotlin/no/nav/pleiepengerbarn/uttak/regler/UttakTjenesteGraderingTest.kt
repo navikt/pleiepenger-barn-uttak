@@ -133,6 +133,28 @@ internal class UttakTjenesteGraderingTest {
         sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
     }
 
+
+    @Test
+    fun `En uttaksperiode med gradering i en deltidsjobb`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.dividedBy(2), skalJobbe = Prosent(25))))
+                )
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertTrue(uttaksplan.perioder.size == 1)
+        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent("87.5"))
+    }
+
+
     @Test
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot tilsyn`() {
         val grunnlag = RegelGrunnlag(

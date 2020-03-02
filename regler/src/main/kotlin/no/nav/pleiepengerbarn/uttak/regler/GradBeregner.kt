@@ -14,7 +14,7 @@ import java.time.Duration
  * https://confluence.adeo.no/display/SIF/Beskrivelse+av+uttakskomponenten
  */
 internal object GradBeregner {
-    private val HUNDRE_PROSENT = Prosent.valueOf(100)
+    private val HUNDRE_PROSENT = Prosent.valueOf(100).setScale(2, RoundingMode.HALF_UP)
 
     private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
@@ -58,7 +58,7 @@ internal object GradBeregner {
         }
         if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
             if (sumAvFraværIPerioden <= maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
-                val avkortetMotArbeid = HUNDRE_PROSENT - BigDecimal(sumAvFraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+                val avkortetMotArbeid = HUNDRE_PROSENT - HUNDRE_PROSENT * BigDecimal(sumAvFraværIPerioden.toMillis()) / BigDecimal(antallVirketimerIPerioden.toMillis())
                 return if (avkortetMotArbeid < takForYtelsePåGrunnAvTilsyn) avkortetMotArbeid else takForYtelsePåGrunnAvTilsyn
             } else {
                 return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
