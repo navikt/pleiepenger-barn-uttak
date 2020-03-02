@@ -8,14 +8,14 @@ import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.Duration
 
+
+
 /**
  * https://confluence.adeo.no/display/SIF/Beskrivelse+av+uttakskomponenten
  */
 internal object GradBeregner {
+    private val HUNDRE_PROSENT = Prosent.valueOf(100)
 
-    private val TilsynsGrad = Prosent(0)
-    private val TakForYtelsePåGrunnAvTilsyn = Prosent(100)
-    private val GraderingsfaktorPåGrunnAvTilsynIPerioden = Prosent(100)
     private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
@@ -24,7 +24,8 @@ internal object GradBeregner {
 
 
         val antallVirketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
-        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager()) //TODO ta hensyn til tilsyn
+        val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(periode, grunnlag)
+        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = Duration.ofMillis((BigDecimal(EnVirkedag.multipliedBy(periode.antallVirkedager()).toMillis()) * takForYtelsePåGrunnAvTilsyn / HUNDRE_PROSENT).toLong())
 
         grunnlag.arbeid.forEach { arbeidsforholdOgArbeidsperioder ->
             arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
@@ -36,12 +37,15 @@ internal object GradBeregner {
             }
         }
 
-        val uavkortetGrad = beregnGrad(TakForYtelsePåGrunnAvTilsyn, TilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden)
+
+        val tilsynsGrad = finnTilsyn(periode, grunnlag)
+        val uavkortetGrad = beregnGrad(takForYtelsePåGrunnAvTilsyn, tilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden)
         val avkortetGrad = finnAvkortetGrad(periode, grunnlag, uavkortetGrad)
+        val graderingsfaktorPåGrunnAvTilsynIPerioden = finnGraderingsfaktorPåGrunnAvTilsynIPerioden(takForYtelsePåGrunnAvTilsyn,sumAvFraværIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden, antallVirketimerIPerioden)
         return Grader(
                 grad = avkortetGrad,
                 utbetalingsgrader = fraværsGrader.onEach {
-                    it.value * GraderingsfaktorPåGrunnAvTilsynIPerioden / Prosent(100)
+                    it.value * graderingsfaktorPåGrunnAvTilsynIPerioden / HUNDRE_PROSENT
                 }
         )
 
@@ -52,9 +56,10 @@ internal object GradBeregner {
         if (tilsynsGradIPerioden > Prosent(80)) {
             return Prosent(0)
         }
-        if (sumAvFraværIPerioden < antallVirketimerIPerioden) {
-            if (sumAvFraværIPerioden < maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
-                return Prosent.valueOf(100) - BigDecimal(sumAvFraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+        if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
+            if (sumAvFraværIPerioden <= maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
+                val avkortetMotArbeid = HUNDRE_PROSENT - BigDecimal(sumAvFraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+                return if (avkortetMotArbeid < takForYtelsePåGrunnAvTilsyn) avkortetMotArbeid else takForYtelsePåGrunnAvTilsyn
             } else {
                 return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
             }
@@ -94,6 +99,35 @@ internal object GradBeregner {
         return sumAndreParter
     }
 
+    private fun finnTakForYtelsePåGrunnAvTilsyn(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
+        val tilsyn = finnTilsyn(periode, grunnlag)
+        if (tilsyn < Prosent(10)) {
+            return Prosent(100).setScale(2, RoundingMode.HALF_EVEN)
+        } else {
+            if (tilsyn > Prosent(80)) {
+                return Prosent.ZERO
+            }
+            return Prosent(100).setScale(2, RoundingMode.HALF_EVEN) - tilsyn
+        }
+    }
+
+
+    private fun finnGraderingsfaktorPåGrunnAvTilsynIPerioden(takForYtelsePåGrunnAvTilsyn:Prosent, sumAvFraværIPerioden: Duration, maksimaltAntallVirketimerViKanGiYtelseForIPerioden:Duration, antallVirketimerIPerioden:Duration):Prosent {
+        if (takForYtelsePåGrunnAvTilsyn.compareTo(Prosent.ZERO)==0) {
+            return Prosent.ZERO
+        }
+        if (takForYtelsePåGrunnAvTilsyn.compareTo(HUNDRE_PROSENT)==0) {
+            return HUNDRE_PROSENT
+        }
+        if (sumAvFraværIPerioden <= maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
+            return HUNDRE_PROSENT
+        }
+        if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
+            return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()) / (BigDecimal(sumAvFraværIPerioden.toMillis())) * Prosent(100)
+        }
+        return takForYtelsePåGrunnAvTilsyn
+    }
+
 
     private fun finnTilsyn(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         val tilsyn = grunnlag.tilsynsperioder.entries.find { overlapper(it.key, periode) }
@@ -106,7 +140,7 @@ internal object GradBeregner {
     private fun finnTilsynsbehov(periode:LukketPeriode, grunnlag: RegelGrunnlag):Prosent {
         val tilsynsbehovSomOverlapperMedPeriode = grunnlag.tilsynsbehov.entries.find { overlapper(it.key, periode) }
         return when (tilsynsbehovSomOverlapperMedPeriode?.value?.prosent) {
-            TilsynsbehovStørrelse.PROSENT_100 -> Prosent(100)
+            TilsynsbehovStørrelse.PROSENT_100 -> HUNDRE_PROSENT
             TilsynsbehovStørrelse.PROSENT_200 -> Prosent(200)
             else -> Prosent.ZERO
         }.setScale(2, RoundingMode.HALF_EVEN)
