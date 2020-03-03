@@ -18,13 +18,24 @@ internal class Desimal(bigDecimal: BigDecimal) {
         private val ToHundre = fraDouble(200.00)
     }
 
+    // Gjør at vi kan stole på bruk av == mellom Desimal
     override fun equals(other: Any?): Boolean {
         return if (other == null || other !is Desimal) false
         else compareTo(other) == 0
     }
     override fun hashCode() = value?.hashCode() ?: 0
     override fun toString(): String = value.toPlainString()
-    operator fun compareTo(other: Desimal) = value.compareTo(other.value)
+
+    // Bruke <=> mellom Desimal
+    internal operator fun compareTo(other: Desimal) = value.compareTo(other.value)
+    // Bruke + mellom Desimal
+    internal operator fun plus(annen: Desimal) = Desimal(value.add(annen.value))
+    // Bruke - mellom Desimal
+    internal operator fun minus(annen: Desimal) = Desimal(value.subtract(annen.value))
+    // Bruke * mellom Desimal
+    internal operator fun times(annen: Desimal) = Desimal(value.multiply(annen.value))
+    // Bruke / mellom Desimal
+    internal operator fun div(annen: Desimal) = Desimal(value.divide(annen.value, Scale, RoundingMode))
 
     internal fun fraFaktorTilProsent() = this * EtHundre
     internal fun fraProsentTilFaktor() = this / EtHundre
@@ -33,17 +44,9 @@ internal class Desimal(bigDecimal: BigDecimal) {
     internal fun erEtHundre() = equals(EtHundre)
     internal fun erToHundre() = equals(ToHundre)
 
-    internal val value = bigDecimal.setScale(Scale, RoundingMode) // Context ?
+    private val value = bigDecimal.setScale(Scale, RoundingMode)
 }
 
-// Bruke + mellom Desimal
-internal operator fun Desimal.plus(annen: Desimal) = Desimal(value.add(annen.value))
-// Bruke - mellom Desimal
-internal operator fun Desimal.minus(annen: Desimal) = Desimal(value.subtract(annen.value))
-// Bruke * mellom Desimal
-internal operator fun Desimal.times(annen: Desimal) = Desimal(value.multiply(annen.value))
-// Bruke / mellom Desimal
-internal operator fun Desimal.div(annen: Desimal) = Desimal(value.divide(annen.value, Desimal.Scale, Desimal.RoundingMode))
 // Kunne dele duration på en annen Duration
 internal operator fun Duration.div(annen: Duration) = Desimal.fraDuration(this) / Desimal.fraDuration(annen)
 // Unngå å måtte bruke dividedBy på Duration
