@@ -45,7 +45,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun tilsynsbehovTidslinje():Tidslinje {
         val tilsynbehovPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsbehov.forEach {periode, tilsynsbehov ->
+        grunnlag.tilsynsbehov.forEach { (periode, tilsynsbehov) ->
             val grad = if (tilsynsbehov.prosent == TilsynsbehovStørrelse.PROSENT_200) {
                 Prosent(200)
             } else {
@@ -86,9 +86,9 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun arbeidsperioder():List<Tidslinje> {
         val tidslinjer = mutableListOf<Tidslinje>()
-        grunnlag.arbeidsforhold.forEach { arbeidsforhold ->
+        grunnlag.arbeid.forEach { arbeidsforholdOgPerioder ->
             val arbeidsperioder = mutableMapOf<LukketPeriode, Prosent>()
-            arbeidsforhold.perioder.forEach { (periode, info) -> arbeidsperioder[periode] = info.arbeidsprosent }
+            arbeidsforholdOgPerioder.perioder.forEach { (periode, info) -> arbeidsperioder[periode] = info.arbeidsprosent() }
             tidslinjer.add(Tidslinje("Arbeid", arbeidsperioder))
         }
         return tidslinjer

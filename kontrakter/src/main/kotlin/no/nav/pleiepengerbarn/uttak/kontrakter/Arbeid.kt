@@ -1,13 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
+import java.time.Duration
 import java.util.*
 
 data class Arbeidsforhold(
         val arbeidstype:Arbeidstype,
         val organisasjonsnummer: Organisasjonsnummer? = null,
         val fødselsnummer: Fødselsnummer? = null,
-        val arbeidsforholdId: UUID? = null,
-        val perioder: Map<LukketPeriode, ArbeidsforholdPeriodeInfo> = mapOf()
+        val arbeidsforholdId: UUID? = null
 ) {
     init {
         require(!(organisasjonsnummer == null && fødselsnummer == null)) { "Arbeidsgiver må ha enten organisasjonsnummer eller fødselsnummer" }
@@ -16,7 +16,14 @@ data class Arbeidsforhold(
     }
 }
 
-data class ArbeidsforholdPeriodeInfo(
-        val inntekt:Beløp,
-        val arbeidsprosent: Prosent = Prosent.ZERO
-)
+data class ArbeidsforholdOgArbeidsperioder(val arbeidsforhold: Arbeidsforhold, val perioder: Map<LukketPeriode, ArbeidInfo> = mapOf())
+
+
+data class ArbeidInfo(
+        val jobberNormalt: Duration,
+        val skalJobbe: Prosent
+) {
+    fun arbeidsprosent(): Prosent {
+        return skalJobbe
+    }
+}

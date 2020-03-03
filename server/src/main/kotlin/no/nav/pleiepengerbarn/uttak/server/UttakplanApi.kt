@@ -60,7 +60,8 @@ class UttakplanApi {
             perioder = mapOf(
                     LukketPeriode("2020-01-01/2020-01-31") to InnvilgetPeriode(
                             grad = Prosent(100),
-                            knekkpunktTyper = setOf()
+                            knekkpunktTyper = setOf(),
+                            utbetalingsgrader = listOf()
                     )
             )
     )

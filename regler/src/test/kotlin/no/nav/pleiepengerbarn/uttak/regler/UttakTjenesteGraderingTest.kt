@@ -3,13 +3,16 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import org.junit.jupiter.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
 import java.util.*
 
 internal class UttakTjenesteGraderingTest {
+
+    private companion object {val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)}
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID())
     private val arbeidsforhold2 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID())
@@ -29,13 +32,16 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(20))
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(80))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80))
     }
 
     @Test
@@ -47,15 +53,15 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(75))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(75))
     }
 
     @Test
@@ -68,17 +74,17 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40))
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(knekkpunktTyper = setOf(), grad = Prosent(40), utbetalingsgrader = listOf(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold1, Prosent(40))))
                 ))),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(60))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(60))
     }
 
 
@@ -91,8 +97,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(35))))
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(35))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -101,8 +107,8 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(65))
     }
 
 
@@ -115,8 +121,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(25))))
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
@@ -125,12 +131,13 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(70))
     }
 
+
     @Test
-    fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot tilsyn`() {
+    fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -138,11 +145,33 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(2000), arbeidsprosent = Prosent(40)))),
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1500), arbeidsprosent = Prosent(20)))),
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(500), arbeidsprosent = Prosent(80)))),
-                        arbeidsforhold1.copy(perioder = mapOf(helePerioden to ArbeidsforholdPeriodeInfo(inntekt = Beløp(1000), arbeidsprosent = Prosent(0))))
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.dividedBy(2), skalJobbe = Prosent(25))))
+                )
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent("37.5"))
+    }
+
+
+    @Test
+    fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot arbeid`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(40)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(20)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(80)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(0))))
+
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(40))
@@ -151,7 +180,65 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(60))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(52))
 
     }
+
+    @Test
+    fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(30))
+                        ))
+                )
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(3)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
+    }
+
+    @Test
+    fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(30))
+                        ))
+                ),
+                tilsynsperioder = mapOf(
+                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Tilsyn(Prosent(35))
+                )
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(4)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
+    }
+
 }

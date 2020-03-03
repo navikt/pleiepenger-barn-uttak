@@ -24,7 +24,7 @@ internal object KnekkpunktUtleder {
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.tilsynsbehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
-        finnForArbeid(knekkpunkMap, regelGrunnlag.arbeidsforhold)
+        finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
@@ -55,9 +55,9 @@ internal object KnekkpunktUtleder {
         }
     }
 
-    private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeidsforholdList: List<Arbeidsforhold>) {
-        arbeidsforholdList.forEach { arbeidsforhold ->
-            arbeidsforhold.perioder.keys.forEach { periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID) }
+    private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeidList: List<ArbeidsforholdOgArbeidsperioder>) {
+        arbeidList.forEach { arbeidsforholdOgPerioder ->
+            arbeidsforholdOgPerioder.perioder.keys.forEach { periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID) }
         }
     }
 

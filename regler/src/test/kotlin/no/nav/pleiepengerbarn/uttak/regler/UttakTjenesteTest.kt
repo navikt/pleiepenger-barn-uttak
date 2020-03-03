@@ -4,12 +4,15 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import org.junit.jupiter.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
 
 internal class UttakTjenesteTest {
+
+    private companion object {val FULL_UKE = Duration.ofHours(37).plusMinutes(30)}
 
     private val arbeidsforhold1 = Arbeidsforhold(arbeidstype = Arbeidstype.ARBEIDSGIVER, organisasjonsnummer = "123456789")
 
@@ -23,15 +26,15 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                arbeidsforhold = listOf(
-                        arbeidsforhold1
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(100))
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100))
     }
 
 
@@ -47,14 +50,18 @@ internal class UttakTjenesteTest {
                 ),
                 ferier = listOf(
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
                 )
+
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
-        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
+        sjekkAvslått(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
     }
 
     @Test
@@ -66,14 +73,17 @@ internal class UttakTjenesteTest {
                 ),
                 søknadsperioder = listOf(
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(100))
-        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100))
+        sjekkAvslått(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
     }
 
     @Test
@@ -88,31 +98,37 @@ internal class UttakTjenesteTest {
                 ),
                 søknadsperioder = listOf(
                         helePerioden
+                ),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 2)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
-        sjekkAvslått(uttaksplan.perioder.entries.elementAt(1), helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
+        sjekkAvslått(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
     }
 
     @Test
     fun `Kun medlem i slutten av søknadsperioden`() {
-        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25");
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25")
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
                         søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(søknadsperiode),
-                ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15"))
+                ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(søknadsperiode to ArbeidInfo(FULL_UKE, Prosent.ZERO)))
+                )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
-        assertTrue(uttaksplan.perioder.size == 2)
-        sjekkAvslått(uttaksplan.perioder.entries.first(), LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
-        sjekkInnvilget(uttaksplan.perioder.entries.elementAt(1), LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
+        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
     }
 }
