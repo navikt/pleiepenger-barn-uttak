@@ -45,7 +45,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun tilsynsbehovTidslinje():Tidslinje {
         val tilsynbehovPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsbehov.forEach {periode, tilsynsbehov ->
+        grunnlag.tilsynsbehov.forEach { (periode, tilsynsbehov) ->
             val grad = if (tilsynsbehov.prosent == TilsynsbehovStørrelse.PROSENT_200) {
                 Prosent(200)
             } else {

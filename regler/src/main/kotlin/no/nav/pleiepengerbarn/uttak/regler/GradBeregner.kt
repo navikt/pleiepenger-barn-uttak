@@ -144,13 +144,6 @@ internal object GradBeregner {
         }.setScale(2, RoundingMode.HALF_EVEN)
     }
 
-    private fun max(a:Prosent, b:Prosent):Prosent {
-        if (b > a) {
-            return b
-        }
-        return a
-    }
-
     private fun overlapper(periode1: LukketPeriode, periode2: LukketPeriode) =
             (periode1.fom == periode2.fom || periode1.fom.isBefore(periode2.fom)) &&
                     (periode1.tom == periode2.tom || periode1.tom.isAfter(periode2.tom))
@@ -163,7 +156,7 @@ private fun LukketPeriode.antallVirkedager(): Long {
     var nåværende = fom
     var antall = 0L
     while (!nåværende.isAfter(tom)) {
-        if (!(nåværende.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))) {
+        if (nåværende.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
             antall++
         }
         nåværende = nåværende.plusDays(1)
