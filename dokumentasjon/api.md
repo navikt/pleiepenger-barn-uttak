@@ -1,125 +1,113 @@
 # API
 
-## Opprettelse av nytt uttak
-- 'sakId' ikke brukt til noe funksjonelt i uttak, kun for 
-- 'aktuelleBehandlinger' er et sett med andre id på andre behandlingsIder som skal hensyntas ved beregning av uttaket. Alle uttak som hensyntas må være knyttet til det samme barnet.
-- 'fødselsdato' på 'søker' for å kunne håndheve at Det ytes ikke stønad til medlem som er fylt 70 år.
-- 'tilsynbehov' på 'barn' inneholder periodiserte maksrammer for uttaket på tvers av omsorgspersoner for barnet. Det er kun disse verdiene som vil hensyntas i beregningen av uttaket, ikke tilsvarende verdier som ligger i 'aktuelleBehandlinger'.
-- 'arbeidsforholdId' settes når det finnes flere arbeidsforhold hos samme orgnr. 
-
-
 ### Request
-POST /uttak
+POST /uttaksplan
 
 ```json
-
 {
-    "sakId": "123",
-    "behandlingId": "345",
-    "aktuelleBehandlinger": [
-        "12345",
-        "3333"
-    ],
-    "søker": {
-        "aktørId": "4552",
-        "fødselsdato": "1990-09-09"
-    },
-    "barn": {
-        "aktørId": "123",
-        "tilsynbehov" : {
-            "2018-10-10/2018-12-29": 200,
-            "2018-10-10/2018-12-30": 100
-        }
-    },
-    "søknadsperioder": {
-        "2018-10-10/2018-12-29": {},
-        "2018-10-10/2018-12-30": {}
-    },
-    "arbeid": {
-        "arbeidstaker": [{
-            "organisasjonsnummer": "999999999",
-            "arbeidsforholdId": null,
-            "norskIdentitetsnummer": null,
-            "perioder": {
-                "2018-10-10/2018-12-29": {
-                    "skalJobbeProsent": 50.25
-                }
-            }
-        }, {
-            "organisasjonsnummer": null,
-            "arbeidsforholdId": null,
-            "norskIdentitetsnummer": "29099012345",
-            "perioder": {
-                "2018-11-10/2018-12-29": {
-                    "skalJobbeProsent": 20.00
-                }
-            }
-        }]
-    }
+	"sakId": "ABC123",
+	"behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
+	"andrePartersBehandlinger": [
+	  "474abb91-0e61-4459-ba5f-7e960d45c164", 
+	  "474abb91-0e61-4459-ba5f-7e960d45c112"
+	],
+	"søker": {
+	    "fødselsdato": "1990-09-29",
+		"dødsdato": "2020-01-01"
+	},
+	"barn": {
+		"dødsdato": "2020-01-01"
+	},
+	"søknadsperioder": [
+		"2020-01-01/2020-03-31"
+	],
+	"lovbestemtFerie": [
+		"2020-01-01/2020-03-10"
+	],
+	"arbeid": [{
+		"arbeidsforhold": {
+			"arbeidstype": "ARBEIDSGIVER",
+			"organisasjonsnummer": "999999999",
+			"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+		},
+		"perioder": {
+			"2020-01-01/2020-03-31": {
+				"jobberNormalt": "PT7H30M",
+				"skalJobbe": "20"
+			}
+		}
+	}],
+	"tilsynsbehov": {
+		"2020-01-01/2020-03-31": {
+			"prosent": "100"
+		},
+		"2020-04-01/2020-04-31": {
+			"prosent": "200"
+		}
+	},
+	"medlemskap": {
+		"2020-01-01/2020-03-31": {
+			"frivilligEllerPliktigMedlem": true
+		}
+	}
 }
 ```
 
 ### Response
 HTTP 201
 
-## Endringer
-### Request
-PUT /uttak/{behandlingId}
-
-Samme request som ved opprettelse,
-
-men noen verdier som ikke vil hensyntas om de skulle sendes;
-
-- sakId
-- behandlingId (ettersom det hentes fra pathen)
-- aktørId på søker (ettersom det ikke kan endres)
-- aktørId på barn (ettersom det ikke kan endres)
-
-Og visse ting kan være i tillegg til opprettelsen;
-
-- dødsdato på søker
-- dødsdato på barn
+```json
+{
+	"perioder": {
+		"2020-01-01/2020-03-31": {
+			"type": "innvilget",
+			"grad": 100.00,
+			"utbetalingsgrader": [{
+				"arbeidsforhold": {
+					"arbeidstype": "ARBEIDSGIVER",
+					"organisasjonsnummer": "999999999",
+					"fødselsnummer": null,
+					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+				},
+				"utbetalingsgrad": 80.00
+			}]
+		},
+		"2020-02-02/2020-02-15": {
+			"type": "innvilget",
+			"grad": 80.00,
+			"utbetalingsgrader": [{
+				"arbeidsforhold": {
+					"arbeidstype": "ARBEIDSGIVER",
+					"organisasjonsnummer": "999999999",
+					"fødselsnummer": null,
+					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+				},
+				"utbetalingsgrad": 75.00
+			}]
+		}
+	},
+	"2020-02-16/2020-02-25": {
+		"type": "avslått",
+		"avslagsÅrsaker": ["IKKE_MEDLEM"]
+	}
+}
+```
 
 ## Henting av uttak
 ### Request
-GET /uttak?behandlingId=123&behandlingId=456
+GET /uttaksplan?behandlingId=123&behandlingId=456
+
 ### Response
-- grad - angir prosent uttak av pleiepenger.
-- resultat_type - INNVILGET, AVSLÅTT eller UAVKLART periode.
-- årsak - årsak til at perioder ble INNVILGET eller AVSLÅTT. Ikke satt dersom perioden er UAVKLART.
 
 ```json
 {
+  "uttaksplaner": {
     "123": {
-        "perioder": {
-            "2018-10-10/2018-12-29": {
-                "grad": 50.0,
-                "resultat_type": "INNVILGET",
-                "årsak": "§..."
-            },
-            "2018-10-10/2018-12-30": {
-                "grad": 73.5,
-                "resultat_type": "AVSLÅTT",
-                "årsak": "§..."
-            }
-        }
+      // Samme format som response ved opprettelse
     },
     "456": {
-        "perioder": {
-            "2018-10-10/2018-12-29": {
-                "grad": 50.0,
-                "resultat_type": "INNVILGET",
-                "årsak": "§..."
-            },
-            "2018-10-10/2018-12-30": {
-                "grad": 73.5,
-                "resultat_type": "INNVILGET",
-                "årsak": "§..."
-            }
-        }
+      // Samme format som response ved opprettelse
     }
+  }
 }
 ```
-#### Utvidelsesbehov
-- Grad per arbeidsgiver (for beregning)
-- Ev. mer info fra grunnlaget avhengig av hva de funksjonelle behovene for hva en saksbehandler skal se i løsningen.
