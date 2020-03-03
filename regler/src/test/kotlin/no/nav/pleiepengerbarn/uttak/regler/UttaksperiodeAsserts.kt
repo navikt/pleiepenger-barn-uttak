@@ -13,7 +13,7 @@ internal object UttaksperiodeAsserts {
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
         val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
-        assertThat(innvilgetPeriode.grad).isEqualByComparingTo(forventetGrad.setScale(2, RoundingMode.HALF_EVEN))
+        assertThat(innvilgetPeriode.grad).isEqualByComparingTo(forventetGrad)
     }
 
     internal fun sjekkAvslått(uttaksplan: Uttaksplan, forventetPeriode: LukketPeriode, forventedAvslagsÅrsaker:Set<AvslåttPeriodeÅrsak>) {
