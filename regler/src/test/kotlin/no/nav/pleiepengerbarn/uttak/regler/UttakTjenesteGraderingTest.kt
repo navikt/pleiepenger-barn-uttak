@@ -41,7 +41,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(80))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80))
     }
 
     @Test
@@ -61,7 +61,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(75))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(75))
     }
 
     @Test
@@ -84,7 +84,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(60))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(60))
     }
 
 
@@ -108,7 +108,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(65))
     }
 
 
@@ -132,7 +132,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(70))
     }
 
 
@@ -153,7 +153,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 31)), Prosent("37.5"))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent("37.5"))
     }
 
 
@@ -181,7 +181,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan.perioder.entries.first(), helePerioden, Prosent(52))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(52))
 
     }
 
