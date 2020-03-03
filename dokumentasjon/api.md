@@ -84,11 +84,11 @@ HTTP 201
 				},
 				"utbetalingsgrad": 75.00
 			}]
+		},
+		"2020-02-16/2020-02-25": {
+			"type": "avslått",
+			"avslagsÅrsaker": ["IKKE_MEDLEM"]
 		}
-	},
-	"2020-02-16/2020-02-25": {
-		"type": "avslått",
-		"avslagsÅrsaker": ["IKKE_MEDLEM"]
 	}
 }
 ```
