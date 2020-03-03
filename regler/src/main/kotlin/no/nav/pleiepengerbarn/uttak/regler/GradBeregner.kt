@@ -8,13 +8,13 @@ import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.Duration
 
+private val HUNDRE_PROSENT = Prosent.valueOf(100).setScale(2, RoundingMode.HALF_UP)
 
 
 /**
  * https://confluence.adeo.no/display/SIF/Beskrivelse+av+uttakskomponenten
  */
 internal object GradBeregner {
-    private val HUNDRE_PROSENT = Prosent.valueOf(100).setScale(2, RoundingMode.HALF_UP)
 
     private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
@@ -51,17 +51,15 @@ internal object GradBeregner {
 
     }
 
-
     private fun beregnGrad(takForYtelsePåGrunnAvTilsyn:Prosent, tilsynsGradIPerioden:Prosent, sumAvFraværIPerioden:Duration, antallVirketimerIPerioden:Duration, maksimaltAntallVirketimerViKanGiYtelseForIPerioden:Duration):Prosent {
         if (tilsynsGradIPerioden > Prosent(80)) {
             return Prosent(0)
         }
         if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
             if (sumAvFraværIPerioden <= maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
-                val avkortetMotArbeid = HUNDRE_PROSENT - HUNDRE_PROSENT * BigDecimal(sumAvFraværIPerioden.toMillis()) / BigDecimal(antallVirketimerIPerioden.toMillis())
-                return if (avkortetMotArbeid < takForYtelsePåGrunnAvTilsyn) avkortetMotArbeid else takForYtelsePåGrunnAvTilsyn
+                return HUNDRE_PROSENT * BigDecimal(sumAvFraværIPerioden.toMillis()) / BigDecimal(antallVirketimerIPerioden.toMillis())
             } else {
-                return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis())/BigDecimal(antallVirketimerIPerioden.toMillis())*BigDecimal(100).setScale(2, RoundingMode.HALF_UP)
+                return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()) * HUNDRE_PROSENT
             }
 
         } else {
@@ -176,8 +174,8 @@ private fun LukketPeriode.antallVirkedager(): Long {
 private fun ArbeidInfo.fraværIPerioden(periode:LukketPeriode): Duration {
     val jobberNormaltPerVirkedag = jobberNormalt.dividedBy(5)
     val kunneJobbetIPerioden = jobberNormaltPerVirkedag.multipliedBy(periode.antallVirkedager())
-    val millis = skalJobbe.longValueExact() * kunneJobbetIPerioden.toMillis() / 100
-    return if (millis < 0) Duration.ZERO else Duration.ofMillis(millis)
+    val fraværMillis = (HUNDRE_PROSENT - skalJobbe)/ HUNDRE_PROSENT * BigDecimal(kunneJobbetIPerioden.toMillis())
+    return if (fraværMillis < BigDecimal.ZERO) Duration.ZERO else Duration.ofMillis(fraværMillis.longValueExact())
 }
 
 data class Grader(

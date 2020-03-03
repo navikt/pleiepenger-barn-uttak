@@ -42,7 +42,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         },
                         "perioder": {
                             "2020-01-01/2020-03-31": {
-                                "jobberNormalt": "PT7H30M",
+                                "jobberNormalt": "PT37H30M",
                                 "skalJobbe": "0"
                             }
                         }
