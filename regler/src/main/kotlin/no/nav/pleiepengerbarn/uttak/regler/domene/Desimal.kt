@@ -6,16 +6,16 @@ import java.math.RoundingMode.HALF_UP
 
 internal class Desimal(bigDecimal: BigDecimal) {
     internal companion object {
-        internal const val Scale = 2
-        internal val RoundingMode = HALF_UP
+        private const val Scale = 2
+        private val RoundingMode = HALF_UP
 
         internal fun fraBigDecimal(bigDecimal: BigDecimal) = Desimal(bigDecimal)
         internal fun fraDouble(double: Double) = Desimal(BigDecimal.valueOf(double))
         internal fun fraDuration(duration: Duration) = Desimal(BigDecimal.valueOf(duration.toMillis()))
 
-        private val Null = fraDouble(0.00)
-        private val EtHundre = fraDouble(100.00)
-        private val ToHundre = fraDouble(200.00)
+        internal val En = fraDouble(1.00)
+        internal val Null = fraDouble(0.00)
+        internal val EtHundre = fraDouble(100.00)
     }
 
     // Gjør at vi kan stole på bruk av == mellom Desimal
@@ -37,12 +37,20 @@ internal class Desimal(bigDecimal: BigDecimal) {
     // Bruke / mellom Desimal
     internal operator fun div(annen: Desimal) = Desimal(value.divide(annen.value, Scale, RoundingMode))
 
+    internal infix fun maks(maks: Desimal) = if (this > maks) maks else this
+
     internal fun fraFaktorTilProsent() = this * EtHundre
     internal fun fraProsentTilFaktor() = this / EtHundre
 
+    private fun tilLong() = value.longValueExact()
+    internal fun tilDuration() : Duration {
+        val millis = tilLong()
+        return if (millis <= 0) Duration.ZERO
+        else Duration.ofMillis(millis)
+    }
+
     internal fun erNull() = equals(Null)
     internal fun erEtHundre() = equals(EtHundre)
-    internal fun erToHundre() = equals(ToHundre)
 
     private val value = bigDecimal.setScale(Scale, RoundingMode)
 }
@@ -51,3 +59,5 @@ internal class Desimal(bigDecimal: BigDecimal) {
 internal operator fun Duration.div(annen: Duration) = Desimal.fraDuration(this) / Desimal.fraDuration(annen)
 // Unngå å måtte bruke dividedBy på Duration
 internal operator fun Duration.div(long: Long) = dividedBy(long)
+// Unngå å måtte bruke multipliedBy på Duration
+internal operator fun Duration.times(long: Long) = multipliedBy(long)
