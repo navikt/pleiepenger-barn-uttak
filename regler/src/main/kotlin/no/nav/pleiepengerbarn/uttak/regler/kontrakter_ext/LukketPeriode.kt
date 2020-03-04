@@ -3,13 +3,9 @@ package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import java.time.LocalDate
 
-internal fun LukketPeriode.overlapper(periode: LukketPeriode) : Boolean {
-    if (fom.isEqual(periode.fom)) return true
-    if (fom.isEqual(periode.tom)) return true
-    if (tom.isEqual(periode.tom)) return true
-    if (tom.isEqual(periode.fom)) return true
-    return fom.isBefore(periode.tom) && tom.isAfter(periode.tom)
-}
+internal fun LukketPeriode.overlapper(annen: LukketPeriode) =
+        (fom == annen.fom || fom.isBefore(annen.fom)) &&
+        (tom == annen.tom || tom.isAfter(annen.tom))
 
 internal fun LukketPeriode.erLik(periode: LukketPeriode) = fom.isEqual(periode.fom) && tom.isEqual(periode.tom)
 private fun LukketPeriode.erKantIKant(periode: LukketPeriode) = tom.plusDays(1).isEqual(periode.fom)

@@ -133,7 +133,7 @@ internal object GradBeregner {
         andrePartersUttaksplan.forEach {uttaksplan ->
 
             val annenPartsPeriode = uttaksplan.perioder
-                    .filter { overlapper(it.key, periode) }
+                    .filter { it.key.overlapper(periode) }
                     .filter { it.value is InnvilgetPeriode }
                     .values.firstOrNull() as InnvilgetPeriode?
 
@@ -179,26 +179,19 @@ internal object GradBeregner {
     }
 
 
-    private fun RegelGrunnlag.finnTilsynsordningsgrad(periode: LukketPeriode) : Desimaltall { // TilsynsordningGrad?
-        val tilsyn = tilsynsperioder.entries.find { overlapper(it.key, periode) }
+    private fun RegelGrunnlag.finnTilsynsordningsgrad(periode: LukketPeriode) : Desimaltall {
+        val tilsyn = tilsynsperioder.entries.find { it.key.overlapper(periode)}
         return tilsyn?.value?.grad?.somDesimaltall()?.maks(Desimaltall.EtHundre)?.min(Desimaltall.Null) ?: Desimaltall.Null
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
-        val tilsynsbehov = tilsynsbehov.entries.find { overlapper(it.key, periode) }
+        val tilsynsbehov = tilsynsbehov.entries.find { it.key.overlapper(periode) }
         return when (tilsynsbehov?.value?.prosent) {
             TilsynsbehovStørrelse.PROSENT_100 -> Desimaltall.EtHundre
             TilsynsbehovStørrelse.PROSENT_200 -> ToHundreProsent
             else -> Desimaltall.Null
         }
     }
-
-    private fun overlapper(periode1: LukketPeriode, periode2: LukketPeriode) =
-            (periode1.fom == periode2.fom || periode1.fom.isBefore(periode2.fom)) &&
-                    (periode1.tom == periode2.tom || periode1.tom.isAfter(periode2.tom))
-
-
-
 }
 
 private fun LukketPeriode.antallVirkedager(): Long {
