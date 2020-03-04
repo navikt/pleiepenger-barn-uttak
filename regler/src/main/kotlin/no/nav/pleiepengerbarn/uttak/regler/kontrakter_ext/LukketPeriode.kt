@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 internal fun LukketPeriode.overlapper(annen: LukketPeriode) =
@@ -60,8 +61,7 @@ internal fun <T>LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriod
 }
 
 internal fun List<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
-    (it.fom == periode.fom || it.fom.isBefore(periode.fom)) &&
-    (it.tom == periode.tom || it.tom.isAfter(periode.tom))
+    it.overlapper(periode)
 }
 
 internal fun LukketPeriode.inneholder(dato: LocalDate) = fom.isEqual(dato) || tom.isEqual(dato) || (dato.isAfter(fom) && dato.isBefore(tom))
@@ -73,3 +73,15 @@ internal fun Collection<LukketPeriode>.inneholder(dato: LocalDate) = firstOrNull
 internal fun <T> Map<LukketPeriode, T>.inneholder(dato: LocalDate) = filterKeys {
     it.inneholder(dato)
 }.entries.firstOrNull()
+
+internal fun LukketPeriode.antallVirkedager(): Long {
+    var nåværende = fom
+    var antall = 0L
+    while (!nåværende.isAfter(tom)) {
+        if (nåværende.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+            antall++
+        }
+        nåværende = nåværende.plusDays(1)
+    }
+    return antall
+}

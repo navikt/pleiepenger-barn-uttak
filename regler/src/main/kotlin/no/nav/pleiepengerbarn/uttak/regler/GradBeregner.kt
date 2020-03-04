@@ -3,8 +3,8 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
-import java.time.DayOfWeek
 import java.time.Duration
 
 /**
@@ -192,33 +192,21 @@ internal object GradBeregner {
             else -> Desimaltall.Null
         }
     }
-}
 
-private fun LukketPeriode.antallVirkedager(): Long {
-    var nåværende = fom
-    var antall = 0L
-    while (!nåværende.isAfter(tom)) {
-        if (nåværende.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-            antall++
-        }
-        nåværende = nåværende.plusDays(1)
+    private fun ArbeidInfo.fravær(
+            kunneJobbetIPerioden: Duration) : Duration {
+        val fraværsfaktor = Desimaltall
+                .EtHundre
+                .minus(skalJobbe.somDesimaltall())
+                .maks(Desimaltall.EtHundre)
+                .min(Desimaltall.Null)
+                .fraProsentTilFaktor()
+
+        return Desimaltall
+                .fraDuration(kunneJobbetIPerioden)
+                .times(fraværsfaktor)
+                .tilDuration()
     }
-    return antall
-}
-
-private fun ArbeidInfo.fravær(
-        kunneJobbetIPerioden: Duration) : Duration {
-    val fraværsfaktor = Desimaltall
-            .EtHundre
-            .minus(skalJobbe.somDesimaltall())
-            .maks(Desimaltall.EtHundre)
-            .min(Desimaltall.Null)
-            .fraProsentTilFaktor()
-
-    return Desimaltall
-            .fraDuration(kunneJobbetIPerioden)
-            .times(fraværsfaktor)
-            .tilDuration()
 }
 
 data class Grader(
