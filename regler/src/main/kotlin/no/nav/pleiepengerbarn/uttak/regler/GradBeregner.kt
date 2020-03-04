@@ -32,7 +32,7 @@ internal object GradBeregner {
             }?.apply {
                 val jobberNormaltPerVirkedag = this.value.jobberNormalt.dividedBy(5)
                 val kunneJobbetIPerioden = jobberNormaltPerVirkedag.multipliedBy(periode.antallVirkedager())
-                sumVirketimerIPeriode = sumAvFraværIPerioden.plus(kunneJobbetIPerioden)
+                sumVirketimerIPeriode = sumVirketimerIPeriode.plus(kunneJobbetIPerioden)
                 val fraværIPerioden = this.value.fraværIPerioden(periode)
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
                 fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = BigDecimal(fraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP).divide(BigDecimal(kunneJobbetIPerioden.toMillis()), RoundingMode.HALF_UP) * HUNDRE_PROSENT
