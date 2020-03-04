@@ -21,31 +21,35 @@ internal object GradBeregner {
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
         val fraværsGrader = mutableMapOf<Arbeidsforhold, Prosent>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
+        var sumVirketimerIPeriode: Duration = Duration.ZERO
 
 
         val antallVirketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
         val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(periode, grunnlag)
-        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = Duration.ofMillis((BigDecimal(EnVirkedag.multipliedBy(periode.antallVirkedager()).toMillis()) * takForYtelsePåGrunnAvTilsyn / HUNDRE_PROSENT).toLong())
-
         grunnlag.arbeid.forEach { arbeidsforholdOgArbeidsperioder ->
             arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
+                val jobberNormaltPerVirkedag = this.value.jobberNormalt.dividedBy(5)
+                val kunneJobbetIPerioden = jobberNormaltPerVirkedag.multipliedBy(periode.antallVirkedager())
+                sumVirketimerIPeriode = sumAvFraværIPerioden.plus(kunneJobbetIPerioden)
                 val fraværIPerioden = this.value.fraværIPerioden(periode)
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
-                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = Prosent(fraværIPerioden.dividedBy(antallVirketimerIPerioden) * 100)
+                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = BigDecimal(fraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(kunneJobbetIPerioden.toMillis()) * HUNDRE_PROSENT
             }
         }
 
 
+        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = Duration.ofMillis((BigDecimal(sumVirketimerIPeriode.toMillis()) * takForYtelsePåGrunnAvTilsyn / HUNDRE_PROSENT).toLong())
         val tilsynsGrad = finnTilsyn(periode, grunnlag)
-        val uavkortetGrad = beregnGrad(takForYtelsePåGrunnAvTilsyn, tilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden)
+        val uavkortetGrad = beregnGrad(takForYtelsePåGrunnAvTilsyn, tilsynsGrad, sumAvFraværIPerioden, antallVirketimerIPerioden/*sumVirketimerIPeriode*/, maksimaltAntallVirketimerViKanGiYtelseForIPerioden)
         val avkortetGrad = finnAvkortetGrad(periode, grunnlag, uavkortetGrad)
-        val graderingsfaktorPåGrunnAvTilsynIPerioden = finnGraderingsfaktorPåGrunnAvTilsynIPerioden(takForYtelsePåGrunnAvTilsyn,sumAvFraværIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden, antallVirketimerIPerioden)
+        val graderingsfaktorPåGrunnAvTilsynIPerioden = finnGraderingsfaktorPåGrunnAvTilsynIPerioden(takForYtelsePåGrunnAvTilsyn, sumAvFraværIPerioden, maksimaltAntallVirketimerViKanGiYtelseForIPerioden, sumVirketimerIPeriode)
+        val justeringForAvkortetGrad = if (uavkortetGrad.compareTo(Prosent(0)) == 0) Prosent(0) else avkortetGrad / uavkortetGrad
         return Grader(
                 grad = avkortetGrad,
                 utbetalingsgrader = fraværsGrader.onEach {
-                    it.value * graderingsfaktorPåGrunnAvTilsynIPerioden / HUNDRE_PROSENT
+                    fraværsGrader[it.key] = it.value.setScale(2, RoundingMode.HALF_UP) * graderingsfaktorPåGrunnAvTilsynIPerioden.setScale(2, RoundingMode.HALF_UP) / HUNDRE_PROSENT * justeringForAvkortetGrad
                 }
         )
 
@@ -59,7 +63,7 @@ internal object GradBeregner {
             if (sumAvFraværIPerioden <= maksimaltAntallVirketimerViKanGiYtelseForIPerioden) {
                 return HUNDRE_PROSENT * BigDecimal(sumAvFraværIPerioden.toMillis()) / BigDecimal(antallVirketimerIPerioden.toMillis())
             } else {
-                return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()) * HUNDRE_PROSENT
+                return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP)/BigDecimal(antallVirketimerIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
             }
 
         } else {
@@ -103,7 +107,7 @@ internal object GradBeregner {
             return Prosent(100).setScale(2, RoundingMode.HALF_EVEN)
         } else {
             if (tilsyn > Prosent(80)) {
-                return Prosent.ZERO
+                return Prosent.ZERO.setScale(2, RoundingMode.HALF_EVEN)
             }
             return Prosent(100).setScale(2, RoundingMode.HALF_EVEN) - tilsyn
         }
@@ -121,7 +125,7 @@ internal object GradBeregner {
             return HUNDRE_PROSENT
         }
         if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
-            return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()) / (BigDecimal(sumAvFraværIPerioden.toMillis())) * Prosent(100)
+            return BigDecimal(maksimaltAntallVirketimerViKanGiYtelseForIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP) / (BigDecimal(sumAvFraværIPerioden.toMillis())).setScale(2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
         }
         return takForYtelsePåGrunnAvTilsyn
     }

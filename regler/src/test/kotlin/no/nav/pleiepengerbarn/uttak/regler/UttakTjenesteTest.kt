@@ -34,7 +34,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
     }
 
 
@@ -60,7 +60,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100))
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
         sjekkAvslått(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
     }
 
@@ -82,7 +82,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
         sjekkAvslått(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
     }
 
@@ -107,7 +107,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100))
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
         sjekkAvslått(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
     }
 
@@ -129,6 +129,6 @@ internal class UttakTjenesteTest {
 
         assertThat(uttaksplan.perioder).hasSize(2)
         sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
-        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100))
+        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
     }
 }
