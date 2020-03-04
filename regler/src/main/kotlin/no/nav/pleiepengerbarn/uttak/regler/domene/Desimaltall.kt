@@ -22,13 +22,13 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     // Gjør at vi kan stole på bruk av == mellom Desimaltall
     override fun equals(other: Any?): Boolean {
         return if (other == null || other !is Desimaltall) false
-        else this.resultat.compareTo(other.resultat) == 0
+        else compareTo(other) == 0
     }
     override fun hashCode() = resultat?.hashCode() ?: 0
     override fun toString(): String = "${resultat.toPlainString()} (${beregning.toPlainString()})"
 
     // Bruke <=> mellom Desimaltall
-    internal operator fun compareTo(other: Desimaltall) = beregning.compareTo(other.beregning)
+    internal operator fun compareTo(other: Desimaltall) = resultat.compareTo(other.resultat)
     // Bruke + mellom Desimaltall
     internal operator fun plus(annen: Desimaltall) = Desimaltall(beregning.add(annen.beregning))
     // Bruke - mellom Desimaltall
@@ -56,7 +56,7 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     internal fun erEtHundre() = equals(EtHundre)
 
     internal val resultat = bigDecimal.setScale(ResultatScale, RoundingMode)
-    internal val beregning = bigDecimal.setScale(BeregningScale, RoundingMode)
+    private val beregning = bigDecimal.setScale(BeregningScale, RoundingMode)
 }
 
 // Kunne dele duration på en annen Duration
