@@ -21,7 +21,7 @@ internal object GradBeregner {
     private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
-        val fraværsGrader = mutableMapOf<Arbeidsforhold, Prosent>()
+        val fraværsGrader = mutableMapOf<Arbeidsforhold, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumVirketimerIPeriode: Duration = Duration.ZERO
 
@@ -42,7 +42,8 @@ internal object GradBeregner {
                 )
 
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
-                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = BigDecimal(fraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP).divide(BigDecimal(kunneJobbetIPerioden.toMillis()), RoundingMode.HALF_UP) * HUNDRE_PROSENT
+
+                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = fraværIPerioden / kunneJobbetIPerioden
             }
         }
 
@@ -55,8 +56,11 @@ internal object GradBeregner {
         val justeringForAvkortetGrad = if (uavkortetGrad.compareTo(Prosent(0)) == 0) Prosent(0) else avkortetGrad / uavkortetGrad
         return Grader(
                 grad = avkortetGrad.setScale(2, RoundingMode.HALF_UP),
-                utbetalingsgrader = fraværsGrader.onEach {
-                    fraværsGrader[it.key] = (it.value.setScale(2, RoundingMode.HALF_UP) * graderingsfaktorPåGrunnAvTilsynIPerioden.setScale(2, RoundingMode.HALF_UP) / HUNDRE_PROSENT * justeringForAvkortetGrad).setScale(2, RoundingMode.HALF_UP)
+                utbetalingsgrader = fraværsGrader.mapValues { (_, fraværsgrad) ->
+                    fraværsgrad
+                            .times(graderingsfaktorPåGrunnAvTilsynIPerioden.somDesimaltall())
+                            .times(justeringForAvkortetGrad.somDesimaltall())
+                            .resultat
                 }
         )
 
