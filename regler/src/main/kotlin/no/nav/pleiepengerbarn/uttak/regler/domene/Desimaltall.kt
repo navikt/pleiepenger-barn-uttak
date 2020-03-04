@@ -6,7 +6,8 @@ import java.math.RoundingMode.HALF_UP
 
 internal class Desimaltall(bigDecimal: BigDecimal) {
     internal companion object {
-        private const val Scale = 2
+        private const val ResultatScale = 2
+        private const val BeregningScale = 10
         private val RoundingMode = HALF_UP
 
         internal fun fraBigDecimal(bigDecimal: BigDecimal) = Desimaltall(bigDecimal)
@@ -21,28 +22,28 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     // Gjør at vi kan stole på bruk av == mellom Desimaltall
     override fun equals(other: Any?): Boolean {
         return if (other == null || other !is Desimaltall) false
-        else compareTo(other) == 0
+        else this.resultat.compareTo(other.resultat) == 0
     }
-    override fun hashCode() = value?.hashCode() ?: 0
-    override fun toString(): String = value.toPlainString()
+    override fun hashCode() = resultat?.hashCode() ?: 0
+    override fun toString(): String = "${resultat.toPlainString()} (${beregning.toPlainString()})"
 
     // Bruke <=> mellom Desimaltall
-    internal operator fun compareTo(other: Desimaltall) = value.compareTo(other.value)
+    internal operator fun compareTo(other: Desimaltall) = beregning.compareTo(other.beregning)
     // Bruke + mellom Desimaltall
-    internal operator fun plus(annen: Desimaltall) = Desimaltall(value.add(annen.value))
+    internal operator fun plus(annen: Desimaltall) = Desimaltall(beregning.add(annen.beregning))
     // Bruke - mellom Desimaltall
-    internal operator fun minus(annen: Desimaltall) = Desimaltall(value.subtract(annen.value))
+    internal operator fun minus(annen: Desimaltall) = Desimaltall(beregning.subtract(annen.beregning))
     // Bruke * mellom Desimaltall
-    internal operator fun times(annen: Desimaltall) = Desimaltall(value.multiply(annen.value))
+    internal operator fun times(annen: Desimaltall) = Desimaltall(beregning.multiply(annen.beregning))
     // Bruke / mellom Desimaltall
-    internal operator fun div(annen: Desimaltall) = Desimaltall(value.divide(annen.value, Scale, RoundingMode))
+    internal operator fun div(annen: Desimaltall) = Desimaltall(beregning.divide(annen.beregning, BeregningScale, RoundingMode))
 
     internal infix fun maks(maks: Desimaltall) = if (this > maks) maks else this
 
     internal fun fraFaktorTilProsent() = this * EtHundre
     internal fun fraProsentTilFaktor() = this / EtHundre
 
-    private fun tilLong() = value.longValueExact()
+    private fun tilLong() = beregning.longValueExact()
     internal fun tilDuration() : Duration {
         val millis = tilLong()
         return if (millis <= 0) Duration.ZERO
@@ -52,7 +53,8 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     internal fun erNull() = equals(Null)
     internal fun erEtHundre() = equals(EtHundre)
 
-    private val value = bigDecimal.setScale(Scale, RoundingMode)
+    internal val resultat = bigDecimal.setScale(ResultatScale, RoundingMode)
+    internal val beregning = bigDecimal.setScale(BeregningScale, RoundingMode)
 }
 
 // Kunne dele duration på en annen Duration
@@ -61,3 +63,5 @@ internal operator fun Duration.div(annen: Duration) = Desimaltall.fraDuration(th
 internal operator fun Duration.div(long: Long) = dividedBy(long)
 // Unngå å måtte bruke multipliedBy på Duration
 internal operator fun Duration.times(long: Long) = multipliedBy(long)
+// Gjøre en BigDecimal til Desimaltall
+internal fun BigDecimal.somDesimaltall() = Desimaltall.fraBigDecimal(this)
