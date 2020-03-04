@@ -39,6 +39,8 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     internal operator fun div(annen: Desimaltall) = Desimaltall(beregning.divide(annen.beregning, BeregningScale, RoundingMode))
 
     internal infix fun maks(maks: Desimaltall) = if (this > maks) maks else this
+    internal infix fun min(min: Desimaltall) = if (this < min) min else this
+
 
     internal fun fraFaktorTilProsent() = this * EtHundre
     internal fun fraProsentTilFaktor() = this / EtHundre
@@ -61,6 +63,8 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
 internal operator fun Duration.div(annen: Duration) = Desimaltall.fraDuration(this) / Desimaltall.fraDuration(annen)
 // Unngå å måtte bruke dividedBy på Duration
 internal operator fun Duration.div(long: Long) = dividedBy(long)
+internal operator fun Duration.div(int: Int) = dividedBy(int.toLong())
+
 // Unngå å måtte bruke multipliedBy på Duration
 internal operator fun Duration.times(long: Long) = multipliedBy(long)
 // Gjøre en BigDecimal til Desimaltall

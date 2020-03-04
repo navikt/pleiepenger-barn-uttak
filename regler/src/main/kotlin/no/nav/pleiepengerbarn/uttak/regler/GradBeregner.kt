@@ -1,7 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -16,6 +17,7 @@ private val HUNDRE_PROSENT = Prosent.valueOf(100).setScale(2, RoundingMode.HALF_
  */
 internal object GradBeregner {
 
+    private const val AntallVirkedagerIUken = 5
     private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
@@ -30,10 +32,15 @@ internal object GradBeregner {
             arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
-                val jobberNormaltPerVirkedag = this.value.jobberNormalt.dividedBy(5)
-                val kunneJobbetIPerioden = jobberNormaltPerVirkedag.multipliedBy(periode.antallVirkedager())
+                val jobberISnittPerVirkedag = this.value.jobberNormalt / AntallVirkedagerIUken
+                val kunneJobbetIPerioden = jobberISnittPerVirkedag * periode.antallVirkedager()
+
                 sumVirketimerIPeriode = sumVirketimerIPeriode.plus(kunneJobbetIPerioden)
-                val fraværIPerioden = this.value.fraværIPerioden(periode)
+
+                val fraværIPerioden = this.value.fravær(
+                        kunneJobbetIPerioden = kunneJobbetIPerioden
+                )
+
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
                 fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = BigDecimal(fraværIPerioden.toMillis()).setScale(2, RoundingMode.HALF_UP).divide(BigDecimal(kunneJobbetIPerioden.toMillis()), RoundingMode.HALF_UP) * HUNDRE_PROSENT
             }
@@ -166,6 +173,21 @@ private fun LukketPeriode.antallVirkedager(): Long {
         nåværende = nåværende.plusDays(1)
     }
     return antall
+}
+
+private fun ArbeidInfo.fravær(
+        kunneJobbetIPerioden: Duration) : Duration {
+    val fraværsfaktor = Desimaltall
+            .EtHundre
+            .minus(skalJobbe.somDesimaltall())
+            .maks(Desimaltall.EtHundre)
+            .min(Desimaltall.Null)
+            .fraProsentTilFaktor()
+
+    return Desimaltall
+            .fraDuration(kunneJobbetIPerioden)
+            .times(fraværsfaktor)
+            .tilDuration()
 }
 
 private fun ArbeidInfo.fraværIPerioden(periode:LukketPeriode): Duration {
