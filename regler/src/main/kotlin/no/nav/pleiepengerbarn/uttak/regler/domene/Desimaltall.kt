@@ -67,5 +67,6 @@ internal operator fun Duration.div(int: Int) = dividedBy(int.toLong())
 
 // Unngå å måtte bruke multipliedBy på Duration
 internal operator fun Duration.times(long: Long) = multipliedBy(long)
+internal operator fun Duration.times(desimaltall: Desimaltall) = Desimaltall.fraDuration(this).times(desimaltall).tilDuration()
 // Gjøre en BigDecimal til Desimaltall
 internal fun BigDecimal.somDesimaltall() = Desimaltall.fraBigDecimal(this)
