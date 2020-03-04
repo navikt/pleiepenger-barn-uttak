@@ -113,9 +113,8 @@ internal class UttakTjenesteGraderingTest {
     }
 
 
-    @Disabled
     @Test
-    fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot arbeid`() {
+    fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
