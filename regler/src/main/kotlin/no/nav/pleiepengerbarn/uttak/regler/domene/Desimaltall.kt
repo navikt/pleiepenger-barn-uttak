@@ -36,11 +36,13 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     // Bruke * mellom Desimaltall
     internal operator fun times(annen: Desimaltall) = Desimaltall(beregning.multiply(annen.beregning))
     // Bruke / mellom Desimaltall
-    internal operator fun div(annen: Desimaltall) = Desimaltall(beregning.divide(annen.beregning, BeregningScale, RoundingMode))
+    internal operator fun div(annen: Desimaltall) = if (annen.erNull()) Null else Desimaltall(beregning.divide(annen.beregning, BeregningScale, RoundingMode))
 
     internal infix fun maks(maks: Desimaltall) = if (this > maks) maks else this
     internal infix fun min(min: Desimaltall) = if (this < min) min else this
 
+    internal fun normaliserProsent() = min(Null).maks(EtHundre)
+    internal fun normaliserFaktor() = min(Null).maks(En)
 
     internal fun fraFaktorTilProsent() = this * EtHundre
     internal fun fraProsentTilFaktor() = this / EtHundre

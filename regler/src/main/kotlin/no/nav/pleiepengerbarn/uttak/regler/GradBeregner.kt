@@ -23,7 +23,8 @@ internal object GradBeregner {
         val fraværsGrader = mutableMapOf<Arbeidsforhold, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumVirketimerIPerioden: Duration = Duration.ZERO
-        val antallVirketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
+        val antallVirkedagerIPerioden = periode.antallVirkedager()
+        val antallVirketimerIPerioden = EnVirkedag.multipliedBy(antallVirkedagerIPerioden)
 
         val tilsynsordninggrad = grunnlag.finnTilsynsordningsgrad(periode)
         val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(tilsynsordninggrad)
@@ -33,7 +34,7 @@ internal object GradBeregner {
                 it.key.overlapper(periode)
             }?.apply {
                 val jobberISnittPerVirkedag = this.value.jobberNormalt / AntallVirkedagerIUken
-                val kunneJobbetIPerioden = jobberISnittPerVirkedag * periode.antallVirkedager()
+                val kunneJobbetIPerioden = jobberISnittPerVirkedag * antallVirkedagerIPerioden
 
                 sumVirketimerIPerioden = sumVirketimerIPerioden.plus(kunneJobbetIPerioden)
 
@@ -69,7 +70,7 @@ internal object GradBeregner {
                 antallVirketimerIPerioden = sumVirketimerIPerioden
         )
 
-        val justeringsFaktor = if (uavkortetGrad.erNull()) Desimaltall.Null else gradetMotTilsyn / uavkortetGrad
+        val justeringsFaktor = gradetMotTilsyn / uavkortetGrad
 
         return Grader(
                 grad = gradetMotTilsyn.resultat,
@@ -78,6 +79,7 @@ internal object GradBeregner {
                             .times(graderingsfaktorPåGrunnAvTilsynIPerioden)
                             .times(justeringsFaktor)
                             .fraFaktorTilProsent()
+                            .normaliserProsent()
                             .resultat
                 }
         )
@@ -99,10 +101,12 @@ internal object GradBeregner {
                 sumAvFraværIPerioden
                         .div(antallVirketimerIPerioden)
                         .fraFaktorTilProsent()
+                        .normaliserProsent()
             } else {
                 maksimaltAntallVirketimerViKanGiYtelseForIPerioden
                         .div(antallVirketimerIPerioden)
                         .fraFaktorTilProsent()
+                        .normaliserProsent()
             }
         } else {
             takForYtelsePåGrunnAvTilsyn
@@ -125,7 +129,7 @@ internal object GradBeregner {
             tilgjengeligGrad
         } else {
             uavkortetGrad
-        }.min(Desimaltall.Null).maks(Desimaltall.EtHundre)
+        }.normaliserProsent()
     }
 
     private fun RegelGrunnlag.finnTilsynsbehovDekketAvAndreParter(periode: LukketPeriode) : Desimaltall {
@@ -152,7 +156,9 @@ internal object GradBeregner {
             if (tilsynsordninggrad > ÅttiProsent) {
                 Desimaltall.Null
             } else  {
-                Desimaltall.EtHundre - tilsynsordninggrad
+                Desimaltall.EtHundre
+                        .minus(tilsynsordninggrad)
+                        .normaliserProsent()
             }
         }
     }
@@ -173,7 +179,9 @@ internal object GradBeregner {
             return Desimaltall.En
         }
         if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
-            return maksimaltAntallVirketimerViKanGiYtelseForIPerioden.div(sumAvFraværIPerioden)
+            return maksimaltAntallVirketimerViKanGiYtelseForIPerioden
+                    .div(sumAvFraværIPerioden)
+                    .normaliserFaktor()
         }
         return takForYtelsePåGrunnAvTilsyn.fraProsentTilFaktor()
     }
@@ -181,7 +189,7 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.finnTilsynsordningsgrad(periode: LukketPeriode) : Desimaltall {
         val tilsyn = tilsynsperioder.entries.find { it.key.overlapper(periode)}
-        return tilsyn?.value?.grad?.somDesimaltall()?.maks(Desimaltall.EtHundre)?.min(Desimaltall.Null) ?: Desimaltall.Null
+        return tilsyn?.value?.grad?.somDesimaltall()?.normaliserProsent() ?: Desimaltall.Null
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
@@ -198,9 +206,8 @@ internal object GradBeregner {
         val fraværsfaktor = Desimaltall
                 .EtHundre
                 .minus(skalJobbe.somDesimaltall())
-                .maks(Desimaltall.EtHundre)
-                .min(Desimaltall.Null)
                 .fraProsentTilFaktor()
+                .normaliserFaktor()
 
         return Desimaltall
                 .fraDuration(kunneJobbetIPerioden)
