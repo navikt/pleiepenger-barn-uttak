@@ -22,11 +22,11 @@ internal object GradBeregner {
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
         val fraværsGrader = mutableMapOf<Arbeidsforhold, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
-        var sumVirketimerIPeriode: Duration = Duration.ZERO
+        var sumVirketimerIPerioden: Duration = Duration.ZERO
         val antallVirketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
 
-        val tilsynsgrad = grunnlag.finnTilsynsgrad(periode = periode)
-        val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(tilsynsgrad = tilsynsgrad)
+        val tilsynsordninggrad = grunnlag.finnTilsynsordningsgrad(periode)
+        val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(tilsynsordninggrad)
 
         grunnlag.arbeid.forEach { arbeidsforholdOgArbeidsperioder ->
             arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
@@ -35,7 +35,7 @@ internal object GradBeregner {
                 val jobberISnittPerVirkedag = this.value.jobberNormalt / AntallVirkedagerIUken
                 val kunneJobbetIPerioden = jobberISnittPerVirkedag * periode.antallVirkedager()
 
-                sumVirketimerIPeriode = sumVirketimerIPeriode.plus(kunneJobbetIPerioden)
+                sumVirketimerIPerioden = sumVirketimerIPerioden.plus(kunneJobbetIPerioden)
 
                 val fraværIPerioden = this.value.fravær(
                         kunneJobbetIPerioden = kunneJobbetIPerioden
@@ -47,32 +47,32 @@ internal object GradBeregner {
             }
         }
 
-
-        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = sumVirketimerIPeriode * takForYtelsePåGrunnAvTilsyn.fraProsentTilFaktor()
+        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = sumVirketimerIPerioden * takForYtelsePåGrunnAvTilsyn.fraProsentTilFaktor()
 
         val uavkortetGrad = beregnUavkortetGrad(
                 takForYtelsePåGrunnAvTilsyn = takForYtelsePåGrunnAvTilsyn,
-                tilsynsgrad = tilsynsgrad,
+                tilsynsordninggrad = tilsynsordninggrad,
                 sumAvFraværIPerioden = sumAvFraværIPerioden,
                 antallVirketimerIPerioden = antallVirketimerIPerioden,
                 maksimaltAntallVirketimerViKanGiYtelseForIPerioden = maksimaltAntallVirketimerViKanGiYtelseForIPerioden
         )
-        val avkortetGrad = grunnlag.graderPåTilsyn(
+        val gradetMotTilsyn = grunnlag.gradertMotTilsyn(
                 periode = periode,
-                uavkortetGrad = uavkortetGrad
+                uavkortetGrad = uavkortetGrad,
+                tilsynsordninggrad = tilsynsordninggrad
         )
 
         val graderingsfaktorPåGrunnAvTilsynIPerioden = finnGraderingsfaktorPåGrunnAvTilsynIPerioden(
                 takForYtelsePåGrunnAvTilsyn = takForYtelsePåGrunnAvTilsyn,
                 sumAvFraværIPerioden = sumAvFraværIPerioden,
                 maksimaltAntallVirketimerViKanGiYtelseForIPerioden = maksimaltAntallVirketimerViKanGiYtelseForIPerioden,
-                antallVirketimerIPerioden = sumVirketimerIPeriode
+                antallVirketimerIPerioden = sumVirketimerIPerioden
         )
 
-        val justeringsFaktor = if (uavkortetGrad.erNull()) Desimaltall.Null else avkortetGrad / uavkortetGrad
+        val justeringsFaktor = if (uavkortetGrad.erNull()) Desimaltall.Null else gradetMotTilsyn / uavkortetGrad
 
         return Grader(
-                grad = avkortetGrad.resultat,
+                grad = gradetMotTilsyn.resultat,
                 utbetalingsgrader = fraværsGrader.mapValues { (_, fraværsgrad) ->
                     fraværsgrad
                             .times(graderingsfaktorPåGrunnAvTilsynIPerioden)
@@ -86,12 +86,12 @@ internal object GradBeregner {
 
     private fun beregnUavkortetGrad(
             takForYtelsePåGrunnAvTilsyn: Desimaltall,
-            tilsynsgrad: Desimaltall,
+            tilsynsordninggrad: Desimaltall,
             sumAvFraværIPerioden: Duration,
             antallVirketimerIPerioden: Duration,
             maksimaltAntallVirketimerViKanGiYtelseForIPerioden : Duration
     ) : Desimaltall {
-        if (tilsynsgrad > ÅttiProsent) {
+        if (tilsynsordninggrad > ÅttiProsent) {
             return Desimaltall.Null
         }
         return if (sumAvFraværIPerioden <= antallVirketimerIPerioden) {
@@ -110,14 +110,14 @@ internal object GradBeregner {
     }
 
 
-    private fun RegelGrunnlag.graderPåTilsyn(
+    private fun RegelGrunnlag.gradertMotTilsyn(
             periode: LukketPeriode,
-            uavkortetGrad: Desimaltall
-            //tilsynsgrad: Desimaltall TODO: Tror vi trenger denne og..?
+            uavkortetGrad: Desimaltall,
+            tilsynsordninggrad: Desimaltall
     ) : Desimaltall {
         val tilsynsbehov = finnTilsynsbehov(periode)
         val tilsynsbehovDekketAvAndreParter = finnTilsynsbehovDekketAvAndreParter(periode)
-        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter
+        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsordninggrad
         if (tilgjengeligGrad < Desimaltall.Null) {
             return Desimaltall.Null
         }
@@ -145,14 +145,14 @@ internal object GradBeregner {
     }
 
 
-    private fun finnTakForYtelsePåGrunnAvTilsyn(tilsynsgrad: Desimaltall) : Desimaltall {
-        return if (tilsynsgrad < TiProsent) {
+    private fun finnTakForYtelsePåGrunnAvTilsyn(tilsynsordninggrad: Desimaltall) : Desimaltall {
+        return if (tilsynsordninggrad < TiProsent) {
             Desimaltall.EtHundre
         } else {
-            if (tilsynsgrad > ÅttiProsent) {
+            if (tilsynsordninggrad > ÅttiProsent) {
                 Desimaltall.Null
             } else  {
-                Desimaltall.EtHundre - tilsynsgrad
+                Desimaltall.EtHundre - tilsynsordninggrad
             }
         }
     }
@@ -179,7 +179,7 @@ internal object GradBeregner {
     }
 
 
-    private fun RegelGrunnlag.finnTilsynsgrad(periode: LukketPeriode) : Desimaltall { // TilsynsordningGrad?
+    private fun RegelGrunnlag.finnTilsynsordningsgrad(periode: LukketPeriode) : Desimaltall { // TilsynsordningGrad?
         val tilsyn = tilsynsperioder.entries.find { overlapper(it.key, periode) }
         return tilsyn?.value?.grad?.somDesimaltall()?.maks(Desimaltall.EtHundre)?.min(Desimaltall.Null) ?: Desimaltall.Null
     }
