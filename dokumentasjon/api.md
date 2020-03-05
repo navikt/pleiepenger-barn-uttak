@@ -37,6 +37,14 @@ POST /uttaksplan
 			}
 		}
 	}],
+    "arbeidsforhold" : {
+        "123-123-123": {
+            "2020-01-01/2020-03-31": {
+                "jobberNormalt": "PT7H30M",
+                "skalJobbe": "20"
+            }
+        }
+    },
 	"tilsynsbehov": {
 		"2020-01-01/2020-03-31": {
 			"prosent": "100"

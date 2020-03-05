@@ -6,7 +6,7 @@ data class RegelGrunnlag(
         val søker: Søker = Søker(),
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val søknadsperioder:List<LukketPeriode>,
-        val arbeid: List<ArbeidsforholdOgArbeidsperioder> = listOf(),
+        val arbeid: Arbeid = mapOf(),
         val tilsynsperioder:Map<LukketPeriode, Tilsyn> = mapOf(),
         val ferier:List<LukketPeriode> = listOf(),
         val andrePartersUttaksplan: List<Uttaksplan> = listOf(),

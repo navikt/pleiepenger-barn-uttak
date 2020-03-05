@@ -53,7 +53,7 @@ internal object UttaksplanRegler {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
                             grad = grader.grad,
-                            utbetalingsgrader = konverter(grader.utbetalingsgrader)
+                            utbetalingsgrader = grader.utbetalingsgrader
 
                     )
                 }
@@ -68,14 +68,6 @@ internal object UttaksplanRegler {
             )
         }
         return uttaksplan
-    }
-
-    private fun konverter(utbetalingsgrader: Map<Arbeidsforhold, Prosent>):List<ArbeidsforholdOgUtbetalingsgrad> {
-        val arbeidsforholdOgUtbetalingsgrader = mutableListOf<ArbeidsforholdOgUtbetalingsgrad>()
-        utbetalingsgrader.forEach { (arbeidsforhold, grad) ->
-            arbeidsforholdOgUtbetalingsgrader.add(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold, grad))
-        }
-        return arbeidsforholdOgUtbetalingsgrader
     }
 
 }
