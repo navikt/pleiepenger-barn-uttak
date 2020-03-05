@@ -20,7 +20,7 @@ internal object GradBeregner {
     private val ToHundreProsent = Desimaltall.fraDouble(200.00)
 
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
-        val fraværsGrader = mutableMapOf<Arbeidsforhold, Desimaltall>()
+        val fraværsGrader = mutableMapOf<ArbeidsforholdRef, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumVirketimerIPerioden: Duration = Duration.ZERO
         val antallVirkedagerIPerioden = periode.antallVirkedager()
@@ -29,8 +29,8 @@ internal object GradBeregner {
         val tilsynsordninggrad = grunnlag.finnTilsynsordningsgrad(periode)
         val takForYtelsePåGrunnAvTilsyn = finnTakForYtelsePåGrunnAvTilsyn(tilsynsordninggrad)
 
-        grunnlag.arbeid.forEach { arbeidsforholdOgArbeidsperioder ->
-            arbeidsforholdOgArbeidsperioder.perioder.entries.firstOrNull {
+        grunnlag.arbeid.forEach { (arbeidsforholdRef, perioderMedArbeid) ->
+            perioderMedArbeid.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
                 val jobberISnittPerVirkedag = this.value.jobberNormalt / AntallVirkedagerIUken
@@ -44,7 +44,7 @@ internal object GradBeregner {
 
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
 
-                fraværsGrader[arbeidsforholdOgArbeidsperioder.arbeidsforhold] = fraværIPerioden / kunneJobbetIPerioden
+                fraværsGrader[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
             }
         }
 
@@ -218,5 +218,5 @@ internal object GradBeregner {
 
 data class Grader(
         val grad: Prosent,
-        val utbetalingsgrader: Map<Arbeidsforhold, Prosent>
+        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>
 )

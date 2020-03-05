@@ -24,19 +24,14 @@ POST /uttaksplan
 	"lovbestemtFerie": [
 		"2020-01-01/2020-03-10"
 	],
-	"arbeid": [{
-		"arbeidsforhold": {
-			"arbeidstype": "ARBEIDSGIVER",
-			"organisasjonsnummer": "999999999",
-			"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-		},
-		"perioder": {
+	"arbeid" : {
+		"3fa85f64-5717-4562-b3fc-2c963f66afa6": {
 			"2020-01-01/2020-03-31": {
 				"jobberNormalt": "PT7H30M",
 				"skalJobbe": "20"
 			}
 		}
-	}],
+	},
 	"tilsynsbehov": {
 		"2020-01-01/2020-03-31": {
 			"prosent": "100"
@@ -62,28 +57,16 @@ HTTP 201
 		"2020-01-01/2020-03-31": {
 			"type": "innvilget",
 			"grad": 100.00,
-			"utbetalingsgrader": [{
-				"arbeidsforhold": {
-					"arbeidstype": "ARBEIDSGIVER",
-					"organisasjonsnummer": "999999999",
-					"fødselsnummer": null,
-					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-				},
-				"utbetalingsgrad": 80.00
-			}]
+			"utbetalingsgrader": {
+				"3fa85f64-5717-4562-b3fc-2c963f66afa6": {"utbetalingsgrad": 80.00}
+			}
 		},
 		"2020-02-02/2020-02-15": {
 			"type": "innvilget",
 			"grad": 80.00,
-			"utbetalingsgrader": [{
-				"arbeidsforhold": {
-					"arbeidstype": "ARBEIDSGIVER",
-					"organisasjonsnummer": "999999999",
-					"fødselsnummer": null,
-					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-				},
-				"utbetalingsgrad": 75.00
-			}]
+			"utbetalingsgrader": {
+				"3fa85f64-5717-4562-b3fc-2c963f66afa6": {"utbetalingsgrad": 75.00}
+			}
 		},
 		"2020-02-16/2020-02-25": {
 			"type": "avslått",

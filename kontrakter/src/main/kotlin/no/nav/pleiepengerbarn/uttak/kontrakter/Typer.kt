@@ -4,6 +4,6 @@ import java.math.BigDecimal
 
 typealias SakId = String
 typealias BehandlingId = String
-typealias Fødselsnummer = String
-typealias Organisasjonsnummer = String
+typealias ArbeidsforholdRef = String
+typealias Arbeid = Map<ArbeidsforholdRef, Map<LukketPeriode, ArbeidInfo>>
 typealias Prosent = BigDecimal

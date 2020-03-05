@@ -21,13 +21,11 @@ interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
-data class ArbeidsforholdOgUtbetalingsgrad(val arbeidsforhold: Arbeidsforhold, val utbetalingsgrad:Prosent)
-
 @JsonTypeName("innvilget")
 data class InnvilgetPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
-        val utbetalingsgrader: List<ArbeidsforholdOgUtbetalingsgrad>
+        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>
 ) : UttaksPeriodeInfo {
     override fun knekkpunktTyper() = knekkpunktTyper
 }

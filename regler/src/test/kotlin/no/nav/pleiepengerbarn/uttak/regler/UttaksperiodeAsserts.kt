@@ -7,16 +7,16 @@ import org.junit.jupiter.api.Assertions.assertTrue
 
 internal object UttaksperiodeAsserts {
 
-    internal fun sjekkInnvilget(uttaksplan: Uttaksplan, forventetPeriode: LukketPeriode, forventetGrad:Prosent, forventedeUtbetalingsgrader:Map<Arbeidsforhold,Prosent> = mapOf()) {
+    internal fun sjekkInnvilget(uttaksplan: Uttaksplan, forventetPeriode: LukketPeriode, forventetGrad:Prosent, forventedeUtbetalingsgrader:Map<ArbeidsforholdRef,Prosent> = mapOf()) {
         val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
         val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
         assertThat(innvilgetPeriode.grad).isEqualByComparingTo(forventetGrad)
-        forventedeUtbetalingsgrader.forEach { (arbeidsforhold, forventetUtbetalingsgrad) ->
-            val arbeidsforholdOgUtbetalingsgrad = innvilgetPeriode.utbetalingsgrader.find {it.arbeidsforhold == arbeidsforhold}
-            assertNotNull(arbeidsforholdOgUtbetalingsgrad)
-            assertThat(arbeidsforholdOgUtbetalingsgrad?.utbetalingsgrad).isEqualByComparingTo(forventetUtbetalingsgrad)
+        forventedeUtbetalingsgrader.forEach { (arbeidsforholdRef, forventetUtbetalingsgrad) ->
+            val utbetalingsgrad =innvilgetPeriode.utbetalingsgrader[arbeidsforholdRef]
+            assertNotNull(utbetalingsgrad)
+            assertThat(utbetalingsgrad).isEqualByComparingTo(forventetUtbetalingsgrad)
         }
     }
 
