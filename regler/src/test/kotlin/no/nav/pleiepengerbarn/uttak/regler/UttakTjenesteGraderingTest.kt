@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
@@ -88,6 +89,56 @@ internal class UttakTjenesteGraderingTest {
         sjekkInnvilget(uttaksplan, helePerioden, Prosent(60), mapOf(arbeidsforhold1 to Prosent(60)))
     }
 
+    @Test
+    fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                andrePartersUttaksplan = listOf(
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = listOf(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold1, Prosent(40))))
+                        ))),
+                arbeid = listOf(
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(25))))
+                ),
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(grad = Prosent(30))
+                )
+
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)))
+    }
+
+    @Test
+    fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80% skal føre til avslag`() {
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                andrePartersUttaksplan = listOf(
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = listOf(ArbeidsforholdOgUtbetalingsgrad(arbeidsforhold1, Prosent(40))))
+                        ))),
+                tilsynsperioder = mapOf(
+                        helePerioden to Tilsyn(grad = Prosent(45))
+                )
+
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkAvslått(uttaksplan, helePerioden, setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
+    }
 
     @Test
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
