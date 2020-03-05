@@ -158,32 +158,37 @@ internal class UttakTjenesteGraderingTest {
     }
 
 
-    @Disabled
     @Test
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot arbeid`() {
+        val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                        enUke to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
-                        helePerioden
+                        enUke
                 ),
                 arbeid = listOf(
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(40)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(20)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(80)))),
-                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(helePerioden to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(0))))
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold1, mapOf(enUke to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(40)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold2, mapOf(enUke to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(20)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold3, mapOf(enUke to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(80)))),
+                        ArbeidsforholdOgArbeidsperioder(arbeidsforhold4, mapOf(enUke to ArbeidInfo(jobberNormalt = FULL_UKE.minusHours(30), skalJobbe = Prosent(0))))
 
                 ),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(Prosent(40))
+                        enUke to Tilsyn(Prosent(40))
                 )
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(52))
+        sjekkInnvilget(uttaksplan, enUke, Prosent(52), mapOf(
+                arbeidsforhold1 to Prosent(60),
+                arbeidsforhold2 to Prosent(80),
+                arbeidsforhold3 to Prosent(20),
+                arbeidsforhold4 to Prosent(100)
+        ))
 
     }
 

@@ -48,7 +48,7 @@ internal object GradBeregner {
             }
         }
 
-        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = sumVirketimerIPerioden * takForYtelsePåGrunnAvTilsyn.fraProsentTilFaktor()
+        val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = antallVirketimerIPerioden * takForYtelsePåGrunnAvTilsyn.fraProsentTilFaktor()
 
         val uavkortetGrad = beregnUavkortetGrad(
                 takForYtelsePåGrunnAvTilsyn = takForYtelsePåGrunnAvTilsyn,
