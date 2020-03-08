@@ -65,7 +65,7 @@ internal object Lovhenvisninger {
     internal val FastsettingAvTilsynsgradOgPleiepengegrad = FolketrygdlovenHenvisning(
             navn = ForskriftOmGraderingAvPleiepenger.Navn,
             version = ForskriftOmGraderingAvPleiepenger.Versjon,
-            lovdata = URI("https://lovdata.no/forskrift/2017-09-14-1405/§2"),
+            lovdata = URI("https://lovdata.no/forskrift/2017-09-14-1405/§3"),
             paragraf = "3",
             ledd = 3
     )
