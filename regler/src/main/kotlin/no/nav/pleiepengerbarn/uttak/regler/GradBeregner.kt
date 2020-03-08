@@ -68,7 +68,7 @@ internal object GradBeregner {
 
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
 
-                fraværsFaktorer[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
+                fraværsfaktorer[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
             }
         }
 
