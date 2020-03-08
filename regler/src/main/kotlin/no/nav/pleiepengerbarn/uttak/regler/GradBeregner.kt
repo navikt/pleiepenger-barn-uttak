@@ -25,7 +25,7 @@ internal object GradBeregner {
 
     internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
         val årsakbygger = Årsaksbygger()
-        val fraværsGrader = mutableMapOf<ArbeidsforholdRef, Desimaltall>() // TODO: Faktor?
+        val fraværsfaktorer = mutableMapOf<ArbeidsforholdRef, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
@@ -68,7 +68,7 @@ internal object GradBeregner {
 
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
 
-                fraværsGrader[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
+                fraværsFaktorer[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
             }
         }
 
@@ -112,8 +112,8 @@ internal object GradBeregner {
 
         return Grader(
                 grad = endeligGrad.resultat,
-                utbetalingsgrader = fraværsGrader.mapValues { (_, fraværsgrad) ->
-                    fraværsgrad
+                utbetalingsgrader = fraværsfaktorer.mapValues { (_, fraværsfaktor) ->
+                    fraværsfaktor
                             .times(graderingsfaktorPåGrunnAvTilsynIPerioden)
                             .times(justeringsFaktor)
                             .fraFaktorTilProsent()
