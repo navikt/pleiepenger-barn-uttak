@@ -22,7 +22,7 @@ data class InnvilgetÅrsak (
     override fun hjemler() = hjemler
 }
 
-data class AvlslåttÅrsak (
+data class AvslåttÅrsak (
         val årsak: AvslåttÅrsaker,
         val hjemler: Set<Hjemmel>
 ): Årsak {
