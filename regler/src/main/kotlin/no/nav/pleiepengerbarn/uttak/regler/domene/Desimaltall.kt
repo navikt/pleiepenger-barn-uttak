@@ -56,6 +56,7 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
 
     internal fun erNull() = equals(Null)
     internal fun erEtHundre() = equals(EtHundre)
+    internal fun formatertProsent() = "${resultat.toPlainString()}%"
 
     internal val resultat = bigDecimal.setScale(ResultatScale, RoundingMode)
     private val beregning = bigDecimal.setScale(BeregningScale, RoundingMode)

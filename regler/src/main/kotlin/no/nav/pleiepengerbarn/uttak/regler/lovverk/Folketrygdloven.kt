@@ -19,7 +19,7 @@ internal object ForskriftOmGraderingAvPleiepenger {
 internal class FolketrygdlovenHenvisning(
         navn: String,
         version: String,
-        lovdata: URI,
+        private val lovdata: URI,
         paragraf: Paragraf,
         ledd: Ledd? = null,
         punktum: Punktum? = null) : Lovhenvisning {
@@ -28,8 +28,7 @@ internal class FolketrygdlovenHenvisning(
             version,
             "§ $paragraf",
             ledd?.leddTilTekst(),
-            punktum?.punktumTilTekst(),
-            "($lovdata)"
+            punktum?.punktumTilTekst()
     ).joinToString(" ")
 
     override fun anvend(anvendelse: Anvendelse) = Hjemmel(
@@ -37,5 +36,5 @@ internal class FolketrygdlovenHenvisning(
             henvisning = henvisning
     )
 
-    override fun toString() = henvisning
+    override fun toString() = "$henvisning ($lovdata)"
 }

@@ -6,8 +6,8 @@ typealias HjemmeloppsamlingId = String
 
 internal class Årsaksbygger {
     private val oppsamledeHjemler = mutableMapOf<HjemmeloppsamlingId, MutableSet<Hjemmel>>()
-    private var innvilgetÅrsaker = mutableMapOf<InnvilgetÅrsaker, MutableSet<Hjemmel>>()
-    private var avslåttÅrsaker = mutableMapOf<AvslåttÅrsaker, MutableSet<Hjemmel>>()
+    private val innvilgetÅrsaker = mutableMapOf<InnvilgetÅrsaker, MutableSet<Hjemmel>>()
+    private val avslåttÅrsaker = mutableMapOf<AvslåttÅrsaker, MutableSet<Hjemmel>>()
 
     internal fun hjemmel(hjemmeloppsamlingId: HjemmeloppsamlingId, hjemmel: Hjemmel) {
         oppsamledeHjemler[hjemmeloppsamlingId] = oppsamledeHjemler
@@ -49,7 +49,7 @@ internal class Årsaksbygger {
         check(!(innvilgetÅrsaker.isNotEmpty() && avslåttÅrsaker.isNotEmpty())) { "Finnes både innvilget- og avslåttårsaker for perioden." }
     }
 
-    internal fun årsaker() : Set<Årsak>{
+    internal fun bygg() : Set<Årsak>{
         valider()
         val årsaker = mutableSetOf<Årsak>()
         avslåttÅrsaker.forEach { (årsak, hjemler) ->

@@ -37,7 +37,8 @@ enum class InnvilgetÅrsaker {
 
 enum class AvslåttÅrsaker  {
     UtenomTilsynsbehov,
-    ForLavGradPleiepengegrad,
+    ForLavGrad,
+    ForHøyTilsynsgrad, // TODO: Ny <- Legg til test.
     Ferie,
     IkkeMedlemIFolketrygden,
     SøkersDødsfall
