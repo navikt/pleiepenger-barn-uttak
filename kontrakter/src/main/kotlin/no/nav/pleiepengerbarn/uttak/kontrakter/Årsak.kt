@@ -2,40 +2,40 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 
 typealias Henvisning = String
 typealias Anvendelse = String
-typealias Utfallnavn = String
+typealias Årsaknavn = String
 
 data class Hjemmel(
         val henvisning: Henvisning,
         val anvendelse: Anvendelse
 )
 
-interface Utfall {
-    fun navn() : Utfallnavn
+interface Årsak {
+    fun årsak() : Årsaknavn
     fun hjemler() : Set<Hjemmel>
 }
 
-data class InnvilgelsesUtfall (
-        private val navn: InnvilgelsesUtfallnavn,
+data class InnvilgetÅrsak (
+        private val årsak: InnvilgetÅrsaker,
         private val hjemler: Set<Hjemmel>
-): Utfall {
-    override fun navn() = navn.name
+): Årsak {
+    override fun årsak() = årsak.name
     override fun hjemler() = hjemler
 }
 
-data class AvslagsUtfall (
-        val navn: AvslagsUtfallnavn,
+data class AvlslåttÅrsak (
+        val årsak: AvslåttÅrsaker,
         val hjemler: Set<Hjemmel>
-): Utfall {
-    override fun navn() = navn.name
+): Årsak {
+    override fun årsak() = årsak.name
     override fun hjemler() = hjemler
 }
-enum class InnvilgelsesUtfallnavn {
+enum class InnvilgetÅrsaker {
     GradertMotTilsyn,
     AvkortetMotInntekt,
     BarnetsDødsfall
 }
 
-enum class AvslagsUtfallnavn  {
+enum class AvslåttÅrsaker  {
     UtenomTilsynsbehov,
     ForLavGradPleiepengegrad,
     Ferie,
