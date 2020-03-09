@@ -36,8 +36,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 "arbeid": {
                     "123-456-789": {
                         "2020-01-01/2020-03-31": {
-                            "jobberNormalt": "PT37H30M",
-                            "skalJobbe": "0"
+                            "jobberNormaltPerUke": "PT37H30M",
+                            "skalJobbeProsent": "0"
                         }
                     }
                 },
@@ -47,9 +47,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                     }
                 },
                 "medlemskap": {
-                    "2020-01-01/2020-03-31": {
-                        "frivilligMedlem": true
-                    }
+                    "2020-01-01/2020-03-31": {}
                 }
             }
         """.trimIndent()
