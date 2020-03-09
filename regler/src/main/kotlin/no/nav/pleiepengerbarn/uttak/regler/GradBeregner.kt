@@ -26,8 +26,10 @@ internal object GradBeregner {
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
     private val ToHundreProsent = Desimaltall.fraDouble(200.00)
 
-    internal fun beregnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): Grader {
-        val årsakbygger = Årsaksbygger()
+    internal fun beregnGrader(
+            periode: LukketPeriode,
+            grunnlag: RegelGrunnlag,
+            årsakbygger: Årsaksbygger): Grader {
         val fraværsfaktorer = mutableMapOf<ArbeidsforholdRef, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
@@ -132,7 +134,7 @@ internal object GradBeregner {
             avkortetMotTilsynsordningOgAndreOmsorgspersoner: Desimaltall,
             årsakbygger: Årsaksbygger): Desimaltall {
         return if (avkortetMotTilsynsordningOgAndreOmsorgspersoner < TjueProsent) {
-            årsakbygger.hjemmel(YtelsenKanGraderesNedTil20Prosent.anvend(
+            årsakbygger.hjemmel(YtelsenKanGraderesNedTil20Prosent.anvend( // Dette er mot tilsyn. Avkortet mot inntekt erm 9-15 jf. 8-13 første ledd andre punktum
                     "Ikke rett ytelsen da ${avkortetMotTilsynsordningOgAndreOmsorgspersoner.formatertProsent()} er under 20%"
             ))
             Desimaltall.Null
@@ -208,7 +210,7 @@ internal object GradBeregner {
         ))
 
         årsakbygger.hjemmel(tilgjengeligGradLovhenvisning.anvend(
-                "Fastsatt at ${tilsynsbehovDekketAvAndreParter.formatertProsent()} av barnets behov for tilsyn dekkes av andre omsorgspersoner." +
+                "Fastsatt at ${tilsynsbehovDekketAvAndreParter.formatertProsent()} av barnets behov for tilsyn dekkes av andre omsorgspersoner. " +
                         "Tilsynsbehovet som ikke er dekket av andre (tilsynsordninger eller andre omsorgspersoner) er fastsatt til ${tilgjengeligGrad.formatertProsent()}"
         ))
 
@@ -310,6 +312,7 @@ internal object GradBeregner {
 
 
 private const val BeregningAvGrader = "BeregningAvGrader"
+internal fun Årsaksbygger.startBeregningAvGraderMed(hjemler: Set<Hjemmel>) = hjemler(BeregningAvGrader, hjemler)
 private fun Årsaksbygger.hjemmel(hjemmel: Hjemmel) = hjemmel(BeregningAvGrader, hjemmel)
 private fun Årsaksbygger.byggOgTillattKunEn(): Årsak {
     val årsaker = bygg()
@@ -330,7 +333,12 @@ private fun Årsaksbygger.avgjørÅrsak(
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
         }
         else -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.GradertMotTilsyn)
+            if (endeligGrad < takForYtelsePåGrunnAvTilsynsgrad) {
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
+            } else {
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.GradertMotTilsyn)
+
+            }
         }
     }
 }

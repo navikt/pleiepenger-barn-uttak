@@ -7,8 +7,10 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import java.time.LocalDate
 import java.util.*
 
-internal class SøkersDødRegel : UttaksplanRegel {
+internal class SøkersDødRegel : UttaksplanRegel { // 9-10
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
+        return uttaksplan
+        /*
         val dødsdato = grunnlag.søker.dødsdato ?: return uttaksplan
 
         val perioder = uttaksplan.perioder.sortertPåFom()
@@ -29,9 +31,12 @@ internal class SøkersDødRegel : UttaksplanRegel {
         return uttaksplan.copy(
                 perioder = perioder
         )
+
+         */
     }
 }
 
+/*
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
         dødsdato: LocalDate,
         uttaksperiode: Uttaksperiode) {
@@ -93,3 +98,4 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
         }
     }
 }
+*/

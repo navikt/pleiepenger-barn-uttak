@@ -16,7 +16,7 @@ internal object ForskriftOmGraderingAvPleiepenger {
     internal const val Versjon = "FOR-2017-09-14-1405"
 }
 
-internal class FolketrygdlovenHenvisning(
+internal class FolketrygdlovenHenvisning( // TODO ParagrafHenvisning?
         navn: String,
         version: String,
         private val lovdata: URI,
@@ -29,6 +29,24 @@ internal class FolketrygdlovenHenvisning(
             "§ $paragraf",
             ledd?.leddTilTekst(),
             punktum?.punktumTilTekst()
+    ).joinToString(" ")
+
+    override fun anvend(anvendelse: Anvendelse) = Hjemmel(
+            anvendelse = anvendelse,
+            henvisning = henvisning
+    )
+
+    override fun toString() = "$henvisning ($lovdata)"
+}
+
+internal class FolketrygdlovenKapittelHenvisning(
+        kapittel: Int,
+        private val lovdata: URI
+) : Lovhenvisning {
+    private val henvisning = listOf(
+            Folketrygdloven.Navn,
+            Folketrygdloven.Versjon,
+            "Kapittel $kapittel"
     ).joinToString(" ")
 
     override fun anvend(anvendelse: Anvendelse) = Hjemmel(

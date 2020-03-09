@@ -21,11 +21,12 @@ interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
-@JsonTypeName("Innvilget")
+@JsonTypeName("Innvilget") // TODO: Skille på det som er på POST og GET response..
 data class InnvilgetPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
-        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>
+        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+        val årsak: InnvilgetÅrsak
 ) : UttaksPeriodeInfo {
     override fun knekkpunktTyper() = knekkpunktTyper
 }
@@ -33,7 +34,7 @@ data class InnvilgetPeriode(
 @JsonTypeName("Avslått")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        val avslagsÅrsaker: Set<AvslåttPeriodeÅrsak>
+        val årsaker: Set<AvslåttÅrsak>
 ) : UttaksPeriodeInfo {
     override fun knekkpunktTyper() = knekkpunktTyper
 }

@@ -15,8 +15,8 @@ interface Årsak {
 }
 
 data class InnvilgetÅrsak (
-        private val årsak: InnvilgetÅrsaker,
-        private val hjemler: Set<Hjemmel>
+        val årsak: InnvilgetÅrsaker,
+        val hjemler: Set<Hjemmel>
 ): Årsak {
     override fun årsak() = årsak.name
     override fun hjemler() = hjemler
@@ -39,7 +39,7 @@ enum class AvslåttÅrsaker  {
     UtenomTilsynsbehov,
     ForLavGrad,
     ForHøyTilsynsgrad, // TODO: Ny <- Legg til test.
-    Ferie,
+    LovbestemtFerie,
     IkkeMedlemIFolketrygden,
     SøkersDødsfall
 }

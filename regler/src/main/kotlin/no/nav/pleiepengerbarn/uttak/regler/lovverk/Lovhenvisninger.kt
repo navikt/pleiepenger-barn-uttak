@@ -4,7 +4,21 @@ import java.net.URI
 
 internal object Lovhenvisninger {
 
-    internal val BorteFraArbeidet = FolketrygdlovenHenvisning( // 9-3
+    internal val MedlemskapIFolketrygden = FolketrygdlovenKapittelHenvisning(
+            kapittel = 2,
+            lovdata = URI("https://lovdata.no/dokument/NL/lov/1997-02-28-19/KAPITTEL_2-2#KAPITTEL_2-2")
+    )
+
+    internal val TapAvInntekt = FolketrygdlovenHenvisning( // 9-3
+            navn = Folketrygdloven.Navn,
+            version = Folketrygdloven.Versjon,
+            lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
+            paragraf = "9-3",
+            ledd = 1,
+            punktum = 1
+    )
+
+    internal val BorteFraArbeidet = FolketrygdlovenHenvisning( // Referer til TapAvInntekt
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,
             lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
