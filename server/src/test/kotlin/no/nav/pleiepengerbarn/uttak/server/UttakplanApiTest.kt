@@ -43,7 +43,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 },
                 "tilsynsbehov": {
                     "2020-01-01/2020-03-31": {
-                        "prosent": "PROSENT_100"
+                        "prosent": 100
                     }
                 },
                 "medlemskap": {
