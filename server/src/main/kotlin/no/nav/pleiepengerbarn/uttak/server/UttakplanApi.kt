@@ -14,6 +14,8 @@ import org.springframework.web.util.UriComponentsBuilder
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
 class UttakplanApi {
 
+    private val lagredeUttaksplaner = mutableMapOf<BehandlingId, Uttaksplan>()
+
     private companion object {
         private const val Path = "/uttaksplan"
         private const val BehandlingId = "behandlingId"
@@ -25,10 +27,17 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
-        //TODO hent uttaksplan for andre parter
-        //TODO lagre uttaksplan
+        val andrePartersUttaksplan = lagredeUttaksplaner
+                .filterKeys { uttaksgrunnlag.andrePartersBehandlinger.contains(it) }
+                .values
+                .toList()
 
-        val uttaksplan = UttakTjeneste.uttaksplan(GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf()))
+        val uttaksplan = UttakTjeneste.uttaksplan(GrunnlagMapper.tilRegelGrunnlag(
+                uttaksgrunnlag = uttaksgrunnlag,
+                andrePartersUttakplan = andrePartersUttaksplan
+        ))
+
+        lagredeUttaksplaner[uttaksgrunnlag.behandlingId] = uttaksplan
 
         val uri = uriComponentsBuilder
                 .path(Path)
@@ -46,24 +55,12 @@ class UttakplanApi {
     @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
     fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
 
-        //TODO fjern mock kode
         val uttaksplaner = Uttaksplaner(
-                uttaksplaner = mapOf(
-                        behandlingId.first() to dummyUttaksplan()
-                )
+                uttaksplaner = lagredeUttaksplaner
+                        .filterKeys { behandlingId.contains(it) }
         )
 
         return ResponseEntity.ok(uttaksplaner)
     }
-
-    private fun dummyUttaksplan() = Uttaksplan(
-            perioder = mapOf(
-                    LukketPeriode("2020-01-01/2020-01-31") to InnvilgetPeriode(
-                            grad = Prosent(100),
-                            knekkpunktTyper = setOf(),
-                            utbetalingsgrader = mapOf()
-                    )
-            )
-    )
 }
 
