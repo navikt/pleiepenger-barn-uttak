@@ -60,7 +60,7 @@ internal object GradBeregner {
             perioderMedArbeid.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
-                val jobberISnittPerVirkedag = this.value.jobberNormalt / AntallVirkedagerIUken
+                val jobberISnittPerVirkedag = this.value.jobberNormaltPerUke / AntallVirkedagerIUken
                 val kunneJobbetIPerioden = jobberISnittPerVirkedag * antallVirkedagerIPerioden
 
                 sumKunneJobbetIPerioden = sumKunneJobbetIPerioden.plus(kunneJobbetIPerioden)
@@ -296,7 +296,7 @@ internal object GradBeregner {
             kunneJobbetIPerioden: Duration) : Duration {
         val fraværsfaktor = Desimaltall
                 .EtHundre
-                .minus(skalJobbe.somDesimaltall())
+                .minus(skalJobbeProsent.somDesimaltall())
                 .fraProsentTilFaktor()
                 .normaliserFaktor()
 

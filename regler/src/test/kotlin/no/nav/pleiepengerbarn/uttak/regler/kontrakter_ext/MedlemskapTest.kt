@@ -19,12 +19,12 @@ internal class MedlemskapTest {
         )
 
         val medlem = mapOf(
-                LukketPeriode(fom = LocalDate.parse("2020-02-25"), tom = LocalDate.parse("2020-02-27")) to Medlemskap(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-12"), tom = LocalDate.parse("2020-03-15")) to Medlemskap(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-08"), tom = LocalDate.parse("2020-03-10")) to Medlemskap(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-02-28"), tom = LocalDate.parse("2020-03-01")) to Medlemskap(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-17"), tom = LocalDate.parse("2020-03-18")) to Medlemskap(frivilligMedlem = true),
-                LukketPeriode(fom = LocalDate.parse("2020-03-19"), tom = LocalDate.parse("2020-03-20")) to Medlemskap(frivilligMedlem = true)
+                LukketPeriode(fom = LocalDate.parse("2020-02-25"), tom = LocalDate.parse("2020-02-27")) to Medlemskap(),
+                LukketPeriode(fom = LocalDate.parse("2020-03-12"), tom = LocalDate.parse("2020-03-15")) to Medlemskap(),
+                LukketPeriode(fom = LocalDate.parse("2020-03-08"), tom = LocalDate.parse("2020-03-10")) to Medlemskap(),
+                LukketPeriode(fom = LocalDate.parse("2020-02-28"), tom = LocalDate.parse("2020-03-01")) to Medlemskap(),
+                LukketPeriode(fom = LocalDate.parse("2020-03-17"), tom = LocalDate.parse("2020-03-18")) to Medlemskap(),
+                LukketPeriode(fom = LocalDate.parse("2020-03-19"), tom = LocalDate.parse("2020-03-20")) to Medlemskap()
         )
 
         val forventedePerioderIkkeMedlem = listOf(

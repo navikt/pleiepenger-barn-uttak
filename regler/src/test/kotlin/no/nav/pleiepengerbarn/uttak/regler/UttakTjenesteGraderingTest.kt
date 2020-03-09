@@ -253,9 +253,9 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
                         )
                 )
         )
@@ -279,9 +279,9 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormalt = FULL_UKE, skalJobbe = Prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
                         )
                 ),
                 tilsynsperioder = mapOf(
