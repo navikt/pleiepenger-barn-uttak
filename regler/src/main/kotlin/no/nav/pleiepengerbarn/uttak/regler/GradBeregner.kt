@@ -81,7 +81,7 @@ internal object GradBeregner {
                 "Fastsatt fravær til ${sumAvFraværIPerioden.somTekst()} av normalt ${sumKunneJobbetIPerioden.somTekst()}"
         ))
 
-        val grad = beregnGrad(
+        val beregnetGrad = beregnGrad(
                 takForYtelsePåGrunnAvTilsynsgrad = takForYtelsePåGrunnAvTilsynsgrad,
                 tilsynsgrad = tilsynsgrad,
                 sumAvFraværIPerioden = sumAvFraværIPerioden,
@@ -91,7 +91,7 @@ internal object GradBeregner {
 
         val avkortetMotTilsynsordningOgAndreOmsorgspersoner = grunnlag.avkortMotTilsynsgradOgAndreOmsorgspersoner(
                 periode = periode,
-                grad = grad,
+                beregnetGrad = beregnetGrad,
                 tilsynsgrad = tilsynsgrad,
                 årsakbygger = årsakbygger
         )
@@ -102,6 +102,7 @@ internal object GradBeregner {
         )
 
         årsakbygger.avgjørÅrsak(
+                beregnetGrad = beregnetGrad,
                 endeligGrad = endeligGrad,
                 takForYtelsePåGrunnAvTilsynsgrad = takForYtelsePåGrunnAvTilsynsgrad
         )
@@ -113,7 +114,7 @@ internal object GradBeregner {
                 antallVirketimerIPerioden = sumKunneJobbetIPerioden
         )
 
-        val justeringsFaktor = endeligGrad / grad
+        val justeringsFaktor = endeligGrad / beregnetGrad
 
         return Grader(
                 grad = endeligGrad.resultat,
@@ -134,7 +135,7 @@ internal object GradBeregner {
             avkortetMotTilsynsordningOgAndreOmsorgspersoner: Desimaltall,
             årsakbygger: Årsaksbygger): Desimaltall {
         return if (avkortetMotTilsynsordningOgAndreOmsorgspersoner < TjueProsent) {
-            årsakbygger.hjemmel(YtelsenKanGraderesNedTil20Prosent.anvend( // Dette er mot tilsyn. Avkortet mot inntekt erm 9-15 jf. 8-13 første ledd andre punktum
+            årsakbygger.hjemmel(YtelsenKanGraderesNedTil20Prosent.anvend( // TODO Dette er mot tilsyn. Avkortet mot inntekt erm 9-15 jf. 8-13 første ledd andre punktum
                     "Ikke rett ytelsen da ${avkortetMotTilsynsordningOgAndreOmsorgspersoner.formatertProsent()} er under 20%"
             ))
             Desimaltall.Null
@@ -175,7 +176,7 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.avkortMotTilsynsgradOgAndreOmsorgspersoner(
             periode: LukketPeriode,
-            grad: Desimaltall,
+            beregnetGrad: Desimaltall,
             tilsynsgrad: Desimaltall,
             årsakbygger: Årsaksbygger
     ) : Desimaltall {
@@ -184,10 +185,10 @@ internal object GradBeregner {
         val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsgrad
         val avkortet = if (tilgjengeligGrad < Desimaltall.Null) {
             return Desimaltall.Null
-        } else if (grad >= tilgjengeligGrad) {
+        } else if (beregnetGrad >= tilgjengeligGrad) {
             tilgjengeligGrad
         } else {
-            grad
+            beregnetGrad
         }.normaliserProsent()
 
         val tilgjengeligGradLovhenvisning = when {
@@ -320,6 +321,7 @@ private fun Årsaksbygger.byggOgTillattKunEn(): Årsak {
     return årsaker.first()
 }
 private fun Årsaksbygger.avgjørÅrsak(
+        beregnetGrad: Desimaltall,
         endeligGrad: Desimaltall,
         takForYtelsePåGrunnAvTilsynsgrad: Desimaltall) {
     when {
@@ -333,7 +335,7 @@ private fun Årsaksbygger.avgjørÅrsak(
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
         }
         else -> {
-            if (endeligGrad < takForYtelsePåGrunnAvTilsynsgrad) {
+            if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {
                 innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
             } else {
                 innvilget(BeregningAvGrader, InnvilgetÅrsaker.GradertMotTilsyn)

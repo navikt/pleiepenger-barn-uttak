@@ -30,7 +30,7 @@ data class InnvilgetPeriode(
         private val årsak: InnvilgetÅrsak
 ) : UttaksPeriodeInfo {
     override fun knekkpunktTyper() = knekkpunktTyper
-    @get:JsonProperty("årsak") val innvilgetÅrsak = årsak.årsak
+    @get:JsonProperty("årsak") val innvilgetÅrsak = årsak
     @get:JsonProperty("hjemler") val hjemler = årsak.hjemler
 }
 

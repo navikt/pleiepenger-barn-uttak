@@ -5,7 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -100,7 +99,6 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    @Disabled("Årsaksbygger.avgjørÅrsak må re-implementeres for å funger")
     fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(

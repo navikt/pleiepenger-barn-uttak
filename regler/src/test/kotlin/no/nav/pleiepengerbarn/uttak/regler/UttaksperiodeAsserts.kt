@@ -23,7 +23,7 @@ internal object UttaksperiodeAsserts {
             assertNotNull(utbetalingsgrad)
             assertThat(utbetalingsgrad).isEqualByComparingTo(forventetUtbetalingsgrad)
         }
-        assertThat(innvilgetPeriode.innvilgetÅrsak).isEqualTo(forventedeInnvilgetÅrsak.name)
+        assertThat(innvilgetPeriode.innvilgetÅrsak.årsak).isEqualTo(forventedeInnvilgetÅrsak)
 
     }
 
