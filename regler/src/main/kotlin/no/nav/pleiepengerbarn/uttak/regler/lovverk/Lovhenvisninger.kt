@@ -4,7 +4,7 @@ import java.net.URI
 
 internal object Lovhenvisninger {
 
-    internal val BorteFraArbeidet = FolketrygdlovenHenvisning(
+    internal val BorteFraArbeidet = FolketrygdlovenHenvisning( // 9-3
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,
             lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
@@ -12,12 +12,28 @@ internal object Lovhenvisninger {
             ledd = 1
     )
 
-    internal val InntilToOmsorgspersoner = FolketrygdlovenHenvisning(
+    internal val InntilEtHundreProsent = FolketrygdlovenHenvisning(
+            navn = Folketrygdloven.Navn,
+            version = Folketrygdloven.Versjon,
+            lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-11"),
+            paragraf = "9-10",
+            ledd = 1
+    )
+
+    internal val InntilToHundreProsent = FolketrygdlovenHenvisning(
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,
             lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
             paragraf = "9-10",
             ledd = 2
+    )
+
+    internal val TilsynsordningDelerAvPerioden = FolketrygdlovenHenvisning(
+            navn = Folketrygdloven.Navn,
+            version = Folketrygdloven.Versjon,
+            lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-11"),
+            paragraf = "9-11",
+            ledd = 1
     )
 
     internal val GraderesNedForHverTimeBarnetHarTilsynAvAndre = FolketrygdlovenHenvisning(
@@ -27,6 +43,7 @@ internal object Lovhenvisninger {
             paragraf = "9-11",
             ledd = 2
     )
+
     internal val YtelsenKanGraderesNedTil20Prosent = FolketrygdlovenHenvisning(
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,

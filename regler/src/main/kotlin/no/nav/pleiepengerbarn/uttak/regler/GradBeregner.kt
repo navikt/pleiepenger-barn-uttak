@@ -6,12 +6,15 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.somTekst
-import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BorteFraArbeidet
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.FastsettingAvTilsynsgradOgPleiepengegrad
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.GraderesNedForHverTimeBarnetHarTilsynAvAndre
-import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.InntilToOmsorgspersoner
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.InntilEtHundreProsent
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.InntilToHundreProsent
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.MaksÅttiProsentTilsynAvAndre
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.NormalArbeidsdag
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.TilsynPåMindreEnn10ProsentSkalIkkeMedregnes
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.TilsynsordningDelerAvPerioden
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.YtelsenKanGraderesNedTil20Prosent
 import java.time.Duration
 
@@ -48,7 +51,7 @@ internal object GradBeregner {
 
         val maksimaltAntallVirketimerViKanGiYtelseForIPerioden = antallVirketimerIPerioden * takForYtelsePåGrunnAvTilsynsgrad.fraProsentTilFaktor()
 
-        årsakbygger.hjemmel(GraderesNedForHverTimeBarnetHarTilsynAvAndre.anvend(
+        årsakbygger.hjemmel(GraderesNedForHverTimeBarnetHarTilsynAvAndre.anvend( // TODO ?
                 "Fastsatt tak for ytelse på grunn av tilsynsgrad til ${takForYtelsePåGrunnAvTilsynsgrad.formatertProsent()} " +
                         "og maksimalt antall virketimer vi kan gi ytelse for til ${maksimaltAntallVirketimerViKanGiYtelseForIPerioden.somTekst()}"
         ))
@@ -185,10 +188,28 @@ internal object GradBeregner {
             grad
         }.normaliserProsent()
 
-        årsakbygger.hjemmel(InntilToOmsorgspersoner.anvend(
-                "Fastsatt tilsynsbehov til ${tilsynsbehov.formatertProsent()} hvor ${tilsynsbehovDekketAvAndreParter.formatertProsent()} " +
-                        "er dekket av andre omsorgspersoner og ${tilsynsgrad.formatertProsent()} i tilsynsordninger. " +
-                        "Tilgjengelig ${avkortet.formatertProsent()}"
+        val tilgjengeligGradLovhenvisning = when {
+            tilsynsbehov.erEtHundre() -> {
+                årsakbygger.hjemmel(InntilEtHundreProsent.anvend(
+                        "Fastsatt at barnet har behov for opp til 100% tilsyn i perioden."
+                ))
+                InntilEtHundreProsent
+            }
+            else -> {
+                årsakbygger.hjemmel(InntilToHundreProsent.anvend(
+                        "Fastsatt at barnet har behov for opp til 200% tilsyn i perioden."
+                ))
+                InntilToHundreProsent
+            }
+        }
+
+        årsakbygger.hjemmel(TilsynsordningDelerAvPerioden.anvend(
+                "Fastsatt at ${tilsynsgrad.formatertProsent()} av barnets behov for tilsyn dekkes i etablert tilsynsordning."
+        ))
+
+        årsakbygger.hjemmel(tilgjengeligGradLovhenvisning.anvend(
+                "Fastsatt at ${tilsynsbehovDekketAvAndreParter.formatertProsent()} av barnets behov for tilsyn dekkes av andre omsorgspersoner." +
+                        "Tilsynsbehovet som ikke er dekket av andre (tilsynsordninger eller andre omsorgspersoner) er fastsatt til ${tilgjengeligGrad.formatertProsent()}"
         ))
 
         return avkortet
@@ -215,13 +236,13 @@ internal object GradBeregner {
             tilsynsgrad: Desimaltall,
             årsakbygger: Årsaksbygger) : Desimaltall {
         return if (tilsynsgrad < TiProsent) {
-            årsakbygger.hjemmel(Lovhenvisninger.TilsynPåMindreEnn10ProsentSkalIkkeMedregnes.anvend(
+            årsakbygger.hjemmel(TilsynPåMindreEnn10ProsentSkalIkkeMedregnes.anvend(
                     "Beregnet tilsynsgrad på ${tilsynsgrad.formatertProsent()} regnes ikke med da den er under 10%"
             ))
             Desimaltall.EtHundre
         } else {
             if (tilsynsgrad > ÅttiProsent) {
-                årsakbygger.hjemmel(Lovhenvisninger.MaksÅttiProsentTilsynAvAndre.anvend(
+                årsakbygger.hjemmel(MaksÅttiProsentTilsynAvAndre.anvend(
                         "Beregnet tilsynsgrad på ${tilsynsgrad.formatertProsent()} gjør at det ikke foreligger rett til pleiepenger."
                 ))
                 Desimaltall.Null
@@ -267,7 +288,7 @@ internal object GradBeregner {
         return when (tilsynsbehov?.value?.prosent) {
             TilsynsbehovStørrelse.PROSENT_100 -> Desimaltall.EtHundre
             TilsynsbehovStørrelse.PROSENT_200 -> ToHundreProsent
-            else -> Desimaltall.Null
+            else -> throw IllegalStateException("Periode uten tilsynsbehov")
         }
     }
 
