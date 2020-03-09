@@ -1,6 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-enum class KnekkpunktType {
+enum class KnekkpunktType { // TODO: Samme format som andre Enums
     FERIE,
     TILSYNSBEHOV,
     TILSYNSPERIODE,
