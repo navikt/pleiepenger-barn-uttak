@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
@@ -26,9 +27,11 @@ data class InnvilgetPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
         val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
-        val årsak: InnvilgetÅrsak
+        private val årsak: InnvilgetÅrsak
 ) : UttaksPeriodeInfo {
     override fun knekkpunktTyper() = knekkpunktTyper
+    @get:JsonProperty("årsak") val innvilgetÅrsak = årsak.årsak
+    @get:JsonProperty("hjemler") val hjemler = årsak.hjemler
 }
 
 @JsonTypeName("Avslått")
