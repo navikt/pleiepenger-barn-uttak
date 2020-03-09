@@ -61,7 +61,8 @@ internal object UttaksplanRegler {
                             knekkpunktTyper = knekkpunktTyper,
                             grad = grader.grad,
                             utbetalingsgrader = grader.utbetalingsgrader,
-                            årsak = grader.årsak
+                            årsak = grader.årsak.årsak,
+                            hjemler = grader.årsak.hjemler
                     )
                 }
             }
