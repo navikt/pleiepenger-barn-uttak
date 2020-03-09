@@ -211,7 +211,7 @@ internal object GradBeregner {
 
         årsakbygger.hjemmel(tilgjengeligGradLovhenvisning.anvend(
                 "Fastsatt at ${tilsynsbehovDekketAvAndreParter.formatertProsent()} av barnets behov for tilsyn dekkes av andre omsorgspersoner. " +
-                        "Tilsynsbehovet som ikke er dekket av andre (tilsynsordninger eller andre omsorgspersoner) er fastsatt til ${tilgjengeligGrad.formatertProsent()}"
+                        "Tilsynsbehovet som ikke er dekket av andre er fastsatt til ${tilgjengeligGrad.formatertProsent()}"
         ))
 
         return avkortet
