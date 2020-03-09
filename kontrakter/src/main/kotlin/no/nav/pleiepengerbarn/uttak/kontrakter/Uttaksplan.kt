@@ -12,16 +12,16 @@ data class Uttaksplan(
         val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "innvilget"),
-        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "avslått")
+        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "Innvilget"),
+        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "Avslått")
 )
 interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
-@JsonTypeName("innvilget")
+@JsonTypeName("Innvilget")
 data class InnvilgetPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
@@ -30,7 +30,7 @@ data class InnvilgetPeriode(
     override fun knekkpunktTyper() = knekkpunktTyper
 }
 
-@JsonTypeName("avslått")
+@JsonTypeName("Avslått")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val avslagsÅrsaker: Set<AvslåttPeriodeÅrsak>
