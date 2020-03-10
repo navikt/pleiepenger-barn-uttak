@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.*
 
 data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
 
+typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
+
 data class Uttaksplan(
         val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
@@ -17,7 +19,7 @@ interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
-@JsonTypeName("Innvilget") // TODO: Skille på det som er på POST og GET response..
+@JsonTypeName("Innvilget")
 data class InnvilgetPeriode @JsonCreator constructor(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,

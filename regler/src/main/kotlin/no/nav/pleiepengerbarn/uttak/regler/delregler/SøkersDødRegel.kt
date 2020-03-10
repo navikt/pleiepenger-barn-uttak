@@ -4,13 +4,19 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
+import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.TapAvInntekt
 import java.time.LocalDate
 import java.util.*
 
-internal class SøkersDødRegel : UttaksplanRegel { // 9-10
+internal class SøkersDødRegel : UttaksplanRegel {
+    internal companion object {
+        internal fun søkersDødAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
+                årsak = AvslåttÅrsaker.SøkersDødsfall,
+                hjemler = setOf(TapAvInntekt.anvend("Fastsatt at søker døde $dødsdato."))
+        )
+    }
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
-        return uttaksplan
-        /*
+
         val dødsdato = grunnlag.søker.dødsdato ?: return uttaksplan
 
         val perioder = uttaksplan.perioder.sortertPåFom()
@@ -31,12 +37,9 @@ internal class SøkersDødRegel : UttaksplanRegel { // 9-10
         return uttaksplan.copy(
                 perioder = perioder
         )
-
-         */
     }
 }
 
-/*
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
         dødsdato: LocalDate,
         uttaksperiode: Uttaksperiode) {
@@ -63,14 +66,14 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     val knekkpunktTyper = uttaksPeriodeInfo
             .knekkpunktTyper()
             .toMutableSet()
-            .also { it.add(KnekkpunktType.SØKERS_DØDSFALL) }
+            .also { it.add(KnekkpunktType.SøkersDødsfall) }
 
-    val avslagsÅrsaker = (if (uttaksPeriodeInfo is AvslåttPeriode) uttaksPeriodeInfo.avslagsÅrsaker.toMutableSet() else mutableSetOf()).also {
-        it.add(AvslåttPeriodeÅrsak.SØKERS_DØDSFALL)
+    val avslåttÅrsaker = (if (uttaksPeriodeInfo is AvslåttPeriode) uttaksPeriodeInfo.årsaker.toMutableSet() else mutableSetOf()).also {
+        it.add(SøkersDødRegel.søkersDødAvslåttÅrsak(dødsdato))
     }
     put(periodeEtterDødsfall, AvslåttPeriode(
             knekkpunktTyper = knekkpunktTyper,
-            avslagsÅrsaker = avslagsÅrsaker
+            årsaker = avslåttÅrsaker
     ))
 }
 
@@ -83,19 +86,19 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
          */
         if (periodeInfo is AvslåttPeriode) {
             val avslagsÅrsaker = periodeInfo
-                    .avslagsÅrsaker
+                    .årsaker
                     .toMutableSet()
-                    .also { eksisterende -> eksisterende.add(AvslåttPeriodeÅrsak.SØKERS_DØDSFALL) }
+                    .also { eksisterende -> eksisterende.add(SøkersDødRegel.søkersDødAvslåttÅrsak(dødsdato))
+            }
 
             put(periode, periodeInfo.copy(
-                    avslagsÅrsaker = avslagsÅrsaker)
-            )
+                    årsaker = avslagsÅrsaker
+            ))
         } else {
             put(periode, AvslåttPeriode(
                     knekkpunktTyper = periodeInfo.knekkpunktTyper(),
-                    avslagsÅrsaker = setOf(AvslåttPeriodeÅrsak.SØKERS_DØDSFALL)
+                    årsaker = setOf(SøkersDødRegel.søkersDødAvslåttÅrsak(dødsdato))
             ))
         }
     }
 }
-*/

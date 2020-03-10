@@ -14,6 +14,8 @@ internal class FerieRegel : PeriodeRegel {
             return Avslått(årsaker = Årsaksbygger().hjemmel(AvslåttÅrsaker.LovbestemtFerie, TapAvInntekt.anvend(
                     "Fastsatt at det ikke er noe inntektstap ved avvkling av lovbestemt ferie."
             )).byggAvslåttÅrsaker())
+
+            // Ferie: Legge til ref. til 9-15 jfr. 8-17 andre lett
         }
         return TilBeregningAvGrad(
                 hjemler = setOf() // TOD: Legge til noe her..?
