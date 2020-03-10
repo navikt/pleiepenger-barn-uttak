@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonValue
 enum class TilsynsbehovStørrelse(
         @get:JsonValue val prosent: Prosent) {
     PROSENT_100(Prosent(100)),
-    PROSENT_200(Prosent(200));
-    // TODO: HMM 1000 prosent.. ?
+    PROSENT_200(Prosent(200)),
+    PROSENT_1000(Prosent(1000));
 
     companion object {
         @JsonCreator
         @JvmStatic
         fun fraProsent(prosent: Prosent): TilsynsbehovStørrelse =
-                values()
+                values().filterNot { it == PROSENT_1000 }
                 .firstOrNull { it.prosent.compareTo(prosent) == 0 }
                 ?: throw IllegalArgumentException("Ikke støttet størrelse på tilsyn ${prosent.toPlainString()}")
     }

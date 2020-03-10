@@ -35,8 +35,8 @@ data class InnvilgetPeriode @JsonCreator constructor(
             knekkpunktTyper = knekkpunktTyper,
             grad = grad,
             utbetalingsgrader = utbetalingsgrader,
-            årsak =
-            årsak.årsak, hjemler = årsak.hjemler
+            årsak = årsak.årsak,
+            hjemler = årsak.hjemler
     )
 
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper

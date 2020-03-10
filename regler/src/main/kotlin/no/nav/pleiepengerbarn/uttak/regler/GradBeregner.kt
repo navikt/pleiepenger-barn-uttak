@@ -288,11 +288,7 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
         val tilsynsbehov = tilsynsbehov.entries.find { it.key.overlapper(periode) }
-        return when (tilsynsbehov?.value?.prosent) {
-            TilsynsbehovStørrelse.PROSENT_100 -> Desimaltall.EtHundre
-            TilsynsbehovStørrelse.PROSENT_200 -> ToHundreProsent
-            else -> throw IllegalStateException("Periode uten tilsynsbehov")
-        }
+        return tilsynsbehov?.value?.prosent?.prosent?.somDesimaltall() ?: throw IllegalStateException("Periode uten tilsynsbehov")
     }
 
     private fun ArbeidInfo.fravær(
