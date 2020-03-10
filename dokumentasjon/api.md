@@ -7,12 +7,12 @@ POST /uttaksplan
 {
 	"sakId": "ABC123",
 	"behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
-	"andrePartersBehandlinger": [
-	  "474abb91-0e61-4459-ba5f-7e960d45c164", 
-	  "474abb91-0e61-4459-ba5f-7e960d45c112"
+	"andrePartersSaker": [
+		"ABC124",
+		"ABC125"
 	],
 	"søker": {
-	    "fødselsdato": "1990-09-29",
+		"fødselsdato": "1990-09-29",
 		"dødsdato": "2020-01-01"
 	},
 	"barn": {
@@ -24,26 +24,30 @@ POST /uttaksplan
 	"lovbestemtFerie": [
 		"2020-01-01/2020-03-10"
 	],
-	"arbeid" : {
-		"3fa85f64-5717-4562-b3fc-2c963f66afa6": {
+	"arbeid": [{
+		"arbeidsforhold": {
+			"type": "Arbeidstaker",
+			"organisasjonsnummer": "999999999",
+			"aktørId": null,
+			"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+		},
+		"perioder": {
 			"2020-01-01/2020-03-31": {
-				"jobberNormalt": "PT7H30M",
-				"skalJobbe": "20"
+				"jobberNormaltPerUke": "PT7H30M",
+				"skalJobbeProsent": "20"
 			}
 		}
-	},
+	}],
 	"tilsynsbehov": {
 		"2020-01-01/2020-03-31": {
-			"prosent": "100"
+			"prosent": 100
 		},
 		"2020-04-01/2020-04-31": {
-			"prosent": "200"
+			"prosent": 200
 		}
 	},
 	"medlemskap": {
-		"2020-01-01/2020-03-31": {
-			"frivilligEllerPliktigMedlem": true
-		}
+		"2020-01-01/2020-03-31": {}
 	}
 }
 ```
@@ -56,21 +60,41 @@ HTTP 201
 	"perioder": {
 		"2020-01-01/2020-03-31": {
 			"type": "innvilget",
-			"grad": 100.00,
-			"utbetalingsgrader": {
-				"3fa85f64-5717-4562-b3fc-2c963f66afa6": {"utbetalingsgrad": 80.00}
-			}
+			"grad": 100,
+			"utbetalingsgrader": [{
+				"arbeidsforhold": {
+					"type": "Arbeidstaker",
+					"organisasjonsnummer": "999999999",
+					"aktørId": null,
+					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+				},
+				"utbetalingsgrad": 75.00
+			}]
 		},
 		"2020-02-02/2020-02-15": {
-			"type": "innvilget",
-			"grad": 80.00,
-			"utbetalingsgrader": {
-				"3fa85f64-5717-4562-b3fc-2c963f66afa6": {"utbetalingsgrad": 75.00}
-			}
+			"utfall": "Innvilget",
+			"årsak": "AvkortetMotInntekt",
+			"hjemler": [],
+			"grad": 80,
+			"utbetalingsgrader": [{
+				"arbeidsforhold": {
+					"type": "Arbeidstaker",
+					"organisasjonsnummer": "999999999",
+					"aktørId": null,
+					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+				},
+				"utbetalingsgrad": 80.00
+			}]
 		},
 		"2020-02-16/2020-02-25": {
-			"type": "avslått",
-			"avslagsÅrsaker": ["IKKE_MEDLEM"]
+			"utfall": "Avslått",
+			"årsaker": [{
+				"årsak": "IkkeMedlemIFolketrygden",
+				"hjemler": [{
+					"henvisning": "Folketrygdloven LOV-1997-02-28-19 Kapittel 2",
+					"anvendelse": "Fastsatt at personen ikke er medlem av folketrygden i perioden."
+				}]
+			}]
 		}
 	}
 }
