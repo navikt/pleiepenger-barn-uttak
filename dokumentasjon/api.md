@@ -24,14 +24,21 @@ POST /uttaksplan
 	"lovbestemtFerie": [
 		"2020-01-01/2020-03-10"
 	],
-	"arbeid" : {
-		"3fa85f64-5717-4562-b3fc-2c963f66afa6": {
-			"2020-01-01/2020-03-31": {
-				"jobberNormalt": "PT7H30M",
-				"skalJobbe": "20"
+	"arbeid" : [
+			{
+				"arbeidsforhold": {
+					"organisasjonsnummer": "999999999",  
+					"privatArbeidsgiverAktørId": null,
+					"arbeidsforholdId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+				}, 
+				"perioder": {
+					"2020-01-01/2020-03-31": {
+						"jobberNormaltPerUke": "PT7H30M",
+						"skalJobbeProsent": "20"
+					}
+				}
 			}
-		}
-	},
+	],
 	"tilsynsbehov": {
 		"2020-01-01/2020-03-31": {
 			"prosent": "100"
