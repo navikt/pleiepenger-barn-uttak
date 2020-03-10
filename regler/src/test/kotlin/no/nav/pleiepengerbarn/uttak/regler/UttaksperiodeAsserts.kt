@@ -7,7 +7,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 
 internal object UttaksperiodeAsserts {
 
-    internal fun sjekkInnvilget(uttaksplan: Uttaksplan, forventetPeriode: LukketPeriode, forventetGrad:Prosent, forventedeUtbetalingsgrader:Map<ArbeidsforholdRef,Prosent> = mapOf()) {
+    internal fun sjekkInnvilget(
+            uttaksplan: Uttaksplan,
+            forventetPeriode: LukketPeriode,
+            forventetGrad:Prosent,
+            forventedeUtbetalingsgrader:Map<ArbeidsforholdRef,Prosent> = mapOf(),
+            forventedeInnvilgetÅrsak: InnvilgetÅrsaker) {
         val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
@@ -18,14 +23,19 @@ internal object UttaksperiodeAsserts {
             assertNotNull(utbetalingsgrad)
             assertThat(utbetalingsgrad).isEqualByComparingTo(forventetUtbetalingsgrad)
         }
+        assertThat(innvilgetPeriode.årsak).isEqualTo(forventedeInnvilgetÅrsak)
+
     }
 
-    internal fun sjekkAvslått(uttaksplan: Uttaksplan, forventetPeriode: LukketPeriode, forventedAvslagsÅrsaker:Set<AvslåttPeriodeÅrsak>) {
+    internal fun sjekkAvslått(
+            uttaksplan: Uttaksplan,
+            forventetPeriode: LukketPeriode,
+            forventetAvslåttÅrsaker:Set<AvslåttÅrsaker>) {
         val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
         val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
-        assertThat(avslåttPeriode.avslagsÅrsaker).isEqualTo(forventedAvslagsÅrsaker)
+        assertThat(avslåttPeriode.årsaker.map { it.årsak.name }).isEqualTo(forventetAvslåttÅrsaker.map { it.name })
     }
 
 }

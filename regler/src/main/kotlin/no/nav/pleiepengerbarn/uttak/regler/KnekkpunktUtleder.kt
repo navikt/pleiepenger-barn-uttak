@@ -34,30 +34,30 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
-        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM) }
+        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IkkeMedlem) }
     }
 
     private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Tilsyn>) {
-        tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
+        tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.Tilsynsperiode) }
     }
 
     private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
-        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.FERIE)}
+        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.Ferie)}
     }
 
     private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>) {
-        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.TILSYNSBEHOV)}
+        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.Tilsynsbehov)}
     }
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {
         andrePartersUttaksplan.forEach { uttaksplan ->
-            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.ANNEN_PARTS_UTTAK)}
+            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.AnnenPartsUttak)}
         }
     }
 
     private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: Arbeid) {
         arbeid.values.forEach {
-            it.keys.forEach {periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID)}
+            it.keys.forEach {periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.Arbeid)}
         }
     }
 

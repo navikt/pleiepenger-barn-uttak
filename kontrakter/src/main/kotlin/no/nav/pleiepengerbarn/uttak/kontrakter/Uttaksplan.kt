@@ -1,8 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.annotation.*
 
 data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
 
@@ -22,18 +20,32 @@ interface UttaksPeriodeInfo {
 }
 
 @JsonTypeName("Innvilget")
-data class InnvilgetPeriode(
+data class InnvilgetPeriode @JsonCreator constructor(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
-        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>
+        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+        val årsak: InnvilgetÅrsaker,
+        val hjemler: Set<Hjemmel>
+
 ) : UttaksPeriodeInfo {
-    override fun knekkpunktTyper() = knekkpunktTyper
+    constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+                grad: Prosent,
+                utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+                årsak: InnvilgetÅrsak) : this(
+            knekkpunktTyper = knekkpunktTyper,
+            grad = grad,
+            utbetalingsgrader = utbetalingsgrader,
+            årsak =
+            årsak.årsak, hjemler = årsak.hjemler
+    )
+
+    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
 }
 
 @JsonTypeName("Avslått")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        val avslagsÅrsaker: Set<AvslåttPeriodeÅrsak>
+        val årsaker: Set<AvslåttÅrsak>
 ) : UttaksPeriodeInfo {
-    override fun knekkpunktTyper() = knekkpunktTyper
+    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
 }
