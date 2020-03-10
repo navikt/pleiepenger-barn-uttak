@@ -34,7 +34,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.AvkortetMotInntekt)
     }
 
 
@@ -59,8 +59,8 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
-        sjekkAvslått(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttPeriodeÅrsak.OVERLAPPER_MED_FERIE))
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkAvslått(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(AvslåttÅrsaker.LovbestemtFerie))
     }
 
     @Test
@@ -81,12 +81,12 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
-        sjekkAvslått(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttPeriodeÅrsak.PERIODE_ETTER_TILSYNSBEHOV))
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkAvslått(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(AvslåttÅrsaker.UtenomTilsynsbehov))
     }
 
     @Test
-    fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for lav prosent`() {
+    fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for høy tilsynsgrad`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 tilsynsbehov = mapOf(
@@ -106,8 +106,8 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
-        sjekkAvslått(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD))
+        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkAvslått(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttÅrsaker.ForHøyTilsynsgrad))
     }
 
     @Test
@@ -127,7 +127,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttPeriodeÅrsak.IKKE_MEDLEM))
-        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)))
+        sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden))
+        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.AvkortetMotInntekt)
     }
 }

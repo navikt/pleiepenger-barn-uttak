@@ -1,8 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.AvslåttPeriodeÅrsak
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 
 internal interface PeriodeRegel {
@@ -10,8 +8,8 @@ internal interface PeriodeRegel {
 }
 
 internal interface Utfall
-internal class Avslått(internal val avslagsÅrsak: AvslåttPeriodeÅrsak) : Utfall
-internal class TilBeregningAvGrad : Utfall
+internal class Avslått(internal val årsaker: Set<AvslåttÅrsak>) : Utfall
+internal class TilBeregningAvGrad(internal val hjemler: Set<Hjemmel>) : Utfall
 
 internal interface UttaksplanRegel {
     fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag) : Uttaksplan
