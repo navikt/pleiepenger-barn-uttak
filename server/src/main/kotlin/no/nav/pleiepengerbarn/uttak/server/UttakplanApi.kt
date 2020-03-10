@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
+import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -14,7 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
 class UttakplanApi {
 
-    private val lagredeUttaksplaner = mutableMapOf<BehandlingId, Uttaksplan>()
+    @Autowired
+    private val uttakRepository: UttakRepository? = null
 
     private companion object {
         private const val Path = "/uttaksplan"
@@ -27,17 +30,16 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
-        val andrePartersUttaksplan = lagredeUttaksplaner
-                .filterKeys { uttaksgrunnlag.andrePartersBehandlinger.contains(it) }
-                .values
-                .toList()
 
-        val uttaksplan = UttakTjeneste.uttaksplan(GrunnlagMapper.tilRegelGrunnlag(
-                uttaksgrunnlag = uttaksgrunnlag,
-                andrePartersUttakplan = andrePartersUttaksplan
-        ))
+        val andrePartersUttaksplaner = mutableListOf<Uttaksplan>()
+        uttaksgrunnlag.andrePartersBehandlinger.forEach {
 
-        lagredeUttaksplaner[uttaksgrunnlag.behandlingId] = uttaksplan
+        }
+        //TODO hent uttaksplan for andre parter
+        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf())
+        val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
+
+        uttakRepository?.lagre(uttaksgrunnlag.saksnummer, uttaksgrunnlag.behandlingId, regelGrunnlag, uttaksplan)
 
         val uri = uriComponentsBuilder
                 .path(Path)
@@ -50,17 +52,17 @@ class UttakplanApi {
                 .body(uttaksplan)
     }
 
-
     @GetMapping(Path, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
     fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
-
-        val uttaksplaner = Uttaksplaner(
-                uttaksplaner = lagredeUttaksplaner
-                        .filterKeys { behandlingId.contains(it) }
-        )
-
-        return ResponseEntity.ok(uttaksplaner)
+        val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
+        behandlingId.forEach {
+            val uttaksplan = uttakRepository?.hent(it)
+            if (uttaksplan != null) {
+                uttaksplanMap[it] = uttaksplan
+            }
+        }
+        return ResponseEntity.ok(Uttaksplaner(uttaksplanMap))
     }
 }
 

@@ -1,11 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.server
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.InnvilgetPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import com.opentable.db.postgres.embedded.EmbeddedPostgres
+import com.zaxxer.hikari.HikariConfig
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,26 +15,59 @@ import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.test.context.ActiveProfiles
 import java.net.URI
+import java.sql.Connection
 import java.time.LocalDate
 import java.time.Month
+import java.util.*
 
 private const val UTTAKSPLAN_PATH = "/uttaksplan"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
+internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
+
+    private lateinit var embeddedPostgres: EmbeddedPostgres
+    private lateinit var postgresConnection: Connection
+
+    private lateinit var hikariConfig: HikariConfig
+
+    @BeforeEach
+    fun `start postgres`() {
+        embeddedPostgres = EmbeddedPostgres.builder()
+                .start()
+
+        postgresConnection = embeddedPostgres.postgresDatabase.connection
+        val jdbcUrl = embeddedPostgres.getJdbcUrl("postgres", "postgres")
+        println(jdbcUrl)
+        hikariConfig = createHikariConfig(jdbcUrl)
+    }
+
+    private fun createHikariConfig(jdbcUrl: String) =
+        HikariConfig().apply {
+            this.jdbcUrl = jdbcUrl
+            maximumPoolSize = 3
+            minimumIdle = 1
+            idleTimeout = 10001
+            connectionTimeout = 1000
+            maxLifetime = 30001
+    }
 
     @Test
     fun `Opprett uttaksplan`() {
+
+        val behandlingId = UUID.randomUUID().toString()
+        //
+        // Lagre ny uttaksplan
+        //
         val requestBody = """
             {
                 "saksnummer": "123",
-                "behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
+                "behandlingId": "$behandlingId",
                 "søknadsperioder": [
                     "2020-01-01/2020-03-31"
                 ],
                 "arbeid": {
-                    "123-456-789": {
+                    "86c86307-ccf9-4c78-8873-75d601c09d26": {
                         "2020-01-01/2020-03-31": {
                             "jobberNormaltPerUke": "PT37H30M",
                             "skalJobbeProsent": "0"
@@ -74,6 +107,18 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertTrue(info is InnvilgetPeriode)
         val innvilgetPeriode = info as InnvilgetPeriode
         assertThat(innvilgetPeriode.grad).isEqualByComparingTo(Prosent(100))
+
+
+        //
+        // Hent uttaksplan
+        //
+        val getResponse = restTemplate.getForEntity(
+                URI.create(UTTAKSPLAN_PATH + "?behandlingId=$behandlingId"),
+                Uttaksplan::class.java)
+        val uttaksplaner = response.body
+
+        assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
+        println(uttaksplaner)
     }
 
 }
