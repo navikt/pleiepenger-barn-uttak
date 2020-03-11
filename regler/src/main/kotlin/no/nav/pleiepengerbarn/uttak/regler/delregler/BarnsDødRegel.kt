@@ -9,6 +9,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.perioderSomIkkeInngårI
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BarnetsDødsfall
+import java.lang.IllegalStateException
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -32,11 +33,20 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
         val perioder = uttaksplan.perioder.sortertPåFom()
 
+        val uttaksperiodeDaBarnetDøde = perioder.inneholder(dødsdato)
+
+        perioder.knekkUttaksperiodenDaBarnetDøde(
+                dødsdato = dødsdato,
+                uttaksperiodeDaBarnetDøde = uttaksperiodeDaBarnetDøde
+        )
+
         val innvilgetUttaksperiodeDaBarnetDøde =
                 perioder.inneholder(dødsdato)?.takeIf { it.value is InnvilgetPeriode }
 
         if (innvilgetUttaksperiodeDaBarnetDøde == null) {
-            perioder.avslåAllePerioderEtterDødsfallet(dødsdato)
+            perioder.avslåAllePerioderEtterDødsfallet(
+                    dødsdato = dødsdato
+            )
         } else {
             perioder.fjernAllePerioderEtterDødsfallet(
                     dødsdato = dødsdato,
@@ -55,7 +65,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
                             søknadsperioder = grunnlag.søknadsperioder.søknadsperioderEtterDødsdato(
-                                    dagenEtterDødsfall = grunnlag.barn.dagenEtterDødsfall()
+                                    dødsdato = dødsdato
                             ),
                             tilsynsperioder = emptyMap(),
                             tilsynsbehov = mapOf(sorgperiode to Tilsynsbehov(
@@ -86,6 +96,46 @@ internal class BarnsDødRegel : UttaksplanRegel {
         return uttaksplan.copy(
                 perioder = perioder
         )
+    }
+}
+
+/**
+ * - Om barnet døde utenom en uttaksperiode forblir periodene som de var
+ * - Om barnet døde i en uttaksperiode, men det var siste dag i uttaksperioden forblir periodene som de var
+ * - Om barnet døde i en uttaksperiode utenom sise dag i perioden knekkes den i to:
+ *      1) FOM til dødsdato - UttaksPeriodeInfo forblir som det var
+ *      2) (dødsdato + 1 dag) til TOM - UtttaksPeriodeInfo forblir som det var, med knekkpunkt 'BARNETS_DØDSFALL'
+ */
+private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBarnetDøde(
+        dødsdato: LocalDate,
+        uttaksperiodeDaBarnetDøde: Uttaksperiode?) {
+    uttaksperiodeDaBarnetDøde?.takeUnless { it.key.tom.isEqual(dødsdato) }?.apply {
+        val periode = this.key
+        val periodeInfo = this.value
+
+        // Fjerner perioden dødsfallet fant sted
+        remove(periode)
+
+        // Legger til knekk FOM - dødsdato
+        put(LukketPeriode(
+                fom = uttaksperiodeDaBarnetDøde.key.fom,
+                tom = dødsdato
+        ), periodeInfo)
+
+        val periodeInfoMedKnekkpunkt = when (periodeInfo) {
+            is InnvilgetPeriode -> {
+                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BarnetsDødsfall))
+            }
+            is AvslåttPeriode -> {
+                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BarnetsDødsfall))
+            }
+            else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
+        }
+        // Legger til knekk (dødsdato+1) - TOM
+        put(LukketPeriode(
+                fom = dødsdato.plusDays(1),
+                tom = uttaksperiodeDaBarnetDøde.key.tom
+        ), periodeInfoMedKnekkpunkt)
     }
 }
 
@@ -125,21 +175,28 @@ private fun Map<LukketPeriode, InnvilgetPeriode>.innvilgetPeriodeMedNærmesteTom
 }
 
 
-    private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dagenEtterDødsfall: LocalDate) : List<LukketPeriode> {
-    val perioder = filter { dagenEtterDødsfall.isAfter(it.fom) }.toMutableList()
-    val periodenDødsfalletFantSted = find { it.inneholder(dagenEtterDødsfall) }
+private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalDate) : List<LukketPeriode> {
+    val perioderEtterDødfallet =
+            filter { it.fom.isAfter(dødsdato) }
+            .toMutableList()
+
+    val periodenDødsfalletFantSted =
+            find { it.inneholder(dødsdato) }
+            ?.takeUnless { dødsdato.isEqual(it.tom) }
+
     if (periodenDødsfalletFantSted != null) {
-        perioder.add(LukketPeriode(
-                fom = dagenEtterDødsfall,
+        perioderEtterDødfallet.add(LukketPeriode(
+                fom = dødsdato.plusDays(1),
                 tom = periodenDødsfalletFantSted.tom
         ))
     }
-    return perioder.toList()
+    return perioderEtterDødfallet.toList()
 }
 
-/*
-    1. Legger til ny avslagsårsak på alle avslåtte perioder etter dødsfallet fant sted
-    2. Avslår alle innvilgede perioder etter dødsfallet fant sted med avslagsårsak
+/**
+ *  - Alle periodene med FOM etter dødsdato avslås
+ *      - De som allerede var avslått får en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
+ *      - De som var innvilget blir avslått med AvslåttÅrsak 'BARNETS_DØDSFALL'
  */
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfallet(
         dødsdato: LocalDate) {

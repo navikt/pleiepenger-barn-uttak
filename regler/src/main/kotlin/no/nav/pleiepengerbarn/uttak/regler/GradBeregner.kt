@@ -324,11 +324,11 @@ private fun Årsaksbygger.avgjørÅrsak(
         takForYtelsePåGrunnAvTilsynsgrad.erNull() -> {
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForHøyTilsynsgrad)
         }
-        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
-        }
         endeligGrad.erNull() -> {
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
+        }
+        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
+            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
         }
         else -> {
             if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {
