@@ -62,7 +62,9 @@ internal class BarnsDødRegel : UttaksplanRegel {
              *      -   kjører uttak som om barnet lever
              *      -   søknadsperiodene er kun etter barnets død
              *      -   aldri noe tilsynsperiode
-             *      -   taket for ytelsen er 1000 (10 personer med 100%)
+             *      -   fjerner andre omsorgspersoner.
+             *          "taket" på ytelsen totalt set nå er 1000% (10 personer med 100%)
+             *          setter tilsynsbehovet da alltid til 100% ettersom det kun er den akutelle søkeren som er med i beregningen.
              *      -   om søknadsperiodene går utover sorgperidoen vil GradBergner si at årsaken er
              *          at det er Utenom Tilsynsbehov, det overstyres her til at årsaken er Barnets dødsfall.
              */
@@ -71,12 +73,13 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             barn = Barn(
                                     dødsdato = null
                             ),
+                            andrePartersUttaksplan = listOf(),
                             søknadsperioder = grunnlag.søknadsperioder.søknadsperioderEtterDødsdato(
                                     dødsdato = dødsdato
                             ),
                             tilsynsperioder = emptyMap(),
                             tilsynsbehov = mapOf(sorgperiode to Tilsynsbehov(
-                                    prosent = TilsynsbehovStørrelse.PROSENT_1000
+                                    prosent = TilsynsbehovStørrelse.PROSENT_100
                             ))
                     )
             ).perioder.mapValues { (_,uttaksPeriodeInfo) ->
