@@ -42,6 +42,117 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
+    internal fun `Om barnet dør i midten av en innvilget periode gradert mot tilsyn`() {
+        val grunnlag = lagGrunnlag(
+                dødeIEnPeriodeGradertMotTilsyn = true
+        )
+
+        val dødsdato = grunnlag.barn.dødsdato!!
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        uttaksplanFørRegelkjøring.print(grunnlag)
+
+        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                grunnlag = grunnlag
+        )
+
+        uttaksplanEtterRegelkjøring.print(grunnlag)
+
+        // 1. Opprinnelige Periode
+        var periode = LukketPeriode("2020-01-01/2020-01-20")
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // Forventer at denne perioden nå er lik som den var - periode før dødsfall
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+
+        // 2. Opprinnelige periode -  Et "hull" mellom to uttaksperioder
+        periode = LukketPeriode("2020-01-21/2020-01-28")
+        assertNull(uttaksplanFørRegelkjøring.perioder[periode])
+        // I ny plan bør dette fortsatt være et hull - periode før dødsfall
+        assertNull(uttaksplanEtterRegelkjøring.perioder[periode])
+
+        // 3. Opprinnelige periode
+        periode = LukketPeriode("2020-01-29/2020-01-31")
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // Forventer at denne perioden skal være som den var - periode før dødsfall
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // 4. Opprinnelige periode
+        periode = LukketPeriode("2020-02-01/2020-02-10")
+        sjekkAvslått(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+        )
+        // Avslag skal forbli avslag, forventer det samme
+        sjekkAvslått(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+        )
+        // 5. Opprinnelig periode
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventetGrad = forventetGradVedGraderingMotTilsyn,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
+        )
+        // Forventer at perioden er delt i to:
+        //      1) 2020-02-11 - 2020-02-15 (Sistnevnte dødsdato)
+        //         Denne perioden bør nå være Avkortet mot inntekt istedenfor Gradert mot tilsyn
+        //      2) 2020-02-16 - 2020-03-01
+        //         Denne perioden bør være avkortet mot inntekt
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-11/2020-02-15"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventetGrad = forventetGradVedGraderingMotTilsyn,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
+        )
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-16/2020-03-01"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // En helt ny periode som er "sorgperioden" som går utover opprinnelig uttaksplan
+        // Som strekker seg til 6 uker etter dødsfallet
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-03-02/2020-03-29"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+        )
+    }
+
+    @Test
     internal fun `Om barnet dør i midten av en innvilget periode avkortet mot inntekt`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeAvkortetMotInntekt = true
@@ -50,8 +161,6 @@ internal class BarnsDødRegelTest {
         val dødsdato = grunnlag.barn.dødsdato!!
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
-
-        println(uttaksplanFørRegelkjøring)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 

@@ -88,6 +88,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
             val sisteDagISorgperioden = sorgperiode.tom
             sorgperiode
                     .perioderSomIkkeInngårI(perioder)
+                    .filter { it.fom.isAfter(dødsdato) }
                     .plussDelenAvSorgperiodenSomIkkeInngårIUttakplanen(
                             sisteDagIUttaksplan = sisteDagIUttaksplan,
                             sisteDagISorgperioden = sisteDagISorgperioden
