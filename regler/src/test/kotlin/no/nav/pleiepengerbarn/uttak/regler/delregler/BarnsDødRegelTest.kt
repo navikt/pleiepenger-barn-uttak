@@ -161,7 +161,11 @@ internal class BarnsDødRegelTest {
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
+        assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
+
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertEquals(6, uttaksplanEtterRegelkjøring.perioder.size)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -272,7 +276,11 @@ internal class BarnsDødRegelTest {
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
+        assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
+
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertEquals(7, uttaksplanEtterRegelkjøring.perioder.size)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -384,7 +392,11 @@ internal class BarnsDødRegelTest {
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
+        assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
+
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertEquals(5, uttaksplanEtterRegelkjøring.perioder.size)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -473,7 +485,11 @@ internal class BarnsDødRegelTest {
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
+        assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
+
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertEquals(4, uttaksplanEtterRegelkjøring.perioder.size)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
