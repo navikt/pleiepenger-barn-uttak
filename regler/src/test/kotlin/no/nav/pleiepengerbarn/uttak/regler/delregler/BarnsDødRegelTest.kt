@@ -46,17 +46,17 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeGradertMotTilsyn = true
         )
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
 
         val dødsdato = grunnlag.barn.dødsdato!!
 
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
-        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                grunnlag = grunnlag
-        )
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -157,17 +157,17 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeAvkortetMotInntekt = true
         )
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
 
         val dødsdato = grunnlag.barn.dødsdato!!
 
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
-        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                grunnlag = grunnlag
-        )
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -269,16 +269,17 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeIEnAvslåttPeriode = true
         )
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
+
         val dødsdato = grunnlag.barn.dødsdato!!
 
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
-        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                grunnlag = grunnlag
-        )
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
@@ -322,6 +323,7 @@ internal class BarnsDødRegelTest {
     @Test
     internal fun `Om barnet fortsatt lever har ikke kjøring av regel noen effekt`() {
         val grunnlag = lagGrunnlag()
+
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
@@ -339,14 +341,15 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeEtterSisteSøknadsperiode = true
         )
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
-        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                grunnlag = grunnlag
-        )
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         assertEquals(uttaksplanFørRegelkjøring, uttaksplanEtterRegelkjøring)
     }
@@ -356,14 +359,16 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeFørFørsteSøknadsperiode = true
         )
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
-        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                grunnlag = grunnlag
-        )
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 

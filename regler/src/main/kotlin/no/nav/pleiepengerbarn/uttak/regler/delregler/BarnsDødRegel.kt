@@ -59,14 +59,18 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
             /**
              *  Kjører nytt uttak for perioden etter barnets død.
+             *      -   kjører uttak som om barnet lever
              *      -   søknadsperiodene er kun etter barnets død
-             *      -   aldri noe tilsynsperioder
+             *      -   aldri noe tilsynsperiode
              *      -   taket for ytelsen er 1000 (10 personer med 100%)
              *      -   om søknadsperiodene går utover sorgperidoen vil GradBergner si at årsaken er
              *          at det er Utenom Tilsynsbehov, det overstyres her til at årsaken er Barnets dødsfall.
              */
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
+                            barn = Barn(
+                                    dødsdato = null
+                            ),
                             søknadsperioder = grunnlag.søknadsperioder.søknadsperioderEtterDødsdato(
                                     dødsdato = dødsdato
                             ),
