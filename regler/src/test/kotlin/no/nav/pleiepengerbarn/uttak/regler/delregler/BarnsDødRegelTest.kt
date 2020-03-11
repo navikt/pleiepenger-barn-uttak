@@ -42,6 +42,111 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
+    internal fun `Om barnet dør i en periode man er avkortet grunnet annen omsorgsperson skal denne avkortingen opphøre`() {
+        val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
+                denAndreOmsorgsPersonensGrad = Prosent(80)
+        )
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
+
+        uttaksplanFørRegelkjøring.print(grunnlag)
+
+        assertEquals(1, uttaksplanFørRegelkjøring.perioder.size)
+
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        uttaksplanEtterRegelkjøring.print(grunnlag)
+
+        assertEquals(3, uttaksplanEtterRegelkjøring.perioder.size)
+
+        // 1. Opprinnelig periode
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = Prosent(20),
+                forventedeUtbetalingsgrader = mapOf(
+                        "123" to Prosent(20)
+                )
+        )
+        // Forventer at perioden er delt i to. Første TOM dødsfall lik
+        // Den andre perioden har man fått 50% ettersom det ikke er avkortet mot annen
+        // omsorgsperson lengre.
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = Prosent(20),
+                forventedeUtbetalingsgrader = mapOf(
+                        "123" to Prosent(20)
+                )
+        )
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = Prosent(50),
+                forventedeUtbetalingsgrader = mapOf(
+                        "123" to Prosent(50)
+                )
+        )
+        // En helt ny periode som er "sorgperioden" som går utover opprinnelig uttaksplan
+        // Som strekker seg til 6 uker etter dødsfallet
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-13/2020-01-25"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+        )
+    }
+
+    @Test
+    internal fun `Om barnet dør i en periode man har fått avslag grunnet annen omsorgsperson forblir det et avslag`() {
+        val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
+                denAndreOmsorgsPersonensGrad = Prosent(81)
+        )
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                dødsdato = null
+        ))
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
+
+        uttaksplanFørRegelkjøring.print(grunnlag)
+
+        assertEquals(1, uttaksplanFørRegelkjøring.perioder.size)
+
+        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        uttaksplanEtterRegelkjøring.print(grunnlag)
+
+        assertEquals(2, uttaksplanEtterRegelkjøring.perioder.size)
+
+        // 1. Opprinnelig periode
+        sjekkAvslått(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad)
+        )
+
+        // Forventer at perioden er delt i to. Første TOM dødsfall lik
+        // Den andre perioden er lik med har også fått en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
+        sjekkAvslått(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad)
+        )
+        sjekkAvslått(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad, AvslåttÅrsaker.BarnetsDødsfall)
+        )
+    }
+
+    @Test
     internal fun `Om barnet dør i midten av en innvilget periode gradert mot tilsyn`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeGradertMotTilsyn = true
@@ -439,6 +544,51 @@ internal class BarnsDødRegelTest {
                 ),
                 ikkeMedlem = listOf(
                         LukketPeriode("2020-02-01/2020-02-10")
+                )
+        )
+    }
+
+    private fun lagGrunnlagMedAnnenOmsorgsperson(
+            denAndreOmsorgsPersonensGrad: Prosent
+    ) : RegelGrunnlag {
+        val helePerioden = LukketPeriode("2020-01-06/2020-01-12")
+        val barnetsDødsdato = LocalDate.parse("2020-01-07")
+        return RegelGrunnlag(
+                barn = Barn(
+                        dødsdato = barnetsDødsdato
+                ),
+                arbeid = mapOf(
+                        "123" to mapOf(
+                                helePerioden to ArbeidInfo(
+                                        jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
+                                        skalJobbeProsent = Prosent(50)
+                                )
+                        )
+                ),
+                søknadsperioder = listOf(
+                        helePerioden
+                ),
+                tilsynsbehov = mapOf(
+                        helePerioden to Tilsynsbehov(
+                                prosent = TilsynsbehovStørrelse.PROSENT_100
+                        )
+                ),
+                andrePartersUttaksplan = listOf(
+                        Uttaksplan(
+                                perioder = mapOf(
+                                        helePerioden to InnvilgetPeriode(
+                                                knekkpunktTyper = setOf(),
+                                                grad = denAndreOmsorgsPersonensGrad,
+                                                utbetalingsgrader = mapOf(
+                                                        "123" to Prosent(100)
+                                                ),
+                                                årsak = InnvilgetÅrsak(
+                                                        årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                                                        hjemler = setOf()
+                                                )
+                                        )
+                                )
+                        )
                 )
         )
     }
