@@ -511,10 +511,14 @@ internal class BarnsDødRegelTest {
             dødeFørFørsteSøknadsperiode: Boolean = false,
             dødeEtterSisteSøknadsperiode: Boolean = false
     ) : RegelGrunnlag {
-        val antallFlaggSatt =
-                listOf(dødeIEnAvslåttPeriode, dødeIEnPeriodeGradertMotTilsyn, dødeIEnPeriodeAvkortetMotInntekt)
-                        .filter { it }
-                        .size
+        val antallFlaggSatt = listOf(
+                dødeIEnAvslåttPeriode,
+                dødeIEnPeriodeGradertMotTilsyn,
+                dødeIEnPeriodeAvkortetMotInntekt,
+                dødeFørFørsteSøknadsperiode,
+                dødeEtterSisteSøknadsperiode)
+                .filter { it }
+                .size
 
         if (antallFlaggSatt > 1) {
             throw IllegalStateException("Kun et flagg kan settes")
