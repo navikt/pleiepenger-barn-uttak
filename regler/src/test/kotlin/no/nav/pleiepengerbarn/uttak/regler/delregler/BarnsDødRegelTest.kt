@@ -25,8 +25,23 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
-    internal fun `Om barnet dør i midten av en innvilget periode`() {
+    internal fun `Om barnet dør i midten av en innvilget periode avkortet mot innekt`() {
+        val grunnlag = lagGrunnlag(
+                dødeIEnPeriodeAvkortetMotInntekt = true
+        )
 
+        val dødsdato = grunnlag.barn.dødsdato!!
+
+        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        uttaksplanFørRegelkjøring.print(grunnlag)
+
+        val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                grunnlag = grunnlag
+        )
+
+        uttaksplanEtterRegelkjøring.print(grunnlag)
     }
 
     @Test

@@ -24,7 +24,6 @@ internal object GradBeregner {
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
-    private val ToHundreProsent = Desimaltall.fraDouble(200.00)
 
     internal fun beregnGrader(
             periode: LukketPeriode,

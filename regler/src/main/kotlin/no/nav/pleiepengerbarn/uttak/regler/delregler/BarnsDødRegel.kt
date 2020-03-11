@@ -5,13 +5,15 @@ import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.EtHundreProsent
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.barnetsDødAvslåttÅrsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.perioderSomIkkeInngårI
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåTom
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BarnetsDødsfall
 import java.lang.IllegalStateException
-import java.time.Duration
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 internal class BarnsDødRegel : UttaksplanRegel {
@@ -40,27 +42,26 @@ internal class BarnsDødRegel : UttaksplanRegel {
                 uttaksperiodeDaBarnetDøde = uttaksperiodeDaBarnetDøde
         )
 
-        val innvilgetUttaksperiodeDaBarnetDøde =
-                perioder.inneholder(dødsdato)?.takeIf { it.value is InnvilgetPeriode }
+        val dødeIEnInnvilgetPeriode = perioder
+                .inneholder(dødsdato)
+                ?.takeIf { it.value is InnvilgetPeriode } != null
 
-        if (innvilgetUttaksperiodeDaBarnetDøde == null) {
+        if (!dødeIEnInnvilgetPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
                     dødsdato = dødsdato
             )
         } else {
             perioder.fjernAllePerioderEtterDødsfallet(
-                    dødsdato = dødsdato,
-                    innvilgetUttaksperiodeDaBarnetDøde = innvilgetUttaksperiodeDaBarnetDøde
+                    dødsdato = dødsdato
             )
-            // Siste dag i siste periode vil nå være barnets dødsdato
 
             val sorgperiode = grunnlag.utledSorgperiode()
 
-            /*
-                Kjører nytt uttak for perioden etter barnets død.
-                    -   søknadsperiodene er kun etter barnets død
-                    -   aldri noe tilsynsperioder
-                    -   taket for ytelsen er 1000 (10 personer med 100%)
+            /**
+             *  Kjører nytt uttak for perioden etter barnets død.
+             *      -   søknadsperiodene er kun etter barnets død
+             *      -   aldri noe tilsynsperioder
+             *      -   taket for ytelsen er 1000 (10 personer med 100%)
              */
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
@@ -81,6 +82,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
             // Arbeidsforholdene hentes fra forrige innvilgede periode
             sorgperiode
                     .perioderSomIkkeInngårI(perioder)
+                    .plussDelenAvSorgperiodenSomIkkeInngikkIOpprinneligUttaksplan(sorgperiode)
                     .medArbeidsforholdFraForrigeInnvilgedePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
                         perioder[periode] = InnvilgetPeriode(
@@ -97,6 +99,28 @@ internal class BarnsDødRegel : UttaksplanRegel {
                 perioder = perioder
         )
     }
+}
+
+/**
+ *  - Legger til den siste delen av sorgperioen om den ikke allerde er dekket
+ *    som en del av den opprinnelige uttaksplanen.
+ */
+private fun List<LukketPeriode>.plussDelenAvSorgperiodenSomIkkeInngikkIOpprinneligUttaksplan(
+        sorgperiode: LukketPeriode) : List<LukketPeriode> {
+    val nåværendeSisteDag = sortertPåTom().last().tom
+    val sisteDagISorgperiode = sorgperiode.tom
+
+    return if (nåværendeSisteDag.erLikEllerEtter(sisteDagISorgperiode)) {
+        this
+    } else {
+        toMutableList().also {
+            it.add(LukketPeriode(
+                fom = nåværendeSisteDag.plusDays(1),
+                tom = sisteDagISorgperiode
+            ))
+        }
+    }
+
 }
 
 /**
@@ -139,6 +163,12 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
     }
 }
 
+
+/**
+ *  - En liste med perioder vi ikke har noe informasjon om fra grunnlaget
+ *  - Bruker arbeidsforholdene fra forrige innvilgede periode også for denne perioden,
+ *    men med ny utbetalingsgrad; 100%
+ */
 private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
         perioder: Map<LukketPeriode, UttaksPeriodeInfo>
 ) : Map<LukketPeriode, Map<ArbeidsforholdRef, Prosent>> {
@@ -153,6 +183,10 @@ private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
     return map
 }
 
+/**
+ *  - Finner utbetalingsgradene for perioden med TOM nærmeste den aktuelle perioden.
+ *  - Bruker samme arbeidsforhold men overstyrer alle utbetalingsgradene til 100%
+ */
 private fun Map<LukketPeriode, InnvilgetPeriode>.arbeidsforholdFraForrigeInnvilgedePeriode(
         periode: LukketPeriode): Map<ArbeidsforholdRef, Prosent> {
     return innvilgetPeriodeMedNærmesteTom(periode.fom)
@@ -160,13 +194,19 @@ private fun Map<LukketPeriode, InnvilgetPeriode>.arbeidsforholdFraForrigeInnvilg
             .mapValues { EtHundreProsent }
 }
 
+/**
+ *  - Finner innvilgede periode med TOM nærmest, og før i tid i forhold til parameteret FOM
+ *    som her er FOM i periden vi mangler informasjon om.
+ */
 private fun Map<LukketPeriode, InnvilgetPeriode>.innvilgetPeriodeMedNærmesteTom(fom: LocalDate) : InnvilgetPeriode {
+    var nåværendePeriode = keys.first()
     var nåværendeInnvilgetPeriode = values.first()
-    var nåværendeMellomrom = Duration.between(keys.first().tom, fom)
+    var nåværendeMellomrom = ChronoUnit.DAYS.between(nåværendePeriode.tom, fom)
 
-    forEach { periode, innvilgetPeriode ->
-        val nyttMellomrom = Duration.between(periode.tom, fom)
+    filterNot { it.key == nåværendePeriode }.forEach { (periode, innvilgetPeriode) ->
+        val nyttMellomrom = ChronoUnit.DAYS.between(periode.tom, fom)
         if (nyttMellomrom < nåværendeMellomrom) {
+            nåværendePeriode = periode
             nåværendeMellomrom = nyttMellomrom
             nåværendeInnvilgetPeriode = innvilgetPeriode
         }
@@ -174,7 +214,10 @@ private fun Map<LukketPeriode, InnvilgetPeriode>.innvilgetPeriodeMedNærmesteTom
     return nåværendeInnvilgetPeriode
 }
 
-
+/**
+ *  - Tar utgangspunkt i de opprinnelige søknadsperiodene og returerer perioder etter dødsfallet
+ *  - Om dødsfallet fant sted siste dag i en periode forblir søknadsperiodene som de var
+ */
 private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalDate) : List<LukketPeriode> {
     val perioderEtterDødfallet =
             filter { it.fom.isAfter(dødsdato) }
@@ -221,37 +264,18 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
     }
 }
 
-/*
-    1. Om barnet dør siste dag av uttakperioden forblir den som den var
-    2. Om barnet dør et annet tidspunkt i uttaksperioden tar vi kun med oss
-        FOM - dødsdato
+/**
+ *  - Alle perider med FOM etter dødsdato fjernes
  */
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fjernAllePerioderEtterDødsfallet(
-        dødsdato: LocalDate,
-        innvilgetUttaksperiodeDaBarnetDøde: Uttaksperiode) {
-
-    if (!innvilgetUttaksperiodeDaBarnetDøde.key.tom.isEqual(dødsdato)) {
-        // Fjerner perioden dødsfallet fant sted
-        remove(innvilgetUttaksperiodeDaBarnetDøde.key)
-
-        // Legger til perioden frem til og med dødsfallet slik det var
-        val periodeFremTilDødsfallet = LukketPeriode(
-                fom = innvilgetUttaksperiodeDaBarnetDøde.key.fom,
-                tom = dødsdato
-        )
-        put(periodeFremTilDødsfallet, innvilgetUttaksperiodeDaBarnetDøde.value)
-    }
-
-    // Fjerner alle perioder etter dødsato
-    keys.filter { it.fom.isAfter(dødsdato) }.forEach { periode ->
+        dødsdato: LocalDate) {
+    filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, _) ->
         remove(periode)
     }
-
 }
 
 private fun RegelGrunnlag.utledSorgperiode() = LukketPeriode(
     fom = barn.dagenEtterDødsfall(),
     tom = barn.dagenEtterDødsfall().plusWeeks(6)
 )
-
 private fun Barn.dagenEtterDødsfall() = dødsdato!!.plusDays(1)
