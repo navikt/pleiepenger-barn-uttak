@@ -2,11 +2,12 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslåttInneholderAvslåttÅrsaker
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.print
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -33,6 +34,8 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlag(
                 dødeIEnAvslåttPeriode = true
         )
+        val dødsdato = grunnlag.barn.dødsdato!!
+
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
@@ -44,15 +47,41 @@ internal class BarnsDødRegelTest {
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
 
-        assertEquals(uttaksplanFørRegelkjøring.perioder.size, uttaksplanEtterRegelkjøring.perioder.size)
+        // Bør nå finnes en ny knekt periode
+        assertEquals(uttaksplanFørRegelkjøring.perioder.size + 1 , uttaksplanEtterRegelkjøring.perioder.size)
 
-        uttaksplanEtterRegelkjøring.perioder.forEach { (periode, _) ->
-            sjekkAvslått(
-                    uttaksplan = uttaksplanEtterRegelkjøring,
-                    forventetPeriode = periode,
-                    forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
-            )
-        }
+        // Bør nå finnes en periode som har TOM = dødsdato
+        assertTrue(uttaksplanEtterRegelkjøring.perioder.filterKeys { it.tom.isEqual(dødsdato) }.size == 1)
+
+        // Bør nå finnes en periode som har FOM = (dødsdato + 1 dag)
+        assertTrue(uttaksplanEtterRegelkjøring.perioder.filterKeys { it.fom.isEqual(dødsdato.plusDays(1)) }.size == 1)
+
+        // Siste dag i siste periode bør være uendret
+        assertEquals(uttaksplanFørRegelkjøring.perioder.keys.last(), uttaksplanEtterRegelkjøring.perioder.keys.last())
+
+        // Alle perioder før dødsdato bør være uendret
+        val periderFørDødsdato = uttaksplanEtterRegelkjøring.perioder
+                .filterKeys { it.tom.isBefore(dødsdato) || it.tom.isEqual(dødsdato) }
+                .forEach { (periode, periodeInfo) ->
+                    if (!uttaksplanFørRegelkjøring.perioder.containsKey(periode)) {
+                        assertEquals(periodeInfo, uttaksplanFørRegelkjøring.uttaksPeriodeInfoSomInneholder(dødsdato))
+                    } else {
+                        assertEquals(periodeInfo, uttaksplanFørRegelkjøring.perioder[periode])
+                    }
+                }
+
+
+        // Alle perioder etter dødsdato bør være avslått med rett årsak
+        uttaksplanEtterRegelkjøring.perioder
+                .filterKeys { it.fom.isAfter(dødsdato) }
+                .forEach { (periode, periodeInfo) ->
+                    assertTrue(periodeInfo is AvslåttPeriode)
+                    sjekkAvslåttInneholderAvslåttÅrsaker(
+                            uttaksplan = uttaksplanEtterRegelkjøring,
+                            forventetPeriode = periode,
+                            forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
+                    )
+                }
     }
 
     @Test
@@ -114,7 +143,6 @@ internal class BarnsDødRegelTest {
         }
     }
 
-
     private fun lagGrunnlag(
             dødeIEnAvslåttPeriode: Boolean = false,
             dødeIEnPeriodeGradertMotTilsyn: Boolean = false,
@@ -173,5 +201,9 @@ internal class BarnsDødRegelTest {
                         LukketPeriode("2020-02-01/2020-02-10")
                 )
         )
+    }
+
+    private fun Uttaksplan.uttaksPeriodeInfoSomInneholder(dato: LocalDate) : UttaksPeriodeInfo {
+        return perioder.filterKeys { it.inneholder(dato) }.values.firstOrNull() ?: throw IllegalStateException("Fant ikke uttaksperide mot tom=$dato")
     }
 }
