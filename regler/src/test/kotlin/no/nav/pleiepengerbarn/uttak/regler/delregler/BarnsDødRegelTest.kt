@@ -2,12 +2,14 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslåttInneholderAvslåttÅrsaker
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.erLikEllerFør
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.print
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -22,10 +24,25 @@ internal class BarnsDødRegelTest {
                 årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
                 hjemler = hjemler
         )
+
+        private val forventetGradVedAvkortingMotArbeid = Prosent(50)
+        private val forventetUtbetalingsgraderVedAvkortingMotArbeid = mapOf(
+                "123" to Prosent(50)
+        )
+
+        private val forventetGradVedGraderingMotTilsyn= Prosent(40)
+        private val forventetUtbetalingsgraderVedGraderingMotTilsyn = mapOf(
+                "123" to Prosent(40)
+        )
+
+        private val forventetGradInnvilgetÅrsakBarnetsDødsfall = Prosent(100)
+        private val forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall = mapOf(
+                "123" to Prosent(100)
+        )
     }
 
     @Test
-    internal fun `Om barnet dør i midten av en innvilget periode avkortet mot innekt`() {
+    internal fun `Om barnet dør i midten av en innvilget periode avkortet mot inntekt`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeAvkortetMotInntekt = true
         )
@@ -33,6 +50,8 @@ internal class BarnsDødRegelTest {
         val dødsdato = grunnlag.barn.dødsdato!!
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
+
+        println(uttaksplanFørRegelkjøring)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
 
@@ -42,6 +61,98 @@ internal class BarnsDødRegelTest {
         )
 
         uttaksplanEtterRegelkjøring.print(grunnlag)
+
+        // 1. Opprinnelige Periode
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-01/2020-01-20"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // Barnet døde i denne perioden, så forventer nå at den har samme verdier, men er delt i to
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-01/2020-01-15"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-01-16/2020-01-20"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+
+        // 2. Opprinnelige periode -  Et "hull" mellom to uttaksperioder
+        var periode = LukketPeriode("2020-01-21/2020-01-28")
+        assertNull(uttaksplanFørRegelkjøring.perioder[periode])
+        // I ny plan skal denne nå være innvilget med 100%
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+        )
+
+        // 3. Opprinnelige periode
+        periode = LukketPeriode("2020-01-29/2020-01-31")
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // Forventer at denne perioden skal være som den var ettersom den er avkortet mot inntekt
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = periode,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        // 4. Opprinnelige periode
+        periode = LukketPeriode("2020-02-01/2020-02-10")
+        sjekkAvslått(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+        )
+        // Avslag skal forbli avslag, forventer det samme
+        sjekkAvslått(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = periode,
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+        )
+        // 5. Opprinnelig periode
+        sjekkInnvilget(
+                uttaksplan = uttaksplanFørRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventetGrad = forventetGradVedGraderingMotTilsyn,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
+        )
+        // Forventer at perioden er delt i to:
+        //      1) 2020-02-11 - 2020-02-27 (Sistnevnte 6 uker etter dødsfallet)
+        //         Denne perioden bør nå være Avkortet mot inntekt istedenfor Gradert mot tilsyn
+        //      2) 2020-02-28 - 2020-03-01
+        //         Denne perioden bør være avslått med en årsak; 'BARNETS_DØDSFALL'
+        sjekkInnvilget(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-11/2020-02-27"),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventetGrad = forventetGradVedAvkortingMotArbeid,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
+        )
+        sjekkAvslått(
+                uttaksplan = uttaksplanEtterRegelkjøring,
+                forventetPeriode = LukketPeriode("2020-02-28/2020-03-01"),
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
+        )
     }
 
     @Test
@@ -75,8 +186,8 @@ internal class BarnsDødRegelTest {
         assertEquals(uttaksplanFørRegelkjøring.perioder.keys.last(), uttaksplanEtterRegelkjøring.perioder.keys.last())
 
         // Alle perioder før dødsdato bør være uendret
-        val periderFørDødsdato = uttaksplanEtterRegelkjøring.perioder
-                .filterKeys { it.tom.isBefore(dødsdato) || it.tom.isEqual(dødsdato) }
+        uttaksplanEtterRegelkjøring.perioder
+                .filterKeys { it.tom.erLikEllerFør(dødsdato) }
                 .forEach { (periode, periodeInfo) ->
                     if (!uttaksplanFørRegelkjøring.perioder.containsKey(periode)) {
                         assertEquals(periodeInfo, uttaksplanFørRegelkjøring.uttaksPeriodeInfoSomInneholder(dødsdato))

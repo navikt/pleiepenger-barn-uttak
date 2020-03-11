@@ -62,6 +62,8 @@ internal class BarnsDødRegel : UttaksplanRegel {
              *      -   søknadsperiodene er kun etter barnets død
              *      -   aldri noe tilsynsperioder
              *      -   taket for ytelsen er 1000 (10 personer med 100%)
+             *      -   om søknadsperiodene går utover sorgperidoen vil GradBergner si at årsaken er
+             *          at det er Utenom Tilsynsbehov, det overstyres her til at årsaken er Barnets dødsfall.
              */
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
@@ -73,16 +75,23 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                     prosent = TilsynsbehovStørrelse.PROSENT_1000
                             ))
                     )
-            ).perioder
+            ).perioder.mapValues { (_,uttaksPeriodeInfo) ->
+                uttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato)
+            }
 
             // Legger til alle periodene etter dødsfallet
             perioder.putAll(perioderEtterDødsfall)
 
             // Alle perioder i sorgperioden som nå ikke har en uttaksperiode vil få perioder med 100%
             // Arbeidsforholdene hentes fra forrige innvilgede periode
+            val sisteDagIUttaksplan = perioder.sortertPåTom().keys.last().tom
+            val sisteDagISorgperioden = sorgperiode.tom
             sorgperiode
                     .perioderSomIkkeInngårI(perioder)
-                    .plussDelenAvSorgperiodenSomIkkeInngikkIOpprinneligUttaksplan(sorgperiode)
+                    .plussDelenAvSorgperiodenSomIkkeInngårIUttakplanen(
+                            sisteDagIUttaksplan = sisteDagIUttaksplan,
+                            sisteDagISorgperioden = sisteDagISorgperioden
+                    )
                     .medArbeidsforholdFraForrigeInnvilgedePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
                         perioder[periode] = InnvilgetPeriode(
@@ -92,7 +101,6 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                 årsak = barnetsDødInnvilgetÅrsak(dødsdato)
                         )
                     }
-
         }
 
         return uttaksplan.copy(
@@ -103,24 +111,21 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
 /**
  *  - Legger til den siste delen av sorgperioen om den ikke allerde er dekket
- *    som en del av den opprinnelige uttaksplanen.
+ *    som en del av den uttaksplanen.
  */
-private fun List<LukketPeriode>.plussDelenAvSorgperiodenSomIkkeInngikkIOpprinneligUttaksplan(
-        sorgperiode: LukketPeriode) : List<LukketPeriode> {
-    val nåværendeSisteDag = sortertPåTom().last().tom
-    val sisteDagISorgperiode = sorgperiode.tom
-
-    return if (nåværendeSisteDag.erLikEllerEtter(sisteDagISorgperiode)) {
+private fun List<LukketPeriode>.plussDelenAvSorgperiodenSomIkkeInngårIUttakplanen(
+        sisteDagIUttaksplan: LocalDate,
+        sisteDagISorgperioden: LocalDate) : List<LukketPeriode> {
+    return if (sisteDagIUttaksplan.erLikEllerEtter(sisteDagISorgperioden)) {
         this
     } else {
         toMutableList().also {
             it.add(LukketPeriode(
-                fom = nåværendeSisteDag.plusDays(1),
-                tom = sisteDagISorgperiode
+                fom = sisteDagIUttaksplan.plusDays(1),
+                tom = sisteDagISorgperioden
             ))
         }
     }
-
 }
 
 /**
@@ -272,6 +277,14 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fjernAllePerioderEtterD�
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, _) ->
         remove(periode)
     }
+}
+
+private fun UttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato: LocalDate) : UttaksPeriodeInfo {
+    return if (this is AvslåttPeriode && årsaker.size == 1 && årsaker.first().årsak == AvslåttÅrsaker.UtenomTilsynsbehov) {
+        this.copy(
+                årsaker = setOf(barnetsDødAvslåttÅrsak(dødsdato))
+        )
+    } else this
 }
 
 private fun RegelGrunnlag.utledSorgperiode() = LukketPeriode(

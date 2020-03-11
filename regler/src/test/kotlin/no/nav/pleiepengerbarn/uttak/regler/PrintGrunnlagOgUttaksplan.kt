@@ -68,7 +68,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun søknadsperioder():Tidslinje {
         val søknadsperioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(100) }
+        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(0) }
         return Tidslinje("Søknadsperioder", søknadsperioder)
     }
 
