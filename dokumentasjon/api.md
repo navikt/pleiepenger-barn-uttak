@@ -5,7 +5,7 @@ POST /uttaksplan
 
 ```json
 {
-	"sakId": "ABC123",
+	"saksnummer": "ABC123",
 	"behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
 	"andrePartersSaker": [
 		"ABC124",
@@ -59,7 +59,7 @@ HTTP 201
 {
 	"perioder": {
 		"2020-01-01/2020-03-31": {
-			"type": "innvilget",
+			"utfall": "Innvilget",
 			"grad": 100,
 			"utbetalingsgrader": [{
 				"arbeidsforhold": {
