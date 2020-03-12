@@ -328,8 +328,8 @@ private fun Årsaksbygger.avgjørÅrsak(
         endeligGrad.erNull() -> {
             avslått(BeregningAvGrader, AvslåttÅrsaker.FOR_LAV_GRAD)
         }
-        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        endeligGrad.erEtHundre() -> {
+            innvilget(BeregningAvGrader, InnvilgetÅrsaker.FULL_DEKNING)
         }
         else -> {
             if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {
