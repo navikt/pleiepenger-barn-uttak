@@ -130,4 +130,41 @@ internal class UttakTjenesteTest {
         sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN))
         sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), InnvilgetÅrsaker.FULL_DEKNING)
     }
+
+    @Test
+    fun `Får jobbet siste halvdel av en perioder`() {
+        val søknadsperiode = LukketPeriode("2020-03-09/2020-03-22")
+        val periode1 = LukketPeriode("2020-03-09/2020-03-15")
+        val periode2 = LukketPeriode("2020-03-16/2020-03-22")
+
+        val grunnlag = RegelGrunnlag(
+                tilsynsbehov = mapOf(
+                        søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(søknadsperiode),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(
+                                periode1 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO),
+                                periode2 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(20))
+                        )
+                ).somArbeid()
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkInnvilget(
+                uttaksplan = uttaksplan,
+                forventetPeriode = periode1,
+                forventetGrad = Prosent(100),
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+        )
+        sjekkInnvilget(
+                uttaksplan = uttaksplan,
+                forventetPeriode = periode2,
+                forventetGrad = Prosent(80),
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(80)),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+        )
+    }
 }
