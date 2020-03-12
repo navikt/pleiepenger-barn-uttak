@@ -15,7 +15,7 @@ internal class TilsynsbehovRegel : PeriodeRegel {
                     hjemler = setOf() // TODO trengs noe her?
             )
         }
-        return Avslått(årsaker = årsaksbygger.hjemmel(AvslåttÅrsaker.UtenomTilsynsbehov, BorteFraArbeidet.anvend(
+        return Avslått(årsaker = årsaksbygger.hjemmel(AvslåttÅrsaker.UTENOM_TILSYNSBEHOV, BorteFraArbeidet.anvend(
                 "Fastsatt at barnet ikke har behov for tilsyn i perioden."
         )).byggAvslåttÅrsaker())
     }

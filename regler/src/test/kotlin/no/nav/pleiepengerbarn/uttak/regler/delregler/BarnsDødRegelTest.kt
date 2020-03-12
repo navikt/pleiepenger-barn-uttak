@@ -23,7 +23,7 @@ internal class BarnsDødRegelTest {
                 anvendelse = "Testformål"
         ))
         private val innvilgetÅrsak = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 hjemler = hjemler
         )
 
@@ -68,7 +68,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
@@ -80,7 +80,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
@@ -89,7 +89,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(50)
@@ -100,7 +100,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-13/2020-01-25"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
         )
@@ -131,7 +131,7 @@ internal class BarnsDødRegelTest {
         sjekkAvslått(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.FOR_LAV_GRAD)
         )
 
         // Forventer at perioden er delt i to. Første TOM dødsfall lik
@@ -139,12 +139,12 @@ internal class BarnsDødRegelTest {
         sjekkAvslått(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.FOR_LAV_GRAD)
         )
         sjekkAvslått(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.ForLavGrad, AvslåttÅrsaker.BarnetsDødsfall)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.FOR_LAV_GRAD, AvslåttÅrsaker.BARNETS_DØDSFALL)
         )
     }
 
@@ -176,7 +176,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -184,7 +184,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -200,7 +200,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -208,7 +208,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -217,19 +217,19 @@ internal class BarnsDødRegelTest {
         sjekkAvslått(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // Avslag skal forbli avslag, forventer det samme
         sjekkAvslått(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // 5. Opprinnelig periode
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
@@ -241,14 +241,14 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-15"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-16/2020-03-01"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -257,7 +257,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-03-02/2020-03-29"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
         )
@@ -290,7 +290,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-20"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -298,14 +298,14 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-15"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-16/2020-01-20"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -317,7 +317,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
         )
@@ -327,7 +327,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -335,7 +335,7 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -344,19 +344,19 @@ internal class BarnsDødRegelTest {
         sjekkAvslått(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // Avslag skal forbli avslag, forventer det samme
         sjekkAvslått(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IkkeMedlemIFolketrygden)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // 5. Opprinnelig periode
         sjekkInnvilget(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GradertMotTilsyn,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
@@ -368,14 +368,14 @@ internal class BarnsDødRegelTest {
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-27"),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         sjekkAvslått(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-28/2020-03-01"),
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BARNETS_DØDSFALL)
         )
     }
 
@@ -434,7 +434,7 @@ internal class BarnsDødRegelTest {
                     sjekkAvslåttInneholderAvslåttÅrsaker(
                             uttaksplan = uttaksplanEtterRegelkjøring,
                             forventetPeriode = periode,
-                            forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
+                            forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BARNETS_DØDSFALL)
                     )
                 }
     }
@@ -501,7 +501,7 @@ internal class BarnsDødRegelTest {
             sjekkAvslåttInneholderAvslåttÅrsaker(
                     uttaksplan = uttaksplanEtterRegelkjøring,
                     forventetPeriode = periode,
-                    forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BarnetsDødsfall)
+                    forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.BARNETS_DØDSFALL)
             )
         }
     }
@@ -605,7 +605,7 @@ internal class BarnsDødRegelTest {
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),
                                                 årsak = InnvilgetÅrsak(
-                                                        årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                                                        årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                                                         hjemler = setOf()
                                                 )
                                         )

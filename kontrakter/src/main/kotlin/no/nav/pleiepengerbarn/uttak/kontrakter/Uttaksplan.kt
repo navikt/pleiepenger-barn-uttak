@@ -17,14 +17,14 @@ data class Utbetalingsgrader(
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "Innvilget"),
-        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "Avslått")
+        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "INNVILGET"),
+        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "AVSLÅTT")
 )
 interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
-@JsonTypeName("Innvilget")
+@JsonTypeName("INNVILGET")
 data class InnvilgetPeriode @JsonCreator constructor(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
@@ -47,7 +47,7 @@ data class InnvilgetPeriode @JsonCreator constructor(
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
 }
 
-@JsonTypeName("Avslått")
+@JsonTypeName("AVSLÅTT")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val årsaker: Set<AvslåttÅrsak>

@@ -22,7 +22,7 @@ internal class UttakTjenesteGraderingTest {
 
     private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
     private val annenPartInnvilgetÅrsak = InnvilgetÅrsak(
-            årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+            årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
             hjemler = setOf(
                     Hjemmel(
                             henvisning = "En lovtekst",
@@ -52,7 +52,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80.00), mapOf(arbeidsforhold1 to Prosent(80.00)), InnvilgetÅrsaker.GradertMotTilsyn)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80.00), mapOf(arbeidsforhold1 to Prosent(80.00)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
 
     @Test
@@ -72,7 +72,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(75), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(75), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
     @Test
@@ -95,7 +95,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(60), mapOf(arbeidsforhold1 to Prosent(60)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(60), mapOf(arbeidsforhold1 to Prosent(60)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
     @Test
@@ -122,7 +122,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), InnvilgetÅrsaker.GradertMotTilsyn)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
 
     @Test
@@ -146,7 +146,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkAvslått(uttaksplan, helePerioden, setOf(AvslåttÅrsaker.ForLavGrad))
+        sjekkAvslått(uttaksplan, helePerioden, setOf(AvslåttÅrsaker.FOR_LAV_GRAD))
     }
 
     @Test
@@ -169,7 +169,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
 
@@ -193,7 +193,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(70), mapOf(arbeidsforhold1 to Prosent(70)), InnvilgetÅrsaker.GradertMotTilsyn)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(70), mapOf(arbeidsforhold1 to Prosent(70)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
 
 
@@ -214,7 +214,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent("37.5"), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent("37.5"), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
 
@@ -247,7 +247,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold2 to Prosent(80),
                 arbeidsforhold3 to Prosent(20),
                 arbeidsforhold4 to Prosent(100)
-        ), InnvilgetÅrsaker.AvkortetMotInntekt)
+        ), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
 
     }
 
@@ -272,9 +272,9 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(3)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
     @Test
@@ -301,10 +301,10 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(4)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(), InnvilgetÅrsaker.AvkortetMotInntekt)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), InnvilgetÅrsaker.GradertMotTilsyn)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
 
 }

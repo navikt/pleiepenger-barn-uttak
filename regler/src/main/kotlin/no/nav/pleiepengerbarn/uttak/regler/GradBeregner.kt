@@ -323,19 +323,19 @@ private fun Årsaksbygger.avgjørÅrsak(
         takForYtelsePåGrunnAvTilsynsgrad: Desimaltall) {
     when {
         takForYtelsePåGrunnAvTilsynsgrad.erNull() -> {
-            avslått(BeregningAvGrader, AvslåttÅrsaker.ForHøyTilsynsgrad)
+            avslått(BeregningAvGrader, AvslåttÅrsaker.FOR_HØY_TILSYNSGRAD)
         }
         endeligGrad.erNull() -> {
-            avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
+            avslått(BeregningAvGrader, AvslåttÅrsaker.FOR_LAV_GRAD)
         }
         takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
+            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
         }
         else -> {
             if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {
-                innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
             } else {
-                innvilget(BeregningAvGrader, InnvilgetÅrsaker.GradertMotTilsyn)
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
 
             }
         }
