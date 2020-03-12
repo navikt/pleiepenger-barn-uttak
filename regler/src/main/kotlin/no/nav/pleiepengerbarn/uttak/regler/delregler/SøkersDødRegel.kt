@@ -11,7 +11,7 @@ import java.util.*
 internal class SøkersDødRegel : UttaksplanRegel {
     internal companion object {
         internal fun søkersDødAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.SøkersDødsfall,
+                årsak = AvslåttÅrsaker.SØKERS_DØDSFALL,
                 hjemler = setOf(TapAvInntekt.anvend("Fastsatt at søker døde $dødsdato."))
         )
     }
@@ -66,7 +66,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     val knekkpunktTyper = uttaksPeriodeInfo
             .knekkpunktTyper()
             .toMutableSet()
-            .also { it.add(KnekkpunktType.SøkersDødsfall) }
+            .also { it.add(KnekkpunktType.SØKERS_DØDSFALL) }
 
     val avslåttÅrsaker = (if (uttaksPeriodeInfo is AvslåttPeriode) uttaksPeriodeInfo.årsaker.toMutableSet() else mutableSetOf()).also {
         it.add(SøkersDødRegel.søkersDødAvslåttÅrsak(dødsdato))

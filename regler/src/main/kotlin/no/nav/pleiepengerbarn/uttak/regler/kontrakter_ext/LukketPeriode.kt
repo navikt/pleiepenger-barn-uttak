@@ -87,6 +87,9 @@ internal fun LukketPeriode.antallVirkedager(): Long {
     return antall
 }
 
+internal fun LocalDate.erLikEllerEtter(annen: LocalDate) = isEqual(annen) || isAfter(annen)
+internal fun LocalDate.erLikEllerFør(annen: LocalDate) = isEqual(annen) || isBefore(annen)
+
 internal fun Duration.somTekst() : String {
     if (equals(Duration.ZERO)) return "0 timer"
     val timer = seconds / 3600

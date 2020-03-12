@@ -12,7 +12,7 @@ internal class MedlemskapRegel : PeriodeRegel {
         val årsaksbygger = Årsaksbygger()
 
         grunnlag.ikkeMedlem.overlappendePeriode(periode)?.apply {
-            return Avslått(årsaker = årsaksbygger.hjemmel(AvslåttÅrsaker.IkkeMedlemIFolketrygden, MedlemskapIFolketrygden.anvend(
+            return Avslått(årsaker = årsaksbygger.hjemmel(AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN, MedlemskapIFolketrygden.anvend(
                     "Fastsatt at personen ikke er medlem av folketrygden i perioden."
             )).byggAvslåttÅrsaker())
         }

@@ -9,13 +9,13 @@ spec:
   image: {{ image }}
   port: 8080
   liveness:
-    path: /internal/actuator/info
+    path: /pleiepenger-barn-uttak/internal/actuator/info
     initialDelay: 20
     timeout: 1
     periodSeconds: 5
     failureThreshold: 10
   readiness:
-    path: /internal/actuator/info
+    path: /pleiepenger-barn-uttak/internal/actuator/info
     initialDelay: 20
     timeout: 1
   resources:
@@ -33,5 +33,5 @@ spec:
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
-    path: /internal/actuator/prometheus
+    path: /pleiepenger-barn-uttak/internal/actuator/prometheus
   webproxy: true

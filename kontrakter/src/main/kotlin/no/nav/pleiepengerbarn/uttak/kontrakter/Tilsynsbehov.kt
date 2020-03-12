@@ -7,7 +7,6 @@ enum class TilsynsbehovStørrelse(
         @get:JsonValue val prosent: Prosent) {
     PROSENT_100(Prosent(100)),
     PROSENT_200(Prosent(200));
-    // TODO: HMM 1000 prosent.. ?
 
     companion object {
         @JsonCreator

@@ -11,7 +11,7 @@ internal class FerieRegel : PeriodeRegel {
 
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Utfall {
         grunnlag.ferier.overlappendePeriode(periode)?.apply {
-            return Avslått(årsaker = Årsaksbygger().hjemmel(AvslåttÅrsaker.LovbestemtFerie, TapAvInntekt.anvend(
+            return Avslått(årsaker = Årsaksbygger().hjemmel(AvslåttÅrsaker.LOVBESTEMT_FERIE, TapAvInntekt.anvend(
                     "Fastsatt at det ikke er noe inntektstap ved avvkling av lovbestemt ferie."
             )).byggAvslåttÅrsaker())
 

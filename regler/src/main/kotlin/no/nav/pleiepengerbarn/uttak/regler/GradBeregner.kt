@@ -24,13 +24,12 @@ internal object GradBeregner {
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
-    private val ToHundreProsent = Desimaltall.fraDouble(200.00)
 
     internal fun beregnGrader(
             periode: LukketPeriode,
             grunnlag: RegelGrunnlag,
             årsakbygger: Årsaksbygger): Grader {
-        val fraværsfaktorer = mutableMapOf<ArbeidsforholdRef, Desimaltall>()
+        val fraværsfaktorer = mutableMapOf<ArbeidsforholdReferanse, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
@@ -125,10 +124,12 @@ internal object GradBeregner {
                             .fraFaktorTilProsent()
                             .normaliserProsent()
                             .resultat
-                },
+                }.map {(referanse,utbetalingsgrad ) -> Utbetalingsgrader(
+                        arbeidsforhold = referanse,
+                        utbetalingsgrad = utbetalingsgrad
+                )},
                 årsak = årsakbygger.byggOgTillattKunEn()
         )
-
     }
 
     private fun fastsettEndeligGrad(
@@ -288,14 +289,10 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
         val tilsynsbehov = tilsynsbehov.entries.find { it.key.overlapper(periode) }
-        return when (tilsynsbehov?.value?.prosent) {
-            TilsynsbehovStørrelse.PROSENT_100 -> Desimaltall.EtHundre
-            TilsynsbehovStørrelse.PROSENT_200 -> ToHundreProsent
-            else -> throw IllegalStateException("Periode uten tilsynsbehov")
-        }
+        return tilsynsbehov?.value?.prosent?.prosent?.somDesimaltall() ?: throw IllegalStateException("Periode uten tilsynsbehov")
     }
 
-    private fun ArbeidInfo.fravær(
+    private fun ArbeidsforholdPeriodeInfo.fravær(
             kunneJobbetIPerioden: Duration) : Duration {
         val fraværsfaktor = Desimaltall
                 .EtHundre
@@ -326,19 +323,19 @@ private fun Årsaksbygger.avgjørÅrsak(
         takForYtelsePåGrunnAvTilsynsgrad: Desimaltall) {
     when {
         takForYtelsePåGrunnAvTilsynsgrad.erNull() -> {
-            avslått(BeregningAvGrader, AvslåttÅrsaker.ForHøyTilsynsgrad)
-        }
-        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
+            avslått(BeregningAvGrader, AvslåttÅrsaker.FOR_HØY_TILSYNSGRAD)
         }
         endeligGrad.erNull() -> {
-            avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
+            avslått(BeregningAvGrader, AvslåttÅrsaker.FOR_LAV_GRAD)
+        }
+        endeligGrad.erEtHundre() -> {
+            innvilget(BeregningAvGrader, InnvilgetÅrsaker.FULL_DEKNING)
         }
         else -> {
             if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {
-                innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
             } else {
-                innvilget(BeregningAvGrader, InnvilgetÅrsaker.GradertMotTilsyn)
+                innvilget(BeregningAvGrader, InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
 
             }
         }
@@ -347,6 +344,6 @@ private fun Årsaksbygger.avgjørÅrsak(
 
 data class Grader(
         val grad: Prosent,
-        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+        val utbetalingsgrader: List<Utbetalingsgrader>,
         val årsak: Årsak
 )

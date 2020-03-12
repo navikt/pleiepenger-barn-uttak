@@ -14,6 +14,7 @@ object UttakTjeneste {
                 søknadsperioder = grunnlag.søknadsperioder,
                 knekkpunkter = knekkpunkter
         )
+
         return UttaksplanRegler.fastsettUtaksplan(
                 grunnlag = grunnlag,
                 knektePerioder = knektePerioder

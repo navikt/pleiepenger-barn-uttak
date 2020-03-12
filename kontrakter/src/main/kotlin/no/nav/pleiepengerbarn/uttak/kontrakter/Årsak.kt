@@ -30,16 +30,18 @@ data class AvslåttÅrsak (
     override fun hjemler() = hjemler
 }
 enum class InnvilgetÅrsaker {
-    GradertMotTilsyn,
-    AvkortetMotInntekt,
-    BarnetsDødsfall
+    GRADERT_MOT_TILSYN,
+    AVKORTET_MOT_INNTEKT,
+    BARNETS_DØDSFALL,
+    FULL_DEKNING
 }
 
 enum class AvslåttÅrsaker  {
-    UtenomTilsynsbehov,
-    ForLavGrad,
-    ForHøyTilsynsgrad, // TODO: Ny <- Legg til test.
-    LovbestemtFerie,
-    IkkeMedlemIFolketrygden,
-    SøkersDødsfall
+    UTENOM_TILSYNSBEHOV,
+    FOR_LAV_GRAD,
+    FOR_HØY_TILSYNSGRAD,
+    LOVBESTEMT_FERIE,
+    IKKE_MEDLEM_I_FOLKETRYGDEN,
+    SØKERS_DØDSFALL,
+    BARNETS_DØDSFALL
 }
