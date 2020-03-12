@@ -56,8 +56,8 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: Arbeid) {
-        arbeid.values.forEach {
-            it.keys.forEach {periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.Arbeid)}
+        arbeid.forEach {
+            it.perioder.forEach {(periode,_) -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.Arbeid)}
         }
     }
 

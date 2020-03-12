@@ -203,12 +203,12 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
  */
 private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
         perioder: Map<LukketPeriode, UttaksPeriodeInfo>
-) : Map<LukketPeriode, Map<ArbeidsforholdRef, Prosent>> {
+) : Map<LukketPeriode, List<Utbetalingsgrader>> {
     val innvilgedePerioder = perioder
             .filterValues { it is InnvilgetPeriode }
             .mapValues { it.value as InnvilgetPeriode }
 
-    val map = mutableMapOf<LukketPeriode, Map<ArbeidsforholdRef, Prosent>>()
+    val map = mutableMapOf<LukketPeriode, List<Utbetalingsgrader>>()
     forEach {
         map[it] = innvilgedePerioder.arbeidsforholdFraForrigeInnvilgedePeriode(it)
     }
@@ -220,10 +220,12 @@ private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
  *  - Bruker samme arbeidsforhold men overstyrer alle utbetalingsgradene til 100%
  */
 private fun Map<LukketPeriode, InnvilgetPeriode>.arbeidsforholdFraForrigeInnvilgedePeriode(
-        periode: LukketPeriode): Map<ArbeidsforholdRef, Prosent> {
+        periode: LukketPeriode): List<Utbetalingsgrader> {
     return innvilgetPeriodeMedNærmesteTom(periode.fom)
             .utbetalingsgrader
-            .mapValues { EtHundreProsent }
+            .map {
+                it.copy(utbetalingsgrad = EtHundreProsent)
+            }
 }
 
 /**

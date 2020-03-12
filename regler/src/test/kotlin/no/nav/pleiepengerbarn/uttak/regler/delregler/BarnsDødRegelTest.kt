@@ -9,6 +9,8 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.erLikEllerFør
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.print
+import no.nav.pleiepengerbarn.uttak.regler.somArbeid
+import no.nav.pleiepengerbarn.uttak.regler.somUtbetalingsgrader
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -542,12 +544,12 @@ internal class BarnsDødRegelTest {
                 ),
                 arbeid = mapOf(
                         "123" to mapOf(
-                                helePerioden to ArbeidInfo(
+                                helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
                                         skalJobbeProsent = Prosent(50)
                                 )
                         )
-                ),
+                ).somArbeid(),
                 søknadsperioder = listOf(
                         LukketPeriode("2020-01-01/2020-01-20"),
                         LukketPeriode("2020-01-29/2020-03-01")
@@ -579,12 +581,12 @@ internal class BarnsDødRegelTest {
                 ),
                 arbeid = mapOf(
                         "123" to mapOf(
-                                helePerioden to ArbeidInfo(
+                                helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
                                         skalJobbeProsent = Prosent(50)
                                 )
                         )
-                ),
+                ).somArbeid(),
                 søknadsperioder = listOf(
                         helePerioden
                 ),
@@ -601,7 +603,7 @@ internal class BarnsDødRegelTest {
                                                 grad = denAndreOmsorgsPersonensGrad,
                                                 utbetalingsgrader = mapOf(
                                                         "123" to Prosent(100)
-                                                ),
+                                                ).somUtbetalingsgrader(),
                                                 årsak = InnvilgetÅrsak(
                                                         årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
                                                         hjemler = setOf()

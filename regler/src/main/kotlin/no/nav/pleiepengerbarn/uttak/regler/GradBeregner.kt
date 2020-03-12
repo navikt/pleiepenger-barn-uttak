@@ -29,7 +29,7 @@ internal object GradBeregner {
             periode: LukketPeriode,
             grunnlag: RegelGrunnlag,
             årsakbygger: Årsaksbygger): Grader {
-        val fraværsfaktorer = mutableMapOf<ArbeidsforholdRef, Desimaltall>()
+        val fraværsfaktorer = mutableMapOf<ArbeidsforholdReferanse, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
@@ -124,10 +124,12 @@ internal object GradBeregner {
                             .fraFaktorTilProsent()
                             .normaliserProsent()
                             .resultat
-                },
+                }.map {(referanse,utbetalingsgrad ) -> Utbetalingsgrader(
+                        arbeidsforhold = referanse,
+                        utbetalingsgrad = utbetalingsgrad
+                )},
                 årsak = årsakbygger.byggOgTillattKunEn()
         )
-
     }
 
     private fun fastsettEndeligGrad(
@@ -290,7 +292,7 @@ internal object GradBeregner {
         return tilsynsbehov?.value?.prosent?.prosent?.somDesimaltall() ?: throw IllegalStateException("Periode uten tilsynsbehov")
     }
 
-    private fun ArbeidInfo.fravær(
+    private fun ArbeidsforholdPeriodeInfo.fravær(
             kunneJobbetIPerioden: Duration) : Duration {
         val fraværsfaktor = Desimaltall
                 .EtHundre
@@ -342,6 +344,6 @@ private fun Årsaksbygger.avgjørÅrsak(
 
 data class Grader(
         val grad: Prosent,
-        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+        val utbetalingsgrader: List<Utbetalingsgrader>,
         val årsak: Årsak
 )

@@ -15,10 +15,10 @@ internal class UttakTjenesteGraderingTest {
 
     private companion object {val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)}
 
-    private val arbeidsforhold1:ArbeidsforholdRef = UUID.randomUUID().toString()
-    private val arbeidsforhold2:ArbeidsforholdRef = UUID.randomUUID().toString()
-    private val arbeidsforhold3:ArbeidsforholdRef = UUID.randomUUID().toString()
-    private val arbeidsforhold4:ArbeidsforholdRef = UUID.randomUUID().toString()
+    private val arbeidsforhold1 = UUID.randomUUID().toString()
+    private val arbeidsforhold2 = UUID.randomUUID().toString()
+    private val arbeidsforhold3 = UUID.randomUUID().toString()
+    private val arbeidsforhold4 = UUID.randomUUID().toString()
 
     private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
     private val annenPartInnvilgetÅrsak = InnvilgetÅrsak(
@@ -44,15 +44,15 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Tilsyn(Prosent(20))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
 
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80), mapOf(arbeidsforhold1 to Prosent(80)), InnvilgetÅrsaker.GradertMotTilsyn)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(80.00), mapOf(arbeidsforhold1 to Prosent(80.00)), InnvilgetÅrsaker.GradertMotTilsyn)
     }
 
     @Test
@@ -65,8 +65,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent(25)))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -85,11 +85,11 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)), årsak = annenPartInnvilgetÅrsak)))
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent(25)))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -108,11 +108,11 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)), årsak = annenPartInnvilgetÅrsak)))
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent(25)))
-                ),
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
+                ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(grad = Prosent(30))
                 )
@@ -135,7 +135,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)), årsak = annenPartInnvilgetÅrsak )))
+                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(grad = Prosent(45))
@@ -159,8 +159,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent(35)))
-                ),
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(35)))
+                ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
                 )
@@ -183,8 +183,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent(25)))
-                ),
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
+                ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Tilsyn(Prosent(30))
                 )
@@ -207,8 +207,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE.dividedBy(2), Prosent(25)))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE.dividedBy(2), Prosent(25)))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -229,11 +229,11 @@ internal class UttakTjenesteGraderingTest {
                         enUke
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(enUke to ArbeidInfo(FULL_UKE.minusHours(30), Prosent(40))),
-                        arbeidsforhold2 to mapOf(enUke to ArbeidInfo(FULL_UKE.minusHours(30), Prosent(20))),
-                        arbeidsforhold3 to mapOf(enUke to ArbeidInfo(FULL_UKE.minusHours(30), Prosent(80))),
-                        arbeidsforhold4 to mapOf(enUke to ArbeidInfo(FULL_UKE.minusHours(30), Prosent(0)))
-                ),
+                        arbeidsforhold1 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_UKE.minusHours(30), Prosent(40))),
+                        arbeidsforhold2 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_UKE.minusHours(30), Prosent(20))),
+                        arbeidsforhold3 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_UKE.minusHours(30), Prosent(80))),
+                        arbeidsforhold4 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_UKE.minusHours(30), Prosent(0)))
+                ).somArbeid(),
                 tilsynsperioder = mapOf(
                         enUke to Tilsyn(Prosent(40))
                 )
@@ -262,11 +262,11 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
                         )
-                )
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -288,11 +288,11 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE, skalJobbeProsent = Prosent(30))
                         )
-                ),
+                ).somArbeid(),
                 tilsynsperioder = mapOf(
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Tilsyn(Prosent(35))
                 )

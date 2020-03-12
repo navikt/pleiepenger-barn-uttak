@@ -14,7 +14,7 @@ internal class UttakTjenesteTest {
 
     private companion object {val FULL_UKE = Duration.ofHours(37).plusMinutes(30)}
 
-    private val arbeidsforhold1:ArbeidsforholdRef = java.util.UUID.randomUUID().toString()
+    private val arbeidsforhold1 = java.util.UUID.randomUUID().toString()
 
     @Test
     fun `Enkel uttaksperiode uten annen informasjon`() {
@@ -27,8 +27,8 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -52,8 +52,8 @@ internal class UttakTjenesteTest {
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -74,8 +74,8 @@ internal class UttakTjenesteTest {
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -99,8 +99,8 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -120,8 +120,8 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(søknadsperiode),
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidInfo(FULL_UKE, Prosent.ZERO))
-                )
+                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                ).somArbeid()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)

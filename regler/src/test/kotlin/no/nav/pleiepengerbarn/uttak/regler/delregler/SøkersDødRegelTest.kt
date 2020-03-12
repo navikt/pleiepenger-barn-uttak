@@ -32,7 +32,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(80),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
 
                         ),
@@ -46,7 +46,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-02-10/2020-02-25") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(20),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         )
                 )
@@ -108,7 +108,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(80),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         ),
                         LukketPeriode("2020-01-11/2020-01-30") to AvslåttPeriode(
@@ -121,7 +121,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-02-10/2020-02-25") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(20),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         )
                 )
@@ -150,7 +150,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(80),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         )
                 )
@@ -186,7 +186,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-02-11/2020-02-20") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(50),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         )
                 )
@@ -242,7 +242,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(80),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         )
                 )
@@ -271,7 +271,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
                                 knekkpunktTyper = setOf(),
                                 grad = Prosent(80),
-                                utbetalingsgrader = mapOf(),
+                                utbetalingsgrader = listOf(),
                                 årsak = innvilgetÅrsak
                         ),
                         LukketPeriode("2020-01-11/2020-01-15") to AvslåttPeriode(
