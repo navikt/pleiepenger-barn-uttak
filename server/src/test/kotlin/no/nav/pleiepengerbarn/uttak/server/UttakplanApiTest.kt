@@ -28,6 +28,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     fun `Opprett uttaksplan`() {
         val requestBody = """
             {
+                "søker": {
+                    "fødselsdato": "1990-09-29"
+                },
                 "saksnummer": "123",
                 "behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
                 "søknadsperioder": [

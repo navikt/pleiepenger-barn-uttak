@@ -4,7 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class RegelGrunnlag(
         val barn: Barn = Barn(),
-        val søker: Søker = Søker(),
+        val søker: Søker,
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val søknadsperioder:List<LukketPeriode>,
         val arbeid: Arbeid = listOf(),
