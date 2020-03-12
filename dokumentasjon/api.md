@@ -34,7 +34,7 @@ POST /uttaksplan
 		"perioder": {
 			"2020-01-01/2020-03-31": {
 				"jobberNormaltPerUke": "PT7H30M",
-				"skalJobbeProsent": "20"
+				"skalJobbeProsent": 20.50
 			}
 		}
 	}],
@@ -59,7 +59,7 @@ HTTP 201
 {
 	"perioder": {
 		"2020-01-01/2020-03-31": {
-			"utfall": "Innvilget",
+			"utfall": "INNVILGET",
 			"grad": 100,
 			"utbetalingsgrader": [{
 				"arbeidsforhold": {
@@ -72,8 +72,8 @@ HTTP 201
 			}]
 		},
 		"2020-02-02/2020-02-15": {
-			"utfall": "Innvilget",
-			"årsak": "AvkortetMotInntekt",
+			"utfall": "INNVILGET",
+			"årsak": "AVKORTET_MOT_INNTEKT",
 			"hjemler": [],
 			"grad": 80,
 			"utbetalingsgrader": [{
@@ -87,9 +87,9 @@ HTTP 201
 			}]
 		},
 		"2020-02-16/2020-02-25": {
-			"utfall": "Avslått",
+			"utfall": "AVSLÅTT",
 			"årsaker": [{
-				"årsak": "IkkeMedlemIFolketrygden",
+				"årsak": "IKKE_MEDLEM_I_FOLKETRYGDEN",
 				"hjemler": [{
 					"henvisning": "Folketrygdloven LOV-1997-02-28-19 Kapittel 2",
 					"anvendelse": "Fastsatt at personen ikke er medlem av folketrygden i perioden."
