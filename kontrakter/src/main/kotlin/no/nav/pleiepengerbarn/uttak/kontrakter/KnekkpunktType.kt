@@ -1,12 +1,12 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 enum class KnekkpunktType {
-    Ferie,
-    Tilsynsbehov,
-    Tilsynsperiode,
-    AnnenPartsUttak,
-    Arbeid,
-    IkkeMedlem,
-    SøkersDødsfall,
-    BarnetsDødsfall
+    LOVBESTEMT_FERIE,
+    TILSYNSBEHOV,
+    TILSYNSPERIODE,
+    ANNEN_PARTS_UTTAK,
+    ARBEID,
+    IKKE_MEDLEM_I_FOLKETRYGDEN,
+    SØKERS_DØDSFALL,
+    BARNETS_DØDSFALL
 }

@@ -34,30 +34,30 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
-        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IkkeMedlem) }
+        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM_I_FOLKETRYGDEN) }
     }
 
     private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Tilsyn>) {
-        tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.Tilsynsperiode) }
+        tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 
     private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
-        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.Ferie)}
+        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
     }
 
     private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>) {
-        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.Tilsynsbehov)}
+        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.TILSYNSBEHOV)}
     }
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:List<Uttaksplan>) {
         andrePartersUttaksplan.forEach { uttaksplan ->
-            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.AnnenPartsUttak)}
+            uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.ANNEN_PARTS_UTTAK)}
         }
     }
 
     private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: Arbeid) {
         arbeid.forEach {
-            it.perioder.forEach {(periode,_) -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.Arbeid)}
+            it.perioder.forEach {(periode,_) -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID)}
         }
     }
 

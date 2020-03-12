@@ -18,7 +18,7 @@ internal class SøkersDødRegelTest {
                 anvendelse = "Testformål"
         ))
         private val innvilgetÅrsak = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.AvkortetMotInntekt,
+                årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
                 hjemler = hjemler
         )
     }
@@ -39,7 +39,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-11/2020-01-30") to AvslåttPeriode(
                                 knekkpunktTyper = setOf(),
                                 årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.LovbestemtFerie,
+                                        årsak = AvslåttÅrsaker.LOVBESTEMT_FERIE,
                                         hjemler = hjemler
                                 ))
                         ),
@@ -72,14 +72,14 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetGrad = Prosent(80),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AvkortetMotInntekt
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
 
@@ -87,8 +87,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-30"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LovbestemtFerie,
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
 
@@ -96,7 +96,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-10/2020-02-25"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
     }
@@ -114,7 +114,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-11/2020-01-30") to AvslåttPeriode(
                                 knekkpunktTyper = setOf(),
                                 årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.LovbestemtFerie,
+                                        årsak = AvslåttÅrsaker.LOVBESTEMT_FERIE,
                                         hjemler = hjemler
                                 ))
                         ),
@@ -179,7 +179,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to AvslåttPeriode(
                                 knekkpunktTyper = setOf(),
                                 årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.IkkeMedlemIFolketrygden,
+                                        årsak = AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN,
                                         hjemler = hjemler
                                 ))
                         ),
@@ -211,7 +211,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.IkkeMedlemIFolketrygden
+                        AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN
                 )
         )
 
@@ -219,8 +219,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.IkkeMedlemIFolketrygden,
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN,
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
 
@@ -228,7 +228,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-20"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
     }
@@ -277,7 +277,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-11/2020-01-15") to AvslåttPeriode(
                                 knekkpunktTyper = setOf(),
                                 årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.UtenomTilsynsbehov,
+                                        årsak = AvslåttÅrsaker.UTENOM_TILSYNSBEHOV,
                                         hjemler = hjemler
                                 ))
                         )
@@ -301,7 +301,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
 
@@ -309,8 +309,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-15"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.UtenomTilsynsbehov,
-                        AvslåttÅrsaker.SøkersDødsfall
+                        AvslåttÅrsaker.UTENOM_TILSYNSBEHOV,
+                        AvslåttÅrsaker.SØKERS_DØDSFALL
                 )
         )
     }

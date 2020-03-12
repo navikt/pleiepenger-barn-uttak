@@ -22,7 +22,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
         internal val EtHundreProsent = Prosent(100)
 
         internal fun barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.BarnetsDødsfall,
+                årsak = AvslåttÅrsaker.BARNETS_DØDSFALL,
                 hjemler = setOf(BarnetsDødsfall.anvend(
                         "Fastsatt at barnet døde utenfor en innvilget periode ($dødsdato). " +
                                 "Perioden avslås derfor ettersom det ikke foreligger rett til pleiepenger."
@@ -30,7 +30,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
         )
 
         internal fun periodeEtterSorgperiodenAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.BarnetsDødsfall,
+                årsak = AvslåttÅrsaker.BARNETS_DØDSFALL,
                 hjemler = setOf(BarnetsDødsfall.anvend(
                         "Fastsatt at barnet døde i løpet av en innvilget periode ($dødsdato). " +
                                 "Perioden avslås ettersom den er etter 6 uker etter at dødsfallet fant sted."
@@ -38,7 +38,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
         )
 
         internal fun barnetsDødInnvilgetÅrsak(dødsdato: LocalDate) = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.BarnetsDødsfall,
+                årsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 hjemler = setOf(BarnetsDødsfall.anvend(
                         "Fastsatt at barnet døde i løpet av en innvilget periode ($dødsdato). " +
                                 "Perioden innvilges derfor ettersom den er innenfor 6 uker etter at dødsfallet fant sted. "
@@ -122,7 +122,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
                         val innvilgetÅrsak = barnetsDødInnvilgetÅrsak(dødsdato)
                         perioder[periode] = InnvilgetPeriode(
-                                knekkpunktTyper = setOf(KnekkpunktType.BarnetsDødsfall),
+                                knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                                 grad = EtHundreProsent,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                                 årsak = innvilgetÅrsak
@@ -180,10 +180,10 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
 
         val periodeInfoMedKnekkpunkt = when (periodeInfo) {
             is InnvilgetPeriode -> {
-                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BarnetsDødsfall))
+                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
             is AvslåttPeriode -> {
-                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BarnetsDødsfall))
+                periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
             else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
         }
@@ -309,7 +309,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fjernAllePerioderEtterD�
 }
 
 private fun UttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato: LocalDate) : UttaksPeriodeInfo {
-    return if (this is AvslåttPeriode && årsaker.size == 1 && årsaker.first().årsak == AvslåttÅrsaker.UtenomTilsynsbehov) {
+    return if (this is AvslåttPeriode && årsaker.size == 1 && årsaker.first().årsak == AvslåttÅrsaker.UTENOM_TILSYNSBEHOV) {
         this.copy(
                 årsaker = setOf(periodeEtterSorgperiodenAvslåttÅrsak(dødsdato))
         )
