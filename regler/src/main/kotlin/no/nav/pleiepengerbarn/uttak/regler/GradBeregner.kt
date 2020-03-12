@@ -24,7 +24,6 @@ internal object GradBeregner {
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
-    private val ToHundreProsent = Desimaltall.fraDouble(200.00)
 
     internal fun beregnGrader(
             periode: LukketPeriode,
@@ -288,11 +287,7 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
         val tilsynsbehov = tilsynsbehov.entries.find { it.key.overlapper(periode) }
-        return when (tilsynsbehov?.value?.prosent) {
-            TilsynsbehovStørrelse.PROSENT_100 -> Desimaltall.EtHundre
-            TilsynsbehovStørrelse.PROSENT_200 -> ToHundreProsent
-            else -> throw IllegalStateException("Periode uten tilsynsbehov")
-        }
+        return tilsynsbehov?.value?.prosent?.prosent?.somDesimaltall() ?: throw IllegalStateException("Periode uten tilsynsbehov")
     }
 
     private fun ArbeidInfo.fravær(
@@ -328,11 +323,11 @@ private fun Årsaksbygger.avgjørÅrsak(
         takForYtelsePåGrunnAvTilsynsgrad.erNull() -> {
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForHøyTilsynsgrad)
         }
-        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
-            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
-        }
         endeligGrad.erNull() -> {
             avslått(BeregningAvGrader, AvslåttÅrsaker.ForLavGrad)
+        }
+        takForYtelsePåGrunnAvTilsynsgrad.erEtHundre() -> {
+            innvilget(BeregningAvGrader, InnvilgetÅrsaker.AvkortetMotInntekt)
         }
         else -> {
             if (beregnetGrad < takForYtelsePåGrunnAvTilsynsgrad) {

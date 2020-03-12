@@ -7,5 +7,6 @@ enum class KnekkpunktType {
     AnnenPartsUttak,
     Arbeid,
     IkkeMedlem,
-    SøkersDødsfall
+    SøkersDødsfall,
+    BarnetsDødsfall
 }

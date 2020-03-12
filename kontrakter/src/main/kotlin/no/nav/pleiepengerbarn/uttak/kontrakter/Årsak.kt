@@ -41,5 +41,6 @@ enum class AvslåttÅrsaker  {
     ForHøyTilsynsgrad, // TODO: Ny <- Legg til test.
     LovbestemtFerie,
     IkkeMedlemIFolketrygden,
-    SøkersDødsfall
+    SøkersDødsfall,
+    BarnetsDødsfall
 }

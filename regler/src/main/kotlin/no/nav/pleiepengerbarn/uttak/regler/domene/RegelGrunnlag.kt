@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler.domene
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class RegelGrunnlag(
+        val barn: Barn = Barn(),
         val søker: Søker = Søker(),
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val søknadsperioder:List<LukketPeriode>,

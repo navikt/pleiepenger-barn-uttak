@@ -42,6 +42,15 @@ internal object Lovhenvisninger {
             ledd = 2
     )
 
+    internal val BarnetsDødsfall = FolketrygdlovenHenvisning(
+            navn = Folketrygdloven.Navn,
+            version = Folketrygdloven.Versjon,
+            lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
+            paragraf = "9-10",
+            ledd = 4,
+            punktum = 1
+    )
+
     internal val TilsynsordningDelerAvPerioden = FolketrygdlovenHenvisning(
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,

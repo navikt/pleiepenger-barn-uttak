@@ -38,4 +38,15 @@ internal object UttaksperiodeAsserts {
         assertThat(avslåttPeriode.årsaker.map { it.årsak.name }).isEqualTo(forventetAvslåttÅrsaker.map { it.name })
     }
 
+    internal fun sjekkAvslåttInneholderAvslåttÅrsaker(
+            uttaksplan: Uttaksplan,
+            forventetPeriode: LukketPeriode,
+            forventetAvslåttÅrsaker :Set<AvslåttÅrsaker>) {
+        val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
+        assertTrue(uttaksperiodeInfo != null)
+        assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
+        val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
+        assertTrue(avslåttPeriode.årsaker.map { it.årsak }.containsAll(forventetAvslåttÅrsaker))
+    }
+
 }

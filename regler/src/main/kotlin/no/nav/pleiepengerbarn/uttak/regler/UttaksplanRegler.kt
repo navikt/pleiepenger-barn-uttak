@@ -1,10 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
+import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.SøkersDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilBeregningAvGrad
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -19,6 +20,7 @@ internal object UttaksplanRegler {
     )
 
     private val UttaksplanRegler = linkedSetOf(
+            BarnsDødRegel(), // Må kjøres først av uttaksplanreglene
             SøkersDødRegel()
     )
 
