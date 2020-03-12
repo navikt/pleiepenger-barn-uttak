@@ -15,6 +15,10 @@ internal class UttaksplanMergerTest {
             årsak = InnvilgetÅrsak(InnvilgetÅrsaker.AvkortetMotInntekt, setOf()),
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent))
 
+    private val avslått = AvslåttPeriode(
+            årsaker = setOf(AvslåttÅrsak(AvslåttÅrsaker.ForLavGrad, setOf()))
+    )
+
     @Test
     fun `En uttaksplan med en uttaksperiode skal bli til samme uttaksplan`() {
 
@@ -45,6 +49,23 @@ internal class UttaksplanMergerTest {
         )))
     }
 
+    @Test
+    fun `En uttaksplan med delvis overlapp en annen uttaksplan(første uttaksperioder i nyeste uttaksplan) skal slås sammen`() {
+
+        val uttaksplan1 =  Uttaksplan(
+                mapOf(LukketPeriode("2020-01-01/2020-02-10") to innvilget)
+        )
+        val uttaksplan2 =  Uttaksplan(
+                mapOf(LukketPeriode("2020-01-17/2020-03-31") to innvilget)
+        )
+
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan2, uttaksplan1))
+
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
+                LukketPeriode("2020-01-01/2020-01-16") to innvilget,
+                LukketPeriode("2020-01-17/2020-03-31") to innvilget
+        )))
+    }
 
     @Test
     fun `En uttaksplan med hull, skal føre til at underliggende uttaksplan skal brukes i hullet`() {
@@ -68,6 +89,23 @@ internal class UttaksplanMergerTest {
         )))
     }
 
+    @Test
+    fun `En tidligere uttaksplan med innvilget periode og en nyere uttaksplan med et avslag, skal føre til at opprinne uttaksperioder blir splittet`() {
 
+        val uttaksplan1 =  Uttaksplan(
+                mapOf(LukketPeriode("2020-01-10/2020-01-20") to avslått)
+        )
+        val uttaksplan2 =  Uttaksplan(
+                mapOf(LukketPeriode("2020-01-01/2020-01-31") to innvilget)
+        )
+
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan1, uttaksplan2))
+
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
+                LukketPeriode("2020-01-01/2020-01-09") to innvilget,
+                LukketPeriode("2020-01-10/2020-01-20") to avslått,
+                LukketPeriode("2020-01-21/2020-01-31") to innvilget
+        )))
+    }
 
 }
