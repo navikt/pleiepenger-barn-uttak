@@ -2,8 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 
 internal object UttaksperiodeAsserts {
 
@@ -11,18 +10,19 @@ internal object UttaksperiodeAsserts {
             uttaksplan: Uttaksplan,
             forventetPeriode: LukketPeriode,
             forventetGrad:Prosent,
-            forventedeUtbetalingsgrader:Map<ArbeidsforholdRef,Prosent> = mapOf(),
+            forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
             forventedeInnvilgetÅrsak: InnvilgetÅrsaker) {
         val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
         val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
         assertThat(innvilgetPeriode.grad).isEqualByComparingTo(forventetGrad)
-        forventedeUtbetalingsgrader.forEach { (arbeidsforholdRef, forventetUtbetalingsgrad) ->
-            val utbetalingsgrad =innvilgetPeriode.utbetalingsgrader[arbeidsforholdRef]
-            assertNotNull(utbetalingsgrad)
-            assertThat(utbetalingsgrad).isEqualByComparingTo(forventetUtbetalingsgrad)
+
+        forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
+            val innvilgetUtbetalingsgrader = innvilgetPeriode.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
+            assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(innvilgetUtbetalingsgrader.utbetalingsgrad)
         }
+
         assertThat(innvilgetPeriode.årsak).isEqualTo(forventedeInnvilgetÅrsak)
 
     }
@@ -50,3 +50,6 @@ internal object UttaksperiodeAsserts {
     }
 
 }
+
+private fun List<Utbetalingsgrader>.hentForArbeidsforhold(arbeidsforhold: ArbeidsforholdReferanse) =
+        firstOrNull { it.arbeidsforhold == arbeidsforhold} ?: throw IllegalStateException("Fant ikke utbetalingsgrad for $arbeidsforhold")

@@ -88,7 +88,12 @@ private class PrintGrunnlagOgUttaksplan(
         val tidslinjer = mutableListOf<Tidslinje>()
         grunnlag.arbeid.forEach { arbeid ->
             val arbeidsperioder = mutableMapOf<LukketPeriode, Prosent>()
-            grunnlag.arbeid[arbeid.key]?.entries?.forEach { (periode, info) -> arbeidsperioder[periode] = info.skalJobbeProsent }
+            grunnlag.arbeid.forEach { (_,perioder) ->
+                perioder.forEach { (periode, arbeidsforholdPeriodeInfo) ->
+                    arbeidsperioder[periode] = arbeidsforholdPeriodeInfo.skalJobbeProsent
+                }
+            }
+
             tidslinjer.add(Tidslinje("Arbeid", arbeidsperioder))
         }
         return tidslinjer

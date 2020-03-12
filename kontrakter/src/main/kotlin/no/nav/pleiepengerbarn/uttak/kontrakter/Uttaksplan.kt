@@ -10,6 +10,11 @@ data class Uttaksplan(
         val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
 
+data class Utbetalingsgrader(
+        val arbeidsforhold: ArbeidsforholdReferanse,
+        val utbetalingsgrad: Prosent
+)
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
 @JsonSubTypes(
         JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "Innvilget"),
@@ -23,14 +28,14 @@ interface UttaksPeriodeInfo {
 data class InnvilgetPeriode @JsonCreator constructor(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         val grad: Prosent,
-        val utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+        val utbetalingsgrader: List<Utbetalingsgrader>,
         val årsak: InnvilgetÅrsaker,
         val hjemler: Set<Hjemmel>
 
 ) : UttaksPeriodeInfo {
     constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
                 grad: Prosent,
-                utbetalingsgrader: Map<ArbeidsforholdRef, Prosent>,
+                utbetalingsgrader: List<Utbetalingsgrader>,
                 årsak: InnvilgetÅrsak) : this(
             knekkpunktTyper = knekkpunktTyper,
             grad = grad,
