@@ -9,7 +9,7 @@ internal object Lovhenvisninger {
             lovdata = URI("https://lovdata.no/dokument/NL/lov/1997-02-28-19/KAPITTEL_2-2#KAPITTEL_2-2")
     )
 
-    internal val TapAvInntekt = FolketrygdlovenHenvisning( // 9-3
+    internal val TapAvInntekt = FolketrygdlovenHenvisning(
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,
             lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
@@ -18,7 +18,16 @@ internal object Lovhenvisninger {
             punktum = 1
     )
 
-    internal val BorteFraArbeidet = FolketrygdlovenHenvisning( // Referer til TapAvInntekt
+    internal val SøkerFyllerSøtti = FolketrygdlovenHenvisning(
+            navn = Folketrygdloven.Navn,
+            version = Folketrygdloven.Versjon,
+            lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),
+            paragraf = "9-3",
+            ledd = 1,
+            punktum = 2
+    )
+
+    internal val BorteFraArbeidet = FolketrygdlovenHenvisning(
             navn = Folketrygdloven.Navn,
             version = Folketrygdloven.Versjon,
             lovdata = URI("https://lovdata.no/lov/1997-02-28-19/§9-10"),

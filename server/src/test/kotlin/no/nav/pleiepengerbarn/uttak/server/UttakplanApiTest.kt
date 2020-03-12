@@ -42,9 +42,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                             "arbeidsforholdId": "123-456-789"
                         },
                         "perioder" : {
-                            "2020-01-01/2020-03-31": {
+                            "2020-01-01/2020-03-31": {  
                                 "jobberNormaltPerUke": "PT37H30M",
-                                "skalJobbeProsent": "0"
+                                "skalJobbeProsent": 0
                             }
                         }
                     }

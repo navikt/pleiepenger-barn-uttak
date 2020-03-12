@@ -8,5 +8,6 @@ enum class KnekkpunktType {
     ARBEID,
     IKKE_MEDLEM_I_FOLKETRYGDEN,
     SØKERS_DØDSFALL,
-    BARNETS_DØDSFALL
+    BARNETS_DØDSFALL,
+    SØKERS_ALDER
 }
