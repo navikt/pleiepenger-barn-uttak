@@ -54,7 +54,7 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                ferier = listOf(
+                lovbestemtFerie = listOf(
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
                 ),
                 arbeid = mapOf(

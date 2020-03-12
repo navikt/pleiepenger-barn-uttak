@@ -10,7 +10,7 @@ import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.TapAvInntekt
 internal class FerieRegel : PeriodeRegel {
 
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Utfall {
-        grunnlag.ferier.overlappendePeriode(periode)?.apply {
+        grunnlag.lovbestemtFerie.overlappendePeriode(periode)?.apply {
             return Avslått(årsaker = Årsaksbygger().hjemmel(AvslåttÅrsaker.LOVBESTEMT_FERIE, TapAvInntekt.anvend(
                     "Fastsatt at det ikke er noe inntektstap ved avvkling av lovbestemt ferie."
             )).byggAvslåttÅrsaker())

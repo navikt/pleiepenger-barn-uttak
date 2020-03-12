@@ -67,8 +67,8 @@ private class PrintGrunnlagOgUttaksplan(
     }
 
     private fun søknadsperioder():Tidslinje {
-        val søknadsperioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(0) }
+        val søknadsperioder = mutableMapOf<LukketPeriode, Prosent?>()
+        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = null }
         return Tidslinje("Søknadsperioder", søknadsperioder)
     }
 
@@ -79,9 +79,9 @@ private class PrintGrunnlagOgUttaksplan(
     }
 
     private fun ferieperioder():Tidslinje {
-        val ferier = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.ferier.forEach { ferie ->  ferier[ferie] = Prosent(100) }
-        return Tidslinje("Ferier", ferier)
+        val ferier = mutableMapOf<LukketPeriode, Prosent?>()
+        grunnlag.lovbestemtFerie.forEach { ferie ->  ferier[ferie] = null }
+        return Tidslinje("Lovbestemt ferie", ferier)
     }
 
     private fun arbeidsperioder():List<Tidslinje> {

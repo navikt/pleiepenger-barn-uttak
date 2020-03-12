@@ -79,7 +79,11 @@ internal object UttaksplanRegler {
                     grunnlag = grunnlag
             )
         }
-        return uttaksplan
+
+        // Forsikrer at perioder nå ikke er et sortedMap som er sortert på fom/tom
+        return uttaksplan.copy(
+                perioder = uttaksplan.perioder.toMap()
+        )
     }
 
 }

@@ -32,7 +32,7 @@ internal object UttaksperiodeAsserts {
             forventetPeriode: LukketPeriode,
             forventetAvslåttÅrsaker:Set<AvslåttÅrsaker>) {
         val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
-        assertTrue(uttaksperiodeInfo != null)
+        assertNotNull(uttaksperiodeInfo)
         assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
         val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
         assertThat(avslåttPeriode.årsaker.map { it.årsak.name }).isEqualTo(forventetAvslåttÅrsaker.map { it.name })
