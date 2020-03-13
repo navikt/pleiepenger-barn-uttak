@@ -99,7 +99,7 @@ internal class BarnsDødRegelTest {
         // Som strekker seg til 6 uker etter dødsfallet
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
-                forventetPeriode = LukketPeriode("2020-01-13/2020-01-25"),
+                forventetPeriode = LukketPeriode("2020-01-13/2020-02-19"),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall

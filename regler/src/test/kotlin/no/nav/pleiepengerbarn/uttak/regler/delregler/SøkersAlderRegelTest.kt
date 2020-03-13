@@ -15,9 +15,9 @@ import java.time.LocalDate
 internal class SøkersAlderRegelTest {
 
     private companion object {
-        private val helePerioden = LukketPeriode("2020-01-06/2020-01-19")
-        private val periode1 = LukketPeriode("2020-01-06/2020-01-10")
-        private val periode2 = LukketPeriode("2020-01-15/2020-01-19")
+        private val helePerioden = LukketPeriode("2020-01-06/2020-01-26")
+        private val periode1 = LukketPeriode("2020-01-06/2020-01-12")
+        private val periode2 = LukketPeriode("2020-01-21/2020-01-26")
     }
 
     @Test
@@ -94,7 +94,7 @@ internal class SøkersAlderRegelTest {
         assertEquals(3, uttaksplan.perioder.size)
 
         sjekkInnvilget(
-                forventetPeriode = LukketPeriode("2020-01-06/2020-01-08"),
+                forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(25),
                 forventedeUtbetalingsgrader = mapOf(),
@@ -103,7 +103,7 @@ internal class SøkersAlderRegelTest {
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
-                forventetPeriode = LukketPeriode("2020-01-09/2020-01-10"),
+                forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
                 forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.SØKERS_ALDER)
         )
 
@@ -157,7 +157,7 @@ internal class SøkersAlderRegelTest {
 
         uttaksplan.print(grunnlag)
 
-        //assertEquals(2, uttaksplan.perioder.size)
+        assertEquals(3, uttaksplan.perioder.size)
 
         sjekkInnvilget(
                 forventetPeriode = periode1,
@@ -169,7 +169,15 @@ internal class SøkersAlderRegelTest {
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
-                forventetPeriode = periode2,
+                forventetPeriode = LukketPeriode("2020-01-21/2020-01-23"),
+                forventetAvslåttÅrsaker = setOf(
+                        AvslåttÅrsaker.LOVBESTEMT_FERIE
+                )
+        )
+
+        sjekkAvslått(
+                uttaksplan = uttaksplan,
+                forventetPeriode = LukketPeriode("2020-01-24/2020-01-26"),
                 forventetAvslåttÅrsaker = setOf(
                         AvslåttÅrsaker.LOVBESTEMT_FERIE,
                         AvslåttÅrsaker.SØKERS_ALDER
@@ -201,11 +209,11 @@ internal class SøkersAlderRegelTest {
         val søttiårsdag =
                 when {
                     fyllerÅrFørUttaksplanen -> LocalDate.parse("2019-12-31")
-                    fyllerÅrEtterUttaksplanen -> LocalDate.parse("2020-01-20")
-                    fyllerÅrIEnInnvilgetPeriode -> LocalDate.parse("2020-01-08")
-                    fyllerÅrIEnAvslåttperiode -> LocalDate.parse("2020-01-17")
-                    fyllerÅrIEtHullIUttaksplanen -> LocalDate.parse("2020-01-14")
-                    fyllerÅrSisteDagISisteUttaksperiode -> LocalDate.parse("2020-01-19")
+                    fyllerÅrEtterUttaksplanen -> LocalDate.parse("2020-02-01")
+                    fyllerÅrIEnInnvilgetPeriode -> LocalDate.parse("2020-01-09")
+                    fyllerÅrIEnAvslåttperiode -> LocalDate.parse("2020-01-23")
+                    fyllerÅrIEtHullIUttaksplanen -> LocalDate.parse("2020-01-15")
+                    fyllerÅrSisteDagISisteUttaksperiode -> LocalDate.parse("2020-01-26")
                     else -> null
                 }
 

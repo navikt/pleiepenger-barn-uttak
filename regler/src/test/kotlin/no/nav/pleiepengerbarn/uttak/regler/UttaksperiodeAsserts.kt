@@ -12,7 +12,7 @@ internal object UttaksperiodeAsserts {
             forventetGrad:Prosent,
             forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
             forventedeInnvilgetÅrsak: InnvilgetÅrsaker) {
-        val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
+        val uttaksperiodeInfo = uttaksplan.perioder.toMap()[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
         val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
@@ -31,7 +31,7 @@ internal object UttaksperiodeAsserts {
             uttaksplan: Uttaksplan,
             forventetPeriode: LukketPeriode,
             forventetAvslåttÅrsaker:Set<AvslåttÅrsaker>) {
-        val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
+        val uttaksperiodeInfo = uttaksplan.perioder.toMap()[forventetPeriode]
         assertNotNull(uttaksperiodeInfo)
         assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
         val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
@@ -42,7 +42,7 @@ internal object UttaksperiodeAsserts {
             uttaksplan: Uttaksplan,
             forventetPeriode: LukketPeriode,
             forventetAvslåttÅrsaker :Set<AvslåttÅrsaker>) {
-        val uttaksperiodeInfo = uttaksplan.perioder[forventetPeriode]
+        val uttaksperiodeInfo = uttaksplan.perioder.toMap()[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
         val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
