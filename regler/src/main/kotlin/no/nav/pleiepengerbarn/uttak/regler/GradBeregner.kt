@@ -186,7 +186,7 @@ internal object GradBeregner {
     ) : Desimaltall {
         val tilsynsbehov = finnTilsynsbehov(periode)
         val tilsynsbehovDekketAvAndreParter = finnTilsynsbehovDekketAvAndreParter(periode)
-        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsgrad
+        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsgrad.tilsynsgradTilAvkorting()
         val avkortet = if (tilgjengeligGrad < Desimaltall.Null) {
             return Desimaltall.Null
         } else if (beregnetGrad >= tilgjengeligGrad) {
@@ -220,6 +220,12 @@ internal object GradBeregner {
         ))
 
         return avkortet
+    }
+
+    private fun Desimaltall.tilsynsgradTilAvkorting() = if (this < TiProsent) {
+        Desimaltall.Null
+    } else {
+        this
     }
 
     private fun RegelGrunnlag.finnTilsynsbehovDekketAvAndreParter(periode: LukketPeriode) : Desimaltall {

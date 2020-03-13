@@ -185,4 +185,39 @@ internal class UttakTjenesteTest {
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
         )
     }
+
+    @Test
+    fun `Det skal ikke avkortes mot tilsyn under 10%`() {
+        val periode = LukketPeriode("2020-03-09/2020-03-15")
+
+        val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                tilsynsbehov = mapOf(
+                        periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(periode),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(
+                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO)
+                        )
+                ).somArbeid(),
+                tilsynsperioder = mapOf(
+                        periode to Prosent(9)
+                ).somTilsynperioder()
+        )
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+
+        sjekkInnvilget(
+                uttaksplan = uttaksplan,
+                forventetPeriode = periode,
+                forventetGrad = Prosent(100),
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+        )
+
+    }
 }

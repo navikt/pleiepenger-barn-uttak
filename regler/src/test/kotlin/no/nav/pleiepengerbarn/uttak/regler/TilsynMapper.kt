@@ -26,6 +26,6 @@ internal fun Map<LukketPeriode, Prosent>.somTilsynperioder() = mapValues { (peri
 
 internal fun Map.Entry<LukketPeriode, TilsynPeriodeInfo>.somProsent() : Prosent {
     val virketimerIPerioden = EnVirkedag.multipliedBy(key.antallVirkedager())
-    return value.lengde.div(virketimerIPerioden).resultat
+    return value.lengde.div(virketimerIPerioden).fraFaktorTilProsent().resultat
 
 }
