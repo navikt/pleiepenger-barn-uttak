@@ -1,26 +1,28 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksperiode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import java.time.LocalDate
 
 object UttaksplanMerger {
 
-    fun slåSammenUttaksplaner(uttaksplaner:List<Uttaksplan>):Uttaksplan {
-        require(uttaksplaner.isNotEmpty()) {"Det må finnes minst en uttaksplan"}
+    fun slåSammenUttaksplaner(uttaksplaner:List<Uttaksplan>): FullUttaksplan {
+        if (uttaksplaner.isEmpty())  {
+            return FullUttaksplan()
+        }
+        //Sjekk at det finnes minst en periode, hvis ikke returner en tom uttaksplan
+        uttaksplaner.find { uttaksplan -> uttaksplan.perioder.isNotEmpty() } ?: return FullUttaksplan()
+        //Dersom det kun finnes bare en uttaksplan, så bare kopieres alle perioder fra denne ene uttaksplanen
         if (uttaksplaner.size == 1) {
-            return uttaksplaner[0]
+            return FullUttaksplan(perioder = uttaksplaner[0].perioder)
         }
 
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
 
 
         //TODO Sørg for at uttaksplaner er sortert slik at nyeste plan kommer første
-        //TODO Sjekk om det er minst en uttaksperioder, hvis ikke returner en tom plan
+
 
 
         var (start, index) = finnFørsteUttaksdato(uttaksplaner)
@@ -46,9 +48,7 @@ object UttaksplanMerger {
                         startPeriode = null
                     }
                     sisteOverlappendePeriode = null
-                } else if (overlappendeIndex == index) {
-                    //Ingenting å gjøre
-                } else {
+                } else if (overlappendeIndex != index) {
                     nyePerioder[sisteOverlappendePeriode?.key?.copy(fom = startPeriode, tom = dato)!!] = sisteOverlappendePeriode.value
                     index = overlappendeIndex
                     sisteOverlappendePeriode = overlappendePeriode
@@ -64,7 +64,7 @@ object UttaksplanMerger {
             dato = dato.plusDays(1)
         }
 
-        return Uttaksplan(nyePerioder)
+        return FullUttaksplan(nyePerioder)
     }
 
 
