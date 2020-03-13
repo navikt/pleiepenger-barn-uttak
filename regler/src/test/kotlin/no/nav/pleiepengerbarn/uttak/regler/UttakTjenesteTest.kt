@@ -4,6 +4,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.times
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -12,7 +14,9 @@ import java.time.Month
 
 internal class UttakTjenesteTest {
 
-    private companion object {val FULL_UKE = Duration.ofHours(37).plusMinutes(30)}
+    private companion object {
+        private val FULL_UKE = Duration.ofHours(37).plusMinutes(30)
+    }
 
     private val arbeidsforhold1 = java.util.UUID.randomUUID().toString()
 
@@ -105,8 +109,8 @@ internal class UttakTjenesteTest {
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 tilsynsperioder = mapOf(
-                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Tilsyn(Prosent(85))
-                ),
+                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
+                ).somTilsynperioder(),
                 søknadsperioder = listOf(
                         helePerioden
                 ),
@@ -183,6 +187,76 @@ internal class UttakTjenesteTest {
                 forventetGrad = Prosent(80),
                 forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(80)),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+        )
+    }
+
+    @Test
+    fun `Det skal ikke avkortes mot tilsyn under 10%`() {
+        val periode = LukketPeriode("2020-03-09/2020-03-15")
+
+        val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                tilsynsbehov = mapOf(
+                        periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(periode),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(
+                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO)
+                        )
+                ).somArbeid(),
+                tilsynsperioder = mapOf(
+                        periode to Prosent(9)
+                ).somTilsynperioder()
+        )
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+
+        sjekkInnvilget(
+                uttaksplan = uttaksplan,
+                forventetPeriode = periode,
+                forventetGrad = Prosent(100),
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+        )
+
+    }
+
+    @Test
+    fun `Kan rapportere mer tilsyn enn virketimer i perioden`() {
+        val periode = LukketPeriode("2020-03-09/2020-03-15")
+        val virketimer = periode.antallVirketimer()
+
+        val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                tilsynsbehov = mapOf(
+                        periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                ),
+                søknadsperioder = listOf(periode),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(
+                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO)
+                        )
+                ).somArbeid(),
+                tilsynsperioder = mapOf(
+                        periode to TilsynPeriodeInfo(
+                                lengde = virketimer.times(2)
+                        )
+                )
+        )
+        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+
+        sjekkAvslått(
+                uttaksplan = uttaksplan,
+                forventetPeriode = periode,
+                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.FOR_HØY_TILSYNSGRAD)
         )
     }
 }

@@ -74,7 +74,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun tilsynTidsplinje():Tidslinje {
         val tilsynPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsperioder.forEach { (periode, tilsyn) ->  tilsynPerioder[periode] = tilsyn.grad }
+        grunnlag.tilsynsperioder.forEach {  tilsynPerioder[it.key] = it.somProsent() }
         return Tidslinje("Tilsyn", tilsynPerioder)
     }
 

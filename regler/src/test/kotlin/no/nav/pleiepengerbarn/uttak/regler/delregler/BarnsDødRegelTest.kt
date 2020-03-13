@@ -1,7 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
+import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslåttInneholderAvslåttÅrsaker
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
@@ -563,10 +563,8 @@ internal class BarnsDødRegelTest {
                         )
                 ),
                 tilsynsperioder = mapOf(
-                        LukketPeriode("2020-02-11/2020-03-01") to Tilsyn(
-                                grad = Prosent(60)
-                        )
-                ),
+                        LukketPeriode("2020-02-11/2020-03-01") to Prosent(60)
+                ).somTilsynperioder(),
                 ikkeMedlem = listOf(
                         LukketPeriode("2020-02-01/2020-02-10")
                 )

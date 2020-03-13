@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.somTekst
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BorteFraArbeidet
@@ -20,7 +21,6 @@ import java.time.Duration
 
 internal object GradBeregner {
     private const val AntallVirkedagerIUken = 5
-    private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
@@ -34,12 +34,15 @@ internal object GradBeregner {
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
         val antallVirkedagerIPerioden = periode.antallVirkedager()
-        val antallVirketimerIPerioden = EnVirkedag.multipliedBy(antallVirkedagerIPerioden)
+        val antallVirketimerIPerioden = periode.antallVirketimer(antallVirkedagerIPerioden)
         årsakbygger.hjemmel(NormalArbeidsdag.anvend(
                 "Fastsatt $antallVirkedagerIPerioden virkedager, som tilsvarer ${antallVirketimerIPerioden.somTekst()}"
         ))
 
-        val tilsynsgrad = grunnlag.finnTilsynsgrad(periode)
+        val tilsynsgrad = grunnlag.finnTilsynsgrad(
+                periode = periode,
+                antallVirketimerIPerioden = antallVirketimerIPerioden
+        )
         val pleiepengegrad = Desimaltall.EtHundre - tilsynsgrad
         årsakbygger.hjemmel(FastsettingAvTilsynsgradOgPleiepengegrad.anvend(
                 "Fastsatt tilsynsgrad til ${tilsynsgrad.formatertProsent()}, og pleiepengegrad til ${pleiepengegrad.formatertProsent()}"
@@ -183,7 +186,7 @@ internal object GradBeregner {
     ) : Desimaltall {
         val tilsynsbehov = finnTilsynsbehov(periode)
         val tilsynsbehovDekketAvAndreParter = finnTilsynsbehovDekketAvAndreParter(periode)
-        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsgrad
+        val tilgjengeligGrad = tilsynsbehov - tilsynsbehovDekketAvAndreParter - tilsynsgrad.tilsynsgradTilAvkorting()
         val avkortet = if (tilgjengeligGrad < Desimaltall.Null) {
             return Desimaltall.Null
         } else if (beregnetGrad >= tilgjengeligGrad) {
@@ -217,6 +220,12 @@ internal object GradBeregner {
         ))
 
         return avkortet
+    }
+
+    private fun Desimaltall.tilsynsgradTilAvkorting() = if (this < TiProsent) {
+        Desimaltall.Null
+    } else {
+        this
     }
 
     private fun RegelGrunnlag.finnTilsynsbehovDekketAvAndreParter(periode: LukketPeriode) : Desimaltall {
@@ -282,9 +291,11 @@ internal object GradBeregner {
     }
 
 
-    private fun RegelGrunnlag.finnTilsynsgrad(periode: LukketPeriode) : Desimaltall {
+    private fun RegelGrunnlag.finnTilsynsgrad(
+            periode: LukketPeriode,
+            antallVirketimerIPerioden: Duration) : Desimaltall {
         val tilsyn = tilsynsperioder.entries.find { it.key.overlapper(periode)}
-        return tilsyn?.value?.grad?.somDesimaltall()?.normaliserProsent() ?: Desimaltall.Null
+        return tilsyn?.value?.lengde?.div(antallVirketimerIPerioden)?.fraFaktorTilProsent()?.normaliserProsent()?: Desimaltall.Null
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {

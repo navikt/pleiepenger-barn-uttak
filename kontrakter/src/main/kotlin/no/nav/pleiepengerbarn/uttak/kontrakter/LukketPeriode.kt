@@ -21,6 +21,8 @@ data class LukketPeriode (
             tom = tom(iso8601)
     )
 
+    override fun toString() = iso8601
+
     init {
         require(!fom.isAfter(tom)) {"Fom ($fom) må være før eller lik Tom ($tom)."}
     }

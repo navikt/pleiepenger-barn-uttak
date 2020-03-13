@@ -13,7 +13,9 @@ import java.util.*
 
 internal class UttakTjenesteGraderingTest {
 
-    private companion object {val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)}
+    private companion object {
+        private val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)
+    }
 
     private val arbeidsforhold1 = UUID.randomUUID().toString()
     private val arbeidsforhold2 = UUID.randomUUID().toString()
@@ -44,8 +46,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(Prosent(20))
-                ),
+                        helePerioden to Prosent(20)
+                ).somTilsynperioder(),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
                 ).somArbeid()
@@ -126,8 +128,8 @@ internal class UttakTjenesteGraderingTest {
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(grad = Prosent(30))
-                )
+                        helePerioden to Prosent(30)
+                ).somTilsynperioder()
 
         )
 
@@ -153,8 +155,8 @@ internal class UttakTjenesteGraderingTest {
                         Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
                 ),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(grad = Prosent(45))
-                )
+                        helePerioden to Prosent(45)
+                ).somTilsynperioder()
 
         )
 
@@ -180,8 +182,8 @@ internal class UttakTjenesteGraderingTest {
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(35)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(Prosent(30))
-                )
+                        helePerioden to Prosent(30)
+                ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -207,8 +209,8 @@ internal class UttakTjenesteGraderingTest {
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        helePerioden to Tilsyn(Prosent(30))
-                )
+                        helePerioden to Prosent(30)
+                ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -262,8 +264,8 @@ internal class UttakTjenesteGraderingTest {
                         arbeidsforhold4 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_UKE.minusHours(30), Prosent(0)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        enUke to Tilsyn(Prosent(40))
-                )
+                        enUke to Prosent(40)
+                ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
@@ -327,8 +329,8 @@ internal class UttakTjenesteGraderingTest {
                         )
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Tilsyn(Prosent(35))
-                )
+                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Prosent(35)
+                ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)

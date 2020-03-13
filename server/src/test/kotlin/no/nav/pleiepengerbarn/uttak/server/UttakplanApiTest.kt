@@ -54,6 +54,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         "prosent": 100
                     }
                 },
+                "tilsynsperioder": {
+                    "2020-01-01/2020-03-31": {
+                        "lengde": "PT5H"
+                    }
+                },
                 "medlemskap": {
                     "2020-01-01/2020-03-31": {}
                 }
