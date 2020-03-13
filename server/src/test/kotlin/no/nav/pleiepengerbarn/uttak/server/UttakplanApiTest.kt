@@ -28,6 +28,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     fun `Opprett uttaksplan`() {
         val requestBody = """
             {
+                "søker": {
+                    "fødselsdato": "1990-09-29"
+                },
                 "saksnummer": "123",
                 "behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
                 "søknadsperioder": [
@@ -39,9 +42,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                             "arbeidsforholdId": "123-456-789"
                         },
                         "perioder" : {
-                            "2020-01-01/2020-03-31": {
+                            "2020-01-01/2020-03-31": {  
                                 "jobberNormaltPerUke": "PT37H30M",
-                                "skalJobbeProsent": "0"
+                                "skalJobbeProsent": 0
                             }
                         }
                     }

@@ -1,12 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.regler.mapper
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdReferanse
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalStateException
+import java.time.LocalDate
 
 internal class GrunnlagMapperTest {
     @Test
@@ -60,6 +58,9 @@ internal class GrunnlagMapperTest {
     private fun lagUttaksgrunnag(
             arbeidsforholdReferanse1: ArbeidsforholdReferanse,
             arbeidsforholdReferanse2: ArbeidsforholdReferanse) = Uttaksgrunnlag(
+                    søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(50)
+                    ),
                     saksnummer = "1",
                     behandlingId = "2",
                     medlemskap = mapOf(),

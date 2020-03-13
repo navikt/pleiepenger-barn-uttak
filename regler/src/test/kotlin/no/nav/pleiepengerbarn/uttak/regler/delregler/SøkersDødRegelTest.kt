@@ -319,6 +319,7 @@ internal class SøkersDødRegelTest {
         val overordnetPeriode = perioder.keys.overordnetPeriode()
         return RegelGrunnlag(
                 søker = Søker(
+                        fødselsdato = søkersDødsdato?:LocalDate.now().minusYears(50),
                         dødsdato = søkersDødsdato
                 ),
                 tilsynsbehov = mapOf(

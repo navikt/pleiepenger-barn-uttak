@@ -99,7 +99,7 @@ internal class BarnsDødRegelTest {
         // Som strekker seg til 6 uker etter dødsfallet
         sjekkInnvilget(
                 uttaksplan = uttaksplanEtterRegelkjøring,
-                forventetPeriode = LukketPeriode("2020-01-13/2020-01-25"),
+                forventetPeriode = LukketPeriode("2020-01-13/2020-02-19"),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
                 forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
@@ -539,6 +539,9 @@ internal class BarnsDødRegelTest {
                 }
 
         return RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(50)
+                ),
                 barn = Barn(
                         dødsdato = barnetsDødsdato
                 ),
@@ -576,6 +579,9 @@ internal class BarnsDødRegelTest {
         val helePerioden = LukketPeriode("2020-01-06/2020-01-12")
         val barnetsDødsdato = LocalDate.parse("2020-01-07")
         return RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(50)
+                ),
                 barn = Barn(
                         dødsdato = barnetsDødsdato
                 ),

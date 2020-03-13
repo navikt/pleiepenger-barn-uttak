@@ -34,6 +34,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -58,6 +61,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -78,6 +84,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -101,6 +110,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -128,6 +140,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80% skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -152,6 +167,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -176,6 +194,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -200,6 +221,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -222,6 +246,9 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot arbeid`() {
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         enUke to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -254,6 +281,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
@@ -280,6 +310,9 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                søker = Søker(
+                        fødselsdato = LocalDate.now().minusYears(20)
+                ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),

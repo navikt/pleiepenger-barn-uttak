@@ -21,6 +21,7 @@ internal object UttaksplanRegler {
 
     private val UttaksplanRegler = linkedSetOf(
             BarnsDødRegel(), // Må kjøres først av uttaksplanreglene
+            SøkersAlderRegel(),
             SøkersDødRegel()
     )
 
@@ -78,7 +79,7 @@ internal object UttaksplanRegler {
                     grunnlag = grunnlag
             )
         }
+
         return uttaksplan
     }
-
 }

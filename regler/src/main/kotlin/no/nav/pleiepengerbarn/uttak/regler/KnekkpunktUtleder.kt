@@ -20,7 +20,7 @@ internal object KnekkpunktUtleder {
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
         finnForIkkeMedlem(knekkpunkMap, regelGrunnlag.ikkeMedlem)
-        finnForFerie(knekkpunkMap, regelGrunnlag.ferier)
+        finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.tilsynsbehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
