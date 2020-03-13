@@ -80,8 +80,6 @@ internal object UttaksplanRegler {
             )
         }
 
-        return uttaksplan.copy(
-                perioder = uttaksplan.perioder
-        )
+        return uttaksplan
     }
 }
