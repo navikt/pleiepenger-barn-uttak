@@ -1,12 +1,19 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
+import java.time.LocalDateTime
 
 data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
 
 typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
 
 data class Uttaksplan(
+        val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
+) {
+    val opprettetTidspunkt: LocalDateTime = LocalDateTime.now()
+}
+
+data class FullUttaksplan(
         val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
 
