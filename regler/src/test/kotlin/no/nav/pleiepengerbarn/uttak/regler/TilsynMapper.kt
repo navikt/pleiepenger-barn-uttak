@@ -6,13 +6,10 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.TilsynPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
 import no.nav.pleiepengerbarn.uttak.regler.domene.div
 import no.nav.pleiepengerbarn.uttak.regler.domene.somDesimaltall
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
-import java.time.Duration
-
-private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 
 internal fun Map<LukketPeriode, Prosent>.somTilsynperioder() = mapValues { (periode,prosent) ->
-        val virketimerIPerioden = EnVirkedag.multipliedBy(periode.antallVirkedager())
+        val virketimerIPerioden = periode.antallVirketimer()
 
         val lengdePåTilsynsPeriode = Desimaltall
                 .fraDuration(virketimerIPerioden)
@@ -25,7 +22,7 @@ internal fun Map<LukketPeriode, Prosent>.somTilsynperioder() = mapValues { (peri
     }
 
 internal fun Map.Entry<LukketPeriode, TilsynPeriodeInfo>.somProsent() : Prosent {
-    val virketimerIPerioden = EnVirkedag.multipliedBy(key.antallVirkedager())
+    val virketimerIPerioden = key.antallVirketimer()
     return value.lengde.div(virketimerIPerioden).fraFaktorTilProsent().resultat
 
 }

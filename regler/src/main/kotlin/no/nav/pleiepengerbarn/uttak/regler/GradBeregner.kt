@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.somTekst
 import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BorteFraArbeidet
@@ -20,7 +21,6 @@ import java.time.Duration
 
 internal object GradBeregner {
     private const val AntallVirkedagerIUken = 5
-    private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
@@ -34,7 +34,7 @@ internal object GradBeregner {
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
         val antallVirkedagerIPerioden = periode.antallVirkedager()
-        val antallVirketimerIPerioden = EnVirkedag.multipliedBy(antallVirkedagerIPerioden)
+        val antallVirketimerIPerioden = periode.antallVirketimer(antallVirkedagerIPerioden)
         årsakbygger.hjemmel(NormalArbeidsdag.anvend(
                 "Fastsatt $antallVirkedagerIPerioden virkedager, som tilsvarer ${antallVirketimerIPerioden.somTekst()}"
         ))

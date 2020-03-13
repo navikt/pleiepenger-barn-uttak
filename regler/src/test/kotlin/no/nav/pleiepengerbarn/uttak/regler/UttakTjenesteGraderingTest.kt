@@ -13,7 +13,9 @@ import java.util.*
 
 internal class UttakTjenesteGraderingTest {
 
-    private companion object {val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)}
+    private companion object {
+        private val FULL_UKE: Duration = Duration.ofHours(37).plusMinutes(30)
+    }
 
     private val arbeidsforhold1 = UUID.randomUUID().toString()
     private val arbeidsforhold2 = UUID.randomUUID().toString()

@@ -5,6 +5,8 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
 
+private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
+
 internal fun LukketPeriode.overlapper(annen: LukketPeriode) =
         (fom == annen.fom || fom.isBefore(annen.fom)) &&
         (tom == annen.tom || tom.isAfter(annen.tom))
@@ -86,6 +88,8 @@ internal fun LukketPeriode.antallVirkedager(): Long {
     }
     return antall
 }
+
+internal fun LukketPeriode.antallVirketimer(antallVirkedager: Long = antallVirkedager()) = EnVirkedag.multipliedBy(antallVirkedager)
 
 internal fun LocalDate.erLikEllerEtter(annen: LocalDate) = isEqual(annen) || isAfter(annen)
 internal fun LocalDate.erLikEllerFør(annen: LocalDate) = isEqual(annen) || isBefore(annen)
