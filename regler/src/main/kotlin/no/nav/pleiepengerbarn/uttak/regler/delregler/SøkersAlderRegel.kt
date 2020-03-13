@@ -109,8 +109,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksper
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøkerSøttiILøpetAvUttaksplanen(
         søkersSøttiårsdag: LocalDate) : Boolean {
     val sisteDagISistePeriode = lastKey().tom
-    val dagenEtterSøkerFyller70 = søkersSøttiårsdag.plusDays(1)
-    return sisteDagISistePeriode.isAfter(dagenEtterSøkerFyller70)
+    return sisteDagISistePeriode.isAfter(søkersSøttiårsdag)
 }
 
 private fun Søker.søttiårsdag() = fødselsdato.plusYears(70)
