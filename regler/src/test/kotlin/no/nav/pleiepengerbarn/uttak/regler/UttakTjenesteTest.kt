@@ -105,8 +105,8 @@ internal class UttakTjenesteTest {
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 tilsynsperioder = mapOf(
-                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Tilsyn(Prosent(85))
-                ),
+                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
+                ).somTilsynperioder(),
                 søknadsperioder = listOf(
                         helePerioden
                 ),

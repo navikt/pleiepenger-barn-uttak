@@ -39,7 +39,10 @@ internal object GradBeregner {
                 "Fastsatt $antallVirkedagerIPerioden virkedager, som tilsvarer ${antallVirketimerIPerioden.somTekst()}"
         ))
 
-        val tilsynsgrad = grunnlag.finnTilsynsgrad(periode)
+        val tilsynsgrad = grunnlag.finnTilsynsgrad(
+                periode = periode,
+                antallVirketimerIPerioden = antallVirketimerIPerioden
+        )
         val pleiepengegrad = Desimaltall.EtHundre - tilsynsgrad
         årsakbygger.hjemmel(FastsettingAvTilsynsgradOgPleiepengegrad.anvend(
                 "Fastsatt tilsynsgrad til ${tilsynsgrad.formatertProsent()}, og pleiepengegrad til ${pleiepengegrad.formatertProsent()}"
@@ -282,9 +285,11 @@ internal object GradBeregner {
     }
 
 
-    private fun RegelGrunnlag.finnTilsynsgrad(periode: LukketPeriode) : Desimaltall {
+    private fun RegelGrunnlag.finnTilsynsgrad(
+            periode: LukketPeriode,
+            antallVirketimerIPerioden: Duration) : Desimaltall {
         val tilsyn = tilsynsperioder.entries.find { it.key.overlapper(periode)}
-        return tilsyn?.value?.grad?.somDesimaltall()?.normaliserProsent() ?: Desimaltall.Null
+        return tilsyn?.value?.lengde?.div(antallVirketimerIPerioden)?.fraFaktorTilProsent()?.normaliserProsent()?: Desimaltall.Null
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {
