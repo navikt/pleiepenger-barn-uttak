@@ -1,48 +1,51 @@
 package no.nav.pleiepengerbarn.uttak.regler.tidslinje
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.erLikEllerFør
 import java.text.DecimalFormat
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
 internal object TidslinjeAsciiArt {
-    private val df = DecimalFormat().apply {
+    private val decimalFormat = DecimalFormat().apply {
         maximumFractionDigits = 1
         minimumFractionDigits = 1
     }
 
     internal fun printTidslinje(tidslinjer: LinkedHashSet<Tidslinje>){
-        val førsteHverdag = tidslinjer.førsteDato().førsteHverdag()
-        val sisteHverdag = tidslinjer.sisteDato().sisteHverdag()
+        val førsteDag = tidslinjer.førsteDato()
+        val sisteDag = tidslinjer.sisteDato()
 
-        println("Fra og med ${førsteHverdag.dayOfWeek.name} $førsteHverdag")
-        println("Til og med ${sisteHverdag.dayOfWeek.name} $sisteHverdag")
+        println()
+        println("- - - - - - - - - - - - - -")
+        println("Fra og med ${førsteDag.dayOfWeek.name} $førsteDag")
+        println("Til og med ${sisteDag.dayOfWeek.name} $sisteDag")
         println()
 
-        printHeader(førsteHverdag, sisteHverdag)
+        printHeader(førsteDag, sisteDag)
 
         tidslinjer.forEach {
             it.beskrivelse.printBeskrivelse()
-            it.perioder.print(førsteHverdag)
+            it.perioder.print(førsteDag)
             println()
         }
     }
 
     private fun printDivider() = print("|")
 
-    private fun printHeader(førsteDato: LocalDate, sisteDato: LocalDate) {
+    private fun printHeader(
+            førsteDato: LocalDate,
+            sisteDato: LocalDate) {
         "".printBeskrivelse()
         var current = førsteDato
-        while (current.isBefore(sisteDato) || current.isEqual(sisteDato)) {
-            if (current.erHverdag()) {
-                printDivider()
-                print("  ")
-                print(current.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH).substring(0,1))
-                print("  ")
-            }
+        while (current.erLikEllerFør(sisteDato)) {
+            printDivider()
+            print("  ")
+            print(current.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH).substring(0,1))
+            print("  ")
             current = current.plusDays(1)
 
         }
@@ -55,15 +58,13 @@ internal object TidslinjeAsciiArt {
         else print(padEnd(20, ' '))
     }
 
-    private fun LocalDate.erHverdag() = dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY
-
-    private fun Prosent.padded() = df.format(this).padEnd(5, '-')
+    private fun Prosent.padded() = decimalFormat.format(this).padEnd(5, '-')
 
     private fun LukketPeriode.print(grad: Prosent?) {
         var current = fom
         var print = ""
-        while(current.isBefore(tom) || current.isEqual(tom)) {
-            if (current.erHverdag()) print += "------"
+        while(current.erLikEllerFør(tom)) {
+            print += "------"
             current = current.plusDays(1)
         }
         if (print.isEmpty()) return
@@ -72,40 +73,14 @@ internal object TidslinjeAsciiArt {
         printDivider()
     }
 
-    private fun LocalDate.førsteHverdag() : LocalDate {
-        var current = this
-        while (!current.erHverdag()) {
-            current = current.plusDays(1)
-        }
-        return current
-    }
-
-    private fun LocalDate.sisteHverdag() : LocalDate {
-        var current = this
-        while (!current.erHverdag()) {
-            current = current.minusDays(1)
-        }
-        return current
-    }
-
-    private fun LukketPeriode.antallHverdagerMellom(inkluderFraOgMed: Boolean = false) : Int {
-        var antall = 0
-        val førsteHverdag = fom.førsteHverdag()
-        val andreHverdag = førsteHverdag.plusDays(1).førsteHverdag()
-        var current = if (inkluderFraOgMed) førsteHverdag else andreHverdag
-        while (current.isBefore(tom)) {
-            if (current.erHverdag()) antall++
-            current = current.plusDays(1)
-        }
-        return antall
-    }
-
     private fun LukketPeriode.tomPeriode(inkluderFraOgMed: Boolean = false) {
-        val antallHverdager = antallHverdagerMellom(inkluderFraOgMed)
-        if (antallHverdager == 0) return
+        var antallDager = ChronoUnit.DAYS.between(fom, tom).toInt()
+        if (!inkluderFraOgMed) antallDager--
+
+        if (antallDager == 0) return
         var print = ""
 
-        for (x in 1..antallHverdager) {
+        for (x in 1..antallDager) {
             print += "      "
         }
 

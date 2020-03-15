@@ -1,16 +1,17 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
+import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.SøkersDødRegel
+import no.nav.pleiepengerbarn.uttak.regler.delregler.TilBeregningAvGrad
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.domene.Årsaksbygger
 
 internal object UttaksplanRegler {
-
-    private val NEDRE_GRENSE_FOR_UTTAK = Prosent(20)
 
     private val PeriodeRegler = linkedSetOf(
             MedlemskapRegel(),
@@ -19,6 +20,8 @@ internal object UttaksplanRegler {
     )
 
     private val UttaksplanRegler = linkedSetOf(
+            BarnsDødRegel(), // Må kjøres først av uttaksplanreglene
+            SøkersAlderRegel(),
             SøkersDødRegel()
     )
 
@@ -29,36 +32,45 @@ internal object UttaksplanRegler {
         val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
-            val avslagsÅrsaker = mutableSetOf<AvslåttPeriodeÅrsak>()
+            val avslåttÅrsaker = mutableSetOf<AvslåttÅrsak>()
+            val årsakbygger = Årsaksbygger()
             PeriodeRegler.forEach { regel ->
                 val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
                 if (utfall is Avslått) {
-                    avslagsÅrsaker.add(utfall.avslagsÅrsak)
+                    avslåttÅrsaker.addAll(utfall.årsaker)
+                } else if (utfall is TilBeregningAvGrad) {
+                    årsakbygger.startBeregningAvGraderMed(utfall.hjemler)
                 }
             }
-            if (avslagsÅrsaker.isNotEmpty()) {
+            if (avslåttÅrsaker.isNotEmpty()) {
                 perioder[periode] = AvslåttPeriode(
                         knekkpunktTyper = knekkpunktTyper,
-                        avslagsÅrsaker = avslagsÅrsaker.toSet()
+                        årsaker = avslåttÅrsaker
                 )
             } else {
-                val grader = GradBeregner.beregnGrader(periode, grunnlag)
+                val grader = GradBeregner.beregnGrader(
+                        periode = periode,
+                        grunnlag = grunnlag,
+                        årsakbygger = årsakbygger
+                )
 
-                if (grader.grad < NEDRE_GRENSE_FOR_UTTAK) {
+                if (grader.årsak is AvslåttÅrsak) {
                     perioder[periode] = AvslåttPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            avslagsÅrsaker = setOf(AvslåttPeriodeÅrsak.FOR_LAV_UTTAKSGRAD)
+                            årsaker = setOf(grader.årsak)
                     )
-                } else {
+                } else if (grader.årsak is InnvilgetÅrsak) {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
                             grad = grader.grad,
-                            utbetalingsgrader = grader.utbetalingsgrader
-
+                            utbetalingsgrader = grader.utbetalingsgrader,
+                            årsak = grader.årsak.årsak,
+                            hjemler = grader.årsak.hjemler
                     )
                 }
             }
         }
+
         var uttaksplan = Uttaksplan(perioder = perioder)
 
         UttaksplanRegler.forEach {uttaksplanRegler ->
@@ -67,7 +79,7 @@ internal object UttaksplanRegler {
                     grunnlag = grunnlag
             )
         }
+
         return uttaksplan
     }
-
 }

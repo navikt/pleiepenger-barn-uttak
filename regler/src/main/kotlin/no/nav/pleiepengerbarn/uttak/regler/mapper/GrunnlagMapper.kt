@@ -11,13 +11,20 @@ object GrunnlagMapper {
     fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:List<Uttaksplan>): RegelGrunnlag {
 
         val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
+
+        val unikeArbeidsforhold = uttaksgrunnlag.arbeid.map { it.arbeidsforhold }.toSet().size
+        if (unikeArbeidsforhold != uttaksgrunnlag.arbeid.size) {
+            throw IllegalStateException("Arbeidsforholdene i grunnlaget må være unike.")
+        }
+
         return RegelGrunnlag(
+                barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
                 tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
-                ferier = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
+                lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
                 andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner(),
                 ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
         )

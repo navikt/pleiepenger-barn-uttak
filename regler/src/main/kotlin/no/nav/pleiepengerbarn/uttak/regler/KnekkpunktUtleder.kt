@@ -20,7 +20,7 @@ internal object KnekkpunktUtleder {
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
         finnForIkkeMedlem(knekkpunkMap, regelGrunnlag.ikkeMedlem)
-        finnForFerie(knekkpunkMap, regelGrunnlag.ferier)
+        finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.tilsynsbehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
@@ -34,15 +34,15 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
-        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM) }
+        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM_I_FOLKETRYGDEN) }
     }
 
-    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Tilsyn>) {
+    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, TilsynPeriodeInfo>) {
         tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 
     private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
-        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.FERIE)}
+        ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
     }
 
     private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>) {
@@ -56,8 +56,8 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: Arbeid) {
-        arbeid.values.forEach {
-            it.keys.forEach {periode -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID)}
+        arbeid.forEach {
+            it.perioder.forEach {(periode,_) -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID)}
         }
     }
 

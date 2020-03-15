@@ -2,7 +2,10 @@ package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import java.time.DayOfWeek
+import java.time.Duration
 import java.time.LocalDate
+
+private val EnVirkedag = Duration.ofHours(7).plusMinutes(30)
 
 internal fun LukketPeriode.overlapper(annen: LukketPeriode) =
         (fom == annen.fom || fom.isBefore(annen.fom)) &&
@@ -84,4 +87,34 @@ internal fun LukketPeriode.antallVirkedager(): Long {
         nåværende = nåværende.plusDays(1)
     }
     return antall
+}
+
+internal fun LukketPeriode.antallVirketimer(antallVirkedager: Long = antallVirkedager()) = EnVirkedag.multipliedBy(antallVirkedager)
+
+internal fun LocalDate.erLikEllerEtter(annen: LocalDate) = isEqual(annen) || isAfter(annen)
+internal fun LocalDate.erLikEllerFør(annen: LocalDate) = isEqual(annen) || isBefore(annen)
+
+internal fun Duration.somTekst() : String {
+    if (equals(Duration.ZERO)) return "0 timer"
+    val timer = seconds / 3600
+    val minutter = (seconds % 3600) / 60
+    val sekunder = seconds % 60
+
+    val timerTekst = when (timer) {
+        0L -> null
+        1L -> "$timer time"
+        else -> "$timer timer"
+    }
+    val minutterTekst = when (minutter) {
+        0L -> null
+        1L -> "$minutter minutt"
+        else -> "$minutter minutter"
+    }
+    val sekunderTekst = when (sekunder) {
+        0L -> null
+        1L -> "$sekunder sekund"
+        else -> "$sekunder sekunder"
+    }
+
+    return listOfNotNull(timerTekst, minutterTekst, sekunderTekst).joinToString(" ")
 }

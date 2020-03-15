@@ -67,28 +67,33 @@ private class PrintGrunnlagOgUttaksplan(
     }
 
     private fun søknadsperioder():Tidslinje {
-        val søknadsperioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = Prosent(100) }
+        val søknadsperioder = mutableMapOf<LukketPeriode, Prosent?>()
+        grunnlag.søknadsperioder.forEach { søktPeriode ->  søknadsperioder[søktPeriode] = null }
         return Tidslinje("Søknadsperioder", søknadsperioder)
     }
 
     private fun tilsynTidsplinje():Tidslinje {
         val tilsynPerioder = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.tilsynsperioder.forEach { (periode, tilsyn) ->  tilsynPerioder[periode] = tilsyn.grad }
+        grunnlag.tilsynsperioder.forEach {  tilsynPerioder[it.key] = it.somProsent() }
         return Tidslinje("Tilsyn", tilsynPerioder)
     }
 
     private fun ferieperioder():Tidslinje {
-        val ferier = mutableMapOf<LukketPeriode, Prosent>()
-        grunnlag.ferier.forEach { ferie ->  ferier[ferie] = Prosent(100) }
-        return Tidslinje("Ferier", ferier)
+        val ferier = mutableMapOf<LukketPeriode, Prosent?>()
+        grunnlag.lovbestemtFerie.forEach { ferie ->  ferier[ferie] = null }
+        return Tidslinje("Lovbestemt ferie", ferier)
     }
 
     private fun arbeidsperioder():List<Tidslinje> {
         val tidslinjer = mutableListOf<Tidslinje>()
         grunnlag.arbeid.forEach { arbeid ->
             val arbeidsperioder = mutableMapOf<LukketPeriode, Prosent>()
-            grunnlag.arbeid[arbeid.key]?.entries?.forEach { (periode, info) -> arbeidsperioder[periode] = info.skalJobbeProsent }
+            grunnlag.arbeid.forEach { (_,perioder) ->
+                perioder.forEach { (periode, arbeidsforholdPeriodeInfo) ->
+                    arbeidsperioder[periode] = arbeidsforholdPeriodeInfo.skalJobbeProsent
+                }
+            }
+
             tidslinjer.add(Tidslinje("Arbeid", arbeidsperioder))
         }
         return tidslinjer

@@ -12,9 +12,9 @@ enum class TilsynsbehovStørrelse(
         @JsonCreator
         @JvmStatic
         fun fraProsent(prosent: Prosent): TilsynsbehovStørrelse =
-                        values()
-                        .firstOrNull { it.prosent.compareTo(prosent) == 0 }
-                        ?: throw IllegalArgumentException("Ikke støttet størrelse på tilsyn ${prosent.toPlainString()}")
+                values()
+                .firstOrNull { it.prosent.compareTo(prosent) == 0 }
+                ?: throw IllegalArgumentException("Ikke støttet størrelse på tilsyn ${prosent.toPlainString()}")
     }
 }
 

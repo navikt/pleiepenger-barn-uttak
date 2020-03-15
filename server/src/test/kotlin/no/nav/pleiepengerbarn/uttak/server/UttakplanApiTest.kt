@@ -61,22 +61,35 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         //
         val requestBody = """
             {
+                "søker": {
+                    "fødselsdato": "1990-09-29"
+                },
                 "saksnummer": "123",
                 "behandlingId": "$behandlingId",
                 "søknadsperioder": [
                     "2020-01-01/2020-03-31"
                 ],
-                "arbeid": {
-                    "86c86307-ccf9-4c78-8873-75d601c09d26": {
-                        "2020-01-01/2020-03-31": {
-                            "jobberNormaltPerUke": "PT37H30M",
-                            "skalJobbeProsent": "0"
+                "arbeid": [
+                    {
+                        "arbeidsforhold": {
+                            "arbeidsforholdId": "123-456-789"
+                        },
+                        "perioder" : {
+                            "2020-01-01/2020-03-31": {  
+                                "jobberNormaltPerUke": "PT37H30M",
+                                "skalJobbeProsent": 0
+                            }
                         }
                     }
-                },
+                ],
                 "tilsynsbehov": {
                     "2020-01-01/2020-03-31": {
                         "prosent": 100
+                    }
+                },
+                "tilsynsperioder": {
+                    "2020-01-01/2020-03-31": {
+                        "lengde": "PT5H"
                     }
                 },
                 "medlemskap": {
