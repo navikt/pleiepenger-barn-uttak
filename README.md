@@ -13,16 +13,15 @@ Dette regnestykket gjøres for hver `periode`. En `periode` kan være alt fra en
     - I alle andre tilfeller settes den ved å ta 100 minus `tilsynsgrad`
 6. Fastsetter `maksimaltAntallVirketimerViKanGiYtelseForIPerioden`. Dette fastsettes ved å å ta `antallVirketimerIPerioden` og ganger med `takForYtelsePåGrunnAvTilsynsgrad`
 7. Summerer `fraværIPerioden` på tvers av alle arbeidsforhold.
-9. Beregner `grad av ytelse` 
+8. Beregner `grad av ytelse` 
     - Om `tilsynsgrad` er over 80% får man 0%
-    - Om `fraværIPerioden` er mindre eller lik `antallVirketimerIPerioden` blir graden `fraværIPerioden` delt  på `antallVirketimerIPerioden`
-    - Unntak fra punktet over om `fraværIPerioden` er større enn `maksimaltAntallVirketimerViKanGiYtelseForIPerioden`, da blir graden `maksimaltAntallVirketimerViKanGiYtelseForIPerioden` delt på `antallVirketimerIPerioden`
     - Om `fraværIPerioden` er større enn `antallVirketimerIPerioden` blir graden lik `takForYtelsePåGrunnAvTilsynsgrad`
-10. Avkorter `grad av ytelse` mot `tilsynsgrad` og andre omsorgspersoner perioden.
+    - I alle andre tilfeller må vi avklare `avkortetFraværIPerioden`. Dette er det samme som `fraværIPerioden`, men avkortet mot `maksimaltAntallVirketimerViKanGiYtelseForIPerioden`. Om f.eks. `fraværIPerioden` er 30 timer, men `maksimaltAntallVirketimerViKanGiYtelseForIPerioden` er 20 timer er det sistnevnte som blir `avkortetFraværIPerioden`. Videre finner vi da `grad av ytelse` ved å ta `avkortetFraværIPerioden` delt på `antallVirketimerIPerioden`
+9. Avkorter `grad av ytelse` mot `tilsynsgrad` og andre omsorgspersoner perioden.
     - Fastsetter `tilsynsbehov` i perioden som er enten 100% eller 200% 
     - Finner andre omsorgspersoner sin `grad av ytelse` i samme periode.
     - Om `tilsynsbehov` minus `tilsynsgrad` minus det som dekkes av andre omsorgspersoner er større eller lik `grad av ytlese` (regnet i tallpunktet over) gjøres det ingen avkorting. Ellers avkortes det til resultatet av regnetykket.
-11. Om resultatet fra forrge tallpunkt er mindre enn 20% blir `grad av ytelse` 0% ellers er har vi kommet frem til din `grad av ytelse` for perioden.
+10. Om resultatet fra forrge tallpunkt er mindre enn 20% blir `grad av ytelse` 0% ellers er har vi kommet frem til din `grad av ytelse` for perioden.
 
 ## Henvendelser
 Spørsmål knyttet til koden eller prosjektet kan stilles som issues her på GitHub.
