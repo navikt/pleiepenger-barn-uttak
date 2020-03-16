@@ -100,7 +100,7 @@ HTTP 201
 }
 ```
 
-## Slette av uttaksplan
+## Slette uttaksplan
 Ved å opprette en ny uttaksplan på en `behandlingId` det allerede finnes en uttaksplan for vil i praksis den forrige uttaksplanen bli slettet (POST-endepunktet over).
 Dette endepunktet tilbyr å slette en uttaksplan uten å erstatte det med en ny. 
 
