@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.util.*
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
@@ -41,7 +42,7 @@ class UttakplanApi {
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf())
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
-        uttakRepository?.lagre(uttaksgrunnlag.saksnummer, uttaksgrunnlag.behandlingId, regelGrunnlag, uttaksplan)
+        uttakRepository?.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
 
         val uri = uriComponentsBuilder
                 .path(UttaksplanPath)
@@ -59,7 +60,7 @@ class UttakplanApi {
     fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
         val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
         behandlingId.forEach {
-            val uttaksplan = uttakRepository?.hent(it)
+            val uttaksplan = uttakRepository?.hent(UUID.fromString(it))
             if (uttaksplan != null) {
                 uttaksplanMap[it] = uttaksplan
             }

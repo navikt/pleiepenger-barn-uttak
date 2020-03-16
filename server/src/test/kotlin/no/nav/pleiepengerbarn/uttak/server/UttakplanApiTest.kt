@@ -1,11 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.server
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.zaxxer.hikari.HikariConfig
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,7 +12,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.test.context.ActiveProfiles
 import java.net.URI
-import java.sql.Connection
 import java.time.LocalDate
 import java.time.Month
 import java.util.*
@@ -26,31 +22,7 @@ private const val UTTAKSPLAN_PATH = "/uttaksplan"
 @ActiveProfiles("test")
 internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
-    private lateinit var embeddedPostgres: EmbeddedPostgres
-    private lateinit var postgresConnection: Connection
 
-    private lateinit var hikariConfig: HikariConfig
-
-    @BeforeEach
-    fun `start postgres`() {
-        embeddedPostgres = EmbeddedPostgres.builder()
-                .start()
-
-        postgresConnection = embeddedPostgres.postgresDatabase.connection
-        val jdbcUrl = embeddedPostgres.getJdbcUrl("postgres", "postgres")
-        println(jdbcUrl)
-        hikariConfig = createHikariConfig(jdbcUrl)
-    }
-
-    private fun createHikariConfig(jdbcUrl: String) =
-        HikariConfig().apply {
-            this.jdbcUrl = jdbcUrl
-            maximumPoolSize = 3
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
-    }
 
     @Test
     fun `Opprett uttaksplan`() {
@@ -72,7 +44,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 "arbeid": [
                     {
                         "arbeidsforhold": {
-                            "arbeidsforholdId": "123-456-789"
+                            "arbeidsforholdId": "6e914bb2-e282-4ff9-844d-8b10a968133e"
                         },
                         "perioder" : {
                             "2020-01-01/2020-03-31": {  
