@@ -119,6 +119,7 @@ Optional fom/tom
 
 ### Request
 GET /uttaksplan?behandlingId=123&behandlingId=456&fom=2020-01-01&om=2020-02-01
+
 GET /uttaksplan?sakssnummer=789&saksnummer=101112&fom=2020-01-01&om=2020-02-01
 
 ### Response
