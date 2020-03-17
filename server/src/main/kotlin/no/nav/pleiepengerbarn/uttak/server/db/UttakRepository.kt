@@ -16,7 +16,7 @@ import java.util.*
 class UttakRepository {
 
     @Autowired
-    private val jdbcTemplate: JdbcTemplate? = null
+    private lateinit var jdbcTemplate: JdbcTemplate
 
     @Autowired
     private val mapper: ObjectMapper? = null
@@ -24,7 +24,7 @@ class UttakRepository {
     fun lagre(saksnummer:String, behandlingId:UUID, regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
         slettTidligereUttaksplan(behandlingId)
 
-        jdbcTemplate?.update("insert into uttaksresultat (id, saksnummer, behandling_id, regel_grunnlag, uttaksplan, slettet, opprettet_tid) values(nextval('seq_uttaksresultat'), ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("insert into uttaksresultat (id, saksnummer, behandling_id, regel_grunnlag, uttaksplan, slettet, opprettet_tid) values(nextval('seq_uttaksresultat'), ?, ?, ?, ?, ?, ?)",
                 saksnummer, behandlingId, tilJSON(regelGrunnlag), tilJSON(uttaksplan), false, uttaksplan.opprettetTidspunkt)
     }
 
@@ -33,7 +33,7 @@ class UttakRepository {
             resultSet.getString("uttaksplan")
         }
 
-        val uttaksplanJSON = jdbcTemplate?.queryForObject("select uttaksplan from uttaksresultat where behandling_id = ?",
+        val uttaksplanJSON = jdbcTemplate.queryForObject("select uttaksplan from uttaksresultat where behandling_id = ? and slettet=false",
                 rowMapper,
                 behandlingId)
 
@@ -44,7 +44,7 @@ class UttakRepository {
     }
 
     private fun slettTidligereUttaksplan(behandlingId: UUID) {
-        jdbcTemplate?.update("update uttaksresultat set slettet='true' where behandling_id=?", behandlingId)
+        jdbcTemplate.update("update uttaksresultat set slettet=true where behandling_id=?", behandlingId)
     }
 
     private fun tilJSON(obj:Any): PGobject {

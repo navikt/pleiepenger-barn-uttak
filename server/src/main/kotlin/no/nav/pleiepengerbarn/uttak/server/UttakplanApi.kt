@@ -19,7 +19,7 @@ import java.util.*
 class UttakplanApi {
 
     @Autowired
-    private val uttakRepository: UttakRepository? = null
+    private lateinit var uttakRepository: UttakRepository
 
     private companion object {
         private const val UttaksplanPath = "/uttaksplan"
@@ -42,7 +42,7 @@ class UttakplanApi {
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf())
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
-        uttakRepository?.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
+        uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
 
         val uri = uriComponentsBuilder
                 .path(UttaksplanPath)
@@ -60,7 +60,7 @@ class UttakplanApi {
     fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
         val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
         behandlingId.forEach {
-            val uttaksplan = uttakRepository?.hent(UUID.fromString(it))
+            val uttaksplan = uttakRepository.hent(UUID.fromString(it))
             if (uttaksplan != null) {
                 uttaksplanMap[it] = uttaksplan
             }

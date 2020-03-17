@@ -10,7 +10,6 @@ import java.sql.Connection
 
 internal class MigrationTest {
 
-
     private lateinit var embeddedPostgres: EmbeddedPostgres
     private lateinit var postgresConnection: Connection
 
@@ -18,12 +17,10 @@ internal class MigrationTest {
 
     @BeforeEach
     fun `start postgres`() {
-        embeddedPostgres = EmbeddedPostgres.builder()
-                .start()
-
+        embeddedPostgres = EmbeddedPostgres.builder().start()
         postgresConnection = embeddedPostgres.postgresDatabase.connection
-
-        hikariConfig = createHikariConfig(embeddedPostgres.getJdbcUrl("postgres", "postgres"))
+        val jdbcUrl = embeddedPostgres.getJdbcUrl("postgres", "postgres")
+        hikariConfig = createHikariConfig(jdbcUrl)
     }
 
     private fun runMigration() =
