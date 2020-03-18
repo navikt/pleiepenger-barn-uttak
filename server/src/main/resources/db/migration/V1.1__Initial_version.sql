@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS uttaksresultat (
     regel_grunnlag jsonb not null,
     uttaksplan jsonb not null,
     slettet boolean not null,
-    opprettet_tid timestamp not null
+    opprettet_tid timestamptz not null
 );
 
 

@@ -7,22 +7,18 @@ import java.time.LocalDate
 
 object UttaksplanMerger {
 
-    fun slåSammenUttaksplaner(uttaksplaner:List<Uttaksplan>): FullUttaksplan {
+    fun slåSammenUttaksplaner(uttaksplaner:List<Uttaksplan>): Uttaksplan {
         if (uttaksplaner.isEmpty())  {
-            return FullUttaksplan()
+            return Uttaksplan()
         }
         //Sjekk at det finnes minst en periode, hvis ikke returner en tom uttaksplan
-        uttaksplaner.find { uttaksplan -> uttaksplan.perioder.isNotEmpty() } ?: return FullUttaksplan()
+        uttaksplaner.find { uttaksplan -> uttaksplan.perioder.isNotEmpty() } ?: return Uttaksplan()
         //Dersom det kun finnes bare en uttaksplan, så bare kopieres alle perioder fra denne ene uttaksplanen
         if (uttaksplaner.size == 1) {
-            return FullUttaksplan(perioder = uttaksplaner[0].perioder)
+            return Uttaksplan(perioder = uttaksplaner[0].perioder)
         }
 
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
-
-
-        //TODO Sørg for at uttaksplaner er sortert slik at nyeste plan kommer første
-
 
 
         var (start, index) = finnFørsteUttaksdato(uttaksplaner)
@@ -64,7 +60,7 @@ object UttaksplanMerger {
             dato = dato.plusDays(1)
         }
 
-        return FullUttaksplan(nyePerioder)
+        return Uttaksplan(nyePerioder)
     }
 
 

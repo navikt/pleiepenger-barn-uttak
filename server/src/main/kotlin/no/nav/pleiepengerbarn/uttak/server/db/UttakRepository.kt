@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.postgresql.util.PGobject
@@ -8,33 +9,35 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
-import java.sql.ResultSet
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 
 
 @Repository
-class UttakRepository {
+internal class UttakRepository {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
 
     @Autowired
-    private val mapper: ObjectMapper? = null
+    private lateinit var mapper: ObjectMapper
 
-    fun lagre(saksnummer:String, behandlingId:UUID, regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
-        slettTidligereUttaksplan(behandlingId)
-
-        jdbcTemplate.update("insert into uttaksresultat (id, saksnummer, behandling_id, regel_grunnlag, uttaksplan, slettet, opprettet_tid) values(nextval('seq_uttaksresultat'), ?, ?, ?, ?, ?, ?)",
-                saksnummer, behandlingId, tilJSON(regelGrunnlag), tilJSON(uttaksplan), false, uttaksplan.opprettetTidspunkt)
+    private companion object {
+        private val uttaksplanRowMapper = RowMapper {resultSet, _ -> resultSet.getString("uttaksplan")}
     }
 
-    fun hent(behandlingId:UUID):Uttaksplan? {
-        val rowMapper = RowMapper { resultSet: ResultSet, _: Int ->
-            resultSet.getString("uttaksplan")
-        }
+    internal fun lagre(saksnummer:String, behandlingId:UUID, regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
+        slettTidligereUttaksplan(behandlingId)
+        val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
+        jdbcTemplate.update("insert into uttaksresultat (id, saksnummer, behandling_id, regel_grunnlag, uttaksplan, slettet, opprettet_tid) values(nextval('seq_uttaksresultat'), ?, ?, ?, ?, ?, ?)",
+                saksnummer, behandlingId, tilJSON(regelGrunnlag), tilJSON(uttaksplan), false, opprettetTidspunkt)
+    }
 
+    internal fun hent(behandlingId:UUID):Uttaksplan? {
         val uttaksplanJSON = jdbcTemplate.queryForObject("select uttaksplan from uttaksresultat where behandling_id = ? and slettet=false",
-                rowMapper,
+                uttaksplanRowMapper,
                 behandlingId)
 
         if (uttaksplanJSON != null) {
@@ -43,20 +46,28 @@ class UttakRepository {
         return null
     }
 
+    internal fun hent(saksnummer:Saksnummer):List<Uttaksplan> {
+        val uttaksplanJSONListe = jdbcTemplate.query("select uttaksplan from uttaksresultat where saksnummer = ? and slettet=false order by opprettet_tid desc",
+                uttaksplanRowMapper,
+                saksnummer)
+
+        return uttaksplanJSONListe.map { json -> fraJSON(json) }
+    }
+
     private fun slettTidligereUttaksplan(behandlingId: UUID) {
         jdbcTemplate.update("update uttaksresultat set slettet=true where behandling_id=?", behandlingId)
     }
 
     private fun tilJSON(obj:Any): PGobject {
-        val jsonString = mapper?.writeValueAsString(obj) ?: ""
+        val jsonString = mapper.writeValueAsString(obj) ?: ""
         val jsonObject = PGobject()
         jsonObject.type = "json"
         jsonObject.value = jsonString
         return jsonObject
     }
 
-    private fun fraJSON(json:String):Uttaksplan? {
-        return mapper?.readValue(json, Uttaksplan::class.java)
+    private fun fraJSON(json:String):Uttaksplan {
+        return mapper.readValue(json, Uttaksplan::class.java)
     }
 
 }

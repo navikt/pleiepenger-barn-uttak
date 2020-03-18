@@ -12,6 +12,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 internal class UttakRepositoryTest {
@@ -53,6 +54,25 @@ internal class UttakRepositoryTest {
         assertThat(uttaksplan).isNotNull
         assertThat(uttaksplan).isEqualTo(dummyUttaksplan(heleFebruar))
     }
+
+
+
+    @Test
+    internal fun `Flere behandlinger på samme saksnummer skal kunne hentes ut med nyeste uttaksplan først`() {
+        val saksnummer = "123456"
+
+        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        TimeUnit.MILLISECONDS.sleep(100L) //vent 1/10 sekund
+        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = dummyUttaksplan(heleFebruar), regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+
+
+        val uttaksplanListe = uttakRepository.hent(saksnummer)
+        assertThat(uttaksplanListe).hasSize(2)
+        assertThat(uttaksplanListe[0]).isEqualTo(dummyUttaksplan(heleFebruar))
+        assertThat(uttaksplanListe[1]).isEqualTo(dummyUttaksplan(heleJanuar))
+    }
+
+
 
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
