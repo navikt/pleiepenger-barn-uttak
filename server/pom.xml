@@ -12,7 +12,7 @@
     <artifactId>server</artifactId>
 
     <properties>
-        <springdoc.version>1.2.33</springdoc.version>
+        <springdoc.version>1.2.34</springdoc.version>
         <logback.logstash.version>6.3</logback.logstash.version>
     </properties>
 
