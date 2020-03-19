@@ -22,7 +22,7 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = listOf()
+                    andrePartersUttakplan = mapOf()
             )
         }
     }
@@ -37,7 +37,7 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = listOf()
+                    andrePartersUttakplan = mapOf()
             )
         }
     }
@@ -51,7 +51,7 @@ internal class GrunnlagMapperTest {
                                     type = "Seiler"
                             )
                     ),
-                    andrePartersUttakplan = listOf()
+                    andrePartersUttakplan = mapOf()
             )
     }
 

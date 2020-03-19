@@ -22,10 +22,6 @@ internal class BarnsDødRegelTest {
                 henvisning = "Henvsining til en lov",
                 anvendelse = "Testformål"
         ))
-        private val innvilgetÅrsak = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
-                hjemler = hjemler
-        )
 
         private val forventetGradVedAvkortingMotArbeid = Prosent(50)
         private val forventetUtbetalingsgraderVedAvkortingMotArbeid = mapOf(
@@ -157,8 +153,6 @@ internal class BarnsDødRegelTest {
                 dødsdato = null
         ))
 
-        val dødsdato = grunnlag.barn.dødsdato!!
-
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
         uttaksplanFørRegelkjøring.print(grunnlag)
@@ -271,8 +265,6 @@ internal class BarnsDødRegelTest {
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
                 dødsdato = null
         ))
-
-        val dødsdato = grunnlag.barn.dødsdato!!
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
@@ -599,8 +591,8 @@ internal class BarnsDødRegelTest {
                                 prosent = TilsynsbehovStørrelse.PROSENT_100
                         )
                 ),
-                andrePartersUttaksplan = listOf(
-                        Uttaksplan(
+                andrePartersUttaksplan = mapOf(
+                        "999" to Uttaksplan(
                                 perioder = mapOf(
                                         helePerioden to InnvilgetPeriode(
                                                 knekkpunktTyper = setOf(),

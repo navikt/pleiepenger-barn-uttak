@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.Desimaltall
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirkedager
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
@@ -230,9 +231,9 @@ internal object GradBeregner {
 
     private fun RegelGrunnlag.finnTilsynsbehovDekketAvAndreParter(periode: LukketPeriode) : Desimaltall {
         var sumAndreParter = Desimaltall.Null
-        andrePartersUttaksplan.forEach {uttaksplan ->
+        andrePartersUttaksplan.forEach { (_, uttaksplan) ->
 
-            val annenPartsPeriode = uttaksplan.perioder
+            val annenPartsPeriode = uttaksplan.perioder.sortertPåFom()
                     .filter { it.key.overlapper(periode) }
                     .filter { it.value is InnvilgetPeriode }
                     .values.firstOrNull() as InnvilgetPeriode?

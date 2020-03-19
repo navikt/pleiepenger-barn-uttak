@@ -95,8 +95,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
+                andrePartersUttaksplan = mapOf(
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
@@ -121,8 +121,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
+                andrePartersUttaksplan = mapOf(
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(25)))
@@ -151,8 +151,8 @@ internal class UttakTjenesteGraderingTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                andrePartersUttaksplan = listOf(
-                        Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
+                andrePartersUttaksplan = mapOf(
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)

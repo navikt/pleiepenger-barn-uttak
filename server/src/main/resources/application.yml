@@ -37,3 +37,4 @@ springdoc:
     path: /internal/api-docs
   swagger-ui:
     path: /internal/swagger
+

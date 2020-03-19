@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.mapper
 
+import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -8,7 +9,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 
 object GrunnlagMapper {
 
-    fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:List<Uttaksplan>): RegelGrunnlag {
+    fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:Map<Saksnummer, Uttaksplan>): RegelGrunnlag {
 
         val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
 
@@ -25,12 +26,9 @@ object GrunnlagMapper {
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
-                andrePartersUttaksplan = andrePartersUttakplan.sorterteUttaksplaner(),
+                andrePartersUttaksplan = andrePartersUttakplan,
                 ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
         )
     }
 
-    private fun List<Uttaksplan>.sorterteUttaksplaner() = map { it.copy(
-            perioder = it.perioder.sortertPåFom()
-    )}
 }

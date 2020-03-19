@@ -28,7 +28,7 @@ internal class UttaksplanMergerTest {
 
         val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(enkelUttakplan))
 
-        assertThat(sammenslåttUttaksplan).isEqualTo(FullUttaksplan(enkelUttakplan.perioder))
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(enkelUttakplan.perioder))
     }
 
     @Test
@@ -43,7 +43,7 @@ internal class UttaksplanMergerTest {
 
         val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan2, uttaksplan1))
 
-        assertThat(sammenslåttUttaksplan).isEqualTo(FullUttaksplan(mapOf(
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-14") to innvilget,
                 LukketPeriode("2020-01-15/2020-02-10") to innvilget
         )))
@@ -61,7 +61,7 @@ internal class UttaksplanMergerTest {
 
         val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan2, uttaksplan1))
 
-        assertThat(sammenslåttUttaksplan).isEqualTo(FullUttaksplan(mapOf(
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-16") to innvilget,
                 LukketPeriode("2020-01-17/2020-03-31") to innvilget
         )))
@@ -82,7 +82,7 @@ internal class UttaksplanMergerTest {
 
         val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan2, uttaksplan1))
 
-        assertThat(sammenslåttUttaksplan).isEqualTo(FullUttaksplan(mapOf(
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-15") to innvilget,
                 LukketPeriode("2020-01-16/2020-01-24") to innvilget,
                 LukketPeriode("2020-01-25/2020-02-15") to innvilget
@@ -101,7 +101,7 @@ internal class UttaksplanMergerTest {
 
         val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan1, uttaksplan2))
 
-        assertThat(sammenslåttUttaksplan).isEqualTo(FullUttaksplan(mapOf(
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-09") to innvilget,
                 LukketPeriode("2020-01-10/2020-01-20") to avslått,
                 LukketPeriode("2020-01-21/2020-01-31") to innvilget

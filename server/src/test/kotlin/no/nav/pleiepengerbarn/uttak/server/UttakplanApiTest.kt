@@ -1,9 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.InnvilgetPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -17,29 +14,37 @@ import org.springframework.test.context.ActiveProfiles
 import java.net.URI
 import java.time.LocalDate
 import java.time.Month
+import java.util.*
 
 private const val UTTAKSPLAN_PATH = "/uttaksplan"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
+internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
+
+
 
     @Test
     fun `Opprett uttaksplan`() {
+
+        val behandlingId = UUID.randomUUID().toString()
+        //
+        // Lagre ny uttaksplan
+        //
         val requestBody = """
             {
                 "søker": {
                     "fødselsdato": "1990-09-29"
                 },
                 "saksnummer": "123",
-                "behandlingId": "474abb91-0e61-4459-ba5f-7e960d45c165",
+                "behandlingId": "$behandlingId",
                 "søknadsperioder": [
                     "2020-01-01/2020-03-31"
                 ],
                 "arbeid": [
                     {
                         "arbeidsforhold": {
-                            "arbeidsforholdId": "123-456-789"
+                            "arbeidsforholdId": "6e914bb2-e282-4ff9-844d-8b10a968133e"
                         },
                         "perioder" : {
                             "2020-01-01/2020-03-31": {  
@@ -87,6 +92,18 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertTrue(info is InnvilgetPeriode)
         val innvilgetPeriode = info as InnvilgetPeriode
         assertThat(innvilgetPeriode.grad).isEqualByComparingTo(Prosent(100))
+
+
+        //
+        // Hent uttaksplan
+        //
+        val getResponse = restTemplate.getForEntity(
+                URI.create(UTTAKSPLAN_PATH + "?behandlingId=$behandlingId"),
+                Uttaksplan::class.java)
+        val uttaksplaner = response.body
+
+        assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
+        println(uttaksplaner)
     }
 
 }
