@@ -10,6 +10,6 @@ data class RegelGrunnlag(
         val arbeid: Arbeid = listOf(),
         val tilsynsperioder:Map<LukketPeriode, TilsynPeriodeInfo> = mapOf(),
         val lovbestemtFerie:List<LukketPeriode> = listOf(),
-        val andrePartersUttaksplan: List<Uttaksplan> = listOf(),
+        val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
         val ikkeMedlem: List<LukketPeriode> = listOf()
 )

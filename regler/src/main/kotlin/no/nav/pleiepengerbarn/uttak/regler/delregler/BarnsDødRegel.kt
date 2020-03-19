@@ -91,7 +91,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             barn = Barn(
                                     dødsdato = null
                             ),
-                            andrePartersUttaksplan = listOf(),
+                            andrePartersUttaksplan = mapOf(),
                             søknadsperioder = grunnlag.søknadsperioder.søknadsperioderEtterDødsdato(
                                     dødsdato = dødsdato
                             ),

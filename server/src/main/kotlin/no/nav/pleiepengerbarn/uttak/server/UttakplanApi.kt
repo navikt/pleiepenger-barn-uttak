@@ -23,7 +23,6 @@ class UttakplanApi {
 
     private companion object {
         private const val UttaksplanPath = "/uttaksplan"
-        private const val FullUttaksplanPath = "/uttaksplan/full"
         private const val BehandlingId = "behandlingId"
     }
 
@@ -34,12 +33,12 @@ class UttakplanApi {
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
 
-        val andrePartersUttaksplaner = mutableListOf<Uttaksplan>()
-        uttaksgrunnlag.andrePartersBehandlinger.forEach {
-
+        val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
+        uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
+            andrePartersUttaksplaner[saksnummer] = hentUttaksplan(saksnummer)
         }
         //TODO hent uttaksplan for andre parter
-        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, listOf())
+        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
         uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
@@ -57,26 +56,33 @@ class UttakplanApi {
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
-    fun hentUttaksplan(@RequestParam behandlingId: Set<BehandlingId>): ResponseEntity<Uttaksplaner> {
+    fun hentUttaksplan(@RequestParam(required = false) behandlingId: Set<BehandlingId>?, @RequestParam(required = false) saksnummer: Set<Saksnummer>?): ResponseEntity<Uttaksplaner> {
+        if (behandlingId != null && saksnummer != null && behandlingId.isNotEmpty() && saksnummer.isNotEmpty()) {
+            return ResponseEntity.badRequest().build()
+        }
+        if (behandlingId.isNullOrEmpty() && saksnummer.isNullOrEmpty()) {
+            return ResponseEntity.badRequest().build()
+        }
         val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
-        behandlingId.forEach {
-            val uttaksplan = uttakRepository.hent(UUID.fromString(it))
-            if (uttaksplan != null) {
-                uttaksplanMap[it] = uttaksplan
+        if (behandlingId != null && behandlingId.isNotEmpty()) {
+            behandlingId.forEach {
+                val uttaksplan = uttakRepository.hent(UUID.fromString(it))
+                if (uttaksplan != null) {
+                    uttaksplanMap[it] = uttaksplan
+                }
+            }
+        } else {
+            saksnummer?.forEach {
+                uttaksplanMap[it] = hentUttaksplan(it)
             }
         }
         return ResponseEntity.ok(Uttaksplaner(uttaksplanMap))
     }
-/*
-    @GetMapping(FullUttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Full uttaksplan for ett gitt saksnummer.")
-    fun hentFullUttaksplan(@RequestParam saksnummer: Saksnummer): ResponseEntity<FullUttaksplan> {
-        val uttaksplaner = lagredeUttaksplanerPerSaksnummer[saksnummer]
-        if (uttaksplaner != null) {
-            return ResponseEntity.ok(UttaksplanMerger.slåSammenUttaksplaner(uttaksplaner))
-        }
-        return ResponseEntity.notFound().build()
+
+    private fun hentUttaksplan(saksnummer:Saksnummer):Uttaksplan {
+        val uttaksplanListe = uttakRepository.hent(saksnummer)
+        return UttaksplanMerger.slåSammenUttaksplaner(uttaksplanListe)
     }
-*/
+
 }
 

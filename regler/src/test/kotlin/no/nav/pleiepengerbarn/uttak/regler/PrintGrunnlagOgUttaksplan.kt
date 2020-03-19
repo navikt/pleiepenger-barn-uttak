@@ -58,7 +58,7 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun andrePartesUttak():List<Tidslinje> {
         val tidslinjer = mutableListOf<Tidslinje>()
-        grunnlag.andrePartersUttaksplan.forEach {uttaksplan ->
+        grunnlag.andrePartersUttaksplan.forEach { (_, uttaksplan) ->
             val uttaksperioder = mutableMapOf<LukketPeriode, Prosent>()
             uttaksplan.perioder.forEach { (periode, uttaksPeriodeInfo) -> uttaksperioder[periode] = uttaksPeriodeInfo.gradTilTidslinje() }
             tidslinjer.add(Tidslinje("Annen part", uttaksperioder))
@@ -80,13 +80,13 @@ private class PrintGrunnlagOgUttaksplan(
 
     private fun ferieperioder():Tidslinje {
         val ferier = mutableMapOf<LukketPeriode, Prosent?>()
-        grunnlag.lovbestemtFerie.forEach { ferie ->  ferier[ferie] = null }
+        grunnlag.lovbestemtFerie.forEach { ferie -> ferier[ferie] = null }
         return Tidslinje("Lovbestemt ferie", ferier)
     }
 
     private fun arbeidsperioder():List<Tidslinje> {
         val tidslinjer = mutableListOf<Tidslinje>()
-        grunnlag.arbeid.forEach { arbeid ->
+        grunnlag.arbeid.forEach { _ ->
             val arbeidsperioder = mutableMapOf<LukketPeriode, Prosent>()
             grunnlag.arbeid.forEach { (_,perioder) ->
                 perioder.forEach { (periode, arbeidsforholdPeriodeInfo) ->

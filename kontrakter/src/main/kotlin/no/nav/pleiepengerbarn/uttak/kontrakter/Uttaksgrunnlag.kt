@@ -6,7 +6,7 @@ data class Uttaksgrunnlag (
         val saksnummer: Saksnummer,
         val behandlingId: BehandlingId,
         val søknadsperioder: List<LukketPeriode>,
-        val andrePartersBehandlinger: List<BehandlingId> = listOf(),
+        val andrePartersSaksnummer: List<Saksnummer> = listOf(),
         val arbeid: Arbeid,
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val lovbestemtFerie: List<LukketPeriode> = listOf(),
