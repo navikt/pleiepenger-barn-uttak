@@ -8,6 +8,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
@@ -15,6 +16,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @SpringBootTest
+@Transactional
 internal class UttakRepositoryTest {
 
     private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
@@ -70,6 +72,36 @@ internal class UttakRepositoryTest {
         assertThat(uttaksplanListe).hasSize(2)
         assertThat(uttaksplanListe[0]).isEqualTo(dummyUttaksplan(heleFebruar))
         assertThat(uttaksplanListe[1]).isEqualTo(dummyUttaksplan(heleJanuar))
+    }
+
+    @Test
+    internal fun `Hent uttaksplan for behandling skal ta med inaktiv uttaksplan`() {
+        val saksnummer = "123456"
+        val behandingId = UUID.randomUUID()
+
+        uttakRepository.lagre(saksnummer,behandingId, uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+
+        uttakRepository.settInaktiv(behandingId)
+
+        val uttaksplan = uttakRepository.hent(behandingId)
+        assertThat(uttaksplan).isNotNull()
+        assertThat(uttaksplan).isEqualTo(dummyUttaksplan(heleJanuar))
+    }
+
+    @Test
+    internal fun `Hent uttaksplan for saksnummer skal ikke ta med inaktiv uttaksplan`() {
+        val saksnummer = "123456"
+        val behandlingId1 = UUID.randomUUID()
+        val behandlingId2 = UUID.randomUUID()
+
+        uttakRepository.lagre(saksnummer, behandlingId1, uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        TimeUnit.MILLISECONDS.sleep(100L) //vent 1/10 sekund
+        uttakRepository.lagre(saksnummer, behandlingId2, uttaksplan = dummyUttaksplan(heleFebruar), regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.settInaktiv(behandlingId2)
+
+        val uttaksplanListe = uttakRepository.hent(saksnummer)
+        assertThat(uttaksplanListe).hasSize(1)
+        assertThat(uttaksplanListe[0]).isEqualTo(dummyUttaksplan(heleJanuar))
     }
 
 

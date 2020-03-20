@@ -47,11 +47,15 @@ internal class UttakRepository {
     }
 
     internal fun hent(saksnummer:Saksnummer):List<Uttaksplan> {
-        val uttaksplanJSONListe = jdbcTemplate.query("select uttaksplan from uttaksresultat where saksnummer = ? and slettet=false order by opprettet_tid desc",
+        val uttaksplanJSONListe = jdbcTemplate.query("select uttaksplan from uttaksresultat where saksnummer = ? and slettet=false and inaktiv=false order by opprettet_tid desc",
                 uttaksplanRowMapper,
                 saksnummer)
 
         return uttaksplanJSONListe.map { json -> fraJSON(json) }
+    }
+
+    internal fun settInaktiv(behandlingId: UUID) {
+        jdbcTemplate.update("update uttaksresultat set inaktiv=true where behandling_id=? and slettet = false", behandlingId)
     }
 
     private fun slettTidligereUttaksplan(behandlingId: UUID) {

@@ -32,12 +32,12 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
-
+        //Hent uttaksplaner for andre parters sakser
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
             andrePartersUttaksplaner[saksnummer] = hentUttaksplan(saksnummer)
         }
-        //TODO hent uttaksplan for andre parter
+
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
@@ -77,6 +77,13 @@ class UttakplanApi {
             }
         }
         return ResponseEntity.ok(Uttaksplaner(uttaksplanMap))
+    }
+
+    @PatchMapping(UttaksplanPath)
+    @Operation(description = "Sette uttaksplan for en behandling til inaktiv.")
+    fun settInaktiv(behandlingId: BehandlingId): ResponseEntity<String> {
+        uttakRepository.settInaktiv(UUID.fromString(behandlingId))
+        return ResponseEntity.ok().build()
     }
 
     private fun hentUttaksplan(saksnummer:Saksnummer):Uttaksplan {
