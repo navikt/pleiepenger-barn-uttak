@@ -14,7 +14,7 @@
     <properties>
         <springdoc.version>1.4.4</springdoc.version>
         <logback.logstash.version>6.4</logback.logstash.version>
-        <postgres.version>42.2.14</postgres.version>
+        <postgres.version>42.2.15</postgres.version>
     </properties>
 
     <dependencies>
