@@ -2,12 +2,19 @@ package no.nav.pleiepengerbarn.uttak.server.db
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.server.DbContainerInitializer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
@@ -15,6 +22,11 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @SpringBootTest
+@ExtendWith(SpringExtension::class)
+@ContextConfiguration(initializers = [DbContainerInitializer::class])
+@ActiveProfiles("postgres")
+@Tag("integration")
+@Transactional
 internal class UttakRepositoryTest {
 
     private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
