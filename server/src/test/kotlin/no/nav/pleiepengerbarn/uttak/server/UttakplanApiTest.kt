@@ -3,7 +3,9 @@ package no.nav.pleiepengerbarn.uttak.server
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.time.LocalDate
 import java.time.Month
@@ -19,7 +23,10 @@ import java.util.*
 private const val UTTAKSPLAN_PATH = "/uttaksplan"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ExtendWith(SpringExtension::class)
+@ContextConfiguration(initializers = [DbContainerInitializer::class])
+@ActiveProfiles("postgres")
+@Tag("integration")
 internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
 
