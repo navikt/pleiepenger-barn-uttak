@@ -3,7 +3,7 @@ name: Bygg og deploy
 on:
   push:
     branches:
-      - gcp
+      - master
     paths-ignore:
       - '**.md'
       - '.gitignore'
