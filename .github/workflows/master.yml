@@ -38,9 +38,11 @@ jobs:
           docker push $IMAGE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy til Preprod
+      - name: Deploy dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.DEPLOY_KEY }}
-          CLUSTER: dev-fss
-          RESOURCE: nais/dev-fss.yml
+          APIKEY: ${{ secrets.PLEIEPENGER_DEPLOY_KEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/naiserator.yaml
+          VARS: nais/dev-gcp.json
+          PRINT_PAYLOAD: true
