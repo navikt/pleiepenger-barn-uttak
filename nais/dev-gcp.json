@@ -1,0 +1,8 @@
+{
+  "minReplicas": "1",
+  "maxReplicas": "2",
+  "ingresses": [
+    "https://pleiepenger-barn-uttak.dev.adeo.no"
+  ],
+  "env": {}
+}
