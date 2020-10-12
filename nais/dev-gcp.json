@@ -4,5 +4,7 @@
   "ingresses": [
     "https://pleiepenger-barn-uttak.dev.adeo.no"
   ],
-  "env": {}
+  "env": {
+    "FOO": "BAR"
+  }
 }
