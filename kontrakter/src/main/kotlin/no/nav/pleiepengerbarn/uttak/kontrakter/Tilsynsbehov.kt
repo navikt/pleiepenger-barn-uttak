@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 
 enum class TilsynsbehovStørrelse(
         @get:JsonValue val prosent: Prosent) {
+    PROSENT_0(Prosent.ZERO),
     PROSENT_100(Prosent(100)),
     PROSENT_200(Prosent(200));
 

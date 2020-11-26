@@ -540,8 +540,8 @@ internal class BarnsDødRegelTest {
                 arbeid = mapOf(
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
-                                        jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
-                                        skalJobbeProsent = Prosent(50)
+                                        jobberNormalt = Duration.ofHours(37).plusMinutes(30),
+                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),
@@ -578,8 +578,8 @@ internal class BarnsDødRegelTest {
                 arbeid = mapOf(
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
-                                        jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
-                                        skalJobbeProsent = Prosent(50)
+                                        jobberNormalt = Duration.ofHours(37).plusMinutes(30),
+                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),

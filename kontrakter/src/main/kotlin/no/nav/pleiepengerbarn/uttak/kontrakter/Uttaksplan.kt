@@ -11,7 +11,7 @@ data class Uttaksplan(
 )
 
 data class Utbetalingsgrader(
-        val arbeidsforhold: ArbeidsforholdReferanse,
+        val arbeidsforhold: Arbeidsforhold,
         val utbetalingsgrad: Prosent
 )
 

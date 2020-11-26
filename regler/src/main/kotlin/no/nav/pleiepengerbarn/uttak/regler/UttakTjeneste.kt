@@ -15,7 +15,7 @@ object UttakTjeneste {
                 knekkpunkter = knekkpunkter
         )
 
-        return UttaksplanRegler.fastsettUtaksplan(
+        return UttaksplanRegler.fastsettUttaksplan(
                 grunnlag = grunnlag,
                 knektePerioder = knektePerioder
         )

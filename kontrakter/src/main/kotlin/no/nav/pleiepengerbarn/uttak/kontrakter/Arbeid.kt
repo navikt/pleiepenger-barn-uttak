@@ -2,21 +2,23 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import java.time.Duration
 
-typealias Arbeid = List<Arbeidsforhold>
-
-data class Arbeidsforhold(
-        val arbeidsforhold: ArbeidsforholdReferanse,
+data class Arbeid(
+        val arbeidsforhold: Arbeidsforhold,
         val perioder: Map<LukketPeriode, ArbeidsforholdPeriodeInfo>
 )
 
-data class ArbeidsforholdReferanse(
-        val type: String? = null,
+data class Arbeidsforhold(
+        val type: String,
         val organisasjonsnummer: String? = null,
         val aktørId: String? = null,
         val arbeidsforholdId: String? = null
 )
 
 data class ArbeidsforholdPeriodeInfo(
-        val jobberNormaltPerUke: Duration,
-        val skalJobbeProsent: Prosent
-)
+        val jobberNormalt: Duration,
+        val taptArbeidstid: Duration
+) {
+    init {
+        require(taptArbeidstid <= jobberNormalt) {"Tapt arbeidstid ($taptArbeidstid) kan ikke være mer en jobber normalt ($jobberNormalt)."}
+    }
+}

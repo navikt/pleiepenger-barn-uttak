@@ -9,7 +9,7 @@ import java.time.LocalDate
 internal class GrunnlagMapperTest {
     @Test
     internal fun `Duplikate arbeidsforholdreferanser med info satt skal feile`() {
-        val arbeidsforholdReferanse = ArbeidsforholdReferanse(
+        val arbeidsforholdReferanse = Arbeidsforhold(
                 type = "Sjømann",
                 organisasjonsnummer = "123",
                 aktørId = "345",
@@ -29,7 +29,7 @@ internal class GrunnlagMapperTest {
 
     @Test
     internal fun `Duplikate arbeidsforholdreferanser som kun har nullverdier skal feile`() {
-        val arbeidsforholdReferanse = ArbeidsforholdReferanse()
+        val arbeidsforholdReferanse = Arbeidsforhold(type = "frilans")
 
         assertThrows<IllegalStateException>("Arbeidsforholdene i grunnlaget må være unike.") {
             GrunnlagMapper.tilRegelGrunnlag(
@@ -46,9 +46,11 @@ internal class GrunnlagMapperTest {
     internal fun `Om det er to forskjellige arbeidsforholdreferanser og en kun har nullverdier er det ok`() {
         GrunnlagMapper.tilRegelGrunnlag(
                     uttaksgrunnlag = lagUttaksgrunnag(
-                            arbeidsforholdReferanse1 = ArbeidsforholdReferanse(),
-                            arbeidsforholdReferanse2 = ArbeidsforholdReferanse(
-                                    type = "Seiler"
+                            arbeidsforholdReferanse1 = Arbeidsforhold(
+                                    type = "selvstendig"
+                            ),
+                            arbeidsforholdReferanse2 = Arbeidsforhold(
+                                    type = "frilans"
                             )
                     ),
                     andrePartersUttakplan = mapOf()
@@ -56,8 +58,8 @@ internal class GrunnlagMapperTest {
     }
 
     private fun lagUttaksgrunnag(
-            arbeidsforholdReferanse1: ArbeidsforholdReferanse,
-            arbeidsforholdReferanse2: ArbeidsforholdReferanse) = Uttaksgrunnlag(
+            arbeidsforholdReferanse1: Arbeidsforhold,
+            arbeidsforholdReferanse2: Arbeidsforhold) = Uttaksgrunnlag(
                     søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(50)
                     ),
@@ -67,11 +69,11 @@ internal class GrunnlagMapperTest {
                     søknadsperioder = listOf(LukketPeriode("2020-01-01/2021-01-01")),
                     tilsynsbehov = mapOf(),
                     arbeid = listOf(
-                            Arbeidsforhold(
+                            Arbeid(
                                     arbeidsforhold = arbeidsforholdReferanse1,
                                     perioder = mapOf()
                             ),
-                            Arbeidsforhold(
+                            Arbeid(
                                     arbeidsforhold = arbeidsforholdReferanse2,
                                     perioder = mapOf()
                             )

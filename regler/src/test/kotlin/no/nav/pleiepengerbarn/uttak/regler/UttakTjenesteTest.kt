@@ -34,7 +34,7 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -62,7 +62,7 @@ internal class UttakTjenesteTest {
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -87,7 +87,7 @@ internal class UttakTjenesteTest {
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -115,7 +115,7 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -139,7 +139,7 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(søknadsperiode),
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO))
+                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -166,8 +166,8 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(søknadsperiode),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                periode1 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO),
-                                periode2 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(20))
+                                periode1 to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO),
+                                periode2 to ArbeidsforholdPeriodeInfo(FULL_UKE, FULL_UKE.prosent(20))
                         )
                 ).somArbeid()
         )
@@ -204,7 +204,7 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(periode),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO)
+                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO)
                         )
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
@@ -240,7 +240,7 @@ internal class UttakTjenesteTest {
                 søknadsperioder = listOf(periode),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent.ZERO)
+                                periode to ArbeidsforholdPeriodeInfo(FULL_UKE, Duration.ZERO)
                         )
                 ).somArbeid(),
                 tilsynsperioder = mapOf(

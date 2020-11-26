@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.print
+import no.nav.pleiepengerbarn.uttak.regler.prosent
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -226,8 +227,8 @@ internal class SøkersAlderRegelTest {
                 arbeid = mapOf(
                         "123" to mapOf(
                                 periode1 to ArbeidsforholdPeriodeInfo(
-                                        jobberNormaltPerUke = Duration.ofHours(18).plusMinutes(45),
-                                        skalJobbeProsent = Prosent(50)
+                                        jobberNormalt = Duration.ofHours(18).plusMinutes(45),
+                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45).prosent(50)
                                 )
                         )
                 ).somArbeid(),

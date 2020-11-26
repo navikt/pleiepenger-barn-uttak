@@ -25,7 +25,7 @@ internal object UttaksplanRegler {
             SøkersDødRegel()
     )
 
-    internal fun fastsettUtaksplan(
+    internal fun fastsettUttaksplan(
             grunnlag: RegelGrunnlag,
             knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : Uttaksplan {
 

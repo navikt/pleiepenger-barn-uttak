@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.Tidslinje
 import no.nav.pleiepengerbarn.uttak.regler.tidslinje.TidslinjeAsciiArt
+import java.math.BigDecimal
 
 
 internal fun UttakTjeneste.uttaksplanOgPrint(grunnlag: RegelGrunnlag) : Uttaksplan {
@@ -90,7 +91,7 @@ private class PrintGrunnlagOgUttaksplan(
             val arbeidsperioder = mutableMapOf<LukketPeriode, Prosent>()
             grunnlag.arbeid.forEach { (_,perioder) ->
                 perioder.forEach { (periode, arbeidsforholdPeriodeInfo) ->
-                    arbeidsperioder[periode] = arbeidsforholdPeriodeInfo.skalJobbeProsent
+                    arbeidsperioder[periode] = BigDecimal(arbeidsforholdPeriodeInfo.taptArbeidstid.toMillis()).setScale(2) / BigDecimal(arbeidsforholdPeriodeInfo.jobberNormalt.toMillis())
                 }
             }
 

@@ -23,6 +23,7 @@ class UttakplanApi {
 
     private companion object {
         private const val UttaksplanPath = "/uttaksplan"
+        private const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         private const val BehandlingId = "behandlingId"
     }
 
@@ -32,27 +33,38 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
+        return lagUttaksplan(uttaksgrunnlag, true, uriComponentsBuilder)
+    }
 
+    @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
+    fun simulerUttaksplan(
+            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
+
+        return lagUttaksplan(uttaksgrunnlag, false, uriComponentsBuilder)
+    }
+
+    private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
             andrePartersUttaksplaner[saksnummer] = hentUttaksplan(saksnummer)
         }
-        //TODO hent uttaksplan for andre parter
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
+
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
-        uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
+        if (lagre) {
+            uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
+        }
 
-        val uri = uriComponentsBuilder
-                .path(UttaksplanPath)
-                .queryParam(BehandlingId, uttaksgrunnlag.behandlingId)
-                .build()
-                .toUri()
+        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingId, uttaksgrunnlag.behandlingId).build().toUri()
 
         return ResponseEntity
                 .created(uri)
                 .body(uttaksplan)
     }
+
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")

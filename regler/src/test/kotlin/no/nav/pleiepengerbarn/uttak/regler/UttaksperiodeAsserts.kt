@@ -56,5 +56,5 @@ internal object UttaksperiodeAsserts {
 // Assertion får vi kun treff på faktiske matchene perioder
 private fun Map<LukketPeriode, UttaksPeriodeInfo>.forsikreAtDetIkkeErSortedMap() = toMap()
 
-private fun List<Utbetalingsgrader>.hentForArbeidsforhold(arbeidsforhold: ArbeidsforholdReferanse) =
+private fun List<Utbetalingsgrader>.hentForArbeidsforhold(arbeidsforhold: Arbeidsforhold) =
         firstOrNull { it.arbeidsforhold == arbeidsforhold} ?: throw IllegalStateException("Fant ikke utbetalingsgrad for $arbeidsforhold")

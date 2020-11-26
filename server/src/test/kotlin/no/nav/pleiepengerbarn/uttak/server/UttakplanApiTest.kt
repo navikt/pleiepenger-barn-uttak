@@ -34,19 +34,19 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
 
-    private val ARBEIDSFORHOLD1 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789")
-    private val ARBEIDSFORHOLD2 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD3 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD4 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD5 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
+    private val ARBEIDSFORHOLD1 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789")
+    private val ARBEIDSFORHOLD2 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
+    private val ARBEIDSFORHOLD3 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
+    private val ARBEIDSFORHOLD4 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
+    private val ARBEIDSFORHOLD5 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
         val grunnlag = lagGrunnlag(
-                søknadsperioder = listOf(søknadsperiode),
+                søknadsperiode = søknadsperiode,
                 arbeid = listOf(
-                        Arbeidsforhold(ARBEIDSFORHOLD1, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(0))))
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
                 ),
                 tilsynsbehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
         )
@@ -73,12 +73,11 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Enkelt uttak på flere arbeidsforhold`() {
-        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-16")
         val grunnlag = lagGrunnlag(
-                søknadsperioder = listOf(søknadsperiode),
+                søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
                 arbeid = listOf(
-                        Arbeidsforhold(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE.prosent(70), skalJobbeProsent = Prosent(50)))),
-                        Arbeidsforhold(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE.prosent(20), skalJobbeProsent = Prosent(0)))),
+                        Arbeid(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_UKE.prosent(70), taptArbeidstid = FULL_UKE.prosent(70).prosent(50)))),
+                        Arbeid(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_UKE.prosent(20), taptArbeidstid = Duration.ZERO))),
                 ),
                 tilsynsbehov = mapOf(HELE_2020 to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
         )
@@ -102,7 +101,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<ArbeidsforholdReferanse, Prosent> = mapOf(), innvilgetÅrsak: InnvilgetÅrsaker, knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
+    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(), innvilgetÅrsak: InnvilgetÅrsaker) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo) {
             is InnvilgetPeriode -> {
@@ -134,8 +133,8 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     private fun lagGrunnlag(
-            søknadsperioder: List<LukketPeriode>,
-            arbeid: Arbeid,
+            søknadsperiode: LukketPeriode,
+            arbeid: List<Arbeid>,
             tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
             tilsynsperioder: Map<LukketPeriode, TilsynPeriodeInfo> = mapOf(),
             søker: Søker = Søker(LocalDate.parse("2000-01-01")),
@@ -146,7 +145,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 søker = søker,
                 saksnummer = saksnummer,
                 behandlingId = behandlingId,
-                søknadsperioder = søknadsperioder,
+                søknadsperioder = listOf(søknadsperiode),
                 arbeid = arbeid,
                 tilsynsbehov = tilsynsbehov,
                 tilsynsperioder = tilsynsperioder,

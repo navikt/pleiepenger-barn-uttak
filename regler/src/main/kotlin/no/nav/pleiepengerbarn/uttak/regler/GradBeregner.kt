@@ -21,7 +21,7 @@ import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.YtelsenKanGra
 import java.time.Duration
 
 internal object GradBeregner {
-    private const val AntallVirkedagerIUken = 5
+
     private val TiProsent = Desimaltall.fraDouble(10.00)
     private val TjueProsent = Desimaltall.fraDouble(20.00)
     private val ÅttiProsent = Desimaltall.fraDouble(80.00)
@@ -30,7 +30,7 @@ internal object GradBeregner {
             periode: LukketPeriode,
             grunnlag: RegelGrunnlag,
             årsakbygger: Årsaksbygger): Grader {
-        val fraværsfaktorer = mutableMapOf<ArbeidsforholdReferanse, Desimaltall>()
+        val fraværsfaktorer = mutableMapOf<Arbeidsforhold, Desimaltall>()
         var sumAvFraværIPerioden: Duration = Duration.ZERO
         var sumKunneJobbetIPerioden: Duration = Duration.ZERO
 
@@ -65,16 +65,14 @@ internal object GradBeregner {
             perioderMedArbeid.entries.firstOrNull {
                 it.key.overlapper(periode)
             }?.apply {
-                val jobberISnittPerVirkedag = this.value.jobberNormaltPerUke / AntallVirkedagerIUken
-                val kunneJobbetIPerioden = jobberISnittPerVirkedag * antallVirkedagerIPerioden
+                val kunneJobbetIPerioden = this.value.jobberNormalt * antallVirkedagerIPerioden
 
                 sumKunneJobbetIPerioden = sumKunneJobbetIPerioden.plus(kunneJobbetIPerioden)
 
-                val fraværIPerioden = this.value.fravær(
-                        kunneJobbetIPerioden = kunneJobbetIPerioden
-                )
+                val fraværIPerioden = this.value.jobberNormalt - this.value.taptArbeidstid
 
                 sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
+
 
                 fraværsfaktorer[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
             }
@@ -304,19 +302,6 @@ internal object GradBeregner {
         return tilsynsbehov?.value?.prosent?.prosent?.somDesimaltall() ?: throw IllegalStateException("Periode uten tilsynsbehov")
     }
 
-    private fun ArbeidsforholdPeriodeInfo.fravær(
-            kunneJobbetIPerioden: Duration) : Duration {
-        val fraværsfaktor = Desimaltall
-                .EtHundre
-                .minus(skalJobbeProsent.somDesimaltall())
-                .fraProsentTilFaktor()
-                .normaliserFaktor()
-
-        return Desimaltall
-                .fraDuration(kunneJobbetIPerioden)
-                .times(fraværsfaktor)
-                .tilDuration()
-    }
 }
 
 

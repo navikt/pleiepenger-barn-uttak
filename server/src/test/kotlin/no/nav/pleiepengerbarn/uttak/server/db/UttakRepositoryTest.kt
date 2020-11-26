@@ -32,7 +32,7 @@ internal class UttakRepositoryTest {
     private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
     private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
 
-    private val arbeidsforhold1 = ArbeidsforholdReferanse(organisasjonsnummer = "123456789")
+    private val arbeidsforhold1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
@@ -92,12 +92,12 @@ internal class UttakRepositoryTest {
                 søknadsperioder = listOf(periode),
                 tilsynsbehov = mapOf(periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
                 arbeid = listOf(
-                        Arbeidsforhold(
+                        Arbeid(
                                 arbeidsforhold = arbeidsforhold1,
                                 perioder = mapOf(
                                         periode to ArbeidsforholdPeriodeInfo(
-                                                jobberNormaltPerUke = Duration.ofHours(37).plusMinutes(30),
-                                                skalJobbeProsent = Prosent.ZERO)
+                                                jobberNormalt = Duration.ofHours(37).plusMinutes(30),
+                                                taptArbeidstid = Duration.ZERO)
                                 )
                         )
                 )
