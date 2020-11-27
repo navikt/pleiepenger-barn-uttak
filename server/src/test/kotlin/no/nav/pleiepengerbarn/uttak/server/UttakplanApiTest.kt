@@ -46,7 +46,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val grunnlag = lagGrunnlag(
                 søknadsperiode = søknadsperiode,
                 arbeid = listOf(
-                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG)))
                 ),
                 tilsynsbehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
         )
@@ -76,8 +76,8 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val grunnlag = lagGrunnlag(
                 søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
                 arbeid = listOf(
-                        Arbeid(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_UKE.prosent(70), taptArbeidstid = FULL_UKE.prosent(70).prosent(50)))),
-                        Arbeid(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_UKE.prosent(20), taptArbeidstid = Duration.ZERO))),
+                        Arbeid(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(70), taptArbeidstid = FULL_DAG.prosent(70).prosent(50)))),
+                        Arbeid(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(20), taptArbeidstid = FULL_DAG.prosent(20)))),
                 ),
                 tilsynsbehov = mapOf(HELE_2020 to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
         )

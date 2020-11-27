@@ -69,12 +69,9 @@ internal object GradBeregner {
 
                 sumKunneJobbetIPerioden = sumKunneJobbetIPerioden.plus(kunneJobbetIPerioden)
 
-                val fraværIPerioden = this.value.jobberNormalt - this.value.taptArbeidstid
+                sumAvFraværIPerioden = sumAvFraværIPerioden.plus(this.value.taptArbeidstid.multipliedBy(antallVirkedagerIPerioden))
 
-                sumAvFraværIPerioden = sumAvFraværIPerioden.plus(fraværIPerioden)
-
-
-                fraværsfaktorer[arbeidsforholdRef] = fraværIPerioden / kunneJobbetIPerioden
+                fraværsfaktorer[arbeidsforholdRef] = this.value.taptArbeidstid.multipliedBy(antallVirkedagerIPerioden) / kunneJobbetIPerioden
             }
         }
 
