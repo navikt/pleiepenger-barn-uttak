@@ -22,7 +22,7 @@ private class PrintGrunnlagOgUttaksplan(
         private val grunnlag: RegelGrunnlag,
         private val uttaksplan: Uttaksplan) {
 
-    internal fun print() {
+    fun print() {
         val tidslinjer = LinkedHashSet<Tidslinje>()
 
         tidslinjer.add(tilsynsbehovTidslinje())

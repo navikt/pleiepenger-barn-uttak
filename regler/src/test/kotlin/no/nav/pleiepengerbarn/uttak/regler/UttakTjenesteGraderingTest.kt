@@ -207,7 +207,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_UKE, FULL_UKE.dividedBy(4)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(30)
@@ -217,7 +217,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(70), mapOf(arbeidsforhold1 to Prosent(70)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
 
 
@@ -241,7 +241,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent("37.5"), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
 

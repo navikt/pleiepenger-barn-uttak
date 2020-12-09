@@ -10,6 +10,7 @@ import no.nav.pleiepengerbarn.uttak.regler.prosent
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 
@@ -184,8 +185,8 @@ internal class UttaksplanReglerKombinasjonsTest {
                 arbeid = mapOf(
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
-                                        jobberNormalt = Duration.ofHours(37).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(37).plusMinutes(30).prosent(50)
+                                        jobberNormalt = Duration.ofHours(7).plusMinutes(30),
+                                        taptArbeidstid = Duration.ofHours(7).plusMinutes(30).prosent(50)
                                 )
                         )
                 ).somArbeid(),
