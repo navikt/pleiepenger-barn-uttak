@@ -20,7 +20,7 @@ internal object AvklarGrader {
         val (avklartUttaksgrad, justeringsfaktor) = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
         val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, justeringsfaktor)
 
-        return AvklarteGrader(avklartUttaksgrad, avklartUtbetalingsgrader)
+        return AvklarteGrader(avklartUttaksgrad.setScale(0), avklartUtbetalingsgrader)
     }
 
     private fun avklarUttaksgradOgJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
@@ -52,7 +52,7 @@ internal object AvklarGrader {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Prosent>()
         arbeid.forEach { (arbeidsforhold, info) ->
             val ikkeJustertUtbetalingsgrad = BigDecimal(info.taptArbeidstid.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
-            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (justeringsfaktor / HUNDRE_PROSENT)).setScale(2)
+            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (justeringsfaktor / HUNDRE_PROSENT)).setScale(0)
         }
         return utbetalingsgrader
     }
