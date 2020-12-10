@@ -21,8 +21,8 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `100 % vanlig uttak`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-            ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG)
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+            ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
@@ -32,8 +32,8 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `50 % vanlig uttak`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
@@ -42,8 +42,8 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `50 % uttak når annen part også tar ut 50 %`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = Prosent(50), arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
@@ -52,8 +52,8 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `100 % uttak når annen part også tar ut 50 %, men tilsynsbehovet er 200%`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = Prosent(50), arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG)
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(100))
@@ -62,8 +62,8 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `100 % arbeid når annen part også tar ut 50 % blir redusert`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = Prosent(50), arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG)
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
@@ -73,19 +73,19 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `50% arbeid av en stilling på 10 timer, skal gi 50 % uttaksgrad og utbetalingsgrad`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(10), taptArbeidstid = Duration.ofHours(5))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(10), taptArbeidstid = Duration.ofHours(5), søkersTilsyn = Duration.ofHours(5))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(67))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
     }
 
     @Test
     internal fun `100% fravær hos 2 arbeidsgivere`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(3)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(3), søkersTilsyn = Duration.ofHours(3)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
@@ -95,9 +95,9 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(1).plusMinutes(30)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(3))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(1).plusMinutes(30), søkersTilsyn = Duration.ofHours(1).plusMinutes(30)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(3), søkersTilsyn = Duration.ofHours(3))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(60))
@@ -107,33 +107,33 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mindre enn en 100 % stilling`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(1).plusMinutes(30)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofMinutes(45))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(1).plusMinutes(30), søkersTilsyn = Duration.ofHours(1).plusMinutes(30)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofMinutes(45), søkersTilsyn = Duration.ofMinutes(45))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(38))
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(30))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(25))
     }
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mer enn en 100 % stilling`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = NULL_PROSENT, arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(2)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(2))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(2), søkersTilsyn = Duration.ofHours(2)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(2), søkersTilsyn = Duration.ofHours(2))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(47))
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(53))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(44))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(50))
     }
 
     @Test
     internal fun `Søker vil ha 100 % uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 % av 100 % tilsynsbehov`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = Prosent(50), arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
@@ -143,9 +143,9 @@ internal class AvklarGraderTest {
 
     @Test
     internal fun `Søker vil ha 100 % uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 % av 200 % tilsynsbehov`() {
-        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andresTilsyn = Prosent(50), arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30)),
-                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4))
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
         ))
 
         assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(100))

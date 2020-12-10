@@ -14,83 +14,62 @@ internal object AvklarGrader {
     internal fun avklarGrader(
             tilsynsbehov: TilsynsbehovStørrelse,
             etablertTilsyn: Duration,
-            andresTilsyn: Prosent,
+            andreSøkeresTilsyn: Prosent,
             arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
             ): AvklarteGrader {
-
-        val avklartUttaksgrad = avklarUttaksgrad(tilsynsbehov, etablertTilsyn, andresTilsyn, arbeid)
-        val avklartUtbetalingsgrader = avklarUtbetalingsgrader(tilsynsbehov, arbeid, andresTilsyn, etablertTilsyn)
+        val (avklartUttaksgrad, justeringsfaktor) = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
+        val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, justeringsfaktor)
 
         return AvklarteGrader(avklartUttaksgrad, avklartUtbetalingsgrader)
     }
 
-    private fun avklarUttaksgrad(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
+    private fun avklarUttaksgradOgJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
                                  etablertTilsyn: Duration,
                                  andreSøkeresTilsyn: Prosent,
-                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Prosent {
-        val tilsynsbehovprosent = tilsynsbehovStørrelse.prosent
-        val etablertTilsynsprosent = finnEtablertTilsynsprosent(tilsynsbehovStørrelse, etablertTilsyn)
-        val restTilSøker = tilsynsbehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
+                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Pair<Prosent, Prosent> {
+        val restTilSøker = finnRestTilSøker(tilsynsbehovStørrelse, etablertTilsyn, andreSøkeresTilsyn)
+
         val søktUttaksgrad = finnSøktUttaksprosent(arbeid)
 
         if (restTilSøker < TJUE_PROSENT || søktUttaksgrad < TJUE_PROSENT) {
-            return Prosent.ZERO
+            return Pair(Prosent.ZERO, Prosent.ZERO)
         }
         if (restTilSøker < søktUttaksgrad) {
-            return restTilSøker
+            return Pair(restTilSøker, restTilSøker / søktUttaksgrad * Prosent(100))
         }
-        return søktUttaksgrad.setScale(2)
+        return Pair(søktUttaksgrad.setScale(2), HUNDRE_PROSENT)
     }
 
-    private fun avklarUtbetalingsgrader(tilsynsbehovStørrelse: TilsynsbehovStørrelse, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, uttaksgradAndreSøkere: Prosent, etablertTilsyn: Duration): Map<Arbeidsforhold, Prosent> {
+    private fun finnRestTilSøker(tilsynsbehovStørrelse: TilsynsbehovStørrelse, etablertTilsyn: Duration, andreSøkeresTilsyn: Prosent): BigDecimal {
+        val tilsynsbehovprosent = tilsynsbehovStørrelse.prosent
+        val etablertTilsynsprosent = finnEtablertTilsynsprosent(tilsynsbehovStørrelse, etablertTilsyn)
+        return tilsynsbehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
+    }
+
+    private fun avklarUtbetalingsgrader(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, justeringsfaktor: Prosent): Map<Arbeidsforhold, Prosent> {
         var sumTaptArbeid = Duration.ZERO
         arbeid.values.forEach { sumTaptArbeid += it.taptArbeidstid }
-        val utbetalingsgradJusteringsfaktor = finnUtbetalingsgradJusteringsfaktor(tilsynsbehovStørrelse, sumTaptArbeid, uttaksgradAndreSøkere, etablertTilsyn)
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Prosent>()
         arbeid.forEach { (arbeidsforhold, info) ->
             val ikkeJustertUtbetalingsgrad = BigDecimal(info.taptArbeidstid.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
-            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (utbetalingsgradJusteringsfaktor / HUNDRE_PROSENT)).setScale(2)
+            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (justeringsfaktor / HUNDRE_PROSENT)).setScale(2)
         }
         return utbetalingsgrader
     }
 
-    private fun finnUtbetalingsgradJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse, sumTaptArbeid: Duration, uttaksgradAndreSøkere: Prosent, etablertTilsyn: Duration): Prosent {
-        if (tilsynsbehovStørrelse == TilsynsbehovStørrelse.PROSENT_0) {
-            return BigDecimal.ZERO.setScale(2)
-        }
-        val tilsynsgrad = finnTilsynsgrad(uttaksgradAndreSøkere, etablertTilsyn)
-        val fullDagMinusTilsyn = FULL_DAG - FULL_DAG.multipliedBy(tilsynsgrad.toLong()).dividedBy(100)
-        if (sumTaptArbeid <= fullDagMinusTilsyn) {
-            return Prosent(100).setScale(2)
-        }
-
-        if (sumTaptArbeid < FULL_DAG) {
-            return (BigDecimal(FULL_DAG.toMillis()).setScale(2) - (BigDecimal(FULL_DAG.toMillis()) * tilsynsgrad / HUNDRE_PROSENT)) / BigDecimal(sumTaptArbeid.toMillis()) * HUNDRE_PROSENT
-        }
-        val justeringsfaktor = tilsynsbehovStørrelse.prosent.setScale(2) - tilsynsgrad
-        if (justeringsfaktor > HUNDRE_PROSENT) {
-            return HUNDRE_PROSENT.setScale(2)
-        }
-        return justeringsfaktor
-    }
-
-    private fun finnTilsynsgrad(uttaksgradAndreSøkere: Prosent, etablertTilsyn: Duration): Prosent {
-        return uttaksgradAndreSøkere.setScale(2) + (BigDecimal(etablertTilsyn.toMillis())/BigDecimal(FULL_DAG.toMillis())*Prosent(100))
-    }
-
     private fun finnSøktUttaksprosent(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Prosent {
-        var sumTaptArbeidstid = Duration.ZERO
-        var sumJobberNormalt = Duration.ZERO
+        var sumSøktUttak = Duration.ZERO
         arbeid.values.forEach {
-            sumTaptArbeidstid += it.taptArbeidstid
-            sumJobberNormalt += it.jobberNormalt
+            sumSøktUttak += it.søkersTilsyn
         }
-        val søktUttaksgrad = BigDecimal(sumTaptArbeidstid.toMillis()).setScale(2) / BigDecimal(sumJobberNormalt.toMillis()) * HUNDRE_PROSENT
+        val søktUttaksgrad = BigDecimal(sumSøktUttak.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
 
         if ( søktUttaksgrad > HUNDRE_PROSENT) {
+            //TODO: kaste exception istedet?
             return HUNDRE_PROSENT
         }
         if (søktUttaksgrad < Prosent.ZERO) {
+            //TODO: kaste exception istedet?
             return Prosent.ZERO
         }
         return søktUttaksgrad
