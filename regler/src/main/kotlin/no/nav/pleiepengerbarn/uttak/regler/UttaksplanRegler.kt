@@ -10,6 +10,9 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.TilBeregningAvGrad
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.domene.Årsaksbygger
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
+import java.math.BigDecimal
+import java.time.Duration
 
 internal object UttaksplanRegler {
 
@@ -48,11 +51,7 @@ internal object UttaksplanRegler {
                         årsaker = avslåttÅrsaker
                 )
             } else {
-                val grader = GradBeregner.beregnGrader(
-                        periode = periode,
-                        grunnlag = grunnlag,
-                        årsakbygger = årsakbygger
-                )
+                val grader = finnGrader(periode, grunnlag)
 
                 if (grader.årsak is AvslåttÅrsak) {
                     perioder[periode] = AvslåttPeriode(
@@ -62,8 +61,8 @@ internal object UttaksplanRegler {
                 } else if (grader.årsak is InnvilgetÅrsak) {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            grad = grader.grad,
-                            utbetalingsgrader = grader.utbetalingsgrader,
+                            grad = grader.uttaksgrad,
+                            utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
                             årsak = grader.årsak.årsak,
                             hjemler = grader.årsak.hjemler
                     )
@@ -82,4 +81,60 @@ internal object UttaksplanRegler {
 
         return uttaksplan
     }
+
+    private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): AvklarteGrader {
+        val tilsynsbehov = grunnlag.finnTilsynsbehov(periode)
+        val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
+        val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
+        val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
+
+        return AvklarGrader.avklarGrader(tilsynsbehov = tilsynsbehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+    }
+
+    private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): TilsynsbehovStørrelse {
+        val tilsynsbehovPeriode = this.tilsynsbehov.keys.firstOrNull {it.overlapper(periode)}
+        return if (tilsynsbehovPeriode != null) {
+            this.tilsynsbehov[tilsynsbehovPeriode]?.prosent ?: TilsynsbehovStørrelse.PROSENT_0
+        } else {
+            TilsynsbehovStørrelse.PROSENT_0
+        }
+    }
+
+    private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
+        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapper(periode)}
+        return if (etablertTilsynPeriode != null) {
+            this.tilsynsperioder[etablertTilsynPeriode]?.lengde ?: Duration.ZERO
+        } else {
+            Duration.ZERO
+        }
+    }
+
+    private fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): BigDecimal {
+        var andreSøkeresTilsynsgrad = BigDecimal.ZERO
+        this.andrePartersUttaksplan.values.forEach { uttaksplan ->
+            val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapper(periode)}
+            if (overlappendePeriode != null) {
+                val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
+                if (uttaksperiode is InnvilgetPeriode) {
+                    andreSøkeresTilsynsgrad += uttaksperiode.grad
+                }
+            }
+        }
+        return andreSøkeresTilsynsgrad
+    }
+
+    private fun RegelGrunnlag.finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
+        val arbeidPerArbeidsforhold = mutableMapOf<Arbeidsforhold, ArbeidsforholdPeriodeInfo>()
+        this.arbeid.forEach { arbeid ->
+            val periodeFunnet = arbeid.perioder.keys.firstOrNull {  it.overlapper(periode)}
+            if (periodeFunnet != null) {
+                val info = arbeid.perioder[periodeFunnet]
+                if (info != null) {
+                    arbeidPerArbeidsforhold[arbeid.arbeidsforhold] = info
+                }
+            }
+        }
+        return arbeidPerArbeidsforhold
+    }
+
 }

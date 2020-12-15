@@ -20,7 +20,7 @@ internal object AvklarGrader {
         val (avklartUttaksgrad, justeringsfaktor) = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
         val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, justeringsfaktor)
 
-        return AvklarteGrader(avklartUttaksgrad.setScale(0), avklartUtbetalingsgrader)
+        return AvklarteGrader(avklartUttaksgrad.setScale(0), avklartUtbetalingsgrader, InnvilgetÅrsak(InnvilgetÅrsaker.FULL_DEKNING, setOf()))  //TODO: årsak må kom fra utregning og ikke hardkodes til FULL_DEKNING
     }
 
     private fun avklarUttaksgradOgJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
@@ -94,5 +94,6 @@ internal object AvklarGrader {
 
 data class AvklarteGrader(
         val uttaksgrad: Prosent,
-        val utbetalingsgrader: Map<Arbeidsforhold, Prosent>
+        val utbetalingsgrader: Map<Arbeidsforhold, Prosent>,
+        val årsak: Årsak
 )

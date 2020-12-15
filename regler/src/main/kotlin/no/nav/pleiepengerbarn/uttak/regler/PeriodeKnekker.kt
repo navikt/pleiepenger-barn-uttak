@@ -41,7 +41,7 @@ internal object PeriodeKnekker {
     }
 
     private data class PeriodeMedKnekkpunkttyper(
-            internal val periode: LukketPeriode,
-            internal val knekkpunkttyper : Set<KnekkpunktType> = setOf()
+            val periode: LukketPeriode,
+            val knekkpunkttyper : Set<KnekkpunktType> = setOf()
     )
 }
