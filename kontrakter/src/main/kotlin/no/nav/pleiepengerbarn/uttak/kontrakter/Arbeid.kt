@@ -17,7 +17,7 @@ data class Arbeidsforhold(
 data class ArbeidsforholdPeriodeInfo(
         val jobberNormalt: Duration,
         val taptArbeidstid: Duration,
-        val søkersTilsyn: Duration = Duration.ofHours(7).plusMinutes(30) //TODO: fjern default verdi når ny beregning er tatt i bruk
+        val søkersTilsyn: Duration
 ) {
     init {
         require(taptArbeidstid <= jobberNormalt) {"Tapt arbeidstid ($taptArbeidstid) kan ikke være mer en jobber normalt ($jobberNormalt)."}

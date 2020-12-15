@@ -186,7 +186,8 @@ internal class UttaksplanReglerKombinasjonsTest {
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(7).plusMinutes(30).prosent(50)
+                                        taptArbeidstid = Duration.ofHours(7).plusMinutes(30).prosent(50),
+                                        søkersTilsyn = Duration.ofHours(7).plusMinutes(30).prosent(50)
                                 )
                         )
                 ).somArbeid(),

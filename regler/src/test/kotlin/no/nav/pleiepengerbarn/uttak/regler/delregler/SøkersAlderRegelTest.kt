@@ -228,7 +228,8 @@ internal class SøkersAlderRegelTest {
                         "123" to mapOf(
                                 periode1 to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(3).plusMinutes(45),
-                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45).prosent(50)
+                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45).prosent(50),
+                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45).prosent(50)
                                 )
                         )
                 ).somArbeid(),

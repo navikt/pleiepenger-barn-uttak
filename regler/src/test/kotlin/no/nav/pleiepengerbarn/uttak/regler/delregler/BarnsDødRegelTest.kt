@@ -541,7 +541,8 @@ internal class BarnsDødRegelTest {
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45)
+                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45),
+                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),
@@ -579,7 +580,8 @@ internal class BarnsDødRegelTest {
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(37).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45)
+                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45),
+                                        søkersTilsyn = Duration.ofHours(18).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),
