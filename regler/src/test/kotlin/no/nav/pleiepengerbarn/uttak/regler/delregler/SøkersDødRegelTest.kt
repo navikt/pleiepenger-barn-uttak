@@ -5,7 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overordnetPeriode
-import no.nav.pleiepengerbarn.uttak.regler.print
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -56,7 +55,6 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = søkersDødsdato
         )
 
-        uttaksplan.print(grunnlag)
 
         uttaksplan = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplan,
@@ -64,7 +62,6 @@ internal class SøkersDødRegelTest {
         )
 
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(4, uttaksplan.perioder.size)
 
@@ -131,7 +128,6 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = null
         )
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         val uttaksplanEtterRegelkjøring = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplanFørRegelkjøring,
@@ -160,7 +156,6 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = søkersDødsdato
         )
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         val uttaksplanEtterRegelkjøring = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplanFørRegelkjøring,
@@ -196,14 +191,12 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = søkersDødsdato
         )
 
-        uttaksplan.print(grunnlag)
 
         uttaksplan = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplan,
                 grunnlag = grunnlag
         )
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(3, uttaksplan.perioder.size)
 
@@ -252,7 +245,6 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = søkersDødsdato
         )
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         val uttaksplanEtterRegelkjøring = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplanFørRegelkjøring,
@@ -288,7 +280,6 @@ internal class SøkersDødRegelTest {
                 søkersDødsdato = søkersDødsdato
         )
 
-        uttaksplan.print(grunnlag)
 
         uttaksplan = SøkersDødRegel().kjør(
                 uttaksplan = uttaksplan,

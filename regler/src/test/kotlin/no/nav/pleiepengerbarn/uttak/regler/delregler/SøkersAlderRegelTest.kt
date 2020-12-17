@@ -5,7 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.print
 import no.nav.pleiepengerbarn.uttak.regler.prosent
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -33,7 +32,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplanUtenSøttiårsdag = UttakTjeneste.uttaksplan(grunnlagUtenSøttiårsdag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(uttaksplanUtenSøttiårsdag, uttaksplan)
     }
@@ -50,7 +48,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplanUtenSøttiårsdag = UttakTjeneste.uttaksplan(grunnlagUtenSøttiårsdag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(uttaksplanUtenSøttiårsdag, uttaksplan)
     }
@@ -63,7 +60,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(2, uttaksplan.perioder.size)
 
@@ -90,7 +86,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(3, uttaksplan.perioder.size)
 
@@ -99,7 +94,7 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(25),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         sjekkAvslått(
@@ -126,7 +121,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(2, uttaksplan.perioder.size)
 
@@ -135,7 +129,7 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(25),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         sjekkAvslått(
@@ -156,7 +150,6 @@ internal class SøkersAlderRegelTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
 
         assertEquals(3, uttaksplan.perioder.size)
 
@@ -165,7 +158,7 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(25),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         sjekkAvslått(

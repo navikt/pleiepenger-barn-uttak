@@ -8,7 +8,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.erLikEllerFør
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
-import no.nav.pleiepengerbarn.uttak.regler.print
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import no.nav.pleiepengerbarn.uttak.regler.somUtbetalingsgrader
 import org.junit.jupiter.api.Assertions.*
@@ -50,13 +49,11 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(1, uttaksplanFørRegelkjøring.perioder.size)
 
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         assertEquals(3, uttaksplanEtterRegelkjøring.perioder.size)
 
@@ -113,13 +110,11 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(1, uttaksplanFørRegelkjøring.perioder.size)
 
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         assertEquals(2, uttaksplanEtterRegelkjøring.perioder.size)
 
@@ -155,7 +150,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
 
@@ -163,7 +157,6 @@ internal class BarnsDødRegelTest {
 
         assertEquals(6, uttaksplanEtterRegelkjøring.perioder.size)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         // 1. Opprinnelige Periode
         var periode = LukketPeriode("2020-01-01/2020-01-20")
@@ -268,7 +261,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
 
@@ -276,7 +268,6 @@ internal class BarnsDødRegelTest {
 
         assertEquals(7, uttaksplanEtterRegelkjøring.perioder.size)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         // 1. Opprinnelige Periode
         sjekkInnvilget(
@@ -384,7 +375,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
 
@@ -392,7 +382,6 @@ internal class BarnsDødRegelTest {
 
         assertEquals(5, uttaksplanEtterRegelkjøring.perioder.size)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         // Bør nå finnes en ny knekt periode
         assertEquals(uttaksplanFørRegelkjøring.perioder.size + 1 , uttaksplanEtterRegelkjøring.perioder.size)
@@ -437,7 +426,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         val uttaksplanEtterRegelkjøring = BarnsDødRegel().kjør(
                 uttaksplan = uttaksplanFørRegelkjøring,
@@ -458,7 +446,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
@@ -477,7 +464,6 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
-        uttaksplanFørRegelkjøring.print(grunnlag)
 
         assertEquals(4, uttaksplanFørRegelkjøring.perioder.size)
 
@@ -485,7 +471,6 @@ internal class BarnsDødRegelTest {
 
         assertEquals(4, uttaksplanEtterRegelkjøring.perioder.size)
 
-        uttaksplanEtterRegelkjøring.print(grunnlag)
 
         assertEquals(uttaksplanFørRegelkjøring.perioder.size, uttaksplanEtterRegelkjøring.perioder.size)
 
@@ -579,9 +564,9 @@ internal class BarnsDødRegelTest {
                 arbeid = mapOf(
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
-                                        jobberNormalt = Duration.ofHours(37).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(18).plusMinutes(45),
-                                        søkersTilsyn = Duration.ofHours(18).plusMinutes(45)
+                                        jobberNormalt = Duration.ofHours(7).plusMinutes(30),
+                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45),
+                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),

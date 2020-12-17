@@ -17,27 +17,27 @@ internal object AvklarGrader {
             andreSøkeresTilsyn: Prosent,
             arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
             ): AvklarteGrader {
-        val (avklartUttaksgrad, justeringsfaktor) = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
-        val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, justeringsfaktor)
+        val uttaksgradResultat = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
+        val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, uttaksgradResultat.justeringsfaktor)
 
-        return AvklarteGrader(avklartUttaksgrad.setScale(0), avklartUtbetalingsgrader, InnvilgetÅrsak(InnvilgetÅrsaker.FULL_DEKNING, setOf()))  //TODO: årsak må kom fra utregning og ikke hardkodes til FULL_DEKNING
+        return AvklarteGrader(uttaksgradResultat.uttaksgrad.setScale(0), avklartUtbetalingsgrader, uttaksgradResultat.årsak())
     }
 
     private fun avklarUttaksgradOgJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
                                  etablertTilsyn: Duration,
                                  andreSøkeresTilsyn: Prosent,
-                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Pair<Prosent, Prosent> {
+                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): UttaksgradResultat {
         val restTilSøker = finnRestTilSøker(tilsynsbehovStørrelse, etablertTilsyn, andreSøkeresTilsyn)
 
         val søktUttaksgrad = finnSøktUttaksprosent(arbeid)
 
         if (restTilSøker < TJUE_PROSENT || søktUttaksgrad < TJUE_PROSENT) {
-            return Pair(Prosent.ZERO, Prosent.ZERO)
+            return UttaksgradResultat(Prosent.ZERO, Prosent.ZERO, avslåttÅrsak = AvslåttÅrsaker.FOR_LAV_GRAD)
         }
         if (restTilSøker < søktUttaksgrad) {
-            return Pair(restTilSøker, restTilSøker / søktUttaksgrad * Prosent(100))
+            return UttaksgradResultat(restTilSøker, restTilSøker / søktUttaksgrad * Prosent(100), innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
         }
-        return Pair(søktUttaksgrad.setScale(2), HUNDRE_PROSENT)
+        return UttaksgradResultat(søktUttaksgrad.setScale(2), HUNDRE_PROSENT, innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING)
     }
 
     private fun finnRestTilSøker(tilsynsbehovStørrelse: TilsynsbehovStørrelse, etablertTilsyn: Duration, andreSøkeresTilsyn: Prosent): BigDecimal {
@@ -65,11 +65,9 @@ internal object AvklarGrader {
         val søktUttaksgrad = BigDecimal(sumSøktUttak.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
 
         if ( søktUttaksgrad > HUNDRE_PROSENT) {
-            //TODO: kaste exception istedet?
             return HUNDRE_PROSENT
         }
         if (søktUttaksgrad < Prosent.ZERO) {
-            //TODO: kaste exception istedet?
             return Prosent.ZERO
         }
         return søktUttaksgrad
@@ -90,7 +88,6 @@ internal object AvklarGrader {
     }
 
 }
-
 
 data class AvklarteGrader(
         val uttaksgrad: Prosent,

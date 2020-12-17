@@ -5,12 +5,10 @@ import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.print
 import no.nav.pleiepengerbarn.uttak.regler.prosent
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 
@@ -36,8 +34,6 @@ internal class UttaksplanReglerKombinasjonsTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
-
         assertEquals(3, uttaksplan.perioder.size)
 
         // Frem til dødsfallene uendret
@@ -46,7 +42,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         // Perioden som var innvilget er nå avslått
@@ -85,8 +81,6 @@ internal class UttaksplanReglerKombinasjonsTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
-
         assertEquals(4, uttaksplan.perioder.size)
 
         // Frem til barnets dødsfall uendret
@@ -95,7 +89,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         // Etter dødsfall fortsatt avkortet mot inntekt
@@ -104,7 +98,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
         // Sorgperioden frem til søkers edød
         sjekkInnvilget(
@@ -137,8 +131,6 @@ internal class UttaksplanReglerKombinasjonsTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        uttaksplan.print(grunnlag)
-
         assertEquals(3, uttaksplan.perioder.size)
 
         // Frem til fylte 70
@@ -147,7 +139,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
 
         // Frem til død

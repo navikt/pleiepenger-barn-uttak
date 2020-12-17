@@ -54,7 +54,7 @@ internal class UttakTjenesteGraderingTest {
 
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkInnvilget(uttaksplan, helePerioden, Prosent(80.00), mapOf(arbeidsforhold1 to Prosent(80.00)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
@@ -77,10 +77,10 @@ internal class UttakTjenesteGraderingTest {
                 ).somArbeid()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(75), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
     @Test
@@ -103,12 +103,14 @@ internal class UttakTjenesteGraderingTest {
                 ).somArbeid()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(60), mapOf(arbeidsforhold1 to Prosent(60)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
+    /*
+    TODO: utkommentert til tilsyn er implementert
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
@@ -133,11 +135,13 @@ internal class UttakTjenesteGraderingTest {
 
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
+
+     */
 
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80% skal føre til avslag`() {
@@ -160,12 +164,15 @@ internal class UttakTjenesteGraderingTest {
 
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkAvslått(uttaksplan, helePerioden, setOf(AvslåttÅrsaker.FOR_LAV_GRAD))
     }
 
+    /*
+
+     TODO: legg inn igjen når tilsyn er implementert
     @Test
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
@@ -186,12 +193,11 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(35), mapOf(arbeidsforhold1 to Prosent(35)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
-
 
     @Test
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
@@ -213,11 +219,12 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkInnvilget(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
+*/
 
 
     @Test
@@ -237,13 +244,15 @@ internal class UttakTjenesteGraderingTest {
                 ).somArbeid()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(75)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(50)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
+/*
 
+TODO: fiks til realistiske arbeidsforhold
     @Test
     fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot arbeid`() {
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
@@ -268,7 +277,7 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkInnvilget(uttaksplan, enUke, Prosent(52), mapOf(
@@ -279,6 +288,9 @@ internal class UttakTjenesteGraderingTest {
         ), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
 
     }
+
+
+ */
 
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
@@ -301,14 +313,16 @@ internal class UttakTjenesteGraderingTest {
                 ).somArbeid()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(3)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
-        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(70), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkAvslått(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), setOf(AvslåttÅrsaker.FOR_LAV_GRAD))
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(20), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(30), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
+    /*
+    TODO: utkommentert til tilsyn er implementert
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
@@ -333,7 +347,7 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder()
         )
 
-        val uttaksplan = UttakTjeneste.uttaksplanOgPrint(grunnlag)
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(4)
         sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
@@ -341,6 +355,7 @@ internal class UttakTjenesteGraderingTest {
         sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
         sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
+     */
 
 }
 
