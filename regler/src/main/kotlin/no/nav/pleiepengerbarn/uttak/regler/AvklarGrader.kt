@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Duration
 
 internal object AvklarGrader {
@@ -20,7 +21,7 @@ internal object AvklarGrader {
         val uttaksgradResultat = avklarUttaksgradOgJusteringsfaktor(tilsynsbehov, etablertTilsyn, andreSøkeresTilsyn, arbeid)
         val avklartUtbetalingsgrader = avklarUtbetalingsgrader(arbeid, uttaksgradResultat.justeringsfaktor)
 
-        return AvklarteGrader(uttaksgradResultat.uttaksgrad.setScale(0), avklartUtbetalingsgrader, uttaksgradResultat.årsak())
+        return AvklarteGrader(uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP), avklartUtbetalingsgrader, uttaksgradResultat.årsak())
     }
 
     private fun avklarUttaksgradOgJusteringsfaktor(tilsynsbehovStørrelse: TilsynsbehovStørrelse,
@@ -52,7 +53,7 @@ internal object AvklarGrader {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Prosent>()
         arbeid.forEach { (arbeidsforhold, info) ->
             val ikkeJustertUtbetalingsgrad = BigDecimal(info.taptArbeidstid.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
-            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (justeringsfaktor / HUNDRE_PROSENT)).setScale(0)
+            utbetalingsgrader[arbeidsforhold] = (ikkeJustertUtbetalingsgrad * (justeringsfaktor / HUNDRE_PROSENT)).setScale(0, RoundingMode.HALF_UP)
         }
         return utbetalingsgrader
     }

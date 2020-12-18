@@ -19,6 +19,8 @@ internal class AvklarGraderTest {
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "987654321")
 
 
+    //TODO: Sjekk på årsaker også i alle testene
+
     @Test
     internal fun `100 % vanlig uttak`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
@@ -152,4 +154,35 @@ internal class AvklarGraderTest {
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(100))
         assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(100))
     }
+
+    @Test
+    internal fun `Etablert tilsyn skal redusere uttaksgrad og utbetalingsgrad`() {
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG),
+        ))
+
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(40))
+        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(40))
+    }
+
+    @Test
+    internal fun `Etablert tilsyn og delvis arbeid som tilsammen er under 100% skal føre til at søkt periode blir innvilget`() {
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30)),
+        ))
+
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(30))
+        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(30))
+    }
+
+    @Test
+    internal fun `Etablert tilsyn og delvis arbeid som tilsammen går utover 100% skal føre til reduserte grader`() {
+        val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(60), søkersTilsyn = FULL_DAG.prosent(60)),
+        ))
+
+        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(40))
+        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(40))
+    }
+
 }
