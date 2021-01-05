@@ -1,8 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.TilsynsbehovStørrelse.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.TilsynsbehovStørrelse.PROSENT_200
 import org.assertj.core.api.Assertions.assertThat
@@ -27,10 +25,12 @@ internal class AvklarGraderTest {
             ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(HUNDRE_PROSENT)
+        grader.assert(
+                InnvilgetÅrsaker.FULL_DEKNING,
+                HUNDRE_PROSENT,
+                ARBEIDSGIVER1 to HUNDRE_PROSENT
+        )
     }
-
 
     @Test
     internal fun `50 % vanlig uttak`() {
@@ -38,8 +38,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(50),
+                ARBEIDSGIVER1 to Prosent(50)
+        )
     }
 
     @Test
@@ -48,8 +51,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT, //TODO: skal det også være gradert mot andres tilsyn?
+                Prosent(50),
+                ARBEIDSGIVER1 to Prosent(50)
+        )
     }
 
     @Test
@@ -58,8 +64,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(100))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(100))
+        grader.assert(
+                InnvilgetÅrsaker.FULL_DEKNING,
+                HUNDRE_PROSENT,
+                ARBEIDSGIVER1 to HUNDRE_PROSENT
+        )
     }
 
     @Test
@@ -68,8 +77,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Prosent(50),
+                ARBEIDSGIVER1 to Prosent(50)
+        )
     }
 
 
@@ -79,8 +91,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(10), taptArbeidstid = Duration.ofHours(5), søkersTilsyn = Duration.ofHours(5))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(67))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(67),
+                ARBEIDSGIVER1 to Prosent(50)
+        )
     }
 
     @Test
@@ -90,9 +105,13 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(HUNDRE_PROSENT)
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(HUNDRE_PROSENT)
+        grader.assert(
+                InnvilgetÅrsaker.FULL_DEKNING,
+                HUNDRE_PROSENT,
+                ARBEIDSGIVER1 to HUNDRE_PROSENT,
+                ARBEIDSGIVER2 to HUNDRE_PROSENT
+        )
+
     }
 
     @Test
@@ -102,9 +121,12 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(3), søkersTilsyn = Duration.ofHours(3))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(60))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(67))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(60),
+                ARBEIDSGIVER1 to Prosent(50),
+                ARBEIDSGIVER2 to Prosent(67)
+        )
     }
 
     @Test
@@ -114,9 +136,12 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofMinutes(45), søkersTilsyn = Duration.ofMinutes(45))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(30))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(25))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(30),
+                ARBEIDSGIVER1 to Prosent(50),
+                ARBEIDSGIVER2 to Prosent(25)
+        )
     }
 
     @Test
@@ -126,9 +151,12 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(2), søkersTilsyn = Duration.ofHours(2))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(53))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(44))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(53),
+                ARBEIDSGIVER1 to Prosent(44),
+                ARBEIDSGIVER2 to Prosent(50)
+        )
     }
 
     @Test
@@ -138,9 +166,12 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(50))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(50))
+        grader.assert(
+                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Prosent(50),
+                ARBEIDSGIVER1 to Prosent(50),
+                ARBEIDSGIVER2 to Prosent(50)
+        )
     }
 
     @Test
@@ -150,9 +181,12 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(100))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(100))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER2]).isEqualByComparingTo(Prosent(100))
+        grader.assert(
+                InnvilgetÅrsaker.FULL_DEKNING,
+                HUNDRE_PROSENT,
+                ARBEIDSGIVER1 to HUNDRE_PROSENT,
+                ARBEIDSGIVER2 to HUNDRE_PROSENT
+        )
     }
 
     @Test
@@ -161,8 +195,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG),
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(40))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(40))
+        grader.assert(
+                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Prosent(40),
+                ARBEIDSGIVER1 to Prosent(40)
+        )
     }
 
     @Test
@@ -171,8 +208,11 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30)),
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(30))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(30))
+        grader.assert(
+                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Prosent(30),
+                ARBEIDSGIVER1 to Prosent(30)
+        )
     }
 
     @Test
@@ -181,8 +221,21 @@ internal class AvklarGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(60), søkersTilsyn = FULL_DAG.prosent(60)),
         ))
 
-        assertThat(grader.uttaksgrad).isEqualByComparingTo(Prosent(40))
-        assertThat(grader.utbetalingsgrader[ARBEIDSGIVER1]).isEqualByComparingTo(Prosent(40))
+        grader.assert(
+                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Prosent(40),
+                ARBEIDSGIVER1 to Prosent(40)
+        )
+    }
+
+    private fun AvklarteGrader.assert(årsak: InnvilgetÅrsaker, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
+        assertThat(this.årsak).isInstanceOf(InnvilgetÅrsak::class.java)
+        assertThat((this.årsak as InnvilgetÅrsak).årsak).isEqualTo(årsak)
+        assertThat(this.uttaksgrad).isEqualByComparingTo(uttaksgrad)
+        assertThat(this.utbetalingsgrader.size).isEqualTo(utbetalingsgrader.size)
+        utbetalingsgrader.forEach {
+            assertThat(this.utbetalingsgrader[it.first]).isEqualByComparingTo(it.second)
+        }
     }
 
 }

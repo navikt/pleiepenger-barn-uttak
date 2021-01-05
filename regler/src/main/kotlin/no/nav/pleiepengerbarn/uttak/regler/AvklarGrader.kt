@@ -36,9 +36,12 @@ internal object AvklarGrader {
             return UttaksgradResultat(Prosent.ZERO, Prosent.ZERO, avslåttÅrsak = AvslåttÅrsaker.FOR_LAV_GRAD)
         }
         if (restTilSøker < søktUttaksgrad) {
-            return UttaksgradResultat(restTilSøker, restTilSøker / søktUttaksgrad * Prosent(100), innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+            return UttaksgradResultat(restTilSøker, restTilSøker / søktUttaksgrad * Prosent(100), innvilgetÅrsak = InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
         }
-        return UttaksgradResultat(søktUttaksgrad.setScale(2), HUNDRE_PROSENT, innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING)
+        if (arbeid.fulltFravær()) {
+            return UttaksgradResultat(søktUttaksgrad.setScale(2), HUNDRE_PROSENT, innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING)
+        }
+        return UttaksgradResultat(søktUttaksgrad.setScale(2), HUNDRE_PROSENT, innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
     private fun finnRestTilSøker(tilsynsbehovStørrelse: TilsynsbehovStørrelse, etablertTilsyn: Duration, andreSøkeresTilsyn: Prosent): BigDecimal {
@@ -89,6 +92,10 @@ internal object AvklarGrader {
     }
 
 }
+
+
+private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
+private fun ArbeidsforholdPeriodeInfo.fulltFravær() = taptArbeidstid == jobberNormalt
 
 data class AvklarteGrader(
         val uttaksgrad: Prosent,

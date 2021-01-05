@@ -91,7 +91,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                     ARBEIDSFORHOLD2 to Prosent(50),
                     ARBEIDSFORHOLD3 to Prosent(100)
                 ),
-                innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
         )
     }
 
