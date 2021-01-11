@@ -9,18 +9,16 @@ import org.springframework.http.ResponseEntity
 
 internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRestTemplate) {
 
-    private companion object {
-        private const val UttaksplanPath = "/uttaksplan"
-        private const val BehandlingId = "behandlingId"
-    }
-
     internal fun opprettUttaksplan(grunnlag: Uttaksgrunnlag): ResponseEntity<Uttaksplan> {
-        return restTemplate.exchange(UttaksplanPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, HttpHeaders()), Uttaksplan::class.java)
+        return restTemplate.exchange(UttakplanApi.UttaksplanPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, HttpHeaders()), Uttaksplan::class.java)
     }
 
-    internal fun hentUttaksplan(saksnummer: Saksnummer): ResponseEntity<Uttaksplaner> {
-        return restTemplate.exchange(UttaksplanPath + "saksnummer=$saksnummer", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), Uttaksplaner::class.java)
+    internal fun hentUttaksplan(saksnummer: Saksnummer): ResponseEntity<Uttaksplan> {
+        return restTemplate.exchange(UttakplanApi.FullUttaksplanPath + "?saksnummer=$saksnummer", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), Uttaksplan::class.java)
     }
+
+
+
 
 }
 

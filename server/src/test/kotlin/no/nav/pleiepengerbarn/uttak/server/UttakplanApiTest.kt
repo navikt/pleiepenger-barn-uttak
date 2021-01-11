@@ -28,7 +28,6 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     private val testClient = PleiepengerBarnUttakTestClient(restTemplate)
 
     private val FULL_DAG: Duration = Duration.ofHours(7).plusMinutes(30)
-    private val FULL_UKE: Duration = FULL_DAG.multipliedBy(5)
 
     private val HUNDREPROSENT = Prosent(100)
 
@@ -95,13 +94,78 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
+    @Test
+    internal fun `Flere behandlinger med uttak etter hverandre`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-10").opprettUttaksplan()
+        lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
+
+        val uttaksplan = hentFullUttaksplan(saksnummer)
+
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-10"))
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-11/2020-01-20"))
+    }
+
+    @Test
+    internal fun `Flere behandlinger med uttak med overlapp`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
+        lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
+
+        val uttaksplan = hentFullUttaksplan(saksnummer)
+
+        assertThat(uttaksplan.perioder).hasSize(2)
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-07/2020-01-20"))
+    }
+
+    @Test
+    internal fun `Flere behandlinger med uttak med overlapp midt i perioden`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
+        lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
+
+        val uttaksplan = hentFullUttaksplan(saksnummer)
+
+        assertThat(uttaksplan.perioder).hasSize(3)
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-07/2020-01-12"))
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-13/2020-01-20"))
+    }
+
+
+    @Test
+    internal fun `Flere behandlinger med uttak hvor siste behandling overskygger først behandling`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
+
+        val uttaksplan = hentFullUttaksplan(saksnummer)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-20"))
+    }
+
+
+    private fun hentFullUttaksplan(saksnummer: Saksnummer): Uttaksplan {
+        val response = testClient.hentUttaksplan(saksnummer)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        return response.body ?: fail("Mangler uttaksplan")
+    }
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(), innvilgetÅrsak: InnvilgetÅrsaker) {
+    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), innvilgetÅrsak: InnvilgetÅrsaker = InnvilgetÅrsaker.FULL_DEKNING) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo) {
             is InnvilgetPeriode -> {
@@ -130,6 +194,18 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private fun Duration.prosent(prosent: Long):Duration {
         return this.multipliedBy(prosent).dividedBy(100)
+    }
+
+    private fun lagGrunnlag(saksnummer: Saksnummer, periode: String): Uttaksgrunnlag {
+        val søknadsperiode = LukketPeriode(periode)
+        return lagGrunnlag(
+            saksnummer = saksnummer,
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)))
+            ),
+            tilsynsbehov = mapOf(søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+        )
     }
 
     private fun lagGrunnlag(

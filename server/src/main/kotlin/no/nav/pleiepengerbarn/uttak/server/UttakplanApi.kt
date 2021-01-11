@@ -21,10 +21,12 @@ class UttakplanApi {
     @Autowired
     private lateinit var uttakRepository: UttakRepository
 
-    private companion object {
-        private const val UttaksplanPath = "/uttaksplan"
-        private const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
-        private const val BehandlingId = "behandlingId"
+    companion object {
+        const val UttaksplanPath = "/uttaksplan"
+        const val FullUttaksplanPath = "/uttaksplan/full"
+        const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
+        const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
+        const val BehandlingId = "behandlingId"
     }
 
     @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -48,7 +50,7 @@ class UttakplanApi {
     private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
-            andrePartersUttaksplaner[saksnummer] = hentUttaksplan(saksnummer)
+            andrePartersUttaksplaner[saksnummer] = hentUttaksplanerOgSlåSammen(saksnummer)
         }
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
 
@@ -65,33 +67,29 @@ class UttakplanApi {
                 .body(uttaksplan)
     }
 
-
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
-    fun hentUttaksplan(@RequestParam(required = false) behandlingId: Set<BehandlingId>?, @RequestParam(required = false) saksnummer: Set<Saksnummer>?): ResponseEntity<Uttaksplaner> {
-        if (behandlingId != null && saksnummer != null && behandlingId.isNotEmpty() && saksnummer.isNotEmpty()) {
-            return ResponseEntity.badRequest().build()
-        }
-        if (behandlingId.isNullOrEmpty() && saksnummer.isNullOrEmpty()) {
-            return ResponseEntity.badRequest().build()
-        }
-        val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
-        if (behandlingId != null && behandlingId.isNotEmpty()) {
-            behandlingId.forEach {
-                val uttaksplan = uttakRepository.hent(UUID.fromString(it))
-                if (uttaksplan != null) {
-                    uttaksplanMap[it] = uttaksplan
-                }
-            }
-        } else {
-            saksnummer?.forEach {
-                uttaksplanMap[it] = hentUttaksplan(it)
-            }
-        }
-        return ResponseEntity.ok(Uttaksplaner(uttaksplanMap))
+    @Operation(description = "Hent uttaksplan for gitt behandling.")
+    fun hentUttaksplanForBehandling(@RequestParam behandlingId: BehandlingId): ResponseEntity<Uttaksplan> {
+
+        val uttaksplan = uttakRepository.hent(UUID.fromString(behandlingId)) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(uttaksplan)
     }
 
-    private fun hentUttaksplan(saksnummer:Saksnummer):Uttaksplan {
+    @GetMapping(FullUttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Hent full uttaksplan for gitt saksnummer.")
+    fun hentFullUttaksplan(@RequestParam saksnummer: Saksnummer): ResponseEntity<Uttaksplan> {
+        val uttaksplan = hentUttaksplanerOgSlåSammen(saksnummer)
+        return ResponseEntity.ok(uttaksplan)
+    }
+
+    @GetMapping(FullUttaksplanForTilkjentYtelsePath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Hent full uttaksplan for tilkjent ytelse for gitt saksnummer.")
+    fun hentFullUttaksplanForTilkjentYtelse(@RequestParam saksnummer: Saksnummer): ResponseEntity<ForenkletUttaksplan> {
+        TODO()
+    }
+
+
+    private fun hentUttaksplanerOgSlåSammen(saksnummer:Saksnummer): Uttaksplan {
         val uttaksplanListe = uttakRepository.hent(saksnummer)
         return UttaksplanMerger.slåSammenUttaksplaner(uttaksplanListe)
     }
