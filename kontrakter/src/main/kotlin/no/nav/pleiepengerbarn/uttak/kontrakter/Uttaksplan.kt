@@ -11,6 +11,9 @@ data class Uttaksplan(
         @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utbetalingsgrader(
         @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
         @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
@@ -25,6 +28,9 @@ interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonTypeName("INNVILGET")
 data class InnvilgetPeriode @JsonCreator constructor(
     private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
@@ -48,6 +54,9 @@ data class InnvilgetPeriode @JsonCreator constructor(
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonTypeName("AVSLÅTT")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),

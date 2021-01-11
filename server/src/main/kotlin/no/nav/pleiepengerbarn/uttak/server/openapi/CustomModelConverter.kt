@@ -6,6 +6,7 @@ import io.swagger.v3.core.converter.ModelConverter
 import io.swagger.v3.core.converter.ModelConverterContext
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.media.Schema
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import java.time.Duration
 
 internal class CustomModelConverter : ModelConverter {
@@ -23,7 +24,9 @@ internal class CustomModelConverter : ModelConverter {
 
         if (javaType != null) {
             if (javaType.erDuration()) {
-                schema.example("PT7H25M")
+                schema.example("PT7H30M")
+            } else if(javaType.isTypeOrSubTypeOf(LukketPeriode::class.java)){
+                schema.example("2021-01-01/2021-01-10")
             }
         }
 
