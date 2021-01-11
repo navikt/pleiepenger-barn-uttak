@@ -2,17 +2,18 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
 
-data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
-
 typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan(
-        val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
+        @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
 )
 
 data class Utbetalingsgrader(
-        val arbeidsforhold: Arbeidsforhold,
-        val utbetalingsgrad: Prosent
+        @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
+        @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
@@ -26,19 +27,19 @@ interface UttaksPeriodeInfo {
 
 @JsonTypeName("INNVILGET")
 data class InnvilgetPeriode @JsonCreator constructor(
-        private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        val grad: Prosent,
-        val utbetalingsgrader: List<Utbetalingsgrader>,
-        val årsak: InnvilgetÅrsaker,
-        val hjemler: Set<Hjemmel>
+    private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+    @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
+    @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
+    @JsonProperty("årsak") val årsak: InnvilgetÅrsaker,
+    @JsonProperty("hjemler") val hjemler: Set<Hjemmel>
 
 ) : UttaksPeriodeInfo {
     constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-                grad: Prosent,
+                uttaksgrad: Prosent,
                 utbetalingsgrader: List<Utbetalingsgrader>,
                 årsak: InnvilgetÅrsak) : this(
             knekkpunktTyper = knekkpunktTyper,
-            grad = grad,
+            uttaksgrad = uttaksgrad,
             utbetalingsgrader = utbetalingsgrader,
             årsak = årsak.årsak,
             hjemler = årsak.hjemler

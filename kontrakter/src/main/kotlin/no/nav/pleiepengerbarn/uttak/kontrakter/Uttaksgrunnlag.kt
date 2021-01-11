@@ -1,17 +1,26 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.Duration
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksgrunnlag (
-        val barn: Barn = Barn(),
-        val søker: Søker,
-        val saksnummer: Saksnummer,
-        val behandlingId: BehandlingId,
-        val andrePartersSaksnummer: List<Saksnummer> = listOf(),
+        @JsonProperty("barn") val barn: Barn = Barn(),
+        @JsonProperty("søker") val søker: Søker,
+        @JsonProperty("saksnummer") val saksnummer: Saksnummer,
+        @JsonProperty("behandlingId") val behandlingId: BehandlingId,
+        @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
 
-        val søknadsperioder: List<LukketPeriode>,
-        val arbeid: List<Arbeid>,
-        val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
+        @JsonProperty("søknadsperioder") val søknadsperioder: List<LukketPeriode>,
+        @JsonProperty("arbeid") val arbeid: List<Arbeid>,
+        @JsonProperty("tilsynsbehov") val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
 
-        val lovbestemtFerie: List<LukketPeriode> = listOf(),
-        val tilsynsperioder: Map<LukketPeriode, TilsynPeriodeInfo> = mapOf(),
-        val medlemskap: Map<LukketPeriode, Medlemskap>
+        @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
+        @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
+        @JsonProperty("medlemskap") val medlemskap: Map<LukketPeriode, Medlemskap> = mapOf()
 )

@@ -170,7 +170,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         when (periodeInfo) {
             is InnvilgetPeriode -> {
                 assertThat(periodeInfo.årsak).isEqualTo(innvilgetÅrsak)
-                assertThat(periodeInfo.grad).isEqualByComparingTo(grad)
+                assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
                 gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
@@ -212,7 +212,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             søknadsperiode: LukketPeriode,
             arbeid: List<Arbeid>,
             tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
-            tilsynsperioder: Map<LukketPeriode, TilsynPeriodeInfo> = mapOf(),
+            tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
             søker: Søker = Søker(LocalDate.parse("2000-01-01")),
             saksnummer: Saksnummer = nesteSaksnummer(),
             behandlingId: BehandlingId = nesteBehandlingId()

@@ -11,7 +11,7 @@ internal class UttaksplanMergerTest {
 
     private val hundreProsent = Prosent(100)
     private val innvilget = InnvilgetPeriode(
-            grad = hundreProsent,
+            uttaksgrad = hundreProsent,
             årsak = InnvilgetÅrsak(InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT, setOf()),
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader())
 

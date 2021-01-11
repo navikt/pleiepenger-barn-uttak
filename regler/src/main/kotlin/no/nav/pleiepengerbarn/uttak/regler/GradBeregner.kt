@@ -234,7 +234,7 @@ internal object GradBeregner {
                     .values.firstOrNull() as InnvilgetPeriode?
 
             if (annenPartsPeriode != null) {
-                sumAndreParter += annenPartsPeriode.grad.somDesimaltall()
+                sumAndreParter += annenPartsPeriode.uttaksgrad.somDesimaltall()
             }
         }
         return sumAndreParter
@@ -291,7 +291,7 @@ internal object GradBeregner {
             periode: LukketPeriode,
             antallVirketimerIPerioden: Duration) : Desimaltall {
         val tilsyn = tilsynsperioder.entries.find { it.key.overlapper(periode)}
-        return tilsyn?.value?.lengde?.div(antallVirketimerIPerioden)?.fraFaktorTilProsent()?.normaliserProsent()?: Desimaltall.Null
+        return tilsyn?.value?.div(antallVirketimerIPerioden)?.fraFaktorTilProsent()?.normaliserProsent()?: Desimaltall.Null
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): Desimaltall {

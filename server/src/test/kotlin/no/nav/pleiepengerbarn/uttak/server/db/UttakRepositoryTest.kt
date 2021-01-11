@@ -109,7 +109,7 @@ internal class UttakRepositoryTest {
         return Uttaksplan(
                 perioder = mapOf(
                         periode to InnvilgetPeriode(
-                                grad = Prosent(100),
+                                uttaksgrad = Prosent(100),
                                 årsak = InnvilgetÅrsak(InnvilgetÅrsaker.FULL_DEKNING, setOf()),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,

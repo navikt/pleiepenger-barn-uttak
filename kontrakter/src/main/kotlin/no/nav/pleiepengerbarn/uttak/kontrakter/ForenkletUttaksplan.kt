@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.*
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ForenkletUttaksplan @JsonCreator constructor(
-    @JsonProperty("saksnummer")val saksnummer:Saksnummer,
-    @JsonProperty("aktiviteter")var aktiviteter:List<Aktivitet> = listOf(),
+    @JsonProperty("saksnummer") val saksnummer:Saksnummer,
+    @JsonProperty("aktiviteter") var aktiviteter:List<Aktivitet> = listOf(),
 
 )
 
@@ -15,15 +15,15 @@ data class ForenkletUttaksplan @JsonCreator constructor(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Aktivitet @JsonCreator constructor(
-    @JsonProperty("arbeidsforhold")val arbeidsforhold: Arbeidsforhold,
-    @JsonProperty("uttaksperioder")var uttaksperioder:List<ForenkletUttaksperiode> = listOf()
+    @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
+    @JsonProperty("uttaksperioder") var uttaksperioder:List<ForenkletUttaksperiode> = listOf()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ForenkletUttaksperiode @JsonCreator constructor(
-    @JsonProperty("periode")val periode:LukketPeriode,
-    @JsonProperty("innvilget")val innvilget: Boolean,
-    @JsonProperty("utbetalingsgrad")val utbetalingsgrad:Prosent
+    @JsonProperty("periode") val periode:LukketPeriode,
+    @JsonProperty("innvilget") val innvilget: Boolean,
+    @JsonProperty("utbetalingsgrad") val utbetalingsgrad:Prosent
 )

@@ -9,17 +9,14 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.somDesimaltall
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import java.time.Duration
 
-internal fun Map<LukketPeriode, Prosent>.somTilsynperioder() = mapValues { (periode,prosent) ->
-        val virketimerIPerioden = periode.antallVirketimer()
+internal fun Map<LukketPeriode, Prosent>.somTilsynperioder() = mapValues { (_, prosent) ->
 
         val lengdePåTilsynsPeriode = Desimaltall
                 .fraDuration(Duration.ofHours(7).plusMinutes(30))
                 .times(prosent.somDesimaltall().fraProsentTilFaktor().normaliserFaktor())
                 .tilDuration()
 
-        TilsynPeriodeInfo(
-                lengde = lengdePåTilsynsPeriode
-        )
+        lengdePåTilsynsPeriode
     }
 
 internal fun Map.Entry<LukketPeriode, TilsynPeriodeInfo>.somProsent() : Prosent {

@@ -123,7 +123,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                         val innvilgetÅrsak = barnetsDødInnvilgetÅrsak(dødsdato)
                         perioder[periode] = InnvilgetPeriode(
                                 knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
-                                grad = EtHundreProsent,
+                                uttaksgrad = EtHundreProsent,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                                 årsak = innvilgetÅrsak
                         )

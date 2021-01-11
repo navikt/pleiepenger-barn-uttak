@@ -16,7 +16,7 @@ internal object UttaksperiodeAsserts {
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
         val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
-        assertThat(innvilgetPeriode.grad).isEqualByComparingTo(forventetGrad)
+        assertThat(innvilgetPeriode.uttaksgrad).isEqualByComparingTo(forventetGrad)
 
         forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
             val innvilgetUtbetalingsgrader = innvilgetPeriode.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)

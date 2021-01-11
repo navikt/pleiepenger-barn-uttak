@@ -583,7 +583,7 @@ internal class BarnsDødRegelTest {
                                 perioder = mapOf(
                                         helePerioden to InnvilgetPeriode(
                                                 knekkpunktTyper = setOf(),
-                                                grad = denAndreOmsorgsPersonensGrad,
+                                                uttaksgrad = denAndreOmsorgsPersonensGrad,
                                                 utbetalingsgrader = mapOf(
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),

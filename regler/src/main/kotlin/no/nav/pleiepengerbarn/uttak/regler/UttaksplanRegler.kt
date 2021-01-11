@@ -61,7 +61,7 @@ internal object UttaksplanRegler {
                 } else if (grader.årsak is InnvilgetÅrsak) {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            grad = grader.uttaksgrad,
+                            uttaksgrad = grader.uttaksgrad,
                             utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
                             årsak = grader.årsak.årsak,
                             hjemler = grader.årsak.hjemler
@@ -103,7 +103,7 @@ internal object UttaksplanRegler {
     private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
         val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapper(periode)}
         return if (etablertTilsynPeriode != null) {
-            this.tilsynsperioder[etablertTilsynPeriode]?.lengde ?: Duration.ZERO
+            this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
         } else {
             Duration.ZERO
         }
@@ -116,7 +116,7 @@ internal object UttaksplanRegler {
             if (overlappendePeriode != null) {
                 val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
                 if (uttaksperiode is InnvilgetPeriode) {
-                    andreSøkeresTilsynsgrad += uttaksperiode.grad
+                    andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
                 }
             }
         }

@@ -1,7 +1,9 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.Knekkpunkt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
@@ -37,7 +39,7 @@ internal object KnekkpunktUtleder {
         ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM_I_FOLKETRYGDEN) }
     }
 
-    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, TilsynPeriodeInfo>) {
+    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Duration>) {
         tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 

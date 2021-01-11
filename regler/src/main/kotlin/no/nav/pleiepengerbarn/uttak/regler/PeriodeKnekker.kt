@@ -1,8 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Knekkpunkt
 import no.nav.pleiepengerbarn.uttak.kontrakter.KnekkpunktType
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.regler.domene.Knekkpunkt
 import java.util.SortedSet
 
 internal object PeriodeKnekker {
