@@ -10,17 +10,17 @@ import java.time.Duration
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksgrunnlag (
-        @JsonProperty("barn") val barn: Barn = Barn(),
-        @JsonProperty("søker") val søker: Søker,
-        @JsonProperty("saksnummer") val saksnummer: Saksnummer,
-        @JsonProperty("behandlingId") val behandlingId: BehandlingId,
-        @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
+    @JsonProperty("barn") val barn: Barn = Barn(),
+    @JsonProperty("søker") val søker: Søker,
+    @JsonProperty("saksnummer") val saksnummer: Saksnummer,
+    @JsonProperty("behandlingUUID") val behandlingUUID: BehandlingUUID,
+    @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
 
-        @JsonProperty("søknadsperioder") val søknadsperioder: List<LukketPeriode>,
-        @JsonProperty("arbeid") val arbeid: List<Arbeid>,
-        @JsonProperty("tilsynsbehov") val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
+    @JsonProperty("søknadsperioder") val søknadsperioder: List<LukketPeriode>,
+    @JsonProperty("arbeid") val arbeid: List<Arbeid>,
+    @JsonProperty("tilsynsbehov") val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
 
-        @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
-        @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
-        @JsonProperty("medlemskap") val medlemskap: Map<LukketPeriode, Medlemskap> = mapOf()
+    @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
+    @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
+    @JsonProperty("medlemskap") val medlemskap: Map<LukketPeriode, Medlemskap> = mapOf()
 )

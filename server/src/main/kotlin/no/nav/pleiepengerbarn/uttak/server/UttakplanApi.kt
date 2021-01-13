@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.lang.IllegalArgumentException
 import java.util.*
 
 @RestController
@@ -26,7 +28,7 @@ class UttakplanApi {
         const val FullUttaksplanPath = "/uttaksplan/full"
         const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
-        const val BehandlingId = "behandlingId"
+        const val BehandlingUUID = "behandlingUUID"
     }
 
     @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -57,10 +59,10 @@ class UttakplanApi {
         val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
         if (lagre) {
-            uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
+            uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
         }
 
-        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingId, uttaksgrunnlag.behandlingId).build().toUri()
+        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
 
         return ResponseEntity
                 .created(uri)
@@ -68,10 +70,20 @@ class UttakplanApi {
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Hent uttaksplan for gitt behandling.")
-    fun hentUttaksplanForBehandling(@RequestParam behandlingId: BehandlingId): ResponseEntity<Uttaksplan> {
+    @Operation(
+        description = "Hent uttaksplan for gitt behandling.",
+        parameters = [
+            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
+        ]
+    )
+    fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
+        val behandlingUUIDParsed = try {
+            UUID.fromString(behandlingUUID)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().build()
+        }
 
-        val uttaksplan = uttakRepository.hent(UUID.fromString(behandlingId)) ?: return ResponseEntity.notFound().build()
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(uttaksplan)
     }
 

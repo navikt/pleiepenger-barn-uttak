@@ -64,7 +64,7 @@ internal class GrunnlagMapperTest {
                         fødselsdato = LocalDate.now().minusYears(50)
                     ),
                     saksnummer = "1",
-                    behandlingId = "2",
+                    behandlingUUID = "2",
                     medlemskap = mapOf(),
                     søknadsperioder = listOf(LukketPeriode("2020-01-01/2021-01-01")),
                     tilsynsbehov = mapOf(),

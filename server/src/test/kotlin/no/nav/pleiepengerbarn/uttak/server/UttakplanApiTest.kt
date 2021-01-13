@@ -209,18 +209,18 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     private fun lagGrunnlag(
-            søknadsperiode: LukketPeriode,
-            arbeid: List<Arbeid>,
-            tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
-            tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
-            søker: Søker = Søker(LocalDate.parse("2000-01-01")),
-            saksnummer: Saksnummer = nesteSaksnummer(),
-            behandlingId: BehandlingId = nesteBehandlingId()
+        søknadsperiode: LukketPeriode,
+        arbeid: List<Arbeid>,
+        tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
+        tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
+        søker: Søker = Søker(LocalDate.parse("2000-01-01")),
+        saksnummer: Saksnummer = nesteSaksnummer(),
+        behandlingUUID: BehandlingUUID = nesteBehandlingId()
     ): Uttaksgrunnlag {
         return Uttaksgrunnlag(
                 søker = søker,
                 saksnummer = saksnummer,
-                behandlingId = behandlingId,
+                behandlingUUID = behandlingUUID,
                 søknadsperioder = listOf(søknadsperiode),
                 arbeid = arbeid,
                 tilsynsbehov = tilsynsbehov,
@@ -231,5 +231,5 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
 
     private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
-    private fun nesteBehandlingId(): BehandlingId = UUID.randomUUID().toString()
+    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
 }
