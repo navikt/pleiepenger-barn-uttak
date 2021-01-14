@@ -25,12 +25,14 @@ internal class SøkersDødRegel : UttaksplanRegel {
                 ?.takeUnless { it.key.tom.isEqual(dødsdato) }
                 ?.apply {
                     perioder.dødeIEnUttaksperiode(
+                            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
                             dødsdato = dødsdato,
                             uttaksperiode = this
                     )
                 }
 
         perioder.avslåAllePerioderEtterDødsfall(
+                kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
                 dødsdato = dødsdato
         )
 
@@ -41,6 +43,7 @@ internal class SøkersDødRegel : UttaksplanRegel {
 }
 
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
+        kildeBehandlingUUID: BehandlingUUID,
         dødsdato: LocalDate,
         uttaksperiode: Uttaksperiode) {
 
@@ -73,11 +76,13 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     }
     put(periodeEtterDødsfall, AvslåttPeriode(
             knekkpunktTyper = knekkpunktTyper,
+            kildeBehandlingUUID = kildeBehandlingUUID,
             årsaker = avslåttÅrsaker
     ))
 }
 
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfall(
+        kildeBehandlingUUID: BehandlingUUID,
         dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, periodeInfo) ->
         /*
@@ -97,6 +102,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
         } else {
             put(periode, AvslåttPeriode(
                     knekkpunktTyper = periodeInfo.knekkpunktTyper(),
+                    kildeBehandlingUUID = kildeBehandlingUUID,
                     årsaker = setOf(SøkersDødRegel.søkersDødAvslåttÅrsak(dødsdato))
             ))
         }

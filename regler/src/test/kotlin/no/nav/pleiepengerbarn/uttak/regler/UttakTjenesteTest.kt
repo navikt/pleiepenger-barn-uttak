@@ -4,13 +4,12 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.domene.times
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.antallVirketimer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
+import java.util.*
 
 internal class UttakTjenesteTest {
 
@@ -18,7 +17,7 @@ internal class UttakTjenesteTest {
         private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
     }
 
-    private val arbeidsforhold1 = java.util.UUID.randomUUID().toString()
+    private val arbeidsforhold1 = UUID.randomUUID().toString()
 
     @Test
     fun `Enkel uttaksperiode uten annen informasjon`() {
@@ -35,7 +34,8 @@ internal class UttakTjenesteTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -63,7 +63,8 @@ internal class UttakTjenesteTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -88,7 +89,8 @@ internal class UttakTjenesteTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -143,7 +145,8 @@ TODO: fiks når tilsyn er ordentlig implementert
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -172,7 +175,8 @@ TODO: fiks når tilsyn er ordentlig implementert
                                 periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG),
                                 periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(80), FULL_DAG.prosent(80))
                         )
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -272,4 +276,7 @@ TODO: fiks når tilsyn er ordentlig implementert
 
 
  */
+
+    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
+
 }

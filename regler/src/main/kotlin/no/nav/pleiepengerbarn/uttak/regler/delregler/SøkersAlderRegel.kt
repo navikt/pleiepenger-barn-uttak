@@ -40,7 +40,8 @@ internal class SøkersAlderRegel : UttaksplanRegel {
                 }
 
         perioder.avslåAllePerioderEtterSøttiårsdag(
-                søkersSøttiårsdag = søkersSøttiårsdag
+            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+            søkersSøttiårsdag = søkersSøttiårsdag
         )
 
         return uttaksplan.copy(
@@ -51,7 +52,9 @@ internal class SøkersAlderRegel : UttaksplanRegel {
 }
 
 private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterSøttiårsdag(
-        søkersSøttiårsdag: LocalDate) {
+    kildeBehandlingUUID: BehandlingUUID,
+    søkersSøttiårsdag: LocalDate
+) {
     filterKeys { it.fom.isAfter(søkersSøttiårsdag) }
     .forEach { (periode, periodeInfo) ->
         if (periodeInfo is AvslåttPeriode) {
@@ -68,6 +71,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterS
         } else {
             put(periode, AvslåttPeriode(
                     knekkpunktTyper = periodeInfo.knekkpunktTyper(),
+                    kildeBehandlingUUID = kildeBehandlingUUID,
                     årsaker = setOf(søkerfyllerSøtiAvslåttÅrsak(søkersSøttiårsdag))
             ))
         }

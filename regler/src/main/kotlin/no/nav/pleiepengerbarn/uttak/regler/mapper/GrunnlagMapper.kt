@@ -19,6 +19,7 @@ object GrunnlagMapper {
         }
 
         return RegelGrunnlag(
+                kildeBehandlingUUID = uttaksgrunnlag.behandlingUUID,
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
                 tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),

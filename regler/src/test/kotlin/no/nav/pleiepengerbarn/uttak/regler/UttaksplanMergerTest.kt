@@ -8,14 +8,17 @@ import java.util.*
 internal class UttaksplanMergerTest {
 
     private val arbeidsforhold1 = UUID.randomUUID().toString()
+    private val behandlingUUID = UUID.randomUUID().toString()
 
     private val hundreProsent = Prosent(100)
     private val innvilget = InnvilgetPeriode(
+            kildeBehandlingUUID = behandlingUUID,
             uttaksgrad = hundreProsent,
             årsak = InnvilgetÅrsak(InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT, setOf()),
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader())
 
     private val avslått = AvslåttPeriode(
+            kildeBehandlingUUID = behandlingUUID,
             årsaker = setOf(AvslåttÅrsak(AvslåttÅrsaker.FOR_LAV_GRAD, setOf()))
     )
 

@@ -87,6 +87,7 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplan)
     }
 
+    // TODO: denne skal bort.
     @GetMapping(FullUttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Hent full uttaksplan for gitt saksnummer.")
     fun hentFullUttaksplan(@RequestParam saksnummer: Saksnummer): ResponseEntity<Uttaksplan> {
@@ -95,11 +96,21 @@ class UttakplanApi {
     }
 
     @GetMapping(FullUttaksplanForTilkjentYtelsePath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Hent full uttaksplan for tilkjent ytelse for gitt saksnummer.")
-    fun hentFullUttaksplanForTilkjentYtelse(@RequestParam saksnummer: Saksnummer): ResponseEntity<ForenkletUttaksplan> {
-        TODO()
+    @Operation(
+        description = "Hent forenklet uttaksplan for behandling.",
+        parameters = [
+            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
+        ]
+    )
+    fun hentFullUttaksplanForTilkjentYtelse(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
+        val behandlingUUIDParsed = try {
+            UUID.fromString(behandlingUUID)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().build()
+        }
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
+        TODO("konverter uttaksplan til forenklet uttaksplan for tilkjent ytelse")
     }
-
 
     private fun hentUttaksplanerOgSlåSammen(saksnummer:Saksnummer): Uttaksplan {
         val uttaksplanListe = uttakRepository.hent(saksnummer)

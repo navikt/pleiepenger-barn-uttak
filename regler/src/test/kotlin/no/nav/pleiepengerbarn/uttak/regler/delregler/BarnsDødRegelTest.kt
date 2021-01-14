@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.util.*
 
 internal class BarnsDødRegelTest {
     private companion object {
@@ -516,6 +517,7 @@ internal class BarnsDødRegelTest {
                 }
 
         return RegelGrunnlag(
+                kildeBehandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(50)
                 ),
@@ -555,6 +557,7 @@ internal class BarnsDødRegelTest {
         val helePerioden = LukketPeriode("2020-01-06/2020-01-12")
         val barnetsDødsdato = LocalDate.parse("2020-01-07")
         return RegelGrunnlag(
+                kildeBehandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(50)
                 ),
@@ -582,6 +585,7 @@ internal class BarnsDødRegelTest {
                         "999" to Uttaksplan(
                                 perioder = mapOf(
                                         helePerioden to InnvilgetPeriode(
+                                                kildeBehandlingUUID = UUID.randomUUID().toString(),
                                                 knekkpunktTyper = setOf(),
                                                 uttaksgrad = denAndreOmsorgsPersonensGrad,
                                                 utbetalingsgrader = mapOf(

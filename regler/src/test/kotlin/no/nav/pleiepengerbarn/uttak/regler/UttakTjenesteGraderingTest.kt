@@ -50,7 +50,8 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder(),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
 
         )
 
@@ -74,7 +75,8 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -96,11 +98,12 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -156,11 +159,12 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak )))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)
-                ).somTilsynperioder()
+                ).somTilsynperioder(),
+                kildeBehandlingUUID = nesteBehandlingId()
 
         )
 
@@ -241,7 +245,8 @@ internal class UttakTjenesteGraderingTest {
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.dividedBy(4), FULL_DAG.dividedBy(4)))
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -310,7 +315,8 @@ TODO: fiks til realistiske arbeidsforhold
                                 LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(20), søkersTilsyn = FULL_DAG.prosent(20)),
                                 LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30))
                         )
-                ).somArbeid()
+                ).somArbeid(),
+                kildeBehandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -356,6 +362,9 @@ TODO: fiks til realistiske arbeidsforhold
         sjekkInnvilget(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
     }
      */
+
+    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
+
 
 }
 

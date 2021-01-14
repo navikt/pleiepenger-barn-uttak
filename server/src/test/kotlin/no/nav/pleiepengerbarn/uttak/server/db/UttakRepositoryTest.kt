@@ -46,25 +46,29 @@ internal class UttakRepositoryTest {
     internal fun `Uttaksplan kan lagres og hentes opp igjen`() {
         val behandlingId = UUID.randomUUID()
 
-        uttakRepository.lagre("123", behandlingId, uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
 
+        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
 
         val uttaksplan = uttakRepository.hent(behandlingId)
         assertThat(uttaksplan).isNotNull
-        assertThat(uttaksplan).isEqualTo(dummyUttaksplan(heleJanuar))
+        assertThat(uttaksplan).isEqualTo(uttakJanuar)
     }
 
     @Test
     internal fun `Ny uttaksplan på samme behanding, skal føre til at den opprinnelig uttaksplanen blir slettet`() {
         val behandlingId = UUID.randomUUID()
 
-        uttakRepository.lagre("123", behandlingId, uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
-        uttakRepository.lagre("123", behandlingId, uttaksplan = dummyUttaksplan(heleFebruar), regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+        val uttakFebruar = dummyUttaksplan(heleFebruar)
+
+        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
 
 
         val uttaksplan = uttakRepository.hent(behandlingId)
         assertThat(uttaksplan).isNotNull
-        assertThat(uttaksplan).isEqualTo(dummyUttaksplan(heleFebruar))
+        assertThat(uttaksplan).isEqualTo(uttakFebruar)
     }
 
 
@@ -73,21 +77,25 @@ internal class UttakRepositoryTest {
     internal fun `Flere behandlinger på samme saksnummer skal kunne hentes ut med nyeste uttaksplan først`() {
         val saksnummer = "123456"
 
-        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = dummyUttaksplan(heleJanuar), regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+        val uttakFebruar = dummyUttaksplan(heleFebruar)
+
+        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
         TimeUnit.MILLISECONDS.sleep(100L) //vent 1/10 sekund
-        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = dummyUttaksplan(heleFebruar), regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
 
 
         val uttaksplanListe = uttakRepository.hent(saksnummer)
         assertThat(uttaksplanListe).hasSize(2)
-        assertThat(uttaksplanListe[0]).isEqualTo(dummyUttaksplan(heleFebruar))
-        assertThat(uttaksplanListe[1]).isEqualTo(dummyUttaksplan(heleJanuar))
+        assertThat(uttaksplanListe[0]).isEqualTo(uttakFebruar)
+        assertThat(uttaksplanListe[1]).isEqualTo(uttakJanuar)
     }
 
 
 
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
+                kildeBehandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)),
                 søknadsperioder = listOf(periode),
                 tilsynsbehov = mapOf(periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
@@ -109,6 +117,7 @@ internal class UttakRepositoryTest {
         return Uttaksplan(
                 perioder = mapOf(
                         periode to InnvilgetPeriode(
+                                kildeBehandlingUUID = UUID.randomUUID().toString(),
                                 uttaksgrad = Prosent(100),
                                 årsak = InnvilgetÅrsak(InnvilgetÅrsaker.FULL_DEKNING, setOf()),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(

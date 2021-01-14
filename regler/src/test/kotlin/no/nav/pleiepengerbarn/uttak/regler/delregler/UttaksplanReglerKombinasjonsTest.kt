@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.util.*
 
 internal class UttaksplanReglerKombinasjonsTest {
 
@@ -167,6 +168,7 @@ internal class UttaksplanReglerKombinasjonsTest {
             barnetsDødsdato: LocalDate?
     ) : RegelGrunnlag {
         return RegelGrunnlag(
+                kildeBehandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         fødselsdato = søkersFødselsdato,
                         dødsdato = søkersDødsdato

@@ -26,6 +26,7 @@ data class Utbetalingsgrader(
 )
 interface UttaksPeriodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
+    fun kildeBehandlingUUID(): BehandlingUUID
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,17 +35,19 @@ interface UttaksPeriodeInfo {
 @JsonTypeName("INNVILGET")
 data class InnvilgetPeriode @JsonCreator constructor(
     private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+    private val kildeBehandlingUUID: BehandlingUUID,
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("årsak") val årsak: InnvilgetÅrsaker,
     @JsonProperty("hjemler") val hjemler: Set<Hjemmel>
-
 ) : UttaksPeriodeInfo {
     constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+                kildeBehandlingUUID: BehandlingUUID,
                 uttaksgrad: Prosent,
                 utbetalingsgrader: List<Utbetalingsgrader>,
                 årsak: InnvilgetÅrsak) : this(
             knekkpunktTyper = knekkpunktTyper,
+            kildeBehandlingUUID = kildeBehandlingUUID,
             uttaksgrad = uttaksgrad,
             utbetalingsgrader = utbetalingsgrader,
             årsak = årsak.årsak,
@@ -52,6 +55,7 @@ data class InnvilgetPeriode @JsonCreator constructor(
     )
 
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
+    @JsonProperty("kildeBehandlingUUID") override fun kildeBehandlingUUID() = kildeBehandlingUUID
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,7 +64,9 @@ data class InnvilgetPeriode @JsonCreator constructor(
 @JsonTypeName("AVSLÅTT")
 data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+        private val kildeBehandlingUUID: BehandlingUUID,
         val årsaker: Set<AvslåttÅrsak>
 ) : UttaksPeriodeInfo {
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
+    @JsonProperty("kildeBehandlingUUID") override fun kildeBehandlingUUID() = kildeBehandlingUUID
 }

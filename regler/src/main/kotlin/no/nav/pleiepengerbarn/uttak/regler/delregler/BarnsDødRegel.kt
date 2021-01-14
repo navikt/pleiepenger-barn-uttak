@@ -64,6 +64,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
         if (!dødeIEnInnvilgetPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
+                    kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
                     dødsdato = dødsdato
             )
         } else {
@@ -123,6 +124,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                         val innvilgetÅrsak = barnetsDødInnvilgetÅrsak(dødsdato)
                         perioder[periode] = InnvilgetPeriode(
                                 knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
+                                kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
                                 uttaksgrad = EtHundreProsent,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                                 årsak = innvilgetÅrsak
@@ -275,8 +277,7 @@ private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalD
  *      - De som allerede var avslått får en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
  *      - De som var innvilget blir avslått med AvslåttÅrsak 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfallet(
-        dødsdato: LocalDate) {
+private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfallet(kildeBehandlingUUID: BehandlingUUID, dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach {
         val periodeInfo = it.value
         if (periodeInfo is AvslåttPeriode) {
@@ -292,6 +293,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
         } else {
             put(it.key, AvslåttPeriode(
                     knekkpunktTyper = periodeInfo.knekkpunktTyper(),
+                    kildeBehandlingUUID = kildeBehandlingUUID,
                     årsaker = setOf(barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak(dødsdato))
             ))
         }

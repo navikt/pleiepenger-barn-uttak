@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.util.*
 
 internal class SøkersAlderRegelTest {
 
@@ -18,6 +19,7 @@ internal class SøkersAlderRegelTest {
         private val helePerioden = LukketPeriode("2020-01-06/2020-01-26")
         private val periode1 = LukketPeriode("2020-01-06/2020-01-12")
         private val periode2 = LukketPeriode("2020-01-21/2020-01-26")
+        private val behandlingUUID = UUID.randomUUID().toString()
     }
 
     @Test
@@ -214,6 +216,7 @@ internal class SøkersAlderRegelTest {
         val fødselsdato = søttiårsdag?.minusYears(70)?: LocalDate.parse("2020-01-19").minusYears(50)
 
         return RegelGrunnlag(
+                kildeBehandlingUUID = behandlingUUID,
                 søker = Søker(
                     fødselsdato = fødselsdato
                 ),
