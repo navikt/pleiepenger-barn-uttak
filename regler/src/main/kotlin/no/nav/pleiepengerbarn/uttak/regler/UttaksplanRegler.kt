@@ -48,7 +48,7 @@ internal object UttaksplanRegler {
             if (avslåttÅrsaker.isNotEmpty()) {
                 perioder[periode] = AvslåttPeriode(
                         knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                        kildeBehandlingUUID = grunnlag.behandlingUUID,
                         årsaker = avslåttÅrsaker
                 )
             } else {
@@ -57,13 +57,13 @@ internal object UttaksplanRegler {
                 if (grader.årsak is AvslåttÅrsak) {
                     perioder[periode] = AvslåttPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                            kildeBehandlingUUID = grunnlag.behandlingUUID,
                             årsaker = setOf(grader.årsak)
                     )
                 } else if (grader.årsak is InnvilgetÅrsak) {
                     perioder[periode] = InnvilgetPeriode(
                             knekkpunktTyper = knekkpunktTyper,
-                            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                            kildeBehandlingUUID = grunnlag.behandlingUUID,
                             uttaksgrad = grader.uttaksgrad,
                             utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
                             årsak = grader.årsak.årsak,

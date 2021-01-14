@@ -216,7 +216,7 @@ internal class SøkersAlderRegelTest {
         val fødselsdato = søttiårsdag?.minusYears(70)?: LocalDate.parse("2020-01-19").minusYears(50)
 
         return RegelGrunnlag(
-                kildeBehandlingUUID = behandlingUUID,
+                behandlingUUID = behandlingUUID,
                 søker = Søker(
                     fødselsdato = fødselsdato
                 ),

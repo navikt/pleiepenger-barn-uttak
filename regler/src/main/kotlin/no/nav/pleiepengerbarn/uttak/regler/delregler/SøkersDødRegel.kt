@@ -25,14 +25,14 @@ internal class SøkersDødRegel : UttaksplanRegel {
                 ?.takeUnless { it.key.tom.isEqual(dødsdato) }
                 ?.apply {
                     perioder.dødeIEnUttaksperiode(
-                            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                            kildeBehandlingUUID = grunnlag.behandlingUUID,
                             dødsdato = dødsdato,
                             uttaksperiode = this
                     )
                 }
 
         perioder.avslåAllePerioderEtterDødsfall(
-                kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
                 dødsdato = dødsdato
         )
 

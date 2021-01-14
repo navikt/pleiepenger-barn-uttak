@@ -40,7 +40,7 @@ internal class SøkersAlderRegel : UttaksplanRegel {
                 }
 
         perioder.avslåAllePerioderEtterSøttiårsdag(
-            kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+            kildeBehandlingUUID = grunnlag.behandlingUUID,
             søkersSøttiårsdag = søkersSøttiårsdag
         )
 

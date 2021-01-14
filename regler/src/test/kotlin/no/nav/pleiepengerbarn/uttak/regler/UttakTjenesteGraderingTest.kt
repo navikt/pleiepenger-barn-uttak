@@ -51,7 +51,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
 
         )
 
@@ -76,7 +76,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -103,7 +103,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -164,7 +164,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)
                 ).somTilsynperioder(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
 
         )
 
@@ -246,7 +246,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.dividedBy(4), FULL_DAG.dividedBy(4)))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -316,7 +316,7 @@ TODO: fiks til realistiske arbeidsforhold
                                 LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30))
                         )
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)

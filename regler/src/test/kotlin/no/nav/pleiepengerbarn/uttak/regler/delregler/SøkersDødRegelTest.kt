@@ -323,7 +323,7 @@ internal class SøkersDødRegelTest {
     private fun Uttaksplan.dummyGrunnlag(søkersDødsdato: LocalDate?): RegelGrunnlag {
         val overordnetPeriode = perioder.keys.overordnetPeriode()
         return RegelGrunnlag(
-                kildeBehandlingUUID = behandlingUUID,
+                behandlingUUID = behandlingUUID,
                 søker = Søker(
                         fødselsdato = søkersDødsdato?:LocalDate.now().minusYears(50),
                         dødsdato = søkersDødsdato

@@ -95,7 +95,7 @@ internal class UttakRepositoryTest {
 
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
-                kildeBehandlingUUID = UUID.randomUUID().toString(),
+                behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)),
                 søknadsperioder = listOf(periode),
                 tilsynsbehov = mapOf(periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),

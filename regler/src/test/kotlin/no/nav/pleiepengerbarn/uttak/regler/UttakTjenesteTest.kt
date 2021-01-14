@@ -35,7 +35,7 @@ internal class UttakTjenesteTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -64,7 +64,7 @@ internal class UttakTjenesteTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -90,7 +90,7 @@ internal class UttakTjenesteTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -146,7 +146,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -176,7 +176,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                                 periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(80), FULL_DAG.prosent(80))
                         )
                 ).somArbeid(),
-                kildeBehandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)

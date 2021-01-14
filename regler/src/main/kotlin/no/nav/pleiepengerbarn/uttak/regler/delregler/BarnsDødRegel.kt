@@ -64,7 +64,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
         if (!dødeIEnInnvilgetPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
-                    kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                    kildeBehandlingUUID = grunnlag.behandlingUUID,
                     dødsdato = dødsdato
             )
         } else {
@@ -124,7 +124,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                         val innvilgetÅrsak = barnetsDødInnvilgetÅrsak(dødsdato)
                         perioder[periode] = InnvilgetPeriode(
                                 knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
-                                kildeBehandlingUUID = grunnlag.kildeBehandlingUUID,
+                                kildeBehandlingUUID = grunnlag.behandlingUUID,
                                 uttaksgrad = EtHundreProsent,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                                 årsak = innvilgetÅrsak
