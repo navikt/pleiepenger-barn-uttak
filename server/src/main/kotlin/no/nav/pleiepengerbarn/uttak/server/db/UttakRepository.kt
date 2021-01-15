@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.pleiepengerbarn.uttak.kontrakter.BehandlingUUID
 import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -52,6 +53,25 @@ internal class UttakRepository {
 
         return uttaksplanJSONListe.map { json -> fraJSON(json) }
     }
+
+    fun hentForrige(saksnummer: Saksnummer, behandlingUUID: UUID): Uttaksplan? {
+        val forrigeBehandlingUUID = finnForrigeBehandlingUUID(saksnummer, behandlingUUID) ?: return null
+        return hent(forrigeBehandlingUUID)
+    }
+
+    private fun finnForrigeBehandlingUUID(saksnummer: Saksnummer, behandlingUUID: UUID): UUID? {
+        val behandlingUUIDer = jdbcTemplate.query("select behandling_id from uttaksresultat where saksnummer = ? and slettet=false order by opprettet_tid",
+            {resultSet, _ -> UUID.fromString(resultSet.getString("behandling_id"))},
+            saksnummer)
+
+        for ((i, b) in behandlingUUIDer.withIndex()) {
+            if (b == behandlingUUID) {
+                return if (i == 0) null else behandlingUUIDer[i - 1]
+            }
+        }
+        return null
+    }
+
 
     private fun slettTidligereUttaksplan(behandlingId: UUID) {
         jdbcTemplate.update("update uttaksresultat set slettet=true where behandling_id=?", behandlingId)

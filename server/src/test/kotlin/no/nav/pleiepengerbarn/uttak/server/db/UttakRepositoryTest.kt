@@ -31,6 +31,7 @@ internal class UttakRepositoryTest {
 
     private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
     private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
+    private val heleMars = LukketPeriode(LocalDate.of(2020, Month.MARCH, 1), LocalDate.of(2020, Month.MARCH, 31))
 
     private val arbeidsforhold1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
 
@@ -81,7 +82,7 @@ internal class UttakRepositoryTest {
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
         uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
-        TimeUnit.MILLISECONDS.sleep(100L) //vent 1/10 sekund
+        TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
         uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
 
 
@@ -92,6 +93,61 @@ internal class UttakRepositoryTest {
     }
 
 
+    @Test
+    internal fun `Skal ikke finne forrige behandling når det er en behandling`() {
+        val saksnummer = "123456"
+        val behandlingUUID1 = UUID.randomUUID()
+
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+
+        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID1)
+
+        assertThat(forrigeUttaksplan).isNull()
+    }
+
+    @Test
+    internal fun `Skal finne forrige behandling når det er to behandlinger`() {
+        val saksnummer = "123456"
+        val behandlingUUID1 = UUID.randomUUID()
+        val behandlingUUID2 = UUID.randomUUID()
+
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+        val uttakFebruar = dummyUttaksplan(heleFebruar)
+
+        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
+        uttakRepository.lagre(saksnummer, behandlingUUID2, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID2)
+
+        assertThat(forrigeUttaksplan).isNotNull()
+        assertThat(forrigeUttaksplan).isEqualTo(uttakJanuar)
+    }
+
+    @Test
+    internal fun `Skal finne forrige behandling når det er tre behandlinger`() {
+        val saksnummer = "123456"
+        val behandlingUUID1 = UUID.randomUUID()
+        val behandlingUUID2 = UUID.randomUUID()
+        val behandlingUUID3 = UUID.randomUUID()
+
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+        val uttakFebruar = dummyUttaksplan(heleFebruar)
+        val uttakMars = dummyUttaksplan(heleMars)
+
+        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
+        uttakRepository.lagre(saksnummer, behandlingUUID2, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
+        uttakRepository.lagre(saksnummer, behandlingUUID3, uttaksplan = uttakMars, regelGrunnlag = dummyRegelGrunnlag(heleMars))
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID3)
+
+        assertThat(forrigeUttaksplan).isNotNull()
+        assertThat(forrigeUttaksplan).isEqualTo(uttakFebruar)
+    }
 
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
