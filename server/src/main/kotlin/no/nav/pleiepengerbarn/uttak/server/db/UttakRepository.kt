@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.pleiepengerbarn.uttak.kontrakter.BehandlingUUID
 import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -68,6 +67,10 @@ internal class UttakRepository {
             if (b == behandlingUUID) {
                 return if (i == 0) null else behandlingUUIDer[i - 1]
             }
+        }
+        if (behandlingUUIDer.isNotEmpty()) {
+            //Dersom behandling ikke er funner er siste behandling forrige behandling.
+            return behandlingUUIDer[0]
         }
         return null
     }

@@ -149,6 +149,30 @@ internal class UttakRepositoryTest {
         assertThat(forrigeUttaksplan).isEqualTo(uttakFebruar)
     }
 
+    @Test
+    internal fun `Skal finne forrige behandling når det ikke er registrert noen uttaksplan på nåværende behandling`() {
+        val saksnummer = "123456"
+        val behandlingUUID1 = UUID.randomUUID()
+
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+
+        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, UUID.randomUUID())
+
+        assertThat(forrigeUttaksplan).isNotNull()
+        assertThat(forrigeUttaksplan).isEqualTo(uttakJanuar)
+    }
+
+    @Test
+    internal fun `Skal ikke finne forrige behandling når det ikke er registrert noen uttaksplan på saken`() {
+        val saksnummer = "123456"
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, UUID.randomUUID())
+
+        assertThat(forrigeUttaksplan).isNull()
+    }
+
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
