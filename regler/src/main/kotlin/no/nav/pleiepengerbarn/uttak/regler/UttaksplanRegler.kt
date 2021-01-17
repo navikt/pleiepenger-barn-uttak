@@ -141,3 +141,7 @@ internal object UttaksplanRegler {
     }
 
 }
+
+
+private const val BeregningAvGrader = "BeregningAvGrader"
+private fun Årsaksbygger.startBeregningAvGraderMed(hjemler: Set<Hjemmel>) = hjemler(BeregningAvGrader, hjemler)

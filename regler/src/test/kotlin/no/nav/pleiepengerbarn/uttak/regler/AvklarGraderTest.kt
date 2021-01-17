@@ -20,7 +20,7 @@ internal class AvklarGraderTest {
     //TODO: Sjekk på årsaker også i alle testene
 
     @Test
-    internal fun `100 % vanlig uttak`() {
+    internal fun `100 prosent vanlig uttak`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
             ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
@@ -33,7 +33,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `50 % vanlig uttak`() {
+    internal fun `50 prosent vanlig uttak`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
@@ -46,7 +46,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `50 % uttak når annen part også tar ut 50 %`() {
+    internal fun `50 prosent uttak når annen part også tar ut 50 prosent`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.dividedBy(2), søkersTilsyn = FULL_DAG.dividedBy(2))
         ))
@@ -59,7 +59,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `100 % uttak når annen part også tar ut 50 %, men tilsynsbehovet er 200%`() {
+    internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men tilsynsbehovet er 200 prosent`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
@@ -72,7 +72,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `100 % arbeid når annen part også tar ut 50 % blir redusert`() {
+    internal fun `100 prosent arbeid når annen part også tar ut 50 prosent blir redusert`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG, søkersTilsyn = FULL_DAG)
         ))
@@ -86,7 +86,7 @@ internal class AvklarGraderTest {
 
 
     @Test
-    internal fun `50% arbeid av en stilling på 10 timer, skal gi 50 % uttaksgrad og utbetalingsgrad`() {
+    internal fun `50 prosent arbeid av en stilling på 10 timer, skal gi 50 prosent uttaksgrad og utbetalingsgrad`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(10), taptArbeidstid = Duration.ofHours(5), søkersTilsyn = Duration.ofHours(5))
         ))
@@ -99,7 +99,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `100% fravær hos 2 arbeidsgivere`() {
+    internal fun `100 prosent fravær hos 2 arbeidsgivere`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(3), søkersTilsyn = Duration.ofHours(3)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30))
@@ -130,7 +130,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mindre enn en 100 % stilling`() {
+    internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mindre enn en 100 prosent stilling`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofHours(1).plusMinutes(30), søkersTilsyn = Duration.ofHours(1).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), taptArbeidstid = Duration.ofMinutes(45), søkersTilsyn = Duration.ofMinutes(45))
@@ -145,7 +145,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mer enn en 100 % stilling`() {
+    internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mer enn en 100 prosent stilling`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(2), søkersTilsyn = Duration.ofHours(2)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(2), søkersTilsyn = Duration.ofHours(2))
@@ -160,7 +160,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Søker vil ha 100 % uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 % av 100 % tilsynsbehov`() {
+    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 100 prosent tilsynsbehov`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
@@ -175,7 +175,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Søker vil ha 100 % uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 % av 200 % tilsynsbehov`() {
+    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 200 prosent tilsynsbehov`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), taptArbeidstid = Duration.ofHours(4).plusMinutes(30), søkersTilsyn = Duration.ofHours(4).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), taptArbeidstid = Duration.ofHours(4), søkersTilsyn = Duration.ofHours(4))
@@ -203,7 +203,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Etablert tilsyn og delvis arbeid som tilsammen er under 100% skal føre til at søkt periode blir innvilget`() {
+    internal fun `Etablert tilsyn og delvis arbeid som tilsammen er under 100 prosent skal føre til at søkt periode blir innvilget`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30)),
         ))
@@ -216,7 +216,7 @@ internal class AvklarGraderTest {
     }
 
     @Test
-    internal fun `Etablert tilsyn og delvis arbeid som tilsammen går utover 100% skal føre til reduserte grader`() {
+    internal fun `Etablert tilsyn og delvis arbeid som tilsammen går utover 100 prosent skal føre til reduserte grader`() {
         val grader = AvklarGrader.avklarGrader(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(60), søkersTilsyn = FULL_DAG.prosent(60)),
         ))

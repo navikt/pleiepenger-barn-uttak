@@ -147,7 +147,7 @@ internal class UttakTjenesteGraderingTest {
      */
 
     @Test
-    fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80% skal føre til avslag`() {
+    fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
