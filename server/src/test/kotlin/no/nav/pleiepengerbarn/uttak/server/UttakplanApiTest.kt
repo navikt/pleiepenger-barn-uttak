@@ -99,9 +99,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val saksnummer = nesteSaksnummer()
 
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-10").opprettUttaksplan()
-        lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
-
-        val uttaksplan = hentFullUttaksplan(saksnummer)
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
 
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-10"))
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-11/2020-01-20"))
@@ -112,9 +110,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val saksnummer = nesteSaksnummer()
 
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
-        lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
-
-        val uttaksplan = hentFullUttaksplan(saksnummer)
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(2)
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
@@ -126,9 +122,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val saksnummer = nesteSaksnummer()
 
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
-        lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
-
-        val uttaksplan = hentFullUttaksplan(saksnummer)
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(3)
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
@@ -142,21 +136,11 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val saksnummer = nesteSaksnummer()
 
         lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
-        lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
-
-        val uttaksplan = hentFullUttaksplan(saksnummer)
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(1)
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-20"))
     }
-
-
-    private fun hentFullUttaksplan(saksnummer: Saksnummer): Uttaksplan {
-        val response = testClient.hentUttaksplan(saksnummer)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        return response.body ?: fail("Mangler uttaksplan")
-    }
-
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)

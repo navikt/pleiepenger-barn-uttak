@@ -56,7 +56,11 @@ class UttakplanApi {
         }
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
 
-        val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
+        var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
+        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        if (forrigeUttaksplan != null) {
+            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan, forrigeUttaksplan))
+        }
 
         if (lagre) {
             uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
