@@ -29,11 +29,5 @@ data class Arbeidsforhold(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ArbeidsforholdPeriodeInfo(
     @JsonProperty("jobberNormalt") val jobberNormalt: Duration,
-    @JsonProperty("taptArbeidstid") val taptArbeidstid: Duration,
-    @JsonProperty("søkersTilsyn") val søkersTilsyn: Duration
-) {
-    init {
-        require(taptArbeidstid <= jobberNormalt) {"Tapt arbeidstid ($taptArbeidstid) kan ikke være mer en jobber normalt ($jobberNormalt)."}
-        require(søkersTilsyn <= Duration.ofHours(7).plusMinutes(30)) {"Søkers tilsyn ($søkersTilsyn) kan ikke være mer enn 7 timer og 30 minutter."}
-    }
-}
+    @JsonProperty("taptArbeidstid") val jobberNå: Duration?
+)

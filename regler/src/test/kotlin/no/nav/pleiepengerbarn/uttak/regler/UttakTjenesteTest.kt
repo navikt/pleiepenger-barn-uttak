@@ -15,6 +15,7 @@ internal class UttakTjenesteTest {
 
     private companion object {
         private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
+        private val INGENTING = Duration.ZERO
     }
 
     private val arbeidsforhold1 = UUID.randomUUID().toString()
@@ -33,7 +34,7 @@ internal class UttakTjenesteTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -62,7 +63,7 @@ internal class UttakTjenesteTest {
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -88,7 +89,7 @@ internal class UttakTjenesteTest {
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -144,7 +145,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                 søknadsperioder = listOf(søknadsperiode),
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -172,8 +173,8 @@ TODO: fiks når tilsyn er ordentlig implementert
                 søknadsperioder = listOf(søknadsperiode),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG),
-                                periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(80), FULL_DAG.prosent(80))
+                                periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING),
+                                periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(20))
                         )
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()

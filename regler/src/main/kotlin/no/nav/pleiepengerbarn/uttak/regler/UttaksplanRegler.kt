@@ -85,13 +85,13 @@ internal object UttaksplanRegler {
         return uttaksplan
     }
 
-    private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): AvklarteGrader {
+    private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): GraderBeregnet {
         val tilsynsbehov = grunnlag.finnTilsynsbehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
 
-        return AvklarGrader.avklarGrader(tilsynsbehov = tilsynsbehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+        return BeregnGrader.beregn(tilsynsbehov = tilsynsbehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
     }
 
     private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): TilsynsbehovStørrelse {

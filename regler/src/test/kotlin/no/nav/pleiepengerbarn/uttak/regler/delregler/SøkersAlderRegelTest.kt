@@ -94,7 +94,7 @@ internal class SøkersAlderRegelTest {
         sjekkInnvilget(
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 uttaksplan = uttaksplan,
-                forventetGrad = Prosent(25),
+                forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
@@ -129,7 +129,7 @@ internal class SøkersAlderRegelTest {
         sjekkInnvilget(
                 forventetPeriode = periode1,
                 uttaksplan = uttaksplan,
-                forventetGrad = Prosent(25),
+                forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
@@ -158,7 +158,7 @@ internal class SøkersAlderRegelTest {
         sjekkInnvilget(
                 forventetPeriode = periode1,
                 uttaksplan = uttaksplan,
-                forventetGrad = Prosent(25),
+                forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
                 forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
         )
@@ -224,8 +224,7 @@ internal class SøkersAlderRegelTest {
                         "123" to mapOf(
                                 periode1 to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(3).plusMinutes(45),
-                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45).prosent(50),
-                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45).prosent(50)
+                                        jobberNå = Duration.ofHours(3).plusMinutes(45).prosent(50)
                                 )
                         )
                 ).somArbeid(),

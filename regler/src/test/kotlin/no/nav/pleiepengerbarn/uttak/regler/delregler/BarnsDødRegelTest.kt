@@ -42,7 +42,7 @@ internal class BarnsDødRegelTest {
     @Test
     internal fun `Om barnet dør i en periode man er avkortet grunnet annen omsorgsperson skal denne avkortingen opphøre`() {
         val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
-                denAndreOmsorgsPersonensGrad = Prosent(80)
+                denAndreOmsorgspersonensGrad = Prosent(80)
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
                 dødsdato = null
@@ -103,7 +103,7 @@ internal class BarnsDødRegelTest {
     @Test
     internal fun `Om barnet dør i en periode man har fått avslag grunnet annen omsorgsperson forblir det et avslag`() {
         val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
-                denAndreOmsorgsPersonensGrad = Prosent(81)
+                denAndreOmsorgspersonensGrad = Prosent(81)
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
                 dødsdato = null
@@ -528,8 +528,7 @@ internal class BarnsDødRegelTest {
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45),
-                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45)
+                                        jobberNå = Duration.ofHours(3).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),
@@ -552,7 +551,7 @@ internal class BarnsDødRegelTest {
     }
 
     private fun lagGrunnlagMedAnnenOmsorgsperson(
-            denAndreOmsorgsPersonensGrad: Prosent
+        denAndreOmsorgspersonensGrad: Prosent
     ) : RegelGrunnlag {
         val helePerioden = LukketPeriode("2020-01-06/2020-01-12")
         val barnetsDødsdato = LocalDate.parse("2020-01-07")
@@ -568,8 +567,7 @@ internal class BarnsDødRegelTest {
                         "123" to mapOf(
                                 helePerioden to ArbeidsforholdPeriodeInfo(
                                         jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                        taptArbeidstid = Duration.ofHours(3).plusMinutes(45),
-                                        søkersTilsyn = Duration.ofHours(3).plusMinutes(45)
+                                        jobberNå = Duration.ofHours(3).plusMinutes(45)
                                 )
                         )
                 ).somArbeid(),
@@ -587,7 +585,7 @@ internal class BarnsDødRegelTest {
                                         helePerioden to InnvilgetPeriode(
                                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                                 knekkpunktTyper = setOf(),
-                                                uttaksgrad = denAndreOmsorgsPersonensGrad,
+                                                uttaksgrad = denAndreOmsorgspersonensGrad,
                                                 utbetalingsgrader = mapOf(
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),

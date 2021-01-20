@@ -14,7 +14,8 @@ import java.util.*
 internal class UttakTjenesteGraderingTest {
 
     private companion object {
-        private val FULL_DAG: Duration = Duration.ofHours(7).plusMinutes(30)
+        private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
+        private val INGENTING = Duration.ZERO
     }
 
     private val arbeidsforhold1 = UUID.randomUUID().toString()
@@ -49,7 +50,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Prosent(20)
                 ).somTilsynperioder(),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
 
@@ -74,7 +75,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -101,7 +102,7 @@ internal class UttakTjenesteGraderingTest {
                         "999" to Uttaksplan(perioder = mapOf(helePerioden to InnvilgetPeriode(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartInnvilgetÅrsak)))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -164,7 +165,8 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)
                 ).somTilsynperioder(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingId(),
+                arbeid = listOf(Arbeid(Arbeidsforhold(type="frilans"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))))
 
         )
 
@@ -244,7 +246,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.dividedBy(4), FULL_DAG.dividedBy(4)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.prosent(25)))
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()
         )
@@ -252,7 +254,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(50)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        sjekkInnvilget(uttaksplan, helePerioden, Prosent(50), mapOf(arbeidsforhold1 to Prosent(50)), InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
     }
 
 /*
@@ -311,9 +313,9 @@ TODO: fiks til realistiske arbeidsforhold
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(10), søkersTilsyn = FULL_DAG.prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(20), søkersTilsyn = FULL_DAG.prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(90)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(80)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70))
                         )
                 ).somArbeid(),
                 behandlingUUID = nesteBehandlingId()

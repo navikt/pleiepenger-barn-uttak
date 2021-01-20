@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class UttaksgradResultat(
         val uttaksgrad: Prosent,
-        val justeringsfaktor: Prosent,
         val innvilgetÅrsak: InnvilgetÅrsaker? = null,
         val avslåttÅrsak: AvslåttÅrsaker? = null
 ) {

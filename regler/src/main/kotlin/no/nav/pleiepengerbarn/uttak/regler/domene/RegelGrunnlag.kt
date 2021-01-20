@@ -10,7 +10,7 @@ data class RegelGrunnlag(
         val søker: Søker,
         val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
         val søknadsperioder: List<LukketPeriode>,
-        val arbeid: List<Arbeid> = listOf(),
+        val arbeid: List<Arbeid>,
         val tilsynsperioder:Map<LukketPeriode, Duration> = mapOf(),
         val lovbestemtFerie:List<LukketPeriode> = listOf(),
         val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),

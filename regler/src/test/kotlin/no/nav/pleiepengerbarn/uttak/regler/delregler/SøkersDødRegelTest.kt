@@ -331,7 +331,8 @@ internal class SøkersDødRegelTest {
                 tilsynsbehov = mapOf(
                         overordnetPeriode to Tilsynsbehov(prosent = TilsynsbehovStørrelse.PROSENT_100)
                 ),
-                søknadsperioder = listOf(overordnetPeriode)
+                søknadsperioder = listOf(overordnetPeriode),
+                arbeid = listOf()
         )
     }
 }

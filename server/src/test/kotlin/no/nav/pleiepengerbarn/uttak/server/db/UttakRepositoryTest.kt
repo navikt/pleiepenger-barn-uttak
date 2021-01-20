@@ -185,8 +185,8 @@ internal class UttakRepositoryTest {
                                 perioder = mapOf(
                                         periode to ArbeidsforholdPeriodeInfo(
                                                 jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                                taptArbeidstid = Duration.ofHours(7).plusMinutes(30),
-                                                søkersTilsyn = Duration.ofHours(7).plusMinutes(30))
+                                                jobberNå = Duration.ofHours(7).plusMinutes(30)
+                                        )
                                 )
                         )
                 )
