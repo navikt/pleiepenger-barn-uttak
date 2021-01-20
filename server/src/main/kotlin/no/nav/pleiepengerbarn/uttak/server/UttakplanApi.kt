@@ -25,7 +25,6 @@ class UttakplanApi {
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
-        const val FullUttaksplanPath = "/uttaksplan/full"
         const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val BehandlingUUID = "behandlingUUID"
@@ -88,14 +87,6 @@ class UttakplanApi {
         }
 
         val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(uttaksplan)
-    }
-
-    // TODO: denne skal bort.
-    @GetMapping(FullUttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Hent full uttaksplan for gitt saksnummer.")
-    fun hentFullUttaksplan(@RequestParam saksnummer: Saksnummer): ResponseEntity<Uttaksplan> {
-        val uttaksplan = hentUttaksplanerOgSlåSammen(saksnummer)
         return ResponseEntity.ok(uttaksplan)
     }
 

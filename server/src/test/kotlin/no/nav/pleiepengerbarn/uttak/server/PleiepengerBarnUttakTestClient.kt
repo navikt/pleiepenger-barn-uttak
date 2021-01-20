@@ -13,12 +13,13 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
         return restTemplate.exchange(UttakplanApi.UttaksplanPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, HttpHeaders()), Uttaksplan::class.java)
     }
 
-    internal fun hentUttaksplan(saksnummer: Saksnummer): ResponseEntity<Uttaksplan> {
-        return restTemplate.exchange(UttakplanApi.FullUttaksplanPath + "?saksnummer=$saksnummer", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), Uttaksplan::class.java)
+    internal fun hentUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
+        return restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), Uttaksplan::class.java)
     }
 
-
-
+    internal fun hentForenkletUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
+        return restTemplate.exchange(UttakplanApi.FullUttaksplanForTilkjentYtelsePath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), ForenkletUttaksplan::class.java)
+    }
 
 }
 
