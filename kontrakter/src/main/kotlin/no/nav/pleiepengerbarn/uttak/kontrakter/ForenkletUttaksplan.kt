@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.*
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ForenkletUttaksplan @JsonCreator constructor(
-    @JsonProperty("saksnummer") val saksnummer:Saksnummer,
-    @JsonProperty("aktiviteter") var aktiviteter:List<Aktivitet> = listOf(),
+    @JsonProperty("aktiviteter") var aktiviteter:List<Aktivitet> ,
 
 )
 
@@ -16,7 +15,7 @@ data class ForenkletUttaksplan @JsonCreator constructor(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Aktivitet @JsonCreator constructor(
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
-    @JsonProperty("uttaksperioder") var uttaksperioder:List<ForenkletUttaksperiode> = listOf()
+    @JsonProperty("uttaksperioder") var uttaksperioder:List<ForenkletUttaksperiode>
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

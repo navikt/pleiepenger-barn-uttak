@@ -104,7 +104,7 @@ class UttakplanApi {
             return ResponseEntity.badRequest().build()
         }
         val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
-        TODO("konverter uttaksplan til forenklet uttaksplan for tilkjent ytelse")
+        return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
     }
 
     private fun hentUttaksplanerOgSlåSammen(saksnummer:Saksnummer): Uttaksplan {
