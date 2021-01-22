@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.time.Duration
 
 data class RegelGrunnlag(
-        val forrigeBehandlingUUID: BehandlingUUID? = null,
         val behandlingUUID: BehandlingUUID,
         val barn: Barn = Barn(),
         val søker: Søker,

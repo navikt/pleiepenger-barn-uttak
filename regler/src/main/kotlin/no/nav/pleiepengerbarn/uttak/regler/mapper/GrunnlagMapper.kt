@@ -19,7 +19,6 @@ object GrunnlagMapper {
         }
 
         return RegelGrunnlag(
-                forrigeBehandlingUUID = uttaksgrunnlag.forrigeBehandlingUUID,
                 behandlingUUID = uttaksgrunnlag.behandlingUUID,
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
