@@ -1,6 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.testklient.*
+import no.nav.pleiepengerbarn.uttak.testklient.ARBEIDSFORHOLD1
+import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
+import no.nav.pleiepengerbarn.uttak.testklient.INGENTING
+import no.nav.pleiepengerbarn.uttak.testklient.PleiepengerBarnUttakTestClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,8 +18,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Duration
-import java.time.LocalDate
-import java.util.*
 import kotlin.test.fail
 
 
@@ -25,20 +28,7 @@ import kotlin.test.fail
 @Tag("integration")
 internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
-    private val testClient = PleiepengerBarnUttakTestClient(restTemplate)
-
-    private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
-    private val INGENTING = Duration.ZERO
-
-    private val HUNDREPROSENT = Prosent(100)
-
-    private val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
-
-    private val ARBEIDSFORHOLD1 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789")
-    private val ARBEIDSFORHOLD2 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD3 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD4 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD5 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
+    private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
@@ -151,8 +141,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), innvilgetÅrsak: InnvilgetÅrsaker = InnvilgetÅrsaker.FULL_DEKNING) {
-        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
-        when (periodeInfo) {
+        when (val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")) {
             is InnvilgetPeriode -> {
                 assertThat(periodeInfo.årsak).isEqualTo(innvilgetÅrsak)
                 assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
@@ -166,8 +155,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     private fun Uttaksplan.assertAvslått(periode: LukketPeriode, avslåttÅrsaker: Set<AvslåttÅrsaker> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
-        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
-        when (periodeInfo) {
+        when (val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")) {
             is AvslåttPeriode -> {
                 val årsaker = periodeInfo.årsaker.map { it.årsak } .toSet()
                 assertThat(årsaker).isEqualTo(avslåttÅrsaker)
@@ -181,40 +169,4 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return this.multipliedBy(prosent).dividedBy(100)
     }
 
-    private fun lagGrunnlag(saksnummer: Saksnummer, periode: String): Uttaksgrunnlag {
-        val søknadsperiode = LukketPeriode(periode)
-        return lagGrunnlag(
-            saksnummer = saksnummer,
-            søknadsperiode = søknadsperiode,
-            arbeid = listOf(
-                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
-            ),
-            tilsynsbehov = mapOf(søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
-        )
-    }
-
-    private fun lagGrunnlag(
-        søknadsperiode: LukketPeriode,
-        arbeid: List<Arbeid>,
-        tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
-        tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
-        søker: Søker = Søker(LocalDate.parse("2000-01-01")),
-        saksnummer: Saksnummer = nesteSaksnummer(),
-        behandlingUUID: BehandlingUUID = nesteBehandlingId()
-    ): Uttaksgrunnlag {
-        return Uttaksgrunnlag(
-                søker = søker,
-                saksnummer = saksnummer,
-                behandlingUUID = behandlingUUID,
-                søknadsperioder = listOf(søknadsperiode),
-                arbeid = arbeid,
-                tilsynsbehov = tilsynsbehov,
-                tilsynsperioder = tilsynsperioder,
-                medlemskap = mapOf(HELE_2020 to Medlemskap()) //TODO: endret når medlemskap er implementert
-        )
-    }
-
-
-    private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
-    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
 }

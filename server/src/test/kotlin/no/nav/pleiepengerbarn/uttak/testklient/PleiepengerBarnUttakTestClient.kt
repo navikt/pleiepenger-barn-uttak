@@ -1,7 +1,9 @@
-package no.nav.pleiepengerbarn.uttak.server
+package no.nav.pleiepengerbarn.uttak.testklient
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.server.UttakplanApi
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -23,3 +25,8 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
 
 }
 
+internal fun testClientMotLokalServer(): PleiepengerBarnUttakTestClient {
+    val restTemplateBuilder = RestTemplateBuilder()
+        .rootUri("http://localhost:8080/pleiepenger-barn-uttak/")
+    return PleiepengerBarnUttakTestClient(TestRestTemplate(restTemplateBuilder))
+}
