@@ -600,7 +600,7 @@ internal class BarnsDødRegelTest {
         )
     }
 
-    private fun Uttaksplan.uttaksPeriodeInfoSomInneholder(dato: LocalDate) : UttaksPeriodeInfo {
+    private fun Uttaksplan.uttaksPeriodeInfoSomInneholder(dato: LocalDate) : UttaksperiodeInfo {
         return perioder.filterKeys { it.inneholder(dato) }.values.firstOrNull() ?: throw IllegalStateException("Fant ikke uttaksperide mot tom=$dato")
     }
 }

@@ -2,13 +2,17 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
 
-typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
+typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksperiodeInfo>
+
+enum class Utfall {
+    INNVILGET,AVSLÅTT
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan(
-        @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
+        @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,7 +28,7 @@ data class Utbetalingsgrader(
         JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "INNVILGET"),
         JsonSubTypes.Type(value = AvslåttPeriode::class, name = "AVSLÅTT")
 )
-interface UttaksPeriodeInfo {
+interface UttaksperiodeInfo {
     fun knekkpunktTyper() : Set<KnekkpunktType>
     fun kildeBehandlingUUID(): BehandlingUUID
 }
@@ -40,7 +44,7 @@ data class InnvilgetPeriode @JsonCreator constructor(
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("årsak") val årsak: InnvilgetÅrsaker,
     @JsonProperty("hjemler") val hjemler: Set<Hjemmel>
-) : UttaksPeriodeInfo {
+) : UttaksperiodeInfo {
     constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
                 kildeBehandlingUUID: BehandlingUUID,
                 uttaksgrad: Prosent,
@@ -66,7 +70,7 @@ data class AvslåttPeriode(
         private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
         private val kildeBehandlingUUID: BehandlingUUID,
         val årsaker: Set<AvslåttÅrsak>
-) : UttaksPeriodeInfo {
+) : UttaksperiodeInfo {
     @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
     @JsonProperty("kildeBehandlingUUID") override fun kildeBehandlingUUID() = kildeBehandlingUUID
 }

@@ -18,7 +18,7 @@ internal fun Uttaksplan.tilForenkletUttaksplan(): ForenkletUttaksplan {
     return ForenkletUttaksplan(aktiviteter = aktiviteter)
 }
 
-private fun UttaksPeriodeInfo.tilForenkletUttaksperiode(periode: LukketPeriode, arbeidsforhold: Arbeidsforhold): ForenkletUttaksperiode {
+private fun UttaksperiodeInfo.tilForenkletUttaksperiode(periode: LukketPeriode, arbeidsforhold: Arbeidsforhold): ForenkletUttaksperiode {
     return when (val periodeInfo = this) {
         is InnvilgetPeriode -> {
             ForenkletUttaksperiode(periode = periode, innvilget = true, utbetalingsgrad = periodeInfo.utbetalingsgrader.finnFor(arbeidsforhold))

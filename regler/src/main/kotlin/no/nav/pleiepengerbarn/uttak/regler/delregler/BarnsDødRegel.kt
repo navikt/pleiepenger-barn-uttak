@@ -164,7 +164,7 @@ private fun List<LukketPeriode>.plussDelenAvSorgperiodenSomIkkeInngårIUttakplan
  *      1) FOM til dødsdato - UttaksPeriodeInfo forblir som det var
  *      2) (dødsdato + 1 dag) til TOM - UtttaksPeriodeInfo forblir som det var, med knekkpunkt 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBarnetDøde(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.knekkUttaksperiodenDaBarnetDøde(
         dødsdato: LocalDate,
         uttaksperiodeDaBarnetDøde: Uttaksperiode?) {
     uttaksperiodeDaBarnetDøde?.takeUnless { it.key.tom.isEqual(dødsdato) }?.apply {
@@ -204,7 +204,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
  *    men med ny utbetalingsgrad; 100%
  */
 private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
-        perioder: Map<LukketPeriode, UttaksPeriodeInfo>
+        perioder: Map<LukketPeriode, UttaksperiodeInfo>
 ) : Map<LukketPeriode, List<Utbetalingsgrader>> {
     val innvilgedePerioder = perioder
             .filterValues { it is InnvilgetPeriode }
@@ -277,7 +277,7 @@ private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalD
  *      - De som allerede var avslått får en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
  *      - De som var innvilget blir avslått med AvslåttÅrsak 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfallet(kildeBehandlingUUID: BehandlingUUID, dødsdato: LocalDate) {
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfallet(kildeBehandlingUUID: BehandlingUUID, dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach {
         val periodeInfo = it.value
         if (periodeInfo is AvslåttPeriode) {
@@ -303,14 +303,14 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
 /**
  *  - Alle perider med FOM etter dødsdato fjernes
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fjernAllePerioderEtterDødsfallet(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fjernAllePerioderEtterDødsfallet(
         dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, _) ->
         remove(periode)
     }
 }
 
-private fun UttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato: LocalDate) : UttaksPeriodeInfo {
+private fun UttaksperiodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato: LocalDate) : UttaksperiodeInfo {
     return if (this is AvslåttPeriode && årsaker.size == 1 && årsaker.first().årsak == AvslåttÅrsaker.UTENOM_TILSYNSBEHOV) {
         this.copy(
                 årsaker = setOf(periodeEtterSorgperiodenAvslåttÅrsak(dødsdato))

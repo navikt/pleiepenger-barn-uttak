@@ -18,7 +18,7 @@ object UttaksplanMerger {
             return Uttaksplan(perioder = uttaksplaner[0].perioder)
         }
 
-        val nyePerioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
+        val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
 
         var (start, index) = finnFørsteUttaksdato(uttaksplaner)

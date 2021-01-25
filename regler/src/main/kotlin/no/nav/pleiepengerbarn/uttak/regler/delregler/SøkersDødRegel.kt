@@ -42,7 +42,7 @@ internal class SøkersDødRegel : UttaksplanRegel {
     }
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.dødeIEnUttaksperiode(
         kildeBehandlingUUID: BehandlingUUID,
         dødsdato: LocalDate,
         uttaksperiode: Uttaksperiode) {
@@ -81,7 +81,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.dødeIEnUttaksperiode(
     ))
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfall(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfall(
         kildeBehandlingUUID: BehandlingUUID,
         dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, periodeInfo) ->

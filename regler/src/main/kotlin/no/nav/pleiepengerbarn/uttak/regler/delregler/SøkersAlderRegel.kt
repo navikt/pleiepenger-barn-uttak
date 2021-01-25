@@ -51,7 +51,7 @@ internal class SøkersAlderRegel : UttaksplanRegel {
 
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterSøttiårsdag(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterSøttiårsdag(
     kildeBehandlingUUID: BehandlingUUID,
     søkersSøttiårsdag: LocalDate
 ) {
@@ -78,7 +78,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterS
     }
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksperiode(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fyllerSøttiIEnUttaksperiode(
         søkersSøttiårsdag: LocalDate,
         uttaksperiode: Uttaksperiode) {
     val periode = uttaksperiode.key
@@ -110,7 +110,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksper
 }
 
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøkerSøttiILøpetAvUttaksplanen(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fyllerSøkerSøttiILøpetAvUttaksplanen(
         søkersSøttiårsdag: LocalDate) : Boolean {
     val sisteDagISistePeriode = lastKey().tom
     return sisteDagISistePeriode.isAfter(søkersSøttiårsdag)

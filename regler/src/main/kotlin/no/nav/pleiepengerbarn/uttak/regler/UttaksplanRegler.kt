@@ -32,7 +32,7 @@ internal object UttaksplanRegler {
             grunnlag: RegelGrunnlag,
             knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : Uttaksplan {
 
-        val perioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
+        val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
             val avslåttÅrsaker = mutableSetOf<AvslåttÅrsak>()
