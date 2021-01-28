@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import java.time.Duration
 
 internal fun Map<String, Map<LukketPeriode, ArbeidsforholdPeriodeInfo>>.somArbeid()
         = map { (ref, perioder ) ->
@@ -19,6 +20,8 @@ internal fun Map<String, Prosent>.somUtbetalingsgrader() = map { (ref,utbetaling
                     type = "arbeidsforhold",
                     arbeidsforholdId = ref
             ),
-            utbetalingsgrad = utbetalingsgrad
+            utbetalingsgrad = utbetalingsgrad,
+            normalArbeidstid = Duration.ZERO, //NB: Brukes ikke i sammenligning i test
+            faktiskArbeidstid = Duration.ZERO //NB: Brukes ikke i sammenligning i test
     )
 }

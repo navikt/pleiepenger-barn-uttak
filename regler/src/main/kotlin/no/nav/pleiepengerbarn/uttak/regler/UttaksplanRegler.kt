@@ -53,7 +53,7 @@ internal object UttaksplanRegler {
                 if (grader.årsak.innvilget) {
                     perioder[periode] = UttaksperiodeInfo.innvilgelse(
                         uttaksgrad = grader.uttaksgrad,
-                        utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
+                        utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},
                         årsak = grader.årsak,
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID

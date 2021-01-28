@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
+import java.time.Duration
 
 typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksperiodeInfo>
 
@@ -19,8 +20,10 @@ data class Uttaksplan(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utbetalingsgrader(
-        @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
-        @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
+    @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
+    @JsonProperty("normalArbeidstid") val normalArbeidstid: Duration,
+    @JsonProperty("faktiskArbeidstid") val faktiskArbeidstid: Duration?,
+    @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

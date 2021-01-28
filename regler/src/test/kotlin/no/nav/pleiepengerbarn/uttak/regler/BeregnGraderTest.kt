@@ -232,7 +232,7 @@ internal class BeregnGraderTest {
         assertThat(this.uttaksgrad).isEqualByComparingTo(uttaksgrad)
         assertThat(this.utbetalingsgrader.size).isEqualTo(utbetalingsgrader.size)
         utbetalingsgrader.forEach {
-            assertThat(this.utbetalingsgrader[it.first]).isEqualByComparingTo(it.second)
+            assertThat(this.utbetalingsgrader[it.first]!!.utbetalingsgrad).isEqualByComparingTo(it.second)
         }
     }
 

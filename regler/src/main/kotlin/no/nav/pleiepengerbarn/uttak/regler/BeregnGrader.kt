@@ -53,7 +53,7 @@ internal object BeregnGrader {
         return tilsynsbehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
     }
 
-    private fun avklarUtbetalingsgrader(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): Map<Arbeidsforhold, Prosent> {
+    private fun avklarUtbetalingsgrader(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): Map<Arbeidsforhold, Utbetalingsgrad> {
         var sumJobberNormalt = Duration.ZERO
         arbeid.values.forEach {
             sumJobberNormalt += it.jobberNormalt
@@ -61,12 +61,13 @@ internal object BeregnGrader {
 
         val taptArbeidstidSomDekkes = sumJobberNormalt.prosent(uttaksgrad)
 
-        val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Prosent>()
+        val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             val timerDekket = taptArbeidstidSomDekkes.prosent(fordelingsprosent)
-            utbetalingsgrader[arbeidsforhold] = BigDecimal(timerDekket.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+            val utbetalingsgrad = BigDecimal(timerDekket.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+            utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
 
         }
 
@@ -133,8 +134,16 @@ private fun Duration.prosent(prosent: Prosent): Duration = Duration.ofMillis( (B
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
 private fun ArbeidsforholdPeriodeInfo.fulltFravær() = jobberNå == Duration.ZERO
 
+data class Utbetalingsgrad(
+    val utbetalingsgrad: Prosent,
+    val normalArbeidstid: Duration,
+    val faktiskArbeidstid: Duration?
+
+
+    )
+
 data class GraderBeregnet(
         val uttaksgrad: Prosent,
-        val utbetalingsgrader: Map<Arbeidsforhold, Prosent>,
+        val utbetalingsgrader: Map<Arbeidsforhold, Utbetalingsgrad>,
         val årsak: Årsak
 )

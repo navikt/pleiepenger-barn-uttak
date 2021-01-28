@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.server.db
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.server.DbContainerInitializer
+import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -203,7 +204,9 @@ internal class UttakRepositoryTest {
                                 knekkpunktTyper = setOf(),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,
-                                        utbetalingsgrad = Prosent(100))))
+                                        utbetalingsgrad = Prosent(100),
+                                        normalArbeidstid = FULL_DAG,
+                                        faktiskArbeidstid = Duration.ZERO)))
                 )
         )
     }
