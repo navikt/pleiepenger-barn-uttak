@@ -13,14 +13,6 @@ import java.util.*
 internal class SøkersDødRegelTest {
 
     private companion object {
-        private val hjemler = setOf(Hjemmel(
-                henvisning = "Henvsining til en lov",
-                anvendelse = "Testformål"
-        ))
-        private val innvilgetÅrsak = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
-                hjemler = hjemler
-        )
         private val behandlingUUID = UUID.randomUUID().toString()
     }
 
@@ -30,28 +22,25 @@ internal class SøkersDødRegelTest {
 
         var uttaksplan = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
 
                         ),
-                        LukketPeriode("2020-01-11/2020-01-30") to AvslåttPeriode(
+                        LukketPeriode("2020-01-11/2020-01-30") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                                        hjemler = hjemler
-                                ))
+                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE)
                         ),
-                        LukketPeriode("2020-02-10/2020-02-25") to InnvilgetPeriode(
+                        LukketPeriode("2020-02-10/2020-02-25") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(20),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         )
                 )
         )
@@ -74,14 +63,14 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetGrad = Prosent(80),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
 
@@ -89,8 +78,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-30"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.LOVBESTEMT_FERIE,
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
 
@@ -98,7 +87,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-10/2020-02-25"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }
@@ -107,27 +96,24 @@ internal class SøkersDødRegelTest {
     internal fun `Om søker fortsatt lever har ikke kjøring av regel noen effekt`() {
         val uttaksplanFørRegelkjøring = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         ),
-                        LukketPeriode("2020-01-11/2020-01-30") to AvslåttPeriode(
+                        LukketPeriode("2020-01-11/2020-01-30") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                                        hjemler = hjemler
-                                ))
+                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE)
                         ),
-                        LukketPeriode("2020-02-10/2020-02-25") to InnvilgetPeriode(
+                        LukketPeriode("2020-02-10/2020-02-25") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(20),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         )
                 )
         )
@@ -151,12 +137,12 @@ internal class SøkersDødRegelTest {
 
         val uttaksplanFørRegelkjøring = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         )
                 )
         )
@@ -180,20 +166,17 @@ internal class SøkersDødRegelTest {
 
         var uttaksplan = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to AvslåttPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN,
-                                        hjemler = hjemler
-                                ))
+                                årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
                         ),
-                        LukketPeriode("2020-02-11/2020-02-20") to InnvilgetPeriode(
+                        LukketPeriode("2020-02-11/2020-02-20") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(50),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         )
                 )
         )
@@ -215,7 +198,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN
+                        Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN
                 )
         )
 
@@ -223,8 +206,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.IKKE_MEDLEM_I_FOLKETRYGDEN,
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN,
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
 
@@ -232,7 +215,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-20"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }
@@ -243,12 +226,12 @@ internal class SøkersDødRegelTest {
 
         val uttaksplanFørRegelkjøring = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         )
                 )
         )
@@ -272,20 +255,17 @@ internal class SøkersDødRegelTest {
 
         var uttaksplan = Uttaksplan(
                 perioder = mapOf(
-                        LukketPeriode("2020-01-01/2020-01-10") to InnvilgetPeriode(
+                        LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = innvilgetÅrsak
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT
                         ),
-                        LukketPeriode("2020-01-11/2020-01-15") to AvslåttPeriode(
+                        LukketPeriode("2020-01-11/2020-01-15") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(AvslåttÅrsak(
-                                        årsak = AvslåttÅrsaker.UTENOM_TILSYNSBEHOV,
-                                        hjemler = hjemler
-                                ))
+                                årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV)
                         )
                 )
         )
@@ -306,7 +286,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-10"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
 
@@ -314,8 +294,8 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-15"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.UTENOM_TILSYNSBEHOV,
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.UTENOM_TILSYNSBEHOV,
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }

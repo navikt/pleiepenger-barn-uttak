@@ -1,15 +1,14 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.TilBeregningAvGrad
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.domene.Årsaksbygger
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.time.Duration
@@ -35,39 +34,36 @@ internal object UttaksplanRegler {
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
-            val avslåttÅrsaker = mutableSetOf<AvslåttÅrsak>()
-            val årsakbygger = Årsaksbygger()
+            val avslåttÅrsaker = mutableSetOf<Årsak>()
             PeriodeRegler.forEach { regel ->
                 val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
                 if (utfall is Avslått) {
                     avslåttÅrsaker.addAll(utfall.årsaker)
-                } else if (utfall is TilBeregningAvGrad) {
-                    årsakbygger.startBeregningAvGraderMed(utfall.hjemler)
                 }
             }
             if (avslåttÅrsaker.isNotEmpty()) {
-                perioder[periode] = AvslåttPeriode(
-                        knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.behandlingUUID,
-                        årsaker = avslåttÅrsaker
+                perioder[periode] = UttaksperiodeInfo.avslag(
+                    årsaker = avslåttÅrsaker,
+                    knekkpunktTyper = knekkpunktTyper,
+                    kildeBehandlingUUID = grunnlag.behandlingUUID
                 )
             } else {
                 val grader = finnGrader(periode, grunnlag)
 
-                if (grader.årsak is AvslåttÅrsak) {
-                    perioder[periode] = AvslåttPeriode(
-                            knekkpunktTyper = knekkpunktTyper,
-                            kildeBehandlingUUID = grunnlag.behandlingUUID,
-                            årsaker = setOf(grader.årsak)
+                if (grader.årsak.innvilget) {
+                    perioder[periode] = UttaksperiodeInfo.innvilgelse(
+                        uttaksgrad = grader.uttaksgrad,
+                        utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
+                        årsak = grader.årsak,
+                        knekkpunktTyper = knekkpunktTyper,
+                        kildeBehandlingUUID = grunnlag.behandlingUUID
+
                     )
-                } else if (grader.årsak is InnvilgetÅrsak) {
-                    perioder[periode] = InnvilgetPeriode(
-                            knekkpunktTyper = knekkpunktTyper,
-                            kildeBehandlingUUID = grunnlag.behandlingUUID,
-                            uttaksgrad = grader.uttaksgrad,
-                            utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(it.key, it.value)},
-                            årsak = grader.årsak.årsak,
-                            hjemler = grader.årsak.hjemler
+                } else {
+                    perioder[periode] = UttaksperiodeInfo.avslag(
+                        årsaker = setOf(grader.årsak),
+                        knekkpunktTyper = knekkpunktTyper,
+                        kildeBehandlingUUID = grunnlag.behandlingUUID
                     )
                 }
             }
@@ -118,7 +114,7 @@ internal object UttaksplanRegler {
             val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapper(periode)}
             if (overlappendePeriode != null) {
                 val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
-                if (uttaksperiode is InnvilgetPeriode) {
+                if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.INNVILGET) {
                     andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
                 }
             }
@@ -141,7 +137,3 @@ internal object UttaksplanRegler {
     }
 
 }
-
-
-private const val BeregningAvGrader = "BeregningAvGrader"
-private fun Årsaksbygger.startBeregningAvGraderMed(hjemler: Set<Hjemmel>) = hjemler(BeregningAvGrader, hjemler)

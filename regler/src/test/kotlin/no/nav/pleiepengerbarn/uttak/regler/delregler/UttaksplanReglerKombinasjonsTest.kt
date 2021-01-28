@@ -25,12 +25,11 @@ internal class UttaksplanReglerKombinasjonsTest {
     internal fun `Søker og barn dør samme dag`() {
         val søkersDødsdato = LocalDate.parse("2020-01-09")
         val søkersFødselsdato = søkersDødsdato.minusYears(50)
-        val barnetsDødsdato = søkersDødsdato
 
         val grunnlag = lagRegelGrunnlag(
                 søkersFødselsdato = søkersFødselsdato,
                 søkersDødsdato = søkersDødsdato,
-                barnetsDødsdato = barnetsDødsdato
+                barnetsDødsdato = søkersDødsdato
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -43,7 +42,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         // Perioden som var innvilget er nå avslått
@@ -51,19 +50,19 @@ internal class UttaksplanReglerKombinasjonsTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
 
         // Blitt lagt til 6 ukers sorgperiode pga. barnets død som
         // I etterkant har blitt avslått grunnet søkers død
         val seksUkerEtterBarnetsDød =
-                barnetsDødsdato.plusDays(1).plusWeeks(6)
+                søkersDødsdato.plusDays(1).plusWeeks(6)
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-13/$seksUkerEtterBarnetsDød"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }
@@ -90,7 +89,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         // Etter dødsfall fortsatt avkortet mot inntekt
@@ -99,7 +98,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
         // Sorgperioden frem til søkers edød
         sjekkInnvilget(
@@ -107,14 +106,14 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-13/2020-02-06"),
                 forventetGrad = Prosent(100),
                 forventedeUtbetalingsgrader = mapOf("123" to Prosent(100)),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.BARNETS_DØDSFALL
+                forventedeInnvilgetÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL
         )
         // Sorgperiode etter søkers død
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-07/2020-02-21"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }
@@ -140,7 +139,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
                 forventetGrad = forventetGrad,
                 forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         // Frem til død
@@ -148,7 +147,7 @@ internal class UttaksplanReglerKombinasjonsTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-09"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_ALDER
+                        Årsak.SØKERS_ALDER
                 )
         )
         // Etter død
@@ -156,8 +155,8 @@ internal class UttaksplanReglerKombinasjonsTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.SØKERS_ALDER,
-                        AvslåttÅrsaker.SØKERS_DØDSFALL
+                        Årsak.SØKERS_ALDER,
+                        Årsak.SØKERS_DØDSFALL
                 )
         )
     }

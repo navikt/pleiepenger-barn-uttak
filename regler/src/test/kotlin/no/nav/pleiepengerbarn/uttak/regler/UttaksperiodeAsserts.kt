@@ -11,15 +11,14 @@ internal object UttaksperiodeAsserts {
             forventetPeriode: LukketPeriode,
             forventetGrad:Prosent,
             forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
-            forventedeInnvilgetÅrsak: InnvilgetÅrsaker) {
+            forventedeInnvilgetÅrsak: Årsak) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
-        assertTrue(uttaksperiodeInfo != null)
-        assertThat(uttaksperiodeInfo is InnvilgetPeriode).isEqualTo(true)
-        val innvilgetPeriode = uttaksperiodeInfo as InnvilgetPeriode
-        assertThat(innvilgetPeriode.uttaksgrad).isEqualByComparingTo(forventetGrad)
+        assertThat(uttaksperiodeInfo).isNotNull()
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.INNVILGET)
+        assertThat(uttaksperiodeInfo.uttaksgrad).isEqualByComparingTo(forventetGrad)
 
         forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
-            val innvilgetUtbetalingsgrader = innvilgetPeriode.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
+            val innvilgetUtbetalingsgrader = uttaksperiodeInfo.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
             assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(innvilgetUtbetalingsgrader.utbetalingsgrad)
         }
 
@@ -31,23 +30,21 @@ internal object UttaksperiodeAsserts {
     internal fun sjekkAvslått(
             uttaksplan: Uttaksplan,
             forventetPeriode: LukketPeriode,
-            forventetAvslåttÅrsaker:Set<AvslåttÅrsaker>) {
+            forventetAvslåttÅrsaker:Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertNotNull(uttaksperiodeInfo)
-        assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
-        val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
-        assertThat(avslåttPeriode.årsaker.map { it.årsak.name }).isEqualTo(forventetAvslåttÅrsaker.map { it.name })
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.AVSLÅTT)
+        assertThat(uttaksperiodeInfo.årsaker).isEqualTo(forventetAvslåttÅrsaker)
     }
 
     internal fun sjekkAvslåttInneholderAvslåttÅrsaker(
             uttaksplan: Uttaksplan,
             forventetPeriode: LukketPeriode,
-            forventetAvslåttÅrsaker :Set<AvslåttÅrsaker>) {
+            forventetAvslåttÅrsaker :Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
-        assertThat(uttaksperiodeInfo is AvslåttPeriode).isEqualTo(true)
-        val avslåttPeriode = uttaksperiodeInfo as AvslåttPeriode
-        assertTrue(avslåttPeriode.årsaker.map { it.årsak }.containsAll(forventetAvslåttÅrsaker))
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.AVSLÅTT)
+        assertTrue(uttaksperiodeInfo.årsaker.containsAll(forventetAvslåttÅrsaker))
     }
 
 }

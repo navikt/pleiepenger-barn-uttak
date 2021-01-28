@@ -11,15 +11,18 @@ internal class UttaksplanMergerTest {
     private val behandlingUUID = UUID.randomUUID().toString()
 
     private val hundreProsent = Prosent(100)
-    private val innvilget = InnvilgetPeriode(
-            kildeBehandlingUUID = behandlingUUID,
+    private val innvilget = UttaksperiodeInfo.innvilgelse(
             uttaksgrad = hundreProsent,
-            årsak = InnvilgetÅrsak(InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT, setOf()),
-            utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader())
+            utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
+            årsak = Årsak.AVKORTET_MOT_INNTEKT,
+            knekkpunktTyper = setOf(),
+            kildeBehandlingUUID = behandlingUUID
+    )
 
-    private val avslått = AvslåttPeriode(
-            kildeBehandlingUUID = behandlingUUID,
-            årsaker = setOf(AvslåttÅrsak(AvslåttÅrsaker.FOR_LAV_GRAD, setOf()))
+    private val avslått = UttaksperiodeInfo.avslag(
+            årsaker = setOf(Årsak.FOR_LAV_GRAD),
+            knekkpunktTyper = setOf(),
+            kildeBehandlingUUID = behandlingUUID
     )
 
     @Test

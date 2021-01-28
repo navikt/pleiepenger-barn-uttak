@@ -68,14 +68,14 @@ internal class SøkersAlderRegelTest {
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode1,
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.SØKERS_ALDER)
+                forventetAvslåttÅrsaker = setOf(Årsak.SØKERS_ALDER)
         )
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                        AvslåttÅrsaker.SØKERS_ALDER
+                        Årsak.LOVBESTEMT_FERIE,
+                        Årsak.SØKERS_ALDER
                 )
         )
     }
@@ -96,21 +96,21 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(AvslåttÅrsaker.SØKERS_ALDER)
+                forventetAvslåttÅrsaker = setOf(Årsak.SØKERS_ALDER)
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                        AvslåttÅrsaker.SØKERS_ALDER
+                        Årsak.LOVBESTEMT_FERIE,
+                        Årsak.SØKERS_ALDER
                 )
         )
     }
@@ -131,15 +131,15 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                        AvslåttÅrsaker.SØKERS_ALDER
+                        Årsak.LOVBESTEMT_FERIE,
+                        Årsak.SØKERS_ALDER
                 )
         )
     }
@@ -160,14 +160,14 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
         )
 
         sjekkAvslått(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-21/2020-01-23"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE
+                        Årsak.LOVBESTEMT_FERIE
                 )
         )
 
@@ -175,8 +175,8 @@ internal class SøkersAlderRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-24/2020-01-26"),
                 forventetAvslåttÅrsaker = setOf(
-                        AvslåttÅrsaker.LOVBESTEMT_FERIE,
-                        AvslåttÅrsaker.SØKERS_ALDER
+                        Årsak.LOVBESTEMT_FERIE,
+                        Årsak.SØKERS_ALDER
                 )
         )
     }

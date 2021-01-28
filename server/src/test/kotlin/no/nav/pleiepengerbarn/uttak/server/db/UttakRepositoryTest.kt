@@ -196,10 +196,11 @@ internal class UttakRepositoryTest {
     private fun dummyUttaksplan(periode:LukketPeriode): Uttaksplan {
         return Uttaksplan(
                 perioder = mapOf(
-                        periode to InnvilgetPeriode(
+                        periode to UttaksperiodeInfo.innvilgelse(
                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                 uttaksgrad = Prosent(100),
-                                årsak = InnvilgetÅrsak(InnvilgetÅrsaker.FULL_DEKNING, setOf()),
+                                årsak = Årsak.FULL_DEKNING,
+                                knekkpunktTyper = setOf(),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,
                                         utbetalingsgrad = Prosent(100))))

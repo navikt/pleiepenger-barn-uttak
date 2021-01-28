@@ -4,8 +4,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class UttaksgradResultat(
         val uttaksgrad: Prosent,
-        val innvilgetÅrsak: InnvilgetÅrsaker? = null,
-        val avslåttÅrsak: AvslåttÅrsaker? = null
+        val innvilgetÅrsak: Årsak? = null,
+        val avslåttÅrsak: Årsak? = null
 ) {
     init {
         //Enten innvilget årsak eller avslått årsak
@@ -14,8 +14,8 @@ data class UttaksgradResultat(
 
     fun årsak(): Årsak {
         if (innvilgetÅrsak != null) {
-            return InnvilgetÅrsak(innvilgetÅrsak, setOf())
+            return innvilgetÅrsak
         }
-        return AvslåttÅrsak(avslåttÅrsak!!, setOf())
+        return avslåttÅrsak!!
     }
 }

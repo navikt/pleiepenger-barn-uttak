@@ -36,15 +36,15 @@ internal object BeregnGrader {
         val graderingMotInntektstap = finnGraderingMotInntektstap(arbeid)
 
         if (restTilSøker < TJUE_PROSENT || graderingMotInntektstap < TJUE_PROSENT) {
-            return UttaksgradResultat(Prosent.ZERO, avslåttÅrsak = AvslåttÅrsaker.FOR_LAV_GRAD)
+            return UttaksgradResultat(Prosent.ZERO, avslåttÅrsak = Årsak.FOR_LAV_GRAD)
         }
         if (restTilSøker < graderingMotInntektstap) {
-            return UttaksgradResultat(restTilSøker, innvilgetÅrsak = InnvilgetÅrsaker.GRADERT_MOT_TILSYN)
+            return UttaksgradResultat(restTilSøker, innvilgetÅrsak = Årsak.GRADERT_MOT_TILSYN)
         }
         if (arbeid.fulltFravær()) {
-            return UttaksgradResultat(graderingMotInntektstap.setScale(2, RoundingMode.HALF_UP), innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING)
+            return UttaksgradResultat(graderingMotInntektstap.setScale(2, RoundingMode.HALF_UP), innvilgetÅrsak = Årsak.FULL_DEKNING)
         }
-        return UttaksgradResultat(graderingMotInntektstap.setScale(2,RoundingMode.HALF_UP), innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT)
+        return UttaksgradResultat(graderingMotInntektstap.setScale(2,RoundingMode.HALF_UP), innvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT)
     }
 
     private fun finnRestTilSøker(tilsynsbehovStørrelse: TilsynsbehovStørrelse, etablertTilsyn: Duration, andreSøkeresTilsyn: Prosent): BigDecimal {

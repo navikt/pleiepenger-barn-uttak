@@ -23,54 +23,50 @@ data class Utbetalingsgrader(
         @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
-@JsonSubTypes(
-        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "INNVILGET"),
-        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "AVSLÅTT")
-)
-interface UttaksperiodeInfo {
-    fun knekkpunktTyper() : Set<KnekkpunktType>
-    fun kildeBehandlingUUID(): BehandlingUUID
-}
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@JsonTypeName("INNVILGET")
-data class InnvilgetPeriode @JsonCreator constructor(
-    private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-    private val kildeBehandlingUUID: BehandlingUUID,
+data class UttaksperiodeInfo @JsonCreator constructor(
+    @JsonProperty("utfall") val utfall: Utfall,
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
-    @JsonProperty("årsak") val årsak: InnvilgetÅrsaker,
-    @JsonProperty("hjemler") val hjemler: Set<Hjemmel>
-) : UttaksperiodeInfo {
-    constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-                kildeBehandlingUUID: BehandlingUUID,
-                uttaksgrad: Prosent,
-                utbetalingsgrader: List<Utbetalingsgrader>,
-                årsak: InnvilgetÅrsak) : this(
-            knekkpunktTyper = knekkpunktTyper,
-            kildeBehandlingUUID = kildeBehandlingUUID,
-            uttaksgrad = uttaksgrad,
-            utbetalingsgrader = utbetalingsgrader,
-            årsak = årsak.årsak,
-            hjemler = årsak.hjemler
-    )
+    @JsonProperty("årsak") val årsaker: Set<Årsak>,
+    @JsonProperty("knekkpunktTyper") val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+    @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID
+) {
 
-    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
-    @JsonProperty("kildeBehandlingUUID") override fun kildeBehandlingUUID() = kildeBehandlingUUID
+    companion object {
+
+        fun avslag(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID): UttaksperiodeInfo {
+
+            //TODO: sjekk at alle årsaker er avslag
+
+            return UttaksperiodeInfo(
+                utfall = Utfall.AVSLÅTT,
+                uttaksgrad = Prosent.ZERO,
+                utbetalingsgrader = listOf(),
+                årsaker = årsaker,
+                knekkpunktTyper = knekkpunktTyper,
+                kildeBehandlingUUID = kildeBehandlingUUID,
+            )
+        }
+
+        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID): UttaksperiodeInfo {
+
+            //TODO: sjekk at årsak er innvilgelse
+
+            return UttaksperiodeInfo(
+                utfall = Utfall.INNVILGET,
+                uttaksgrad = uttaksgrad,
+                utbetalingsgrader = utbetalingsgrader,
+                årsaker = if (årsak == null) setOf() else setOf(årsak),
+                knekkpunktTyper = knekkpunktTyper,
+                kildeBehandlingUUID = kildeBehandlingUUID
+            )
+        }
+
+    }
+
+
 }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@JsonTypeName("AVSLÅTT")
-data class AvslåttPeriode(
-        private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        private val kildeBehandlingUUID: BehandlingUUID,
-        val årsaker: Set<AvslåttÅrsak>
-) : UttaksperiodeInfo {
-    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
-    @JsonProperty("kildeBehandlingUUID") override fun kildeBehandlingUUID() = kildeBehandlingUUID
-}

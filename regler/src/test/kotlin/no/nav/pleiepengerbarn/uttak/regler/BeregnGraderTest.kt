@@ -25,7 +25,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.FULL_DEKNING,
+                Årsak.FULL_DEKNING,
                 HUNDRE_PROSENT,
                 ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
@@ -38,7 +38,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50)
         )
@@ -51,7 +51,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT, //TODO: skal det også være gradert mot andres tilsyn?
+                Årsak.AVKORTET_MOT_INNTEKT, //TODO: skal det også være gradert mot andres tilsyn?
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50)
         )
@@ -64,7 +64,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.FULL_DEKNING,
+                Årsak.FULL_DEKNING,
                 HUNDRE_PROSENT,
                 ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
@@ -77,7 +77,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Årsak.GRADERT_MOT_TILSYN,
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50)
         )
@@ -91,7 +91,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50)
         )
@@ -105,7 +105,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.FULL_DEKNING,
+                Årsak.FULL_DEKNING,
                 HUNDRE_PROSENT,
                 ARBEIDSGIVER1 to HUNDRE_PROSENT,
                 ARBEIDSGIVER2 to HUNDRE_PROSENT
@@ -121,7 +121,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(60),
                 ARBEIDSGIVER1 to Prosent(50),
                 ARBEIDSGIVER2 to Prosent(67)
@@ -136,7 +136,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(38),
                 ARBEIDSGIVER1 to Prosent(50),
                 ARBEIDSGIVER2 to Prosent(25)
@@ -151,7 +151,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(47),
                 ARBEIDSGIVER1 to Prosent(44),
                 ARBEIDSGIVER2 to Prosent(50)
@@ -166,7 +166,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Årsak.GRADERT_MOT_TILSYN,
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50),
                 ARBEIDSGIVER2 to Prosent(50)
@@ -181,7 +181,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.FULL_DEKNING,
+                Årsak.FULL_DEKNING,
                 HUNDRE_PROSENT,
                 ARBEIDSGIVER1 to HUNDRE_PROSENT,
                 ARBEIDSGIVER2 to HUNDRE_PROSENT
@@ -195,7 +195,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Årsak.GRADERT_MOT_TILSYN,
                 Prosent(40),
                 ARBEIDSGIVER1 to Prosent(40)
         )
@@ -208,7 +208,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT,
+                Årsak.AVKORTET_MOT_INNTEKT,
                 Prosent(30),
                 ARBEIDSGIVER1 to Prosent(30)
         )
@@ -221,15 +221,14 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                InnvilgetÅrsaker.GRADERT_MOT_TILSYN,
+                Årsak.GRADERT_MOT_TILSYN,
                 Prosent(40),
                 ARBEIDSGIVER1 to Prosent(40)
         )
     }
 
-    private fun GraderBeregnet.assert(årsak: InnvilgetÅrsaker, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
-        assertThat(this.årsak).isInstanceOf(InnvilgetÅrsak::class.java)
-        assertThat((this.årsak as InnvilgetÅrsak).årsak).isEqualTo(årsak)
+    private fun GraderBeregnet.assert(årsak: Årsak, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
+        assertThat(this.årsak).isEqualTo(årsak)
         assertThat(this.uttaksgrad).isEqualByComparingTo(uttaksgrad)
         assertThat(this.utbetalingsgrader.size).isEqualTo(utbetalingsgrader.size)
         utbetalingsgrader.forEach {

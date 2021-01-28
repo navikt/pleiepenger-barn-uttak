@@ -51,11 +51,11 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD1 to HUNDREPROSENT
                 ),
-                innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                innvilgetÅrsak = Årsak.FULL_DEKNING
         )
         uttaksplan.assertAvslått(
                 periode = LukketPeriode("2020-01-09/2020-01-10"),
-                avslåttÅrsaker = setOf(AvslåttÅrsaker.UTENOM_TILSYNSBEHOV),
+                avslåttÅrsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
                 knekkpunktTyper = setOf(KnekkpunktType.TILSYNSBEHOV)
         )
     }
@@ -81,7 +81,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                     ARBEIDSFORHOLD2 to Prosent(50),
                     ARBEIDSFORHOLD3 to Prosent(100)
                 ),
-                innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                innvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
     }
 
@@ -140,10 +140,11 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), innvilgetÅrsak: InnvilgetÅrsaker = InnvilgetÅrsaker.FULL_DEKNING) {
-        when (val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")) {
-            is InnvilgetPeriode -> {
-                assertThat(periodeInfo.årsak).isEqualTo(innvilgetÅrsak)
+    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), innvilgetÅrsak: Årsak = Årsak.FULL_DEKNING) {
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        when (periodeInfo.utfall) {
+            Utfall.INNVILGET -> {
+                assertThat(periodeInfo.årsaker).isEqualTo(setOf(innvilgetÅrsak))
                 assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
                 gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
@@ -154,12 +155,12 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         }
     }
 
-    private fun Uttaksplan.assertAvslått(periode: LukketPeriode, avslåttÅrsaker: Set<AvslåttÅrsaker> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
-        when (val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")) {
-            is AvslåttPeriode -> {
-                val årsaker = periodeInfo.årsaker.map { it.årsak } .toSet()
-                assertThat(årsaker).isEqualTo(avslåttÅrsaker)
-                assertThat(periodeInfo.knekkpunktTyper()).isEqualTo(knekkpunktTyper)
+    private fun Uttaksplan.assertAvslått(periode: LukketPeriode, avslåttÅrsaker: Set<Årsak> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        when (periodeInfo.utfall) {
+            Utfall.AVSLÅTT -> {
+                assertThat(periodeInfo.årsaker).isEqualTo(avslåttÅrsaker)
+                assertThat(periodeInfo.knekkpunktTyper).isEqualTo(knekkpunktTyper)
             }
             else -> fail("Perioden $periode er ikke avslått")
         }

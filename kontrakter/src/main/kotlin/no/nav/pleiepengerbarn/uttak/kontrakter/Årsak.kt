@@ -1,48 +1,20 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-typealias Henvisning = String
-typealias Anvendelse = String
-typealias Årsaknavn = String
+enum class Årsak(val innvilget: Boolean)  {
+    //Oppfylt årsak
+    GRADERT_MOT_TILSYN(true),
+    AVKORTET_MOT_INNTEKT(true),
+    OPPFYLT_PGA_BARNETS_DØDSFALL(true),
+    FULL_DEKNING(true),
 
-data class Hjemmel(
-        val henvisning: Henvisning,
-        val anvendelse: Anvendelse
-)
+    //Ikke oppfylt årsak
+    UTENOM_TILSYNSBEHOV(false),
+    FOR_LAV_GRAD(false),
+    FOR_HØY_TILSYNSGRAD(false),
+    LOVBESTEMT_FERIE(false),
+    IKKE_MEDLEM_I_FOLKETRYGDEN(false),
+    SØKERS_DØDSFALL(false),
+    BARNETS_DØDSFALL(false),
+    SØKERS_ALDER(false)
 
-interface Årsak {
-    fun årsak() : Årsaknavn
-    fun hjemler() : Set<Hjemmel>
-}
-
-data class InnvilgetÅrsak (
-        val årsak: InnvilgetÅrsaker,
-        val hjemler: Set<Hjemmel>
-): Årsak {
-    override fun årsak() = årsak.name
-    override fun hjemler() = hjemler
-}
-
-data class AvslåttÅrsak (
-        val årsak: AvslåttÅrsaker,
-        val hjemler: Set<Hjemmel>
-): Årsak {
-    override fun årsak() = årsak.name
-    override fun hjemler() = hjemler
-}
-enum class InnvilgetÅrsaker {
-    GRADERT_MOT_TILSYN,
-    AVKORTET_MOT_INNTEKT,
-    BARNETS_DØDSFALL,
-    FULL_DEKNING
-}
-
-enum class AvslåttÅrsaker  {
-    UTENOM_TILSYNSBEHOV,
-    FOR_LAV_GRAD,
-    FOR_HØY_TILSYNSGRAD,
-    LOVBESTEMT_FERIE,
-    IKKE_MEDLEM_I_FOLKETRYGDEN,
-    SØKERS_DØDSFALL,
-    BARNETS_DØDSFALL,
-    SØKERS_ALDER
 }
