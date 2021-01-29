@@ -22,7 +22,7 @@ object GrunnlagMapper {
                 behandlingUUID = uttaksgrunnlag.behandlingUUID,
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
-                tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
+                pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,

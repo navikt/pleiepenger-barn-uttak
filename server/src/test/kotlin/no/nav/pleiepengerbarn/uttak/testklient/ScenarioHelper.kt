@@ -31,14 +31,14 @@ internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: St
         arbeid = listOf(
             Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
         ),
-        tilsynsbehov = mapOf(søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+        pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
     )
 }
 
 internal fun lagGrunnlag(
     søknadsperiode: LukketPeriode,
     arbeid: List<Arbeid>,
-    tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
+    pleiebehov: Map<LukketPeriode, Pleiebehov>,
     tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     søker: Søker = Søker(LocalDate.parse("2000-01-01")),
     saksnummer: Saksnummer = nesteSaksnummer(),
@@ -50,7 +50,7 @@ internal fun lagGrunnlag(
         behandlingUUID = behandlingUUID,
         søknadsperioder = listOf(søknadsperiode),
         arbeid = arbeid,
-        tilsynsbehov = tilsynsbehov,
+        pleiebehov = pleiebehov,
         tilsynsperioder = tilsynsperioder,
         medlemskap = mapOf(HELE_2020 to Medlemskap()) //TODO: endret når medlemskap er implementert
     )

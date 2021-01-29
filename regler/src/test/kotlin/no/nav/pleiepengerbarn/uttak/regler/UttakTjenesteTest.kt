@@ -27,8 +27,8 @@ internal class UttakTjenesteTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_200
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -53,8 +53,8 @@ internal class UttakTjenesteTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_200
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -82,8 +82,8 @@ internal class UttakTjenesteTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_200)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_200
                 ),
                 søknadsperioder = listOf(
                         LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
@@ -139,8 +139,8 @@ TODO: fiks når tilsyn er ordentlig implementert
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        søknadsperiode to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(søknadsperiode),
                 ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
@@ -167,8 +167,8 @@ TODO: fiks når tilsyn er ordentlig implementert
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        søknadsperiode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        søknadsperiode to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(søknadsperiode),
                 arbeid = mapOf(

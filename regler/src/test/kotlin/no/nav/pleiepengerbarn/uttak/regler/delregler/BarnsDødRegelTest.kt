@@ -532,10 +532,8 @@ internal class BarnsDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-20"),
                         LukketPeriode("2020-01-29/2020-03-01")
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(
-                                prosent = TilsynsbehovStørrelse.PROSENT_100
-                        )
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 tilsynsperioder = mapOf(
                         LukketPeriode("2020-02-11/2020-03-01") to Prosent(60)
@@ -570,10 +568,8 @@ internal class BarnsDødRegelTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(
-                                prosent = TilsynsbehovStørrelse.PROSENT_100
-                        )
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(

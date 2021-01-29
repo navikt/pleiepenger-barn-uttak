@@ -179,7 +179,7 @@ internal class UttakRepositoryTest {
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)),
                 søknadsperioder = listOf(periode),
-                tilsynsbehov = mapOf(periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+                pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
                 arbeid = listOf(
                         Arbeid(
                                 arbeidsforhold = arbeidsforhold1,

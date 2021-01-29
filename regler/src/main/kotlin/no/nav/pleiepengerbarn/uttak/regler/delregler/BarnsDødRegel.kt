@@ -72,9 +72,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                     dødsdato = dødsdato
                             ),
                             tilsynsperioder = emptyMap(),
-                            tilsynsbehov = mapOf(sorgperiode to Tilsynsbehov(
-                                    prosent = TilsynsbehovStørrelse.PROSENT_100
-                            ))
+                            pleiebehov = mapOf(sorgperiode to Pleiebehov.PROSENT_100)
                     )
             ).perioder.mapValues { (_,uttaksPeriodeInfo) ->
                 uttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov()
@@ -100,6 +98,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             uttaksgrad = EtHundreProsent,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                             årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                            graderingMotTilsyn = null, //TODO: hva skal vi angi her???
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                             kildeBehandlingUUID = grunnlag.behandlingUUID
                         )

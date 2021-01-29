@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 data class UttaksgradResultat(
+        val restTilSøker: Prosent,
         val uttaksgrad: Prosent,
         val innvilgetÅrsak: Årsak? = null,
         val avslåttÅrsak: Årsak? = null

@@ -55,6 +55,12 @@ internal object UttaksplanRegler {
                         uttaksgrad = grader.uttaksgrad,
                         utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},
                         årsak = grader.årsak,
+                        graderingMotTilsyn = GraderingMotTilsyn(
+                            pleiebehov = grader.graderingMotTilsyn.pleiebehov.prosent,
+                            etablertTilsyn = grader.graderingMotTilsyn.etablertTilsyn,
+                            andreSøkeresTilsyn = grader.graderingMotTilsyn.andreSøkeresTilsyn,
+                            tilgjengeligForSøker = grader.graderingMotTilsyn.tilgjengeligForSøker
+                        ),
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID
 
@@ -82,20 +88,20 @@ internal object UttaksplanRegler {
     }
 
     private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): GraderBeregnet {
-        val tilsynsbehov = grunnlag.finnTilsynsbehov(periode)
+        val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
 
-        return BeregnGrader.beregn(tilsynsbehov = tilsynsbehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+        return BeregnGrader.beregn(pleiebehov = pleiebehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
     }
 
-    private fun RegelGrunnlag.finnTilsynsbehov(periode: LukketPeriode): TilsynsbehovStørrelse {
-        val tilsynsbehovPeriode = this.tilsynsbehov.keys.firstOrNull {it.overlapper(periode)}
-        return if (tilsynsbehovPeriode != null) {
-            this.tilsynsbehov[tilsynsbehovPeriode]?.prosent ?: TilsynsbehovStørrelse.PROSENT_0
+    private fun RegelGrunnlag.finnPleiebehov(periode: LukketPeriode): Pleiebehov {
+        val pleiebehovPeriode = this.pleiebehov.keys.firstOrNull {it.overlapper(periode)}
+        return if (pleiebehovPeriode != null) {
+            this.pleiebehov[pleiebehovPeriode] ?: Pleiebehov.PROSENT_0
         } else {
-            TilsynsbehovStørrelse.PROSENT_0
+            Pleiebehov.PROSENT_0
         }
     }
 

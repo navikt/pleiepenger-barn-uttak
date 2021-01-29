@@ -34,6 +34,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("årsak") val årsaker: Set<Årsak>,
+    @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
     @JsonProperty("knekkpunktTyper") val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
     @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID
 ) {
@@ -49,12 +50,13 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 uttaksgrad = Prosent.ZERO,
                 utbetalingsgrader = listOf(),
                 årsaker = årsaker,
+                graderingMotTilsyn = null,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = kildeBehandlingUUID,
             )
         }
 
-        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID): UttaksperiodeInfo {
+        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak? = null, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID): UttaksperiodeInfo {
 
             //TODO: sjekk at årsak er innvilgelse
 
@@ -63,6 +65,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 uttaksgrad = uttaksgrad,
                 utbetalingsgrader = utbetalingsgrader,
                 årsaker = if (årsak == null) setOf() else setOf(årsak),
+                graderingMotTilsyn = graderingMotTilsyn,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = kildeBehandlingUUID
             )
@@ -70,6 +73,14 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     }
 
-
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class GraderingMotTilsyn(
+    @JsonProperty("pleiebehov") val pleiebehov: Prosent,
+    @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
+    @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
+    @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
+)

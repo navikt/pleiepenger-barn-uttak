@@ -1,8 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.kontrakter.TilsynsbehovStørrelse.PROSENT_100
-import no.nav.pleiepengerbarn.uttak.kontrakter.TilsynsbehovStørrelse.PROSENT_200
+import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
+import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -20,7 +20,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent vanlig uttak`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
             ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
         ))
 
@@ -33,7 +33,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent vanlig uttak`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
         ))
 
@@ -46,7 +46,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent uttak når annen part også tar ut 50 prosent`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
         ))
 
@@ -59,7 +59,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men tilsynsbehovet er 200 prosent`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
         ))
 
@@ -72,7 +72,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent arbeid når annen part også tar ut 50 prosent blir redusert`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
         ))
 
@@ -86,7 +86,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent arbeid av en stilling på 10 timer, skal gi 50 prosent uttaksgrad og utbetalingsgrad`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(10), jobberNå = Duration.ofHours(5))
         ))
 
@@ -99,7 +99,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent fravær hos 2 arbeidsgivere`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = INGENTING),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), jobberNå = INGENTING)
         ))
@@ -115,7 +115,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = Duration.ofHours(1).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), jobberNå = Duration.ofHours(1).plusMinutes(30))
         ))
@@ -130,7 +130,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mindre enn en 100 prosent stilling`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = Duration.ofHours(1).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = Duration.ofHours(2).plusMinutes(15))
         ))
@@ -145,7 +145,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mer enn en 100 prosent stilling`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), jobberNå = Duration.ofHours(2).plusMinutes(30)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = Duration.ofHours(2))
         ))
@@ -159,8 +159,8 @@ internal class BeregnGraderTest {
     }
 
     @Test
-    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 100 prosent tilsynsbehov`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 100 prosent pleiebehov`() {
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), jobberNå = INGENTING),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
         ))
@@ -174,8 +174,8 @@ internal class BeregnGraderTest {
     }
 
     @Test
-    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 200 prosent tilsynsbehov`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
+    internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 200 prosent pleiebehov`() {
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4).plusMinutes(30), jobberNå = INGENTING),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
         ))
@@ -190,7 +190,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn skal redusere uttaksgrad og utbetalingsgrad`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
         ))
 
@@ -203,7 +203,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn og delvis arbeid som tilsammen er under 100 prosent skal føre til at søkt periode blir innvilget`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70)),
         ))
 
@@ -216,7 +216,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn og delvis arbeid som tilsammen går utover 100 prosent skal føre til reduserte grader`() {
-        val grader = BeregnGrader.beregn(tilsynsbehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = FULL_DAG.prosent(60), andreSøkeresTilsyn = Prosent(0), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
         ))
 

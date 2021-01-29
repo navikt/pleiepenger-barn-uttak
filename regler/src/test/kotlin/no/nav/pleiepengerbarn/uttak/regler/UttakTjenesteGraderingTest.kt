@@ -31,8 +31,8 @@ internal class UttakTjenesteGraderingTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -59,8 +59,8 @@ internal class UttakTjenesteGraderingTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -83,8 +83,8 @@ internal class UttakTjenesteGraderingTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -144,8 +144,8 @@ internal class UttakTjenesteGraderingTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -230,8 +230,8 @@ internal class UttakTjenesteGraderingTest {
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden
@@ -296,8 +296,8 @@ TODO: fiks til realistiske arbeidsforhold
                 søker = Søker(
                         fødselsdato = LocalDate.now().minusYears(20)
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(
                         helePerioden

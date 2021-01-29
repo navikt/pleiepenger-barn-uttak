@@ -67,7 +67,7 @@ internal class GrunnlagMapperTest {
                     behandlingUUID = "2",
                     medlemskap = mapOf(),
                     søknadsperioder = listOf(LukketPeriode("2020-01-01/2021-01-01")),
-                    tilsynsbehov = mapOf(),
+                    pleiebehov = mapOf(),
                     arbeid = listOf(
                             Arbeid(
                                     arbeidsforhold = arbeidsforholdReferanse1,

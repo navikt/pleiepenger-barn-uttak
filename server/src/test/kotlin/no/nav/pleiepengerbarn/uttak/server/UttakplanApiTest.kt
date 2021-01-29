@@ -38,7 +38,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                tilsynsbehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
@@ -69,7 +69,7 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         Arbeid(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(70), jobberNå = FULL_DAG.prosent(70).prosent(50)))),
                         Arbeid(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(20), jobberNå = INGENTING))),
                 ),
-                tilsynsbehov = mapOf(HELE_2020 to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+                pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
         )
 
         val uttaksplan = grunnlag.opprettUttaksplan()

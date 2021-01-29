@@ -308,8 +308,8 @@ internal class SøkersDødRegelTest {
                         fødselsdato = søkersDødsdato?:LocalDate.now().minusYears(50),
                         dødsdato = søkersDødsdato
                 ),
-                tilsynsbehov = mapOf(
-                        overordnetPeriode to Tilsynsbehov(prosent = TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        overordnetPeriode to Pleiebehov.PROSENT_100
                 ),
                 søknadsperioder = listOf(overordnetPeriode),
                 arbeid = listOf()

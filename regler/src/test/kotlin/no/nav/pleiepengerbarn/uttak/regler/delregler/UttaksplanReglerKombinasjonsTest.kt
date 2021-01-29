@@ -186,10 +186,8 @@ internal class UttaksplanReglerKombinasjonsTest {
                 søknadsperioder = listOf(
                         helePerioden
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(
-                                prosent = TilsynsbehovStørrelse.PROSENT_100
-                        )
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 )
         )
     }

@@ -18,7 +18,7 @@ data class Uttaksgrunnlag (
 
     @JsonProperty("søknadsperioder") val søknadsperioder: List<LukketPeriode>,
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
-    @JsonProperty("tilsynsbehov") val tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
+    @JsonProperty("tilsynsbehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),

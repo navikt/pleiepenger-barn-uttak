@@ -232,10 +232,8 @@ internal class SøkersAlderRegelTest {
                         periode1,
                         periode2
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(
-                                prosent = TilsynsbehovStørrelse.PROSENT_100
-                        )
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 lovbestemtFerie = listOf(
                         periode2
