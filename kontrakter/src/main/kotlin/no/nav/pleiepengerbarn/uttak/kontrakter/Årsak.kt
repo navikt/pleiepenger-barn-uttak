@@ -15,6 +15,7 @@ enum class Årsak(val innvilget: Boolean)  {
     IKKE_MEDLEM_I_FOLKETRYGDEN(false),
     SØKERS_DØDSFALL(false),
     BARNETS_DØDSFALL(false),
-    SØKERS_ALDER(false)
+    SØKERS_ALDER(false),
+    INNGANGSVILKÅR_AVSLÅTT(false)
 
 }

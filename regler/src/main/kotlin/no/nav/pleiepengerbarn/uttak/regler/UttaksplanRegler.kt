@@ -18,6 +18,7 @@ internal object UttaksplanRegler {
     private val PeriodeRegler = linkedSetOf(
             MedlemskapRegel(),
             FerieRegel(),
+            InngangsvilkårAvslåttRegel(),
             TilsynsbehovRegel()
     )
 

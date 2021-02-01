@@ -133,6 +133,32 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-20"))
     }
 
+    @Test
+    internal fun `En del av uttaksplan blir av avslått pga avslått inngangsvilkår`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100)
+        ).copy(inngangsvilkårAvslått = listOf(LukketPeriode("2020-01-05/2020-01-08")))
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+        assertThat(uttaksplan.perioder).hasSize(3)
+
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-04"))
+        uttaksplan.assertAvslått(
+            periode = LukketPeriode("2020-01-05/2020-01-08"),
+            avslåttÅrsaker = setOf(Årsak.INNGANGSVILKÅR_AVSLÅTT),
+            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_AVSLÅTT)
+        )
+        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-09/2020-01-10"))
+    }
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
