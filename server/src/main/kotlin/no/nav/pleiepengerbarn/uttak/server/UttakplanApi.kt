@@ -51,7 +51,10 @@ class UttakplanApi {
     private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
-            andrePartersUttaksplaner[saksnummer] = hentUttaksplanerOgSlåSammen(saksnummer)
+            val uttaksplan = uttakRepository.hent(saksnummer)
+            if (uttaksplan != null) {
+                andrePartersUttaksplaner[saksnummer] = uttaksplan
+            }
         }
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
 
@@ -105,11 +108,6 @@ class UttakplanApi {
         }
         val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
-    }
-
-    private fun hentUttaksplanerOgSlåSammen(saksnummer:Saksnummer): Uttaksplan {
-        val uttaksplanListe = uttakRepository.hent(saksnummer)
-        return UttaksplanMerger.slåSammenUttaksplaner(uttaksplanListe)
     }
 
 }

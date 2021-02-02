@@ -76,7 +76,7 @@ internal class UttakRepositoryTest {
 
 
     @Test
-    internal fun `Flere behandlinger på samme saksnummer skal kunne hentes ut med nyeste uttaksplan først`() {
+    internal fun `Flere behandlinger på samme saksnummer skal hente ut med nyeste uttaksplan`() {
         val saksnummer = "123456"
 
         val uttakJanuar = dummyUttaksplan(heleJanuar)
@@ -87,10 +87,10 @@ internal class UttakRepositoryTest {
         uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
 
 
-        val uttaksplanListe = uttakRepository.hent(saksnummer)
-        assertThat(uttaksplanListe).hasSize(2)
-        assertThat(uttaksplanListe[0]).isEqualTo(uttakFebruar)
-        assertThat(uttaksplanListe[1]).isEqualTo(uttakJanuar)
+        val uttaksplan = uttakRepository.hent(saksnummer)
+        assertThat(uttaksplan!!.perioder).hasSize(1)
+        assertThat(uttaksplan.perioder[heleJanuar]).isNull()
+        assertThat(uttaksplan.perioder[heleFebruar]).isNotNull()
     }
 
 
