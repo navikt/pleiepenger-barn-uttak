@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåTom
 import java.lang.IllegalStateException
@@ -28,8 +29,8 @@ internal class SøkersAlderRegel : UttaksplanRegel {
                 }
 
         perioder.avslåAllePerioderEtterSøttiårsdag(
-            kildeBehandlingUUID = grunnlag.behandlingUUID,
-            søkersSøttiårsdag = søkersSøttiårsdag
+            søkersSøttiårsdag = søkersSøttiårsdag,
+            grunnlag = grunnlag
         )
 
         return uttaksplan.copy(
@@ -40,8 +41,8 @@ internal class SøkersAlderRegel : UttaksplanRegel {
 }
 
 private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterSøttiårsdag(
-    kildeBehandlingUUID: BehandlingUUID,
-    søkersSøttiårsdag: LocalDate
+    søkersSøttiårsdag: LocalDate,
+    grunnlag: RegelGrunnlag
 ) {
     filterKeys { it.fom.isAfter(søkersSøttiårsdag) }
     .forEach { (periode, periodeInfo) ->
@@ -60,7 +61,8 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterS
             put(periode, UttaksperiodeInfo.avslag(
                 årsaker = setOf(Årsak.SØKERS_ALDER),
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
-                kildeBehandlingUUID = kildeBehandlingUUID
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                annenPart = grunnlag.annenPart(periode)
             ))
         }
     }

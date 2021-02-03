@@ -581,7 +581,8 @@ internal class BarnsDødRegelTest {
                                                 utbetalingsgrader = mapOf(
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),
-                                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                                annenPart = AnnenPart.ALENE
                                         )
                                 )
                         )

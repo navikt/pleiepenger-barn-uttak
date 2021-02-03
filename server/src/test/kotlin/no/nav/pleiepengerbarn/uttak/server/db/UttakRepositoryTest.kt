@@ -206,7 +206,8 @@ internal class UttakRepositoryTest {
                                         arbeidsforhold = arbeidsforhold1,
                                         utbetalingsgrad = Prosent(100),
                                         normalArbeidstid = FULL_DAG,
-                                        faktiskArbeidstid = Duration.ZERO)))
+                                        faktiskArbeidstid = Duration.ZERO)),
+                                annenPart = AnnenPart.ALENE)
                 )
         )
     }

@@ -16,13 +16,15 @@ internal class UttaksplanMergerTest {
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
             årsak = Årsak.AVKORTET_MOT_INNTEKT,
             knekkpunktTyper = setOf(),
-            kildeBehandlingUUID = behandlingUUID
+            kildeBehandlingUUID = behandlingUUID,
+            annenPart = AnnenPart.ALENE
     )
 
     private val avslått = UttaksperiodeInfo.avslag(
             årsaker = setOf(Årsak.FOR_LAV_GRAD),
             knekkpunktTyper = setOf(),
-            kildeBehandlingUUID = behandlingUUID
+            kildeBehandlingUUID = behandlingUUID,
+            annenPart = AnnenPart.ALENE
     )
 
     @Test

@@ -27,20 +27,22 @@ internal class SøkersDødRegelTest {
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
-
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-01-11/2020-01-30") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE)
+                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE),
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-02-10/2020-02-25") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(20),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )
@@ -101,19 +103,22 @@ internal class SøkersDødRegelTest {
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-01-11/2020-01-30") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE)
+                                årsaker = setOf(Årsak.LOVBESTEMT_FERIE),
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-02-10/2020-02-25") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(20),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )
@@ -142,7 +147,8 @@ internal class SøkersDødRegelTest {
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )
@@ -169,14 +175,16 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                                årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN),
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-02-11/2020-02-20") to UttaksperiodeInfo.innvilgelse(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(50),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )
@@ -231,7 +239,8 @@ internal class SøkersDødRegelTest {
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )
@@ -260,12 +269,14 @@ internal class SøkersDødRegelTest {
                                 kildeBehandlingUUID = behandlingUUID,
                                 uttaksgrad = Prosent(80),
                                 utbetalingsgrader = listOf(),
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-01-11/2020-01-15") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV)
+                                årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
+                                annenPart = AnnenPart.ALENE
                         )
                 )
         )

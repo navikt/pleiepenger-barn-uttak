@@ -39,8 +39,8 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
         if (!dødeIEnInnvilgetPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
-                    kildeBehandlingUUID = grunnlag.behandlingUUID,
-                    dødsdato = dødsdato
+                    dødsdato = dødsdato,
+                    grunnlag = grunnlag
             )
         } else {
             perioder.fjernAllePerioderEtterDødsfallet(
@@ -100,7 +100,8 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
                             graderingMotTilsyn = null, //TODO: hva skal vi angi her???
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
-                            kildeBehandlingUUID = grunnlag.behandlingUUID
+                            kildeBehandlingUUID = grunnlag.behandlingUUID,
+                            annenPart = grunnlag.annenPart(periode)
                         )
                     }
         }
@@ -250,7 +251,7 @@ private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalD
  *      - De som allerede var avslått får en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
  *      - De som var innvilget blir avslått med AvslåttÅrsak 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfallet(kildeBehandlingUUID: BehandlingUUID, dødsdato: LocalDate) {
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfallet(dødsdato: LocalDate, grunnlag: RegelGrunnlag) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach {
         val periodeInfo = it.value
         if (periodeInfo.utfall == Utfall.AVSLÅTT) {
@@ -267,7 +268,8 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
             put(it.key, UttaksperiodeInfo.avslag(
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL),
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
-                kildeBehandlingUUID = kildeBehandlingUUID
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                annenPart = grunnlag.annenPart(it.key)
             ))
         }
     }

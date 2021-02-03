@@ -90,7 +90,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf())))
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
@@ -151,7 +151,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf())))
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)

@@ -9,6 +9,7 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.time.Duration
@@ -46,7 +47,8 @@ internal object UttaksplanRegler {
                 perioder[periode] = UttaksperiodeInfo.avslag(
                     årsaker = avslåttÅrsaker,
                     knekkpunktTyper = knekkpunktTyper,
-                    kildeBehandlingUUID = grunnlag.behandlingUUID
+                    kildeBehandlingUUID = grunnlag.behandlingUUID,
+                    annenPart = grunnlag.annenPart(periode)
                 )
             } else {
                 val grader = finnGrader(periode, grunnlag)
@@ -63,14 +65,15 @@ internal object UttaksplanRegler {
                             tilgjengeligForSøker = grader.graderingMotTilsyn.tilgjengeligForSøker
                         ),
                         knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.behandlingUUID
-
+                        kildeBehandlingUUID = grunnlag.behandlingUUID,
+                        annenPart = grunnlag.annenPart(periode)
                     )
                 } else {
                     perioder[periode] = UttaksperiodeInfo.avslag(
                         årsaker = setOf(grader.årsak),
                         knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.behandlingUUID
+                        kildeBehandlingUUID = grunnlag.behandlingUUID,
+                        annenPart = grunnlag.annenPart(periode)
                     )
                 }
             }
