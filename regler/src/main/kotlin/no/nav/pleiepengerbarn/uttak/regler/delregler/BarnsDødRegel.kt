@@ -35,7 +35,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
 
         val dødeIEnInnvilgetPeriode = perioder
                 .inneholder(dødsdato)
-                ?.takeIf { it.value.utfall == Utfall.INNVILGET } != null
+                ?.takeIf { it.value.utfall == Utfall.OPPFYLT } != null
 
         if (!dødeIEnInnvilgetPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
@@ -155,10 +155,10 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.knekkUttaksperiodenDaBar
         ), periodeInfo)
 
         val periodeInfoMedKnekkpunkt = when (periodeInfo.utfall) {
-            Utfall.INNVILGET -> {
+            Utfall.OPPFYLT -> {
                 periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
-            Utfall.AVSLÅTT -> {
+            Utfall.IKKE_OPPFYLT -> {
                 periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
             else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
@@ -181,7 +181,7 @@ private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
         perioder: Map<LukketPeriode, UttaksperiodeInfo>
 ) : Map<LukketPeriode, List<Utbetalingsgrader>> {
     val innvilgedePerioder = perioder
-            .filterValues { it.utfall == Utfall.INNVILGET }
+            .filterValues { it.utfall == Utfall.OPPFYLT }
             .mapValues { it.value }
 
     val map = mutableMapOf<LukketPeriode, List<Utbetalingsgrader>>()
@@ -254,7 +254,7 @@ private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalD
 private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfallet(dødsdato: LocalDate, grunnlag: RegelGrunnlag) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach {
         val periodeInfo = it.value
-        if (periodeInfo.utfall == Utfall.AVSLÅTT) {
+        if (periodeInfo.utfall == Utfall.IKKE_OPPFYLT) {
             val avslåttÅrsaker = periodeInfo
                     .årsaker
                     .toMutableSet()
@@ -286,7 +286,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fjernAllePerioderEtterD�
 }
 
 private fun UttaksperiodeInfo.håndterPeriodeUtenomTilsynsbehov() : UttaksperiodeInfo {
-    return if (this.utfall == Utfall.AVSLÅTT && årsaker.size == 1 && årsaker.first() == Årsak.UTENOM_TILSYNSBEHOV) {
+    return if (this.utfall == Utfall.IKKE_OPPFYLT && årsaker.size == 1 && årsaker.first() == Årsak.UTENOM_TILSYNSBEHOV) {
         this.copy(
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL)
         )

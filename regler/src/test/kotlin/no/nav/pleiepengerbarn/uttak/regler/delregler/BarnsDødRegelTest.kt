@@ -408,7 +408,7 @@ internal class BarnsDødRegelTest {
         uttaksplanEtterRegelkjøring.perioder
                 .filterKeys { it.fom.isAfter(dødsdato) }
                 .forEach { (periode, periodeInfo) ->
-                    assertThat(periodeInfo.utfall).isEqualTo(Utfall.AVSLÅTT)
+                    assertThat(periodeInfo.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
                     sjekkAvslåttInneholderAvslåttÅrsaker(
                             uttaksplan = uttaksplanEtterRegelkjøring,
                             forventetPeriode = periode,

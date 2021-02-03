@@ -15,7 +15,7 @@ private fun Map<Saksnummer, Uttaksplan>.overlapper(periode: LukketPeriode): Bool
     this.values.forEach { uttaksplan ->
         uttaksplan.perioder.forEach { uttaksperiode ->
             if (uttaksperiode.key.overlapper(periode)) {
-                if (uttaksperiode.value.utfall == Utfall.INNVILGET) {
+                if (uttaksperiode.value.utfall == Utfall.OPPFYLT) {
                     return true
                 }
             }

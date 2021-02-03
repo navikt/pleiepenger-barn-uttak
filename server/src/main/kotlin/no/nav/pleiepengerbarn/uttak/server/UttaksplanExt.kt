@@ -5,7 +5,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 internal fun Uttaksplan.tilForenkletUttaksplan(): ForenkletUttaksplan {
     val arbeidsforholdSet = mutableSetOf<Arbeidsforhold>()
     perioder
-        .filter { it.value.utfall == Utfall.INNVILGET }
+        .filter { it.value.utfall == Utfall.OPPFYLT }
         .map { it.value }
         .forEach { it.utbetalingsgrader.forEach { utbetalingsgrad -> arbeidsforholdSet.add(utbetalingsgrad.arbeidsforhold) } }
 
@@ -21,10 +21,10 @@ internal fun Uttaksplan.tilForenkletUttaksplan(): ForenkletUttaksplan {
 private fun UttaksperiodeInfo.tilForenkletUttaksperiode(periode: LukketPeriode, arbeidsforhold: Arbeidsforhold): ForenkletUttaksperiode {
     val periodeInfo = this
     return when (periodeInfo.utfall) {
-        Utfall.INNVILGET -> {
+        Utfall.OPPFYLT -> {
             ForenkletUttaksperiode(periode = periode, innvilget = true, utbetalingsgrad = periodeInfo.utbetalingsgrader.finnFor(arbeidsforhold))
         }
-        Utfall.AVSLÅTT -> {
+        Utfall.IKKE_OPPFYLT -> {
             ForenkletUttaksperiode(periode = periode, innvilget = false, utbetalingsgrad = Prosent.ZERO)
         }
         else -> {

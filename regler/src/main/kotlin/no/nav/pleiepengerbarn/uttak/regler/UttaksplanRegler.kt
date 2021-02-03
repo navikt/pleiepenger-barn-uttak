@@ -124,7 +124,7 @@ internal object UttaksplanRegler {
             val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapper(periode)}
             if (overlappendePeriode != null) {
                 val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
-                if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.INNVILGET) {
+                if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.OPPFYLT) {
                     andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
                 }
             }

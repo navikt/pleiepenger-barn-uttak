@@ -70,7 +70,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.dødeIEnUttaksperiode(
         .toMutableSet()
         .also { it.add(KnekkpunktType.SØKERS_DØDSFALL) }
 
-    val avslåttÅrsaker = if (uttaksperiodeInfo.utfall == Utfall.AVSLÅTT) uttaksperiodeInfo.årsaker.toMutableSet() else mutableSetOf()
+    val avslåttÅrsaker = if (uttaksperiodeInfo.utfall == Utfall.IKKE_OPPFYLT) uttaksperiodeInfo.årsaker.toMutableSet() else mutableSetOf()
     avslåttÅrsaker.add(Årsak.SØKERS_DØDSFALL)
 
     put(periodeEtterDødsfall, UttaksperiodeInfo.avslag(avslåttÅrsaker, knekkpunktTyper, kildeBehandlingUUID, annenPart))
@@ -84,7 +84,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
             1. Avslåtte perioder forblir avslåtte, men det blir lagt til en ny avslagsårsak - SØKERS_DØDSFALL
             2. Innnvilgede perioder blir avslått med avslagsårsak - SØKERS_DØDSFALL
          */
-        if (periodeInfo.utfall == Utfall.AVSLÅTT) {
+        if (periodeInfo.utfall == Utfall.IKKE_OPPFYLT) {
             val avslagsÅrsaker = periodeInfo
                     .årsaker
                     .toMutableSet()

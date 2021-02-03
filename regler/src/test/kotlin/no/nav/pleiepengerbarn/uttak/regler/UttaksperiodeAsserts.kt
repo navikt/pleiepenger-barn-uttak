@@ -14,7 +14,7 @@ internal object UttaksperiodeAsserts {
             forventedeInnvilgetÅrsak: Årsak) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertThat(uttaksperiodeInfo).isNotNull()
-        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.INNVILGET)
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.OPPFYLT)
         assertThat(uttaksperiodeInfo.uttaksgrad).isEqualByComparingTo(forventetGrad)
 
         forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
@@ -33,7 +33,7 @@ internal object UttaksperiodeAsserts {
             forventetAvslåttÅrsaker:Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertNotNull(uttaksperiodeInfo)
-        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.AVSLÅTT)
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
         assertThat(uttaksperiodeInfo.årsaker).isEqualTo(forventetAvslåttÅrsaker)
     }
 
@@ -43,7 +43,7 @@ internal object UttaksperiodeAsserts {
             forventetAvslåttÅrsaker :Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
-        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.AVSLÅTT)
+        assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
         assertTrue(uttaksperiodeInfo.årsaker.containsAll(forventetAvslåttÅrsaker))
     }
 

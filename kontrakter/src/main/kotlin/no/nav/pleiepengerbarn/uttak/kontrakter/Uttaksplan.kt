@@ -6,13 +6,14 @@ import java.time.Duration
 typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksperiodeInfo>
 
 enum class Utfall {
-    INNVILGET,AVSLÅTT
+    OPPFYLT,
+    IKKE_OPPFYLT
 }
 
 enum class AnnenPart {
     ALENE,
     MED_ANDRE,
-    VENTER_ANDRE
+    VENTER_ANDRE //TODO: skal vi ha med denne?
 }
 
 
@@ -54,7 +55,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             //TODO: sjekk at alle årsaker er avslag
 
             return UttaksperiodeInfo(
-                utfall = Utfall.AVSLÅTT,
+                utfall = Utfall.IKKE_OPPFYLT,
                 uttaksgrad = Prosent.ZERO,
                 utbetalingsgrader = listOf(),
                 årsaker = årsaker,
@@ -70,7 +71,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             //TODO: sjekk at årsak er innvilgelse
 
             return UttaksperiodeInfo(
-                utfall = Utfall.INNVILGET,
+                utfall = Utfall.OPPFYLT,
                 uttaksgrad = uttaksgrad,
                 utbetalingsgrader = utbetalingsgrader,
                 årsaker = if (årsak == null) setOf() else setOf(årsak),

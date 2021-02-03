@@ -46,7 +46,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterS
 ) {
     filterKeys { it.fom.isAfter(søkersSøttiårsdag) }
     .forEach { (periode, periodeInfo) ->
-        if (periodeInfo.utfall == Utfall.AVSLÅTT) {
+        if (periodeInfo.utfall == Utfall.IKKE_OPPFYLT) {
             val avslagsÅrsaker = periodeInfo
                     .årsaker
                     .toMutableSet()
@@ -84,10 +84,10 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fyllerSøttiIEnUttaksper
     ), periodeInfo)
 
     val periodeInfoMedKnekkpunkt = when (periodeInfo.utfall) {
-        Utfall.INNVILGET -> {
+        Utfall.OPPFYLT -> {
             periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.SØKERS_ALDER))
         }
-        Utfall.AVSLÅTT -> {
+        Utfall.IKKE_OPPFYLT -> {
             periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.SØKERS_ALDER))
         }
         else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
