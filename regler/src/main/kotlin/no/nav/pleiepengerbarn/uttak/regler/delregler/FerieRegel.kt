@@ -9,7 +9,7 @@ internal class FerieRegel : PeriodeRegel {
 
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
         grunnlag.lovbestemtFerie.overlappendePeriode(periode)?.apply {
-            return Avslått(årsaker = setOf(Årsak.LOVBESTEMT_FERIE))
+            return IkkeOppfylt(årsaker = setOf(Årsak.LOVBESTEMT_FERIE))
         }
         return TilBeregningAvGrad()
     }

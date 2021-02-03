@@ -23,7 +23,7 @@ internal object KnekkpunktUtleder {
 
         finnForIkkeMedlem(knekkpunkMap, regelGrunnlag.ikkeMedlem)
         finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
-        finnForAvslåtteInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkårAvslått)
+        finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkårIkkeOppfylt)
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
@@ -48,8 +48,8 @@ internal object KnekkpunktUtleder {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
     }
 
-    private fun finnForAvslåtteInngangsvilkår(knekkpunktMap: KnekkpunktMap, inngangsvilkårAvslått: List<LukketPeriode>) {
-        inngangsvilkårAvslått.forEach { finnForPeriode(knekkpunktMap, it, KnekkpunktType.INNGANGSVILKÅR_AVSLÅTT) }
+    private fun finnForIkkeOppfyltInngangsvilkår(knekkpunktMap: KnekkpunktMap, inngangsvilkårIkkeOppfylt: List<LukketPeriode>) {
+        inngangsvilkårIkkeOppfylt.forEach { finnForPeriode(knekkpunktMap, it, KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT) }
     }
 
     private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, pleiebehov: Map<LukketPeriode, Pleiebehov>) {

@@ -3,7 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
-import no.nav.pleiepengerbarn.uttak.regler.delregler.Avslått
+import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.MedlemskapRegel
@@ -19,7 +19,7 @@ internal object UttaksplanRegler {
     private val PeriodeRegler = linkedSetOf(
             MedlemskapRegel(),
             FerieRegel(),
-            InngangsvilkårAvslåttRegel(),
+            InngangsvilkårIkkeOppfyltRegel(),
             TilsynsbehovRegel()
     )
 
@@ -36,16 +36,16 @@ internal object UttaksplanRegler {
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
         knektePerioder.forEach { (periode, knekkpunktTyper) ->
-            val avslåttÅrsaker = mutableSetOf<Årsak>()
+            val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
             PeriodeRegler.forEach { regel ->
                 val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
-                if (utfall is Avslått) {
-                    avslåttÅrsaker.addAll(utfall.årsaker)
+                if (utfall is IkkeOppfylt) {
+                    ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
                 }
             }
-            if (avslåttÅrsaker.isNotEmpty()) {
+            if (ikkeOppfyltÅrsaker.isNotEmpty()) {
                 perioder[periode] = UttaksperiodeInfo.avslag(
-                    årsaker = avslåttÅrsaker,
+                    årsaker = ikkeOppfyltÅrsaker,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
                     annenPart = grunnlag.annenPart(periode)
@@ -53,7 +53,7 @@ internal object UttaksplanRegler {
             } else {
                 val grader = finnGrader(periode, grunnlag)
 
-                if (grader.årsak.innvilget) {
+                if (grader.årsak.oppfylt) {
                     perioder[periode] = UttaksperiodeInfo.innvilgelse(
                         uttaksgrad = grader.uttaksgrad,
                         utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},

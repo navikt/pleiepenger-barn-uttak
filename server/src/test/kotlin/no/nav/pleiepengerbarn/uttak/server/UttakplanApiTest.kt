@@ -45,17 +45,17 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertInnvilget(
+        uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-01-01/2020-01-08"),
                 grad = HUNDREPROSENT,
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD1 to HUNDREPROSENT
                 ),
-                innvilgetÅrsak = Årsak.FULL_DEKNING
+                oppfyltÅrsak = Årsak.FULL_DEKNING
         )
-        uttaksplan.assertAvslått(
+        uttaksplan.assertIkkeOppfylt(
                 periode = LukketPeriode("2020-01-09/2020-01-10"),
-                avslåttÅrsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
+                ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
                 knekkpunktTyper = setOf(KnekkpunktType.TILSYNSBEHOV)
         )
     }
@@ -74,14 +74,14 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val uttaksplan = grunnlag.opprettUttaksplan()
 
-        uttaksplan.assertInnvilget(
+        uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-10-12/2020-10-16"),
                 grad = Prosent(61),
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD2 to Prosent(50),
                     ARBEIDSFORHOLD3 to Prosent(100)
                 ),
-                innvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT
+                oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
     }
 
@@ -92,8 +92,8 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-10").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
 
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-10"))
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-11/2020-01-20"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-11/2020-01-20"))
     }
 
     @Test
@@ -104,8 +104,8 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-07/2020-01-20"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-20"))
     }
 
     @Test
@@ -116,9 +116,9 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(3)
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-06"))
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-07/2020-01-12"))
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-13/2020-01-20"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-12"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-20"))
     }
 
 
@@ -130,11 +130,11 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-20"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-20"))
     }
 
     @Test
-    internal fun `En del av uttaksplan blir av avslått pga avslått inngangsvilkår`() {
+    internal fun `En del av uttaksplan blir ikke oppfylt pga ikke oppfylte inngangsvilkår`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
@@ -142,20 +142,20 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100)
-        ).copy(inngangsvilkårAvslått = listOf(LukketPeriode("2020-01-05/2020-01-08")))
+        ).copy(inngangsvilkårIkkeOppfylt = listOf(LukketPeriode("2020-01-05/2020-01-08")))
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
         assertThat(uttaksplan.perioder).hasSize(3)
 
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-01/2020-01-04"))
-        uttaksplan.assertAvslått(
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-04"))
+        uttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-05/2020-01-08"),
-            avslåttÅrsaker = setOf(Årsak.INNGANGSVILKÅR_AVSLÅTT),
-            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_AVSLÅTT)
+            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
+            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
-        uttaksplan.assertInnvilget(periode = LukketPeriode("2020-01-09/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-09/2020-01-10"))
     }
 
 
@@ -166,29 +166,29 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), innvilgetÅrsak: Årsak = Årsak.FULL_DEKNING) {
+    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {
-                assertThat(periodeInfo.årsaker).isEqualTo(setOf(innvilgetÅrsak))
+                assertThat(periodeInfo.årsaker).isEqualTo(setOf(oppfyltÅrsak))
                 assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
                 gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
                 }
             }
-            else -> fail("Perioden $periode er ikke innvilget")
+            else -> fail("Perioden $periode er ikke oppfylt")
         }
     }
 
-    private fun Uttaksplan.assertAvslått(periode: LukketPeriode, avslåttÅrsaker: Set<Årsak> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
+    private fun Uttaksplan.assertIkkeOppfylt(periode: LukketPeriode, ikkeOppfyltÅrsaker: Set<Årsak> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.IKKE_OPPFYLT -> {
-                assertThat(periodeInfo.årsaker).isEqualTo(avslåttÅrsaker)
+                assertThat(periodeInfo.årsaker).isEqualTo(ikkeOppfyltÅrsaker)
                 assertThat(periodeInfo.knekkpunktTyper).isEqualTo(knekkpunktTyper)
             }
-            else -> fail("Perioden $periode er ikke avslått")
+            else -> fail("Perioden $periode er oppfylt")
         }
     }
 

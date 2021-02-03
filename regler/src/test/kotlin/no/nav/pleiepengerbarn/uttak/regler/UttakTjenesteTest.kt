@@ -1,8 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
     }
 
 
@@ -71,8 +71,8 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkAvslått(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(Årsak.LOVBESTEMT_FERIE))
+        sjekkOppfylt(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(Årsak.LOVBESTEMT_FERIE))
     }
 
     @Test
@@ -97,8 +97,8 @@ internal class UttakTjenesteTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkAvslått(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_TILSYNSBEHOV))
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        sjekkIkkeOppfylt(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_TILSYNSBEHOV))
     }
 
 /*
@@ -127,8 +127,8 @@ TODO: fiks når tilsyn er ordentlig implementert
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkAvslått(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(AvslåttÅrsaker.FOR_HØY_TILSYNSGRAD))
+        sjekkOppfylt(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsaker.FOR_HØY_TILSYNSGRAD))
     }
 */
 
@@ -153,8 +153,8 @@ TODO: fiks når tilsyn er ordentlig implementert
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkAvslått(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN))
-        sjekkInnvilget(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        sjekkIkkeOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN))
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
     }
 
     @Test
@@ -182,19 +182,19 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
         assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode1,
                 forventetGrad = Prosent(100),
                 forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
                 forventetGrad = Prosent(80),
                 forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(80)),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
     }
 
@@ -225,12 +225,12 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         assertThat(uttaksplan.perioder).hasSize(1)
 
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode,
                 forventetGrad = Prosent(100),
                 forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
 
     }
@@ -267,10 +267,10 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         assertThat(uttaksplan.perioder).hasSize(1)
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(Årsak.FOR_HØY_TILSYNSGRAD)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_HØY_TILSYNSGRAD)
         )
     }
 

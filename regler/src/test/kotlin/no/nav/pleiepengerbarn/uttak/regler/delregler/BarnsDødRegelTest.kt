@@ -2,9 +2,9 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslåttInneholderAvslåttÅrsaker
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfyltPeriodeInneholderIkkeOppfyltÅrsaker
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.erLikEllerFør
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
@@ -29,8 +29,8 @@ internal class BarnsDødRegelTest {
                 "123" to Prosent(40)
         )
 
-        private val forventetGradInnvilgetÅrsakBarnetsDødsfall = Prosent(100)
-        private val forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall = mapOf(
+        private val forventetGradOppfyltÅrsakBarnetsDødsfall = Prosent(100)
+        private val forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall = mapOf(
                 "123" to Prosent(100)
         )
     }
@@ -55,10 +55,10 @@ internal class BarnsDødRegelTest {
         assertEquals(3, uttaksplanEtterRegelkjøring.perioder.size)
 
         // 1. Opprinnelig periode
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
@@ -67,19 +67,19 @@ internal class BarnsDødRegelTest {
         // Forventer at perioden er delt i to. Første TOM dødsfall lik
         // Den andre perioden har man fått 50% ettersom det ikke er avkortet mot annen
         // omsorgsperson lengre.
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
                 )
         )
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(50)
@@ -87,12 +87,12 @@ internal class BarnsDødRegelTest {
         )
         // En helt ny periode som er "sorgperioden" som går utover opprinnelig uttaksplan
         // Som strekker seg til 6 uker etter dødsfallet
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-13/2020-02-19"),
-                forventedeInnvilgetÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
-                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )
     }
 
@@ -116,28 +116,28 @@ internal class BarnsDødRegelTest {
         assertEquals(2, uttaksplanEtterRegelkjøring.perioder.size)
 
         // 1. Opprinnelig periode
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
         )
 
         // Forventer at perioden er delt i to. Første TOM dødsfall lik
-        // Den andre perioden er lik med har også fått en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
-        sjekkAvslått(
+        // Den andre perioden er lik med har også fått en ny IkkeOppfyltÅrsak 'BARNETS_DØDSFALL'
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventetAvslåttÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
         )
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(Årsak.FOR_LAV_GRAD, Årsak.BARNETS_DØDSFALL)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD, Årsak.BARNETS_DØDSFALL)
         )
     }
 
     @Test
-    internal fun `Om barnet dør i midten av en innvilget periode gradert mot tilsyn`() {
+    internal fun `Om barnet dør i midten av en oppfylt periode gradert mot tilsyn`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeGradertMotTilsyn = true
         )
@@ -157,18 +157,18 @@ internal class BarnsDødRegelTest {
 
         // 1. Opprinnelige Periode
         var periode = LukketPeriode("2020-01-01/2020-01-20")
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // Forventer at denne perioden nå er lik som den var - periode før dødsfall
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -181,39 +181,39 @@ internal class BarnsDødRegelTest {
 
         // 3. Opprinnelige periode
         periode = LukketPeriode("2020-01-29/2020-01-31")
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // Forventer at denne perioden skal være som den var - periode før dødsfall
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // 4. Opprinnelige periode
         periode = LukketPeriode("2020-02-01/2020-02-10")
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // Avslag skal forbli avslag, forventer det samme
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // 5. Opprinnelig periode
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
-                forventedeInnvilgetÅrsak = Årsak.GRADERT_MOT_TILSYN,
+                forventedeOppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
@@ -222,33 +222,33 @@ internal class BarnsDødRegelTest {
         //         Denne perioden bør nå være Avkortet mot inntekt istedenfor Gradert mot tilsyn
         //      2) 2020-02-16 - 2020-03-01
         //         Denne perioden bør være avkortet mot inntekt
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-15"),
-                forventedeInnvilgetÅrsak = Årsak.GRADERT_MOT_TILSYN,
+                forventedeOppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-16/2020-03-01"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // En helt ny periode som er "sorgperioden" som går utover opprinnelig uttaksplan
         // Som strekker seg til 6 uker etter dødsfallet
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-03-02/2020-03-29"),
-                forventedeInnvilgetÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
-                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )
     }
 
     @Test
-    internal fun `Om barnet dør i midten av en innvilget periode avkortet mot inntekt`() {
+    internal fun `Om barnet dør i midten av en oppfylt periode avkortet mot inntekt`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeAvkortetMotInntekt = true
         )
@@ -267,25 +267,25 @@ internal class BarnsDødRegelTest {
 
 
         // 1. Opprinnelige Periode
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-20"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // Barnet døde i denne perioden, så forventer nå at den har samme verdier, men er delt i to
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-15"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-16/2020-01-20"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
@@ -293,50 +293,50 @@ internal class BarnsDødRegelTest {
         // 2. Opprinnelige periode -  Et "hull" mellom to uttaksperioder
         var periode = LukketPeriode("2020-01-21/2020-01-28")
         assertNull(uttaksplanFørRegelkjøring.perioder[periode])
-        // I ny plan skal denne nå være innvilget med 100%
-        sjekkInnvilget(
+        // I ny plan skal denne nå være oppfylt med 100%
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                forventetGrad = forventetGradInnvilgetÅrsakBarnetsDødsfall,
-                forventedeUtbetalingsgrader = forventetUtbetalingsgraderInnvilgetÅrsakBarnetsDødsfall
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
+                forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )
 
         // 3. Opprinnelige periode
         periode = LukketPeriode("2020-01-29/2020-01-31")
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // Forventer at denne perioden skal være som den var ettersom den er avkortet mot inntekt
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = periode,
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
         // 4. Opprinnelige periode
         periode = LukketPeriode("2020-02-01/2020-02-10")
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // Avslag skal forbli avslag, forventer det samme
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetAvslåttÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
         )
         // 5. Opprinnelig periode
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-03-01"),
-                forventedeInnvilgetÅrsak = Årsak.GRADERT_MOT_TILSYN,
+                forventedeOppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 forventetGrad = forventetGradVedGraderingMotTilsyn,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedGraderingMotTilsyn
         )
@@ -344,25 +344,25 @@ internal class BarnsDødRegelTest {
         //      1) 2020-02-11 - 2020-02-27 (Sistnevnte 6 uker etter dødsfallet)
         //         Denne perioden bør nå være Avkortet mot inntekt istedenfor Gradert mot tilsyn
         //      2) 2020-02-28 - 2020-03-01
-        //         Denne perioden bør være avslått med en årsak; 'BARNETS_DØDSFALL'
-        sjekkInnvilget(
+        //         Denne perioden bør være ikke oppfylt med en årsak; 'BARNETS_DØDSFALL'
+        sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-27"),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
                 forventetGrad = forventetGradVedAvkortingMotArbeid,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderVedAvkortingMotArbeid
         )
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-02-28/2020-03-01"),
-                forventetAvslåttÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
         )
     }
 
     @Test
-    internal fun `Om barnet dør i en avslått periode`() {
+    internal fun `Om barnet dør i en ikke oppfylt periode`() {
         val grunnlag = lagGrunnlag(
-                dødeIEnAvslåttPeriode = true
+                dødeIEnIkkeOppfyltPeriode = true
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
                 dødsdato = null
@@ -404,15 +404,15 @@ internal class BarnsDødRegelTest {
                 }
 
 
-        // Alle perioder etter dødsdato bør være avslått med rett årsak
+        // Alle perioder etter dødsdato bør være ikke oppfylt med rett årsak
         uttaksplanEtterRegelkjøring.perioder
                 .filterKeys { it.fom.isAfter(dødsdato) }
                 .forEach { (periode, periodeInfo) ->
                     assertThat(periodeInfo.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
-                    sjekkAvslåttInneholderAvslåttÅrsaker(
+                    sjekkIkkeOppfyltPeriodeInneholderIkkeOppfyltÅrsaker(
                             uttaksplan = uttaksplanEtterRegelkjøring,
                             forventetPeriode = periode,
-                            forventetAvslåttÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
+                            forventetIkkeOppfyltÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
                     )
                 }
     }
@@ -450,7 +450,7 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
-    internal fun `Om barnet dør før første søknadsperiode skal alle perioder blir avslått`() {
+    internal fun `Om barnet dør før første søknadsperiode skal alle perioder blir ikke oppfylt`() {
         val grunnlag = lagGrunnlag(
                 dødeFørFørsteSøknadsperiode = true
         )
@@ -472,23 +472,23 @@ internal class BarnsDødRegelTest {
         assertEquals(uttaksplanFørRegelkjøring.perioder.size, uttaksplanEtterRegelkjøring.perioder.size)
 
         uttaksplanEtterRegelkjøring.perioder.forEach { (periode, _) ->
-            sjekkAvslåttInneholderAvslåttÅrsaker(
+            sjekkIkkeOppfyltPeriodeInneholderIkkeOppfyltÅrsaker(
                     uttaksplan = uttaksplanEtterRegelkjøring,
                     forventetPeriode = periode,
-                    forventetAvslåttÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
+                    forventetIkkeOppfyltÅrsaker = setOf(Årsak.BARNETS_DØDSFALL)
             )
         }
     }
 
     private fun lagGrunnlag(
-            dødeIEnAvslåttPeriode: Boolean = false,
-            dødeIEnPeriodeGradertMotTilsyn: Boolean = false,
-            dødeIEnPeriodeAvkortetMotInntekt: Boolean = false,
-            dødeFørFørsteSøknadsperiode: Boolean = false,
-            dødeEtterSisteSøknadsperiode: Boolean = false
+        dødeIEnIkkeOppfyltPeriode: Boolean = false,
+        dødeIEnPeriodeGradertMotTilsyn: Boolean = false,
+        dødeIEnPeriodeAvkortetMotInntekt: Boolean = false,
+        dødeFørFørsteSøknadsperiode: Boolean = false,
+        dødeEtterSisteSøknadsperiode: Boolean = false
     ) : RegelGrunnlag {
         val antallFlaggSatt = listOf(
-                dødeIEnAvslåttPeriode,
+                dødeIEnIkkeOppfyltPeriode,
                 dødeIEnPeriodeGradertMotTilsyn,
                 dødeIEnPeriodeAvkortetMotInntekt,
                 dødeFørFørsteSøknadsperiode,
@@ -504,7 +504,7 @@ internal class BarnsDødRegelTest {
 
         val barnetsDødsdato =
                 when {
-                    dødeIEnAvslåttPeriode -> LocalDate.parse("2020-02-08")
+                    dødeIEnIkkeOppfyltPeriode -> LocalDate.parse("2020-02-08")
                     dødeIEnPeriodeGradertMotTilsyn -> LocalDate.parse("2020-02-15")
                     dødeIEnPeriodeAvkortetMotInntekt -> LocalDate.parse("2020-01-15")
                     dødeFørFørsteSøknadsperiode-> LocalDate.parse("2019-12-31")

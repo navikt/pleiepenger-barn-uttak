@@ -5,11 +5,11 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
 
-internal class InngangsvilkårAvslåttRegel : PeriodeRegel {
+internal class InngangsvilkårIkkeOppfyltRegel : PeriodeRegel {
 
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
-        grunnlag.inngangsvilkårAvslått.overlappendePeriode(periode)?.apply {
-            return Avslått(årsaker = setOf(Årsak.INNGANGSVILKÅR_AVSLÅTT))
+        grunnlag.inngangsvilkårIkkeOppfylt.overlappendePeriode(periode)?.apply {
+            return IkkeOppfylt(årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT))
         }
         return TilBeregningAvGrad()
     }

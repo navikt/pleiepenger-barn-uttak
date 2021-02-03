@@ -9,7 +9,7 @@ internal class MedlemskapRegel : PeriodeRegel {
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
 
         grunnlag.ikkeMedlem.overlappendePeriode(periode)?.apply {
-            return Avslått(årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN))
+            return IkkeOppfylt(årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN))
         }
         return TilBeregningAvGrad()
     }

@@ -1,13 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-enum class Årsak(val innvilget: Boolean)  {
-    //Oppfylt årsak
+enum class Årsak(val oppfylt: Boolean)  {
+    //Oppfylt årsaker
     GRADERT_MOT_TILSYN(true),
     AVKORTET_MOT_INNTEKT(true),
     OPPFYLT_PGA_BARNETS_DØDSFALL(true),
     FULL_DEKNING(true),
 
-    //Ikke oppfylt årsak
+    //Ikke oppfylt årsaker
     UTENOM_TILSYNSBEHOV(false),
     FOR_LAV_GRAD(false),
     FOR_HØY_TILSYNSGRAD(false),
@@ -16,6 +16,6 @@ enum class Årsak(val innvilget: Boolean)  {
     SØKERS_DØDSFALL(false),
     BARNETS_DØDSFALL(false),
     SØKERS_ALDER(false),
-    INNGANGSVILKÅR_AVSLÅTT(false)
+    INNGANGSVILKÅR_IKKE_OPPFYLT(false)
 
 }

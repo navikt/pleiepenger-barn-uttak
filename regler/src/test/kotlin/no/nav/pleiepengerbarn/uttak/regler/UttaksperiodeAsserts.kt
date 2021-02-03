@@ -6,45 +6,45 @@ import org.junit.jupiter.api.Assertions.*
 
 internal object UttaksperiodeAsserts {
 
-    internal fun sjekkInnvilget(
-            uttaksplan: Uttaksplan,
-            forventetPeriode: LukketPeriode,
-            forventetGrad:Prosent,
-            forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
-            forventedeInnvilgetÅrsak: Årsak) {
+    internal fun sjekkOppfylt(
+        uttaksplan: Uttaksplan,
+        forventetPeriode: LukketPeriode,
+        forventetGrad:Prosent,
+        forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
+        forventedeOppfyltÅrsak: Årsak) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertThat(uttaksperiodeInfo).isNotNull()
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.OPPFYLT)
         assertThat(uttaksperiodeInfo.uttaksgrad).isEqualByComparingTo(forventetGrad)
 
         forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
-            val innvilgetUtbetalingsgrader = uttaksperiodeInfo.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
-            assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(innvilgetUtbetalingsgrader.utbetalingsgrad)
+            val utbetalingsgrader = uttaksperiodeInfo.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
+            assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(utbetalingsgrader.utbetalingsgrad)
         }
 
-//TODO: legg inn igjen innvilget årsak igjen når den settes riktig
-//        assertThat(innvilgetPeriode.årsak).isEqualTo(forventedeInnvilgetÅrsak)
+//TODO: legg inn igjen oppfylt årsak igjen når den settes riktig
+//        assertThat(oppfyltPeriode.årsak).isEqualTo(forventedeOppfyltÅrsak)
 
     }
 
-    internal fun sjekkAvslått(
-            uttaksplan: Uttaksplan,
-            forventetPeriode: LukketPeriode,
-            forventetAvslåttÅrsaker:Set<Årsak>) {
+    internal fun sjekkIkkeOppfylt(
+        uttaksplan: Uttaksplan,
+        forventetPeriode: LukketPeriode,
+        forventetIkkeOppfyltÅrsaker:Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertNotNull(uttaksperiodeInfo)
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
-        assertThat(uttaksperiodeInfo.årsaker).isEqualTo(forventetAvslåttÅrsaker)
+        assertThat(uttaksperiodeInfo.årsaker).isEqualTo(forventetIkkeOppfyltÅrsaker)
     }
 
-    internal fun sjekkAvslåttInneholderAvslåttÅrsaker(
-            uttaksplan: Uttaksplan,
-            forventetPeriode: LukketPeriode,
-            forventetAvslåttÅrsaker :Set<Årsak>) {
+    internal fun sjekkIkkeOppfyltPeriodeInneholderIkkeOppfyltÅrsaker(
+        uttaksplan: Uttaksplan,
+        forventetPeriode: LukketPeriode,
+        forventetIkkeOppfyltÅrsaker :Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertTrue(uttaksperiodeInfo != null)
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
-        assertTrue(uttaksperiodeInfo.årsaker.containsAll(forventetAvslåttÅrsaker))
+        assertTrue(uttaksperiodeInfo.årsaker.containsAll(forventetIkkeOppfyltÅrsaker))
     }
 
 }

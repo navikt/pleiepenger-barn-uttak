@@ -2,8 +2,8 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.prosent
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
@@ -65,15 +65,15 @@ internal class SøkersAlderRegelTest {
 
         assertEquals(2, uttaksplan.perioder.size)
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode1,
-                forventetAvslåttÅrsaker = setOf(Årsak.SØKERS_ALDER)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.SØKERS_ALDER)
         )
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE,
                         Årsak.SØKERS_ALDER
                 )
@@ -81,9 +81,9 @@ internal class SøkersAlderRegelTest {
     }
 
     @Test
-    internal fun `Søker fyller ikke 70 i løpet av en innvilget periode`() {
+    internal fun `Søker fyller ikke 70 i løpet av en oppfylt periode`() {
         val grunnlag = lagRegelGrunnlag(
-                fyllerÅrIEnInnvilgetPeriode = true
+                fyllerÅrIEnOppfyltPeriode = true
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -91,24 +91,24 @@ internal class SøkersAlderRegelTest {
 
         assertEquals(3, uttaksplan.perioder.size)
 
-        sjekkInnvilget(
+        sjekkOppfylt(
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-09"),
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
-                forventetAvslåttÅrsaker = setOf(Årsak.SØKERS_ALDER)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.SØKERS_ALDER)
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE,
                         Årsak.SØKERS_ALDER
                 )
@@ -126,18 +126,18 @@ internal class SøkersAlderRegelTest {
 
         assertEquals(2, uttaksplan.perioder.size)
 
-        sjekkInnvilget(
+        sjekkOppfylt(
                 forventetPeriode = periode1,
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode2,
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE,
                         Årsak.SØKERS_ALDER
                 )
@@ -145,9 +145,9 @@ internal class SøkersAlderRegelTest {
     }
 
     @Test
-    internal fun `Søker fyller 70 mellom i løpet av en avslått periode`() {
+    internal fun `Søker fyller 70 mellom i løpet av en ikke oppfylt periode`() {
         val grunnlag = lagRegelGrunnlag(
-                fyllerÅrIEnAvslåttperiode = true
+                fyllerÅrIEnIkkeOppfyltPeriode = true
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -155,26 +155,26 @@ internal class SøkersAlderRegelTest {
 
         assertEquals(3, uttaksplan.perioder.size)
 
-        sjekkInnvilget(
+        sjekkOppfylt(
                 forventetPeriode = periode1,
                 uttaksplan = uttaksplan,
                 forventetGrad = Prosent(50),
                 forventedeUtbetalingsgrader = mapOf(),
-                forventedeInnvilgetÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-21/2020-01-23"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-24/2020-01-26"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE,
                         Årsak.SØKERS_ALDER
                 )
@@ -182,18 +182,18 @@ internal class SøkersAlderRegelTest {
     }
 
     private fun lagRegelGrunnlag(
-            fyllerÅrFørUttaksplanen: Boolean = false,
-            fyllerÅrEtterUttaksplanen: Boolean = false,
-            fyllerÅrIEnInnvilgetPeriode: Boolean = false,
-            fyllerÅrIEnAvslåttperiode: Boolean = false,
-            fyllerÅrIEtHullIUttaksplanen: Boolean = false,
-            fyllerÅrSisteDagISisteUttaksperiode: Boolean = false
+        fyllerÅrFørUttaksplanen: Boolean = false,
+        fyllerÅrEtterUttaksplanen: Boolean = false,
+        fyllerÅrIEnOppfyltPeriode: Boolean = false,
+        fyllerÅrIEnIkkeOppfyltPeriode: Boolean = false,
+        fyllerÅrIEtHullIUttaksplanen: Boolean = false,
+        fyllerÅrSisteDagISisteUttaksperiode: Boolean = false
     ) : RegelGrunnlag {
         val antallFlaggSatt = listOf(
                 fyllerÅrFørUttaksplanen,
                 fyllerÅrEtterUttaksplanen,
-                fyllerÅrIEnInnvilgetPeriode,
-                fyllerÅrIEnAvslåttperiode,
+                fyllerÅrIEnOppfyltPeriode,
+                fyllerÅrIEnIkkeOppfyltPeriode,
                 fyllerÅrIEtHullIUttaksplanen)
                 .filter { it }
                 .size
@@ -206,8 +206,8 @@ internal class SøkersAlderRegelTest {
                 when {
                     fyllerÅrFørUttaksplanen -> LocalDate.parse("2019-12-31")
                     fyllerÅrEtterUttaksplanen -> LocalDate.parse("2020-02-01")
-                    fyllerÅrIEnInnvilgetPeriode -> LocalDate.parse("2020-01-09")
-                    fyllerÅrIEnAvslåttperiode -> LocalDate.parse("2020-01-23")
+                    fyllerÅrIEnOppfyltPeriode -> LocalDate.parse("2020-01-09")
+                    fyllerÅrIEnIkkeOppfyltPeriode -> LocalDate.parse("2020-01-23")
                     fyllerÅrIEtHullIUttaksplanen -> LocalDate.parse("2020-01-15")
                     fyllerÅrSisteDagISisteUttaksperiode -> LocalDate.parse("2020-01-26")
                     else -> null

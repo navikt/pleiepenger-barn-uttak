@@ -23,6 +23,6 @@ data class Aktivitet @JsonCreator constructor(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ForenkletUttaksperiode @JsonCreator constructor(
     @JsonProperty("periode") val periode:LukketPeriode,
-    @JsonProperty("innvilget") val innvilget: Boolean,
+    @JsonProperty("oppfylt") val oppfylt: Boolean,
     @JsonProperty("utbetalingsgrad") val utbetalingsgrad:Prosent
 )

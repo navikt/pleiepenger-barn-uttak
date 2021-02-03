@@ -8,7 +8,7 @@ internal interface PeriodeRegel {
 }
 
 internal interface Regelutfall
-internal class Avslått(internal val årsaker: Set<Årsak>) : Regelutfall
+internal class IkkeOppfylt(internal val årsaker: Set<Årsak>) : Regelutfall
 internal class TilBeregningAvGrad : Regelutfall
 
 internal interface UttaksplanRegel {

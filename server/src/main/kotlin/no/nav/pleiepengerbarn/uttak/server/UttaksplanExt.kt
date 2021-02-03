@@ -22,13 +22,10 @@ private fun UttaksperiodeInfo.tilForenkletUttaksperiode(periode: LukketPeriode, 
     val periodeInfo = this
     return when (periodeInfo.utfall) {
         Utfall.OPPFYLT -> {
-            ForenkletUttaksperiode(periode = periode, innvilget = true, utbetalingsgrad = periodeInfo.utbetalingsgrader.finnFor(arbeidsforhold))
+            ForenkletUttaksperiode(periode = periode, oppfylt = true, utbetalingsgrad = periodeInfo.utbetalingsgrader.finnFor(arbeidsforhold))
         }
         Utfall.IKKE_OPPFYLT -> {
-            ForenkletUttaksperiode(periode = periode, innvilget = false, utbetalingsgrad = Prosent.ZERO)
-        }
-        else -> {
-            throw IllegalStateException("Skal ikke kunne være andre sub-klasser enn InnvilgetPeriode og AvslåttPeriode.")
+            ForenkletUttaksperiode(periode = periode, oppfylt = false, utbetalingsgrad = Prosent.ZERO)
         }
     }
 }

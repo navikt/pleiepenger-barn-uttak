@@ -27,7 +27,7 @@ object GrunnlagMapper {
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
-                inngangsvilkårAvslått = uttaksgrunnlag.inngangsvilkårAvslått,
+                inngangsvilkårIkkeOppfylt = uttaksgrunnlag.inngangsvilkårIkkeOppfylt,
                 andrePartersUttaksplan = andrePartersUttakplan,
                 ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
         )

@@ -10,6 +10,6 @@ internal class TilsynsbehovRegel : PeriodeRegel {
         grunnlag.pleiebehov.entries.map { it.key }.overlappendePeriode(periode)?.apply {
             return TilBeregningAvGrad()
         }
-        return Avslått(årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV))
+        return IkkeOppfylt(årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV))
     }
 }

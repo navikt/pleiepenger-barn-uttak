@@ -1,8 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkAvslått
-import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkInnvilget
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
+import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overordnetPeriode
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -17,7 +17,7 @@ internal class SøkersDødRegelTest {
     }
 
     @Test
-    internal fun `Søker dør i en innvilget perioder med påfølgende uttaksperioder`() {
+    internal fun `Søker dør i en oppfylt periode med påfølgende uttaksperioder`() {
         val søkersDødsdato = LocalDate.parse("2020-01-07")
 
         var uttaksplan = Uttaksplan(
@@ -61,34 +61,34 @@ internal class SøkersDødRegelTest {
 
         assertEquals(4, uttaksplan.perioder.size)
 
-        sjekkInnvilget(
+        sjekkOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetGrad = Prosent(80),
-                forventedeInnvilgetÅrsak = Årsak.AVKORTET_MOT_INNTEKT
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.SØKERS_DØDSFALL
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-30"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.LOVBESTEMT_FERIE,
                         Årsak.SØKERS_DØDSFALL
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-10/2020-02-25"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.SØKERS_DØDSFALL
                 )
         )
@@ -167,7 +167,7 @@ internal class SøkersDødRegelTest {
     }
 
     @Test
-    internal fun `Søker dør i en avslått periode med påfølgende innvilget periode`() {
+    internal fun `Søker dør i en ikke oppfylt periode med påfølgende oppfylt periode`() {
         val søkersDødsdato = LocalDate.parse("2020-01-07")
 
         var uttaksplan = Uttaksplan(
@@ -202,27 +202,27 @@ internal class SøkersDødRegelTest {
 
         assertEquals(3, uttaksplan.perioder.size)
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN,
                         Årsak.SØKERS_DØDSFALL
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-02-11/2020-02-20"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.SØKERS_DØDSFALL
                 )
         )
@@ -293,18 +293,18 @@ internal class SøkersDødRegelTest {
 
         assertEquals(2, uttaksplan.perioder.size)
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-10"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.SØKERS_DØDSFALL
                 )
         )
 
-        sjekkAvslått(
+        sjekkIkkeOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-15"),
-                forventetAvslåttÅrsaker = setOf(
+                forventetIkkeOppfyltÅrsaker = setOf(
                         Årsak.UTENOM_TILSYNSBEHOV,
                         Årsak.SØKERS_DØDSFALL
                 )
