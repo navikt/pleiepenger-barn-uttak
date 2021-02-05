@@ -19,14 +19,14 @@ internal object UttaksplanRegler {
     private val PeriodeRegler = linkedSetOf(
             MedlemskapRegel(),
             FerieRegel(),
-            InngangsvilkårIkkeOppfyltRegel(),
             TilsynsbehovRegel()
     )
 
     private val UttaksplanRegler = linkedSetOf(
             BarnsDødRegel(), // Må kjøres først av uttaksplanreglene
             SøkersAlderRegel(),
-            SøkersDødRegel()
+            SøkersDødRegel(),
+            InngangsvilkårIkkeOppfyltRegel()
     )
 
     internal fun fastsettUttaksplan(

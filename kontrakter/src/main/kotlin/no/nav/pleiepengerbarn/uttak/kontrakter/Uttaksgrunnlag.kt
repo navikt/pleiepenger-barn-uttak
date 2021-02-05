@@ -21,7 +21,15 @@ data class Uttaksgrunnlag (
     @JsonProperty("tilsynsbehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
-    @JsonProperty("inngangsvilkårIkkeOppfylt") val inngangsvilkårIkkeOppfylt: List<LukketPeriode> = listOf(),
+    @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     @JsonProperty("medlemskap") val medlemskap: Map<LukketPeriode, Medlemskap> = mapOf()
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class Vilkårsperiode(
+    @JsonProperty("periode") val periode: LukketPeriode,
+    @JsonProperty("utfall") val utfall: Utfall
 )

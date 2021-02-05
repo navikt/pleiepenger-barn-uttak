@@ -42,6 +42,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("årsak") val årsaker: Set<Årsak>,
+    @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
     @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
     @JsonProperty("knekkpunktTyper") val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
     @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID,
