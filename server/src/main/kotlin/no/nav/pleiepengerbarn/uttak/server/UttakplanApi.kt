@@ -61,7 +61,7 @@ class UttakplanApi {
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         if (forrigeUttaksplan != null) {
-            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(listOf(uttaksplan, forrigeUttaksplan))
+            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan)
         }
 
         if (lagre) {
