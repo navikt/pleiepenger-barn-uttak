@@ -12,7 +12,6 @@ enum class Årsak(val oppfylt: Boolean)  {
     FOR_LAV_GRAD(false),
     FOR_HØY_TILSYNSGRAD(false),
     LOVBESTEMT_FERIE(false),
-    IKKE_MEDLEM_I_FOLKETRYGDEN(false),
     SØKERS_DØDSFALL(false),
     BARNETS_DØDSFALL(false),
     SØKERS_ALDER(false),

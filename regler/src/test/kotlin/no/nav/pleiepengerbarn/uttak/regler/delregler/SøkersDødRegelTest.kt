@@ -175,7 +175,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-01/2020-01-10") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN),
+                                årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
                                 annenPart = AnnenPart.ALENE
                         ),
                         LukketPeriode("2020-02-11/2020-02-20") to UttaksperiodeInfo.innvilgelse(
@@ -206,7 +206,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-01/2020-01-07"),
                 forventetIkkeOppfyltÅrsaker = setOf(
-                        Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN
+                        Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT
                 )
         )
 
@@ -214,7 +214,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
                 forventetIkkeOppfyltÅrsaker = setOf(
-                        Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN,
+                        Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT,
                         Årsak.SØKERS_DØDSFALL
                 )
         )

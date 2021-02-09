@@ -133,31 +133,6 @@ TODO: fiks når tilsyn er ordentlig implementert
 */
 
     @Test
-    fun `Kun medlem i slutten av søknadsperioden`() {
-        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-25")
-        val grunnlag = RegelGrunnlag(
-                søker = Søker(
-                        fødselsdato = LocalDate.now().minusYears(20)
-                ),
-                pleiebehov = mapOf(
-                        søknadsperiode to Pleiebehov.PROSENT_100
-                ),
-                søknadsperioder = listOf(søknadsperiode),
-                ikkeMedlem = listOf(LukketPeriode("2020-01-01/2020-01-15")),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
-        )
-
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
-
-        assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkIkkeOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-15"), setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN))
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-25"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-    }
-
-    @Test
     fun `Får jobbet siste halvdel av en perioder`() {
         val søknadsperiode = LukketPeriode("2020-03-09/2020-03-22")
         val periode1 = LukketPeriode("2020-03-09/2020-03-15")

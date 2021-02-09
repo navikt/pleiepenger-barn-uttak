@@ -21,7 +21,6 @@ internal object KnekkpunktUtleder {
 
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
-        finnForIkkeMedlem(knekkpunkMap, regelGrunnlag.ikkeMedlem)
         finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.pleiebehov)
@@ -34,10 +33,6 @@ internal object KnekkpunktUtleder {
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
-    }
-
-    private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
-        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM_I_FOLKETRYGDEN) }
     }
 
     private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Duration>) {

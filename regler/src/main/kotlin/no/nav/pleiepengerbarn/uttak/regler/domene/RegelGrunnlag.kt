@@ -13,6 +13,5 @@ data class RegelGrunnlag(
     val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     val lovbestemtFerie: List<LukketPeriode> = listOf(),
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
-    val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
-    val ikkeMedlem: List<LukketPeriode> = listOf()
+    val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf()
 )

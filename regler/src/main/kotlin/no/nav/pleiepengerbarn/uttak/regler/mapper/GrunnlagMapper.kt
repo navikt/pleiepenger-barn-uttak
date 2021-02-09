@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.ikkeMedlem
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 
 object GrunnlagMapper {
@@ -28,8 +27,7 @@ object GrunnlagMapper {
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
-                andrePartersUttaksplan = andrePartersUttakplan,
-                ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
+                andrePartersUttaksplan = andrePartersUttakplan
         )
     }
 

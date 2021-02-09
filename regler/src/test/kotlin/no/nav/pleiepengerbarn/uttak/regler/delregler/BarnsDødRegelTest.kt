@@ -201,13 +201,13 @@ internal class BarnsDødRegelTest {
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         // Avslag skal forbli avslag, forventer det samme
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         // 5. Opprinnelig periode
         sjekkOppfylt(
@@ -324,13 +324,13 @@ internal class BarnsDødRegelTest {
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         // Avslag skal forbli avslag, forventer det samme
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = periode,
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         // 5. Opprinnelig periode
         sjekkOppfylt(
@@ -538,8 +538,8 @@ internal class BarnsDødRegelTest {
                 tilsynsperioder = mapOf(
                         LukketPeriode("2020-02-11/2020-03-01") to Prosent(60)
                 ).somTilsynperioder(),
-                ikkeMedlem = listOf(
-                        LukketPeriode("2020-02-01/2020-02-10")
+                inngangsvilkår = mapOf(
+                    "MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-02-01/2020-02-10"), Utfall.IKKE_OPPFYLT))
                 )
         )
     }

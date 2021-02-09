@@ -5,9 +5,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
-
-
-
 internal val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
 internal val INGENTING = Duration.ZERO
 
@@ -20,8 +17,6 @@ internal val ARBEIDSFORHOLD2 = Arbeidsforhold(type="arbeidsgiver", organisasjons
 internal val ARBEIDSFORHOLD3 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 //internal val ARBEIDSFORHOLD4 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
 //internal val ARBEIDSFORHOLD5 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
-
-
 
 internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String): Uttaksgrunnlag {
     val søknadsperiode = LukketPeriode(periode)
@@ -51,8 +46,7 @@ internal fun lagGrunnlag(
         søknadsperioder = listOf(søknadsperiode),
         arbeid = arbeid,
         pleiebehov = pleiebehov,
-        tilsynsperioder = tilsynsperioder,
-        medlemskap = mapOf(HELE_2020 to Medlemskap()) //TODO: endret når medlemskap er implementert
+        tilsynsperioder = tilsynsperioder
     )
 }
 
