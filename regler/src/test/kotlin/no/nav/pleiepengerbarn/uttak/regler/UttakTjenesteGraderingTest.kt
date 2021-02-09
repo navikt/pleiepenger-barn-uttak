@@ -16,12 +16,16 @@ internal class UttakTjenesteGraderingTest {
     private companion object {
         private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
         private val INGENTING = Duration.ZERO
+
+        private val arbeidsforhold1 = UUID.randomUUID().toString()
+        private val arbeidsforhold2 = UUID.randomUUID().toString()
+        private val arbeidsforhold3 = UUID.randomUUID().toString()
+        private val arbeidsforhold4 = UUID.randomUUID().toString()
+
+        private val aktørIdSøker = "123"
+        private val aktørIdBarn = "456"
     }
 
-    private val arbeidsforhold1 = UUID.randomUUID().toString()
-    private val arbeidsforhold2 = UUID.randomUUID().toString()
-    private val arbeidsforhold3 = UUID.randomUUID().toString()
-    private val arbeidsforhold4 = UUID.randomUUID().toString()
 
     private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
 
@@ -29,7 +33,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -57,7 +65,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -81,7 +93,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -110,7 +126,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -142,7 +162,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -174,7 +198,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -200,7 +228,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -228,7 +260,11 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -256,7 +292,11 @@ TODO: fiks til realistiske arbeidsforhold
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         enUke to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -294,7 +334,11 @@ TODO: fiks til realistiske arbeidsforhold
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -326,7 +370,11 @@ TODO: fiks til realistiske arbeidsforhold
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)

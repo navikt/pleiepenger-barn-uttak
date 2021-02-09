@@ -35,12 +35,19 @@ internal fun lagGrunnlag(
     arbeid: List<Arbeid>,
     pleiebehov: Map<LukketPeriode, Pleiebehov>,
     tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
-    søker: Søker = Søker(LocalDate.parse("2000-01-01")),
+    søker: Søker = Søker(
+        aktørId = "123",
+        fødselsdato = LocalDate.parse("2000-01-01")
+    ),
+    barn: Barn  = Barn(
+        aktørId = "456"
+    ),
     saksnummer: Saksnummer = nesteSaksnummer(),
     behandlingUUID: BehandlingUUID = nesteBehandlingId()
 ): Uttaksgrunnlag {
     return Uttaksgrunnlag(
         søker = søker,
+        barn = barn,
         saksnummer = saksnummer,
         behandlingUUID = behandlingUUID,
         søknadsperioder = listOf(søknadsperiode),

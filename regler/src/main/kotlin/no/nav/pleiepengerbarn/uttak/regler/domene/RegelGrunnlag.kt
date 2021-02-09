@@ -5,7 +5,7 @@ import java.time.Duration
 
 data class RegelGrunnlag(
     val behandlingUUID: BehandlingUUID,
-    val barn: Barn = Barn(),
+    val barn: Barn,
     val søker: Søker,
     val pleiebehov: Map<LukketPeriode, Pleiebehov>,
     val søknadsperioder: List<LukketPeriode>,

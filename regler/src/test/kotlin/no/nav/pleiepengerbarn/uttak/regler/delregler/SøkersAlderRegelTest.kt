@@ -20,6 +20,10 @@ internal class SøkersAlderRegelTest {
         private val periode1 = LukketPeriode("2020-01-06/2020-01-12")
         private val periode2 = LukketPeriode("2020-01-21/2020-01-26")
         private val behandlingUUID = UUID.randomUUID().toString()
+
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
+
     }
 
     @Test
@@ -218,7 +222,11 @@ internal class SøkersAlderRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = behandlingUUID,
                 søker = Søker(
+                    aktørId = aktørIdSøker,
                     fødselsdato = fødselsdato
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 arbeid = mapOf(
                         "123" to mapOf(

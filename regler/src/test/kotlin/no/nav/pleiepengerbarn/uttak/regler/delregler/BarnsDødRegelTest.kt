@@ -33,6 +33,10 @@ internal class BarnsDødRegelTest {
         private val forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall = mapOf(
                 "123" to Prosent(100)
         )
+
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
+
     }
 
     @Test
@@ -41,6 +45,7 @@ internal class BarnsDødRegelTest {
                 denAndreOmsorgspersonensGrad = Prosent(80)
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -102,6 +107,7 @@ internal class BarnsDødRegelTest {
                 denAndreOmsorgspersonensGrad = Prosent(81)
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -142,6 +148,7 @@ internal class BarnsDødRegelTest {
                 dødeIEnPeriodeGradertMotTilsyn = true
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -253,6 +260,7 @@ internal class BarnsDødRegelTest {
                 dødeIEnPeriodeAvkortetMotInntekt = true
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -365,6 +373,7 @@ internal class BarnsDødRegelTest {
                 dødeIEnIkkeOppfyltPeriode = true
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -438,6 +447,7 @@ internal class BarnsDødRegelTest {
                 dødeEtterSisteSøknadsperiode = true
         )
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -456,6 +466,7 @@ internal class BarnsDødRegelTest {
         )
 
         val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+                aktørId = aktørIdBarn,
                 dødsdato = null
         ))
 
@@ -515,9 +526,11 @@ internal class BarnsDødRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(50)
                 ),
                 barn = Barn(
+                        aktørId = aktørIdBarn,
                         dødsdato = barnetsDødsdato
                 ),
                 arbeid = mapOf(
@@ -552,9 +565,11 @@ internal class BarnsDødRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(50)
                 ),
                 barn = Barn(
+                        aktørId = aktørIdBarn,
                         dødsdato = barnetsDødsdato
                 ),
                 arbeid = mapOf(

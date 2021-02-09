@@ -16,16 +16,24 @@ internal class UttakTjenesteTest {
     private companion object {
         private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
         private val INGENTING = Duration.ZERO
+
+        private val arbeidsforhold1 = UUID.randomUUID().toString()
+
+        private val aktørIdSøker = "123"
+        private val aktørIdBarn = "456"
     }
 
-    private val arbeidsforhold1 = UUID.randomUUID().toString()
 
     @Test
     fun `Enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
@@ -51,7 +59,11 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
@@ -80,7 +92,11 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
@@ -108,7 +124,11 @@ TODO: fiks når tilsyn er ordentlig implementert
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -140,7 +160,11 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         søknadsperiode to Pleiebehov.PROSENT_100
@@ -181,7 +205,11 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
@@ -221,7 +249,11 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(20)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 tilsynsbehov = mapOf(
                         periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)

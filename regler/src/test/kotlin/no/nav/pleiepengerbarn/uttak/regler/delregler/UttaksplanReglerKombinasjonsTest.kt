@@ -19,6 +19,9 @@ internal class UttaksplanReglerKombinasjonsTest {
         private val helePerioden = LukketPeriode("2020-01-06/2020-01-12")
         private val forventetGrad = Prosent(50)
         private val forventedeUtbetalingsgrader = mapOf("123" to Prosent(50))
+
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
     }
 
     @Test
@@ -169,10 +172,12 @@ internal class UttaksplanReglerKombinasjonsTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = søkersFødselsdato,
                         dødsdato = søkersDødsdato
                 ),
                 barn = Barn(
+                        aktørId = aktørIdBarn,
                         dødsdato = barnetsDødsdato
                 ),
                 arbeid = mapOf(

@@ -30,11 +30,16 @@ import java.util.concurrent.TimeUnit
 @Transactional
 internal class UttakRepositoryTest {
 
-    private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
-    private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
-    private val heleMars = LukketPeriode(LocalDate.of(2020, Month.MARCH, 1), LocalDate.of(2020, Month.MARCH, 31))
+    private companion object {
+        private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+        private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
+        private val heleMars = LukketPeriode(LocalDate.of(2020, Month.MARCH, 1), LocalDate.of(2020, Month.MARCH, 31))
 
-    private val arbeidsforhold1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
+        private val arbeidsforhold1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
+
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
+    }
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
@@ -177,7 +182,13 @@ internal class UttakRepositoryTest {
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
-                søker = Søker(fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)),
+                søker = Søker(
+                    aktørId = aktørIdSøker,
+                    fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
+                ),
                 søknadsperioder = listOf(periode),
                 pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
                 arbeid = listOf(

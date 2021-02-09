@@ -10,6 +10,7 @@ import java.time.LocalDate
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Søker(
+        @JsonProperty("aktørId") val aktørId: String,
         @JsonProperty("fødselsdato") val fødselsdato: LocalDate,
         @JsonProperty("dødsdato") val dødsdato: LocalDate? = null
 )

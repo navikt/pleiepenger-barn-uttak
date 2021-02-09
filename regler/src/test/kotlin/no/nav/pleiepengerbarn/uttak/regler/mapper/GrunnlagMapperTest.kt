@@ -7,6 +7,12 @@ import java.lang.IllegalStateException
 import java.time.LocalDate
 
 internal class GrunnlagMapperTest {
+
+    private companion object {
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
+    }
+
     @Test
     internal fun `Duplikate arbeidsforholdreferanser med info satt skal feile`() {
         val arbeidsforholdReferanse = Arbeidsforhold(
@@ -61,7 +67,11 @@ internal class GrunnlagMapperTest {
             arbeidsforholdReferanse1: Arbeidsforhold,
             arbeidsforholdReferanse2: Arbeidsforhold) = Uttaksgrunnlag(
                     søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = LocalDate.now().minusYears(50)
+                    ),
+                    barn = Barn(
+                        aktørId = aktørIdBarn
                     ),
                     saksnummer = "1",
                     behandlingUUID = "2",

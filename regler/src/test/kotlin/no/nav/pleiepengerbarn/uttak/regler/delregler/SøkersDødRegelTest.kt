@@ -14,6 +14,9 @@ internal class SøkersDødRegelTest {
 
     private companion object {
         private val behandlingUUID = UUID.randomUUID().toString()
+
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
     }
 
     @Test
@@ -316,8 +319,12 @@ internal class SøkersDødRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = behandlingUUID,
                 søker = Søker(
+                        aktørId = aktørIdSøker,
                         fødselsdato = søkersDødsdato?:LocalDate.now().minusYears(50),
                         dødsdato = søkersDødsdato
+                ),
+                barn = Barn(
+                    aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
                         overordnetPeriode to Pleiebehov.PROSENT_100

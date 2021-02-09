@@ -64,6 +64,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
                             barn = Barn(
+                                    aktørId = grunnlag.barn.aktørId,
                                     dødsdato = null
                             ),
                             andrePartersUttaksplan = mapOf(),
