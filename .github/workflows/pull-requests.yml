@@ -14,4 +14,4 @@ jobs:
         with:
           java-version: '11.x'
       - name: Bygge JAR
-        run: ./mvnw clean package
+        run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml
