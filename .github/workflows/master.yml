@@ -30,8 +30,8 @@ jobs:
         env:
           DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
         run: |
-          echo "::set-env name=IMAGE::$DOCKER_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)"
-          echo "::set-env name=LATEST::$DOCKER_IMAGE:latest"
+          echo "IMAGE=$DOCKER_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "LATEST=$DOCKER_IMAGE:latest" >> $GITHUB_ENV
       - name: Bygge Docker image
         run: docker build . --pull --tag $IMAGE --tag $LATEST
       - name: Laste opp Docker image
