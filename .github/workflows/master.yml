@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: '11.x'
       - name: Bygge JAR
-        run: ./mvnw clean package --batch-mode
+        run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml
       - name: Sette Docker image navn og tag
         env:
           DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
