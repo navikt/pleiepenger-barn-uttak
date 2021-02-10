@@ -1,49 +1,23 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.EtHundreProsent
-import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak
-import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.periodeEtterSorgperiodenAvslåttÅrsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.perioderSomIkkeInngårI
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåTom
-import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger.BarnetsDødsfall
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
 internal class BarnsDødRegel : UttaksplanRegel {
+
     internal companion object {
         internal val EtHundreProsent = Prosent(100)
-
-        internal fun barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.BARNETS_DØDSFALL,
-                hjemler = setOf(BarnetsDødsfall.anvend(
-                        "Fastsatt at barnet døde utenfor en innvilget periode ($dødsdato). " +
-                                "Perioden avslås derfor ettersom det ikke foreligger rett til pleiepenger."
-                ))
-        )
-
-        internal fun periodeEtterSorgperiodenAvslåttÅrsak(dødsdato: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.BARNETS_DØDSFALL,
-                hjemler = setOf(BarnetsDødsfall.anvend(
-                        "Fastsatt at barnet døde i løpet av en innvilget periode ($dødsdato). " +
-                                "Perioden avslås ettersom den er etter 6 uker etter at dødsfallet fant sted."
-                ))
-        )
-
-        internal fun barnetsDødInnvilgetÅrsak(dødsdato: LocalDate) = InnvilgetÅrsak(
-                årsak = InnvilgetÅrsaker.BARNETS_DØDSFALL,
-                hjemler = setOf(BarnetsDødsfall.anvend(
-                        "Fastsatt at barnet døde i løpet av en innvilget periode ($dødsdato). " +
-                                "Perioden innvilges derfor ettersom den er innenfor 6 uker etter at dødsfallet fant sted. "
-                ))
-        )
     }
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
@@ -58,13 +32,14 @@ internal class BarnsDødRegel : UttaksplanRegel {
                 uttaksperiodeDaBarnetDøde = uttaksperiodeDaBarnetDøde
         )
 
-        val dødeIEnInnvilgetPeriode = perioder
+        val dødeIEnOppfyltPeriode = perioder
                 .inneholder(dødsdato)
-                ?.takeIf { it.value is InnvilgetPeriode } != null
+                ?.takeIf { it.value.utfall == Utfall.OPPFYLT } != null
 
-        if (!dødeIEnInnvilgetPeriode) {
+        if (!dødeIEnOppfyltPeriode) {
             perioder.avslåAllePerioderEtterDødsfallet(
-                    dødsdato = dødsdato
+                    dødsdato = dødsdato,
+                    grunnlag = grunnlag
             )
         } else {
             perioder.fjernAllePerioderEtterDødsfallet(
@@ -89,6 +64,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
                     grunnlag = grunnlag.copy(
                             barn = Barn(
+                                    aktørId = grunnlag.barn.aktørId,
                                     dødsdato = null
                             ),
                             andrePartersUttaksplan = mapOf(),
@@ -96,12 +72,10 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                     dødsdato = dødsdato
                             ),
                             tilsynsperioder = emptyMap(),
-                            tilsynsbehov = mapOf(sorgperiode to Tilsynsbehov(
-                                    prosent = TilsynsbehovStørrelse.PROSENT_100
-                            ))
+                            pleiebehov = mapOf(sorgperiode to Pleiebehov.PROSENT_100)
                     )
             ).perioder.mapValues { (_,uttaksPeriodeInfo) ->
-                uttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato)
+                uttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov()
             }
 
             // Legger til alle periodene etter dødsfallet
@@ -118,14 +92,16 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             sisteDagIUttaksplan = sisteDagIUttaksplan,
                             sisteDagISorgperioden = sisteDagISorgperioden
                     )
-                    .medArbeidsforholdFraForrigeInnvilgedePeriode(perioder)
+                    .medArbeidsforholdFraForrigeOppfyltePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
-                        val innvilgetÅrsak = barnetsDødInnvilgetÅrsak(dødsdato)
-                        perioder[periode] = InnvilgetPeriode(
-                                knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
-                                grad = EtHundreProsent,
-                                utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
-                                årsak = innvilgetÅrsak
+                        perioder[periode] = UttaksperiodeInfo.innvilgelse(
+                            uttaksgrad = EtHundreProsent,
+                            utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
+                            årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                            graderingMotTilsyn = null, //TODO: hva skal vi angi her???
+                            knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
+                            kildeBehandlingUUID = grunnlag.behandlingUUID,
+                            annenPart = grunnlag.annenPart(periode)
                         )
                     }
         }
@@ -162,7 +138,7 @@ private fun List<LukketPeriode>.plussDelenAvSorgperiodenSomIkkeInngårIUttakplan
  *      1) FOM til dødsdato - UttaksPeriodeInfo forblir som det var
  *      2) (dødsdato + 1 dag) til TOM - UtttaksPeriodeInfo forblir som det var, med knekkpunkt 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBarnetDøde(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.knekkUttaksperiodenDaBarnetDøde(
         dødsdato: LocalDate,
         uttaksperiodeDaBarnetDøde: Uttaksperiode?) {
     uttaksperiodeDaBarnetDøde?.takeUnless { it.key.tom.isEqual(dødsdato) }?.apply {
@@ -178,14 +154,13 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
                 tom = dødsdato
         ), periodeInfo)
 
-        val periodeInfoMedKnekkpunkt = when (periodeInfo) {
-            is InnvilgetPeriode -> {
+        val periodeInfoMedKnekkpunkt = when (periodeInfo.utfall) {
+            Utfall.OPPFYLT -> {
                 periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
-            is AvslåttPeriode -> {
+            Utfall.IKKE_OPPFYLT -> {
                 periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL))
             }
-            else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
         }
         // Legger til knekk (dødsdato+1) - TOM
         put(LukketPeriode(
@@ -198,19 +173,19 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.knekkUttaksperiodenDaBar
 
 /**
  *  - En liste med perioder vi ikke har noe informasjon om fra grunnlaget
- *  - Bruker arbeidsforholdene fra forrige innvilgede periode også for denne perioden,
+ *  - Bruker arbeidsforholdene fra forrige oppfylte periode også for denne perioden,
  *    men med ny utbetalingsgrad; 100%
  */
-private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
-        perioder: Map<LukketPeriode, UttaksPeriodeInfo>
+private fun List<LukketPeriode>.medArbeidsforholdFraForrigeOppfyltePeriode(
+        perioder: Map<LukketPeriode, UttaksperiodeInfo>
 ) : Map<LukketPeriode, List<Utbetalingsgrader>> {
-    val innvilgedePerioder = perioder
-            .filterValues { it is InnvilgetPeriode }
-            .mapValues { it.value as InnvilgetPeriode }
+    val oppfyltePerioder = perioder
+            .filterValues { it.utfall == Utfall.OPPFYLT }
+            .mapValues { it.value }
 
     val map = mutableMapOf<LukketPeriode, List<Utbetalingsgrader>>()
     forEach {
-        map[it] = innvilgedePerioder.arbeidsforholdFraForrigeInnvilgedePeriode(it)
+        map[it] = oppfyltePerioder.arbeidsforholdFraForrigeOppfyltePeriode(it)
     }
     return map
 }
@@ -219,9 +194,9 @@ private fun List<LukketPeriode>.medArbeidsforholdFraForrigeInnvilgedePeriode(
  *  - Finner utbetalingsgradene for perioden med TOM nærmeste den aktuelle perioden.
  *  - Bruker samme arbeidsforhold men overstyrer alle utbetalingsgradene til 100%
  */
-private fun Map<LukketPeriode, InnvilgetPeriode>.arbeidsforholdFraForrigeInnvilgedePeriode(
+private fun Map<LukketPeriode, UttaksperiodeInfo>.arbeidsforholdFraForrigeOppfyltePeriode(
         periode: LukketPeriode): List<Utbetalingsgrader> {
-    return innvilgetPeriodeMedNærmesteTom(periode.fom)
+    return oppfyltPeriodeMedNærmesteTom(periode.fom)
             .utbetalingsgrader
             .map {
                 it.copy(utbetalingsgrad = EtHundreProsent)
@@ -232,20 +207,20 @@ private fun Map<LukketPeriode, InnvilgetPeriode>.arbeidsforholdFraForrigeInnvilg
  *  - Finner innvilgede periode med TOM nærmest parameteret FOM
  *    som her er FOM i periden vi mangler informasjon om.
  */
-private fun Map<LukketPeriode, InnvilgetPeriode>.innvilgetPeriodeMedNærmesteTom(fom: LocalDate) : InnvilgetPeriode {
+private fun Map<LukketPeriode, UttaksperiodeInfo>.oppfyltPeriodeMedNærmesteTom(fom: LocalDate) : UttaksperiodeInfo {
     var nåværendePeriode = keys.first()
-    var nåværendeInnvilgetPeriode = values.first()
+    var nåværendeOppfyltPeriode = values.first()
     var nåværendeMellomrom = ChronoUnit.DAYS.between(nåværendePeriode.tom, fom)
 
-    filterNot { it.key == nåværendePeriode }.forEach { (periode, innvilgetPeriode) ->
+    filterNot { it.key == nåværendePeriode }.forEach { (periode, oppfyltPeriode) ->
         val nyttMellomrom = ChronoUnit.DAYS.between(periode.tom, fom)
         if (nyttMellomrom < nåværendeMellomrom) {
             nåværendePeriode = periode
             nåværendeMellomrom = nyttMellomrom
-            nåværendeInnvilgetPeriode = innvilgetPeriode
+            nåværendeOppfyltPeriode = oppfyltPeriode
         }
     }
-    return nåværendeInnvilgetPeriode
+    return nåværendeOppfyltPeriode
 }
 
 /**
@@ -272,27 +247,28 @@ private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalD
 
 /**
  *  - Alle periodene med FOM etter dødsdato avslås
- *      - De som allerede var avslått får en ny AvslåttÅrsak 'BARNETS_DØDSFALL'
- *      - De som var innvilget blir avslått med AvslåttÅrsak 'BARNETS_DØDSFALL'
+ *      - De som allerede var ikke oppfylt får en ny Årsak 'BARNETS_DØDSFALL'
+ *      - De som var oppfylt blir ikke oppfylt med IkkeOppfyltÅrsak 'BARNETS_DØDSFALL'
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterDødsfallet(
-        dødsdato: LocalDate) {
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterDødsfallet(dødsdato: LocalDate, grunnlag: RegelGrunnlag) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach {
         val periodeInfo = it.value
-        if (periodeInfo is AvslåttPeriode) {
-            val avslåttÅrsaker = periodeInfo
+        if (periodeInfo.utfall == Utfall.IKKE_OPPFYLT) {
+            val ikkeOppfyltÅrsaker = periodeInfo
                     .årsaker
                     .toMutableSet()
                     .also { årsaker ->
-                        årsaker.add(barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak(dødsdato))
+                        årsaker.add(Årsak.BARNETS_DØDSFALL)
                     }
             put(it.key, periodeInfo.copy(
-                    årsaker = avslåttÅrsaker)
+                    årsaker = ikkeOppfyltÅrsaker)
             )
         } else {
-            put(it.key, AvslåttPeriode(
-                    knekkpunktTyper = periodeInfo.knekkpunktTyper(),
-                    årsaker = setOf(barnetsDødUtenforInnvilgetPeriodeAvslåttÅrsak(dødsdato))
+            put(it.key, UttaksperiodeInfo.avslag(
+                årsaker = setOf(Årsak.BARNETS_DØDSFALL),
+                knekkpunktTyper = periodeInfo.knekkpunktTyper,
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                annenPart = grunnlag.annenPart(it.key)
             ))
         }
     }
@@ -301,17 +277,17 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterD
 /**
  *  - Alle perider med FOM etter dødsdato fjernes
  */
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fjernAllePerioderEtterDødsfallet(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fjernAllePerioderEtterDødsfallet(
         dødsdato: LocalDate) {
     filterKeys { it.fom.isAfter(dødsdato) }.forEach { (periode, _) ->
         remove(periode)
     }
 }
 
-private fun UttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov(dødsdato: LocalDate) : UttaksPeriodeInfo {
-    return if (this is AvslåttPeriode && årsaker.size == 1 && årsaker.first().årsak == AvslåttÅrsaker.UTENOM_TILSYNSBEHOV) {
+private fun UttaksperiodeInfo.håndterPeriodeUtenomTilsynsbehov() : UttaksperiodeInfo {
+    return if (this.utfall == Utfall.IKKE_OPPFYLT && årsaker.size == 1 && årsaker.first() == Årsak.UTENOM_TILSYNSBEHOV) {
         this.copy(
-                årsaker = setOf(periodeEtterSorgperiodenAvslåttÅrsak(dødsdato))
+                årsaker = setOf(Årsak.BARNETS_DØDSFALL)
         )
     } else this
 }

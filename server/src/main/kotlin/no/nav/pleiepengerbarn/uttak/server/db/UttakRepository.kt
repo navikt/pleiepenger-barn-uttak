@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -46,13 +45,42 @@ internal class UttakRepository {
         return null
     }
 
-    internal fun hent(saksnummer:Saksnummer):List<Uttaksplan> {
-        val uttaksplanJSONListe = jdbcTemplate.query("select uttaksplan from uttaksresultat where saksnummer = ? and slettet=false order by opprettet_tid desc",
-                uttaksplanRowMapper,
-                saksnummer)
-
-        return uttaksplanJSONListe.map { json -> fraJSON(json) }
+    internal fun hent(saksnummer:Saksnummer): Uttaksplan? {
+        val sisteBehandlingUUID = finnForrigeBehandlingUUID(saksnummer, null)
+        if (sisteBehandlingUUID != null) {
+            return hent(sisteBehandlingUUID)
+        }
+        return null
     }
+
+    fun hentForrige(saksnummer: Saksnummer, behandlingUUID: UUID): Uttaksplan? {
+        val forrigeBehandlingUUID = finnForrigeBehandlingUUID(saksnummer, behandlingUUID) ?: return null
+        return hent(forrigeBehandlingUUID)
+    }
+
+    private fun finnForrigeBehandlingUUID(saksnummer: Saksnummer, behandlingUUID: UUID?): UUID? {
+        val behandlingUUIDer = jdbcTemplate.query("select behandling_id from uttaksresultat where saksnummer = ? and slettet=false order by opprettet_tid",
+            {resultSet, _ -> UUID.fromString(resultSet.getString("behandling_id"))},
+            saksnummer)
+
+        //Dersom behandlingUUID er angitt, så skal behandlingen før angitt behandling returneres
+        if (behandlingUUID != null) {
+            for ((i, b) in behandlingUUIDer.withIndex()) {
+                if (b == behandlingUUID) {
+                    return if (i == 0) null else behandlingUUIDer[i - 1]
+                }
+            }
+        }
+
+        //Dersom behandling ikke er funnet er siste behandling forrige behandling.
+        if (behandlingUUIDer.isNotEmpty()) {
+            return behandlingUUIDer.last()
+        }
+
+        //Ingen behandling funnet
+        return null
+    }
+
 
     private fun slettTidligereUttaksplan(behandlingId: UUID) {
         jdbcTemplate.update("update uttaksresultat set slettet=true where behandling_id=?", behandlingId)

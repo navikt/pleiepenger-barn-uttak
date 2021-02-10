@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.ikkeMedlem
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 
 object GrunnlagMapper {
@@ -19,15 +18,16 @@ object GrunnlagMapper {
         }
 
         return RegelGrunnlag(
+                behandlingUUID = uttaksgrunnlag.behandlingUUID,
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
-                tilsynsbehov = uttaksgrunnlag.tilsynsbehov.sortertPåFom(),
+                pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
                 søknadsperioder = søknadsperioderSortert,
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
-                andrePartersUttaksplan = andrePartersUttakplan,
-                ikkeMedlem = uttaksgrunnlag.medlemskap.ikkeMedlem(søknadsperioderSortert)
+                inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
+                andrePartersUttaksplan = andrePartersUttakplan
         )
     }
 

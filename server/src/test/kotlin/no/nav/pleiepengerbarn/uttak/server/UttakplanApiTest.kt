@@ -1,6 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.testklient.*
+import no.nav.pleiepengerbarn.uttak.testklient.ARBEIDSFORHOLD1
+import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
+import no.nav.pleiepengerbarn.uttak.testklient.INGENTING
+import no.nav.pleiepengerbarn.uttak.testklient.PleiepengerBarnUttakTestClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,8 +18,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Duration
-import java.time.LocalDate
-import java.util.*
 import kotlin.test.fail
 
 
@@ -25,47 +28,34 @@ import kotlin.test.fail
 @Tag("integration")
 internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
-    private val testClient = PleiepengerBarnUttakTestClient(restTemplate)
-
-    private val FULL_DAG: Duration = Duration.ofHours(7).plusMinutes(30)
-    private val FULL_UKE: Duration = FULL_DAG.multipliedBy(5)
-
-    private val HUNDREPROSENT = Prosent(100)
-
-    private val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
-
-    private val ARBEIDSFORHOLD1 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789")
-    private val ARBEIDSFORHOLD2 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD3 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD4 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
-    private val ARBEIDSFORHOLD5 = ArbeidsforholdReferanse(type="arbeidsgiver", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
+    private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
         val grunnlag = lagGrunnlag(
-                søknadsperioder = listOf(søknadsperiode),
+                søknadsperiode = søknadsperiode,
                 arbeid = listOf(
-                        Arbeidsforhold(ARBEIDSFORHOLD1, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(FULL_UKE, Prosent(0))))
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                tilsynsbehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertInnvilget(
+        uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-01-01/2020-01-08"),
                 grad = HUNDREPROSENT,
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD1 to HUNDREPROSENT
                 ),
-                innvilgetÅrsak = InnvilgetÅrsaker.FULL_DEKNING
+                oppfyltÅrsak = Årsak.FULL_DEKNING
         )
-        uttaksplan.assertAvslått(
+        uttaksplan.assertIkkeOppfylt(
                 periode = LukketPeriode("2020-01-09/2020-01-10"),
-                avslåttÅrsaker = setOf(AvslåttÅrsaker.UTENOM_TILSYNSBEHOV),
+                ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
                 knekkpunktTyper = setOf(KnekkpunktType.TILSYNSBEHOV)
         )
     }
@@ -73,59 +63,132 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Enkelt uttak på flere arbeidsforhold`() {
-        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-16")
         val grunnlag = lagGrunnlag(
-                søknadsperioder = listOf(søknadsperiode),
+                søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
                 arbeid = listOf(
-                        Arbeidsforhold(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE.prosent(70), skalJobbeProsent = Prosent(50)))),
-                        Arbeidsforhold(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormaltPerUke = FULL_UKE.prosent(20), skalJobbeProsent = Prosent(0)))),
+                        Arbeid(ARBEIDSFORHOLD2, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(70), jobberNå = FULL_DAG.prosent(70).prosent(50)))),
+                        Arbeid(ARBEIDSFORHOLD3, mapOf(HELE_2020 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(20), jobberNå = INGENTING))),
                 ),
-                tilsynsbehov = mapOf(HELE_2020 to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)),
+                pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
         )
 
         val uttaksplan = grunnlag.opprettUttaksplan()
 
-        uttaksplan.assertInnvilget(
+        uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-10-12/2020-10-16"),
-                grad = Prosent(55),
+                grad = Prosent(61),
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD2 to Prosent(50),
                     ARBEIDSFORHOLD3 to Prosent(100)
                 ),
-                innvilgetÅrsak = InnvilgetÅrsaker.AVKORTET_MOT_INNTEKT
+                oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
     }
+
+    @Test
+    internal fun `Flere behandlinger med uttak etter hverandre`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-10").opprettUttaksplan()
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-11/2020-01-20"))
+    }
+
+    @Test
+    internal fun `Flere behandlinger med uttak med overlapp`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(2)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-20"))
+    }
+
+    @Test
+    internal fun `Flere behandlinger med uttak med overlapp midt i perioden`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(3)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-12"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-20"))
+    }
+
+
+    @Test
+    internal fun `Flere behandlinger med uttak hvor siste behandling overskygger først behandling`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-20"))
+    }
+
+    @Test
+    internal fun `En del av uttaksplan blir ikke oppfylt pga ikke oppfylte inngangsvilkår`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100)
+        ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+        assertThat(uttaksplan.perioder).hasSize(3)
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-04"))
+        uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-05/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
+            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
+        )
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-09/2020-01-10"))
+    }
+
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertInnvilget(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<ArbeidsforholdReferanse, Prosent> = mapOf(), innvilgetÅrsak: InnvilgetÅrsaker, knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
+    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
-        when (periodeInfo) {
-            is InnvilgetPeriode -> {
-                assertThat(periodeInfo.årsak).isEqualTo(innvilgetÅrsak)
-                assertThat(periodeInfo.grad).isEqualByComparingTo(grad)
+        when (periodeInfo.utfall) {
+            Utfall.OPPFYLT -> {
+                assertThat(periodeInfo.årsaker).isEqualTo(setOf(oppfyltÅrsak))
+                assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
                 gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
                 }
             }
-            else -> fail("Perioden $periode er ikke innvilget")
+            else -> fail("Perioden $periode er ikke oppfylt")
         }
     }
 
-    private fun Uttaksplan.assertAvslått(periode: LukketPeriode, avslåttÅrsaker: Set<AvslåttÅrsaker> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
+    private fun Uttaksplan.assertIkkeOppfylt(periode: LukketPeriode, ikkeOppfyltÅrsaker: Set<Årsak> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
-        when (periodeInfo) {
-            is AvslåttPeriode -> {
-                val årsaker = periodeInfo.årsaker.map { it.årsak } .toSet()
-                assertThat(årsaker).isEqualTo(avslåttÅrsaker)
-                assertThat(periodeInfo.knekkpunktTyper()).isEqualTo(knekkpunktTyper)
+        when (periodeInfo.utfall) {
+            Utfall.IKKE_OPPFYLT -> {
+                assertThat(periodeInfo.årsaker).isEqualTo(ikkeOppfyltÅrsaker)
+                assertThat(periodeInfo.knekkpunktTyper).isEqualTo(knekkpunktTyper)
             }
-            else -> fail("Perioden $periode er ikke avslått")
+            else -> fail("Perioden $periode er oppfylt")
         }
     }
 
@@ -133,28 +196,4 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return this.multipliedBy(prosent).dividedBy(100)
     }
 
-    private fun lagGrunnlag(
-            søknadsperioder: List<LukketPeriode>,
-            arbeid: Arbeid,
-            tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>,
-            tilsynsperioder: Map<LukketPeriode, TilsynPeriodeInfo> = mapOf(),
-            søker: Søker = Søker(LocalDate.parse("2000-01-01")),
-            saksnummer: Saksnummer = nesteSaksnummer(),
-            behandlingId: BehandlingId = nesteBehandlingId()
-    ): Uttaksgrunnlag {
-        return Uttaksgrunnlag(
-                søker = søker,
-                saksnummer = saksnummer,
-                behandlingId = behandlingId,
-                søknadsperioder = søknadsperioder,
-                arbeid = arbeid,
-                tilsynsbehov = tilsynsbehov,
-                tilsynsperioder = tilsynsperioder,
-                medlemskap = mapOf(HELE_2020 to Medlemskap()) //TODO: endret når medlemskap er implementert
-        )
-    }
-
-
-    private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
-    private fun nesteBehandlingId(): BehandlingId = UUID.randomUUID().toString()
 }

@@ -1,105 +1,30 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
+import no.nav.fpsak.tidsserie.LocalDateSegment
+import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
-import java.time.LocalDate
 
 object UttaksplanMerger {
 
-    fun slåSammenUttaksplaner(uttaksplaner:List<Uttaksplan>): Uttaksplan {
-        if (uttaksplaner.isEmpty())  {
-            return Uttaksplan()
-        }
-        //Sjekk at det finnes minst en periode, hvis ikke returner en tom uttaksplan
-        uttaksplaner.find { uttaksplan -> uttaksplan.perioder.isNotEmpty() } ?: return Uttaksplan()
-        //Dersom det kun finnes bare en uttaksplan, så bare kopieres alle perioder fra denne ene uttaksplanen
-        if (uttaksplaner.size == 1) {
-            return Uttaksplan(perioder = uttaksplaner[0].perioder)
-        }
-
-        val nyePerioder = mutableMapOf<LukketPeriode, UttaksPeriodeInfo>()
-
-
-        var (start, index) = finnFørsteUttaksdato(uttaksplaner)
-        val slutt = finnSisteUttaksdato(uttaksplaner)
-
-        require(!start.isAfter(slutt)) {"FOM(${start}) kan ikke være etter TOM(${slutt})"}
-
-        var dato = start
-        var startPeriode:LocalDate? = start
-        var sisteOverlappendePeriode: Uttaksperiode? = null
-        while(!dato.isAfter(slutt)) {
-            
-            val (overlappendePeriode, overlappendeIndex) = finnFørsteOverlapp(dato.plusDays(1), uttaksplaner)
-
-            if (sisteOverlappendePeriode == null) {
-                sisteOverlappendePeriode = overlappendePeriode
-            }
-
-            if (startPeriode != null) {
-                if (overlappendeIndex == null) {
-                    if (sisteOverlappendePeriode != null) {
-                        nyePerioder[sisteOverlappendePeriode.key.copy(fom = startPeriode, tom = dato)] = sisteOverlappendePeriode.value
-                        startPeriode = null
-                    }
-                    sisteOverlappendePeriode = null
-                } else if (overlappendeIndex != index) {
-                    nyePerioder[sisteOverlappendePeriode?.key?.copy(fom = startPeriode, tom = dato)!!] = sisteOverlappendePeriode.value
-                    index = overlappendeIndex
-                    sisteOverlappendePeriode = overlappendePeriode
-                    startPeriode = dato.plusDays(1)
-                }
-
-            } else {
-                if (overlappendeIndex != null) {
-                    startPeriode = dato
-                    index = overlappendeIndex
-                }
-            }
-            dato = dato.plusDays(1)
-        }
-
-        return Uttaksplan(nyePerioder)
+    fun slåSammenUttaksplaner(forrigeUttaksplan: Uttaksplan, nyUttaksplan: Uttaksplan): Uttaksplan {
+        val segmenterForrigeUttaksplan = lagSegmenter(forrigeUttaksplan)
+        val segmenterNyUttaksplan = lagSegmenter(nyUttaksplan)
+        return lagSammenslåttUttaksplan(segmenterForrigeUttaksplan, segmenterNyUttaksplan)
     }
 
-
-    private fun finnFørsteUttaksdato(uttaksplaner:List<Uttaksplan>): Pair<LocalDate, Int> {
-        var førsteUttaksdato = LocalDate.MAX
-        var førsteUttaksdatoIndex = 0
-        var index = 0
-        uttaksplaner.forEach {
-            val uttaksplansFørsteUttaksdato = it.perioder.sortertPåFom().firstKey().fom
-            if (uttaksplansFørsteUttaksdato < førsteUttaksdato) {
-                førsteUttaksdato = uttaksplansFørsteUttaksdato
-                førsteUttaksdatoIndex = index
-            }
-            index++
-        }
-        return Pair(førsteUttaksdato, førsteUttaksdatoIndex)
+    private fun lagSegmenter(uttaksplan:Uttaksplan): List<LocalDateSegment<UttaksperiodeInfo>> {
+        return uttaksplan.perioder.map { (periode, info) -> LocalDateSegment(periode.fom, periode.tom, info) }
     }
 
-    private fun finnSisteUttaksdato(uttaksplaner:List<Uttaksplan>): LocalDate {
-        var sisteUttaksdato = LocalDate.MIN
-        uttaksplaner.forEach {
-            val uttaksplansSisteUttaksdato = it.perioder.sortertPåFom().lastKey().tom
-            if (uttaksplansSisteUttaksdato > sisteUttaksdato) {
-                sisteUttaksdato = uttaksplansSisteUttaksdato
-            }
+    private fun lagSammenslåttUttaksplan(segmenterForrigeUttaksplan: List<LocalDateSegment<UttaksperiodeInfo>>, segmenterNyUttaksplan: List<LocalDateSegment<UttaksperiodeInfo>>): Uttaksplan {
+        val timelineGammelUttaksplan = LocalDateTimeline(segmenterForrigeUttaksplan)
+        val timelineNyUttaksplan = LocalDateTimeline(segmenterNyUttaksplan)
+        val sammenslåttTimeline = timelineNyUttaksplan.crossJoin(timelineGammelUttaksplan).compress()
+        val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
+        sammenslåttTimeline.toSegments().forEach {
+            perioder[LukketPeriode(it.fom, it.tom)] = it.value
         }
-        return sisteUttaksdato
+        return Uttaksplan(perioder)
     }
-
-    private fun finnFørsteOverlapp(dato:LocalDate, uttaksplaner: List<Uttaksplan>):Pair<Uttaksperiode?, Int?> {
-        uttaksplaner.forEachIndexed {index, uttaksplan ->
-            uttaksplan.perioder.forEach {periode ->
-                if (periode.key.inneholder(dato)) {
-                    return Pair(periode, index)
-                }
-            }
-        }
-        return Pair(null, null)
-    }
-
 
 }

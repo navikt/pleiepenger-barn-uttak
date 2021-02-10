@@ -1,56 +1,98 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
+import java.time.Duration
 
-data class Uttaksplaner(val uttaksplaner: Map<BehandlingId, Uttaksplan>)
+typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksperiodeInfo>
 
-typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksPeriodeInfo>
+enum class Utfall {
+    OPPFYLT,
+    IKKE_OPPFYLT
+}
 
+enum class AnnenPart {
+    ALENE,
+    MED_ANDRE,
+    VENTER_ANDRE //TODO: skal vi ha med denne?
+}
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan(
-        val perioder: Map<LukketPeriode, UttaksPeriodeInfo> = mapOf()
+        @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf()
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utbetalingsgrader(
-        val arbeidsforhold: ArbeidsforholdReferanse,
-        val utbetalingsgrad: Prosent
+    @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
+    @JsonProperty("normalArbeidstid") val normalArbeidstid: Duration,
+    @JsonProperty("faktiskArbeidstid") val faktiskArbeidstid: Duration?,
+    @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "utfall")
-@JsonSubTypes(
-        JsonSubTypes.Type(value = InnvilgetPeriode::class, name = "INNVILGET"),
-        JsonSubTypes.Type(value = AvslåttPeriode::class, name = "AVSLÅTT")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class UttaksperiodeInfo @JsonCreator constructor(
+    @JsonProperty("utfall") val utfall: Utfall,
+    @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
+    @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
+    @JsonProperty("årsak") val årsaker: Set<Årsak>,
+    @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
+    @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
+    @JsonProperty("knekkpunktTyper") val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+    @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID,
+    @JsonProperty("annenPart") val annenPart: AnnenPart
+) {
+
+    companion object {
+
+        fun avslag(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+
+            //TODO: sjekk at alle årsaker er avslag
+
+            return UttaksperiodeInfo(
+                utfall = Utfall.IKKE_OPPFYLT,
+                uttaksgrad = Prosent.ZERO,
+                utbetalingsgrader = listOf(),
+                årsaker = årsaker,
+                graderingMotTilsyn = null,
+                knekkpunktTyper = knekkpunktTyper,
+                kildeBehandlingUUID = kildeBehandlingUUID,
+                annenPart = annenPart
+            )
+        }
+
+        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak? = null, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+
+            //TODO: sjekk at årsak er innvilgelse
+
+            return UttaksperiodeInfo(
+                utfall = Utfall.OPPFYLT,
+                uttaksgrad = uttaksgrad,
+                utbetalingsgrader = utbetalingsgrader,
+                årsaker = if (årsak == null) setOf() else setOf(årsak),
+                graderingMotTilsyn = graderingMotTilsyn,
+                knekkpunktTyper = knekkpunktTyper,
+                kildeBehandlingUUID = kildeBehandlingUUID,
+                annenPart = annenPart
+            )
+        }
+
+    }
+
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class GraderingMotTilsyn(
+    @JsonProperty("pleiebehov") val pleiebehov: Prosent,
+    @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
+    @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
+    @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
 )
-interface UttaksPeriodeInfo {
-    fun knekkpunktTyper() : Set<KnekkpunktType>
-}
-
-@JsonTypeName("INNVILGET")
-data class InnvilgetPeriode @JsonCreator constructor(
-        private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        val grad: Prosent,
-        val utbetalingsgrader: List<Utbetalingsgrader>,
-        val årsak: InnvilgetÅrsaker,
-        val hjemler: Set<Hjemmel>
-
-) : UttaksPeriodeInfo {
-    constructor(knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-                grad: Prosent,
-                utbetalingsgrader: List<Utbetalingsgrader>,
-                årsak: InnvilgetÅrsak) : this(
-            knekkpunktTyper = knekkpunktTyper,
-            grad = grad,
-            utbetalingsgrader = utbetalingsgrader,
-            årsak = årsak.årsak,
-            hjemler = årsak.hjemler
-    )
-
-    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
-}
-
-@JsonTypeName("AVSLÅTT")
-data class AvslåttPeriode(
-        private val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
-        val årsaker: Set<AvslåttÅrsak>
-) : UttaksPeriodeInfo {
-    @JsonProperty("knekkpunkter") override fun knekkpunktTyper() = knekkpunktTyper
-}

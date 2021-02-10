@@ -14,4 +14,7 @@ jobs:
         with:
           java-version: '11.x'
       - name: Bygge JAR
-        run: ./mvnw clean package
+        run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml -Dchangelist= -Dsha1=-$(echo $GITHUB_SHA | cut -c1-7)
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}

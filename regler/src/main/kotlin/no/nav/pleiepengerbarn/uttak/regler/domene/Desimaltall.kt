@@ -24,7 +24,7 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
         return if (other == null || other !is Desimaltall) false
         else compareTo(other) == 0
     }
-    override fun hashCode() = resultat?.hashCode() ?: 0
+    override fun hashCode() = resultat.hashCode()
     override fun toString(): String = "${resultat.toPlainString()} (${beregning.toPlainString()})"
 
     // Bruke <=> mellom Desimaltall
@@ -38,10 +38,9 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
     // Bruke / mellom Desimaltall
     internal operator fun div(annen: Desimaltall) = if (annen.erNull()) Null else Desimaltall(beregning.divide(annen.beregning, BeregningScale, RoundingMode))
 
-    internal infix fun maks(maks: Desimaltall) = if (this > maks) maks else this
-    internal infix fun min(min: Desimaltall) = if (this < min) min else this
+    private infix fun maks(maks: Desimaltall) = if (this > maks) maks else this
+    private infix fun min(min: Desimaltall) = if (this < min) min else this
 
-    internal fun normaliserProsent() = min(Null).maks(EtHundre)
     internal fun normaliserFaktor() = min(Null).maks(En)
 
     internal fun fraFaktorTilProsent() = this * EtHundre
@@ -54,9 +53,7 @@ internal class Desimaltall(bigDecimal: BigDecimal) {
         else Duration.ofMillis(millis)
     }
 
-    internal fun erNull() = equals(Null)
-    internal fun erEtHundre() = equals(EtHundre)
-    internal fun formatertProsent() = "${resultat.toPlainString()}%"
+    private fun erNull() = equals(Null)
 
     internal val resultat = bigDecimal.setScale(ResultatScale, RoundingMode)
     private val beregning = bigDecimal.setScale(BeregningScale, RoundingMode)

@@ -1,7 +1,9 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.domene.Knekkpunkt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
@@ -19,9 +21,9 @@ internal object KnekkpunktUtleder {
 
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
-        finnForIkkeMedlem(knekkpunkMap, regelGrunnlag.ikkeMedlem)
         finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
-        finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.tilsynsbehov)
+        finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
+        finnForTilsynsbehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
@@ -33,11 +35,7 @@ internal object KnekkpunktUtleder {
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
     }
 
-    private fun finnForIkkeMedlem(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, ikkeMedlem: List<LukketPeriode>) {
-        ikkeMedlem.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.IKKE_MEDLEM_I_FOLKETRYGDEN) }
-    }
-
-    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, TilsynPeriodeInfo>) {
+    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Duration>) {
         tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 
@@ -45,8 +43,18 @@ internal object KnekkpunktUtleder {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
     }
 
-    private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, tilsynsbehov: Map<LukketPeriode, Tilsynsbehov>) {
-        tilsynsbehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.TILSYNSBEHOV)}
+    private fun finnForIkkeOppfyltInngangsvilkår(knekkpunktMap: KnekkpunktMap, inngangsvilkår: Map<String, List<Vilkårsperiode>>) {
+        inngangsvilkår.values.forEach { perioder ->
+            perioder.forEach {
+                if (it.utfall == Utfall.IKKE_OPPFYLT) {
+                    finnForPeriode(knekkpunktMap, it.periode, KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
+                }
+            }
+        }
+    }
+
+    private fun finnForTilsynsbehov(knekkpunktMap:KnekkpunktMap, pleiebehov: Map<LukketPeriode, Pleiebehov>) {
+        pleiebehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.TILSYNSBEHOV)}
     }
 
     private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:Map<Saksnummer, Uttaksplan>) {
@@ -55,7 +63,7 @@ internal object KnekkpunktUtleder {
         }
     }
 
-    private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: Arbeid) {
+    private fun finnForArbeid(knekkpunktMap:KnekkpunktMap, arbeid: List<Arbeid>) {
         arbeid.forEach {
             it.perioder.forEach {(periode,_) -> finnForPeriode(knekkpunktMap, periode, KnekkpunktType.ARBEID)}
         }

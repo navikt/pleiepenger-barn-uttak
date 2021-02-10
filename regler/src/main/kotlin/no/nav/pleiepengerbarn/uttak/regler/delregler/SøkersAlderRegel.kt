@@ -1,26 +1,15 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.delregler.SøkersAlderRegel.Companion.søkerfyllerSøtiAvslåttÅrsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåTom
-import no.nav.pleiepengerbarn.uttak.regler.lovverk.Lovhenvisninger
 import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.util.*
 
 internal class SøkersAlderRegel : UttaksplanRegel {
-
-    internal companion object {
-        internal fun søkerfyllerSøtiAvslåttÅrsak(søkersSøttiårsdag: LocalDate) = AvslåttÅrsak(
-                årsak = AvslåttÅrsaker.SØKERS_ALDER,
-                hjemler = setOf(Lovhenvisninger.SøkerFyllerSøtti.anvend(
-                        "Fastsatt at søker fyller 70 år $søkersSøttiårsdag. " +
-                        "Perioden avslås derfor ettersom det ikke foreligger rett til pleiepenger."
-                ))
-        )
-    }
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
         val perioder = uttaksplan.perioder.sortertPåTom()
@@ -40,7 +29,8 @@ internal class SøkersAlderRegel : UttaksplanRegel {
                 }
 
         perioder.avslåAllePerioderEtterSøttiårsdag(
-                søkersSøttiårsdag = søkersSøttiårsdag
+            søkersSøttiårsdag = søkersSøttiårsdag,
+            grunnlag = grunnlag
         )
 
         return uttaksplan.copy(
@@ -50,31 +40,35 @@ internal class SøkersAlderRegel : UttaksplanRegel {
 
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.avslåAllePerioderEtterSøttiårsdag(
-        søkersSøttiårsdag: LocalDate) {
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterSøttiårsdag(
+    søkersSøttiårsdag: LocalDate,
+    grunnlag: RegelGrunnlag
+) {
     filterKeys { it.fom.isAfter(søkersSøttiårsdag) }
     .forEach { (periode, periodeInfo) ->
-        if (periodeInfo is AvslåttPeriode) {
+        if (periodeInfo.utfall == Utfall.IKKE_OPPFYLT) {
             val avslagsÅrsaker = periodeInfo
                     .årsaker
                     .toMutableSet()
                     .also { eksisterende ->
-                        eksisterende.add(søkerfyllerSøtiAvslåttÅrsak(søkersSøttiårsdag))
+                        eksisterende.add(Årsak.SØKERS_ALDER)
                     }
 
             put(periode, periodeInfo.copy(
                     årsaker = avslagsÅrsaker
             ))
         } else {
-            put(periode, AvslåttPeriode(
-                    knekkpunktTyper = periodeInfo.knekkpunktTyper(),
-                    årsaker = setOf(søkerfyllerSøtiAvslåttÅrsak(søkersSøttiårsdag))
+            put(periode, UttaksperiodeInfo.avslag(
+                årsaker = setOf(Årsak.SØKERS_ALDER),
+                knekkpunktTyper = periodeInfo.knekkpunktTyper,
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                annenPart = grunnlag.annenPart(periode)
             ))
         }
     }
 }
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksperiode(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fyllerSøttiIEnUttaksperiode(
         søkersSøttiårsdag: LocalDate,
         uttaksperiode: Uttaksperiode) {
     val periode = uttaksperiode.key
@@ -89,11 +83,11 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksper
             tom = søkersSøttiårsdag
     ), periodeInfo)
 
-    val periodeInfoMedKnekkpunkt = when (periodeInfo) {
-        is InnvilgetPeriode -> {
+    val periodeInfoMedKnekkpunkt = when (periodeInfo.utfall) {
+        Utfall.OPPFYLT -> {
             periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.SØKERS_ALDER))
         }
-        is AvslåttPeriode -> {
+        Utfall.IKKE_OPPFYLT -> {
             periodeInfo.copy(knekkpunktTyper = setOf(KnekkpunktType.SØKERS_ALDER))
         }
         else -> throw IllegalStateException("Må være en innvilget eller avslått periode.")
@@ -106,7 +100,7 @@ private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøttiIEnUttaksper
 }
 
 
-private fun SortedMap<LukketPeriode, UttaksPeriodeInfo>.fyllerSøkerSøttiILøpetAvUttaksplanen(
+private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fyllerSøkerSøttiILøpetAvUttaksplanen(
         søkersSøttiårsdag: LocalDate) : Boolean {
     val sisteDagISistePeriode = lastKey().tom
     return sisteDagISistePeriode.isAfter(søkersSøttiårsdag)

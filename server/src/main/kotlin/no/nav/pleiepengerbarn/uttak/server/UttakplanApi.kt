@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.lang.IllegalArgumentException
 import java.util.*
 
 @RestController
@@ -21,9 +23,11 @@ class UttakplanApi {
     @Autowired
     private lateinit var uttakRepository: UttakRepository
 
-    private companion object {
-        private const val UttaksplanPath = "/uttaksplan"
-        private const val BehandlingId = "behandlingId"
+    companion object {
+        const val UttaksplanPath = "/uttaksplan"
+        const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
+        const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
+        const val BehandlingUUID = "behandlingUUID"
     }
 
     @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -32,22 +36,39 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
 
+        return lagUttaksplan(uttaksgrunnlag, true, uriComponentsBuilder)
+    }
 
+    @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
+    fun simulerUttaksplan(
+            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
+
+        return lagUttaksplan(uttaksgrunnlag, false, uriComponentsBuilder)
+    }
+
+    private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
-            andrePartersUttaksplaner[saksnummer] = hentUttaksplan(saksnummer)
+            val uttaksplan = uttakRepository.hent(saksnummer)
+            if (uttaksplan != null) {
+                andrePartersUttaksplaner[saksnummer] = uttaksplan
+            }
         }
-        //TODO hent uttaksplan for andre parter
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
-        val uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
 
-        uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingId), regelGrunnlag, uttaksplan)
+        var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
+        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        if (forrigeUttaksplan != null) {
+            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan)
+        }
 
-        val uri = uriComponentsBuilder
-                .path(UttaksplanPath)
-                .queryParam(BehandlingId, uttaksgrunnlag.behandlingId)
-                .build()
-                .toUri()
+        if (lagre) {
+            uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
+        }
+
+        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
 
         return ResponseEntity
                 .created(uri)
@@ -55,33 +76,38 @@ class UttakplanApi {
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Uttaksplaner for alle etterspurte behandlinger.")
-    fun hentUttaksplan(@RequestParam(required = false) behandlingId: Set<BehandlingId>?, @RequestParam(required = false) saksnummer: Set<Saksnummer>?): ResponseEntity<Uttaksplaner> {
-        if (behandlingId != null && saksnummer != null && behandlingId.isNotEmpty() && saksnummer.isNotEmpty()) {
+    @Operation(
+        description = "Hent uttaksplan for gitt behandling.",
+        parameters = [
+            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
+        ]
+    )
+    fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
+        val behandlingUUIDParsed = try {
+            UUID.fromString(behandlingUUID)
+        } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().build()
         }
-        if (behandlingId.isNullOrEmpty() && saksnummer.isNullOrEmpty()) {
-            return ResponseEntity.badRequest().build()
-        }
-        val uttaksplanMap = mutableMapOf<BehandlingId, Uttaksplan>()
-        if (behandlingId != null && behandlingId.isNotEmpty()) {
-            behandlingId.forEach {
-                val uttaksplan = uttakRepository.hent(UUID.fromString(it))
-                if (uttaksplan != null) {
-                    uttaksplanMap[it] = uttaksplan
-                }
-            }
-        } else {
-            saksnummer?.forEach {
-                uttaksplanMap[it] = hentUttaksplan(it)
-            }
-        }
-        return ResponseEntity.ok(Uttaksplaner(uttaksplanMap))
+
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(uttaksplan)
     }
 
-    private fun hentUttaksplan(saksnummer:Saksnummer):Uttaksplan {
-        val uttaksplanListe = uttakRepository.hent(saksnummer)
-        return UttaksplanMerger.slåSammenUttaksplaner(uttaksplanListe)
+    @GetMapping(FullUttaksplanForTilkjentYtelsePath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        description = "Hent forenklet uttaksplan for behandling.",
+        parameters = [
+            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
+        ]
+    )
+    fun hentFullUttaksplanForTilkjentYtelse(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
+        val behandlingUUIDParsed = try {
+            UUID.fromString(behandlingUUID)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().build()
+        }
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
     }
 
 }
