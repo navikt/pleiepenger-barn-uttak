@@ -40,7 +40,7 @@ jobs:
           docker push $LATEST
           docker push $IMAGE
         env:
-          GITHUB_TOKEN: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
