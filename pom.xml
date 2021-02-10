@@ -21,14 +21,6 @@
 	<artifactId>pleiepenger-barn-uttak</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub navikt Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/navikt/k9-aarskvantum</url>
-		</repository>
-	</distributionManagement>
-
 	<modules>
 		<module>server</module>
 		<module>kontrakter</module>
