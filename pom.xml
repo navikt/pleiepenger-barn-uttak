@@ -27,4 +27,13 @@
 		<module>regler</module>
 	</modules>
 
+
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/navikt/pleiepenger-barn-uttak/</url>
+		</repository>
+	</repositories>
+
 </project>
