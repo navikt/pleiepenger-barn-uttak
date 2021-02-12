@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_TOKEN: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
-        run: mvn --settings ./.github/.m2/settings.xml deploy -DskipTests=true -Dmaven.wagon.http.pool=false
+        run: mvn --settings ./.m2/settings.xml deploy -DskipTests=true -Dmaven.wagon.http.pool=false
       - name: Sette Docker image navn og tag
         env:
           DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
