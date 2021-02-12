@@ -18,7 +18,7 @@ data class Uttaksgrunnlag (
 
     @JsonProperty("søktUttak") val søktUttak: List<SøktUttak>,
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
-    @JsonProperty("tilsynsbehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
+    @JsonProperty("pleiebehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
