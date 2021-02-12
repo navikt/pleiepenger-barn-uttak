@@ -5,7 +5,7 @@
     <parent>
         <artifactId>pleiepenger-barn-uttak</artifactId>
         <groupId>no.nav.pleiepengerbarn.uttak</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}${sha1}${changelist}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>no.nav.pleiepengerbarn.uttak</groupId>
             <artifactId>kontrakter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

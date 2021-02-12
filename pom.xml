@@ -5,6 +5,9 @@
     <packaging>pom</packaging>
 
 	<properties>
+		<revision>1.0.0</revision>
+		<sha1></sha1>
+		<changelist>-SNAPSHOT</changelist>
 		<java.version>1.8</java.version>
 		<kotlin.version>1.4.21</kotlin.version>
 		<threeten-extra.version>1.5.0</threeten-extra.version>
@@ -19,7 +22,7 @@
 
 	<groupId>no.nav.pleiepengerbarn.uttak</groupId>
 	<artifactId>pleiepenger-barn-uttak</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}${sha1}${changelist}</version>
 
 	<modules>
 		<module>server</module>
