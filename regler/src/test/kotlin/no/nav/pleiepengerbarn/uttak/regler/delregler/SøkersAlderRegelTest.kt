@@ -236,9 +236,9 @@ internal class SøkersAlderRegelTest {
                                 )
                         )
                 ).somArbeid(),
-                søknadsperioder = listOf(
-                        periode1,
-                        periode2
+                søktUttak = listOf(
+                        SøktUttak(periode1),
+                        SøktUttak(periode2)
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100

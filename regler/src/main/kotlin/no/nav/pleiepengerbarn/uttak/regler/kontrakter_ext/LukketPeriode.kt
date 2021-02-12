@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
@@ -15,14 +16,14 @@ internal fun LukketPeriode.erLik(periode: LukketPeriode) = fom.isEqual(periode.f
 private fun LukketPeriode.erKantIKant(periode: LukketPeriode) = tom.plusDays(1).isEqual(periode.fom)
 
 internal fun Collection<LukketPeriode>.overordnetPeriode() = LukketPeriode(
-        fom = sortertPåFom().first().fom,
-        tom = sortertPåTom().last().tom
+        fom = this.sortedBy { it.fom } .first().fom,
+        tom = this.sortedBy { it.tom } .last().tom
 )
 
 internal fun <T> Map<LukketPeriode, T>.sortertPåFom() = toSortedMap(compareBy { it.fom })
 internal fun <T> Map<LukketPeriode, T>.sortertPåTom() = toSortedMap(compareBy { it.tom })
-internal fun Collection<LukketPeriode>.sortertPåFom() = sortedBy { it.fom }
-internal fun Collection<LukketPeriode>.sortertPåTom() = sortedBy { it.tom }
+internal fun Collection<SøktUttak>.sortertPåFom() = sortedBy { it.periode.fom }
+internal fun Collection<SøktUttak>.sortertPåTom() = sortedBy { it.periode.tom }
 
 
 internal fun <T>LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriode, T>) : List<LukketPeriode> {

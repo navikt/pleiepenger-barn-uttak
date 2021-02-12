@@ -2,28 +2,30 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.KnekkpunktType
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
 import no.nav.pleiepengerbarn.uttak.regler.domene.Knekkpunkt
 import java.util.SortedSet
 
 internal object PeriodeKnekker {
     internal fun knekk(
-            søknadsperioder: List<LukketPeriode>,
-            knekkpunkter: SortedSet<Knekkpunkt>) : Map<LukketPeriode, Set<KnekkpunktType>> {
-        val resultat = mutableMapOf<LukketPeriode, MutableSet<KnekkpunktType>>()
+        søktUttak: List<SøktUttak>,
+        knekkpunkter: SortedSet<Knekkpunkt>) : Map<SøktUttak, Set<KnekkpunktType>> {
+        val resultat = mutableMapOf<SøktUttak, MutableSet<KnekkpunktType>>()
 
-        søknadsperioder.forEach { søknadsperiode ->
+        søktUttak.forEach { søktUttaksperiode ->
             var rest = PeriodeMedKnekkpunkttyper(
-                    periode = søknadsperiode
+                    periode = søktUttaksperiode.periode
             )
             knekkpunkter.forEach { knekkpunkt ->
                 val knekkDato = knekkpunkt.knekk
-                if (!knekkDato.isEqual(søknadsperiode.fom) && !knekkDato.isBefore(søknadsperiode.fom) && !knekkDato.isAfter(søknadsperiode.tom)) {
+                if (!knekkDato.isEqual(søktUttaksperiode.periode.fom) && !knekkDato.isBefore(søktUttaksperiode.periode.fom) && !knekkDato.isAfter(søktUttaksperiode.periode.tom)) {
                     val periode = LukketPeriode(
                             fom = rest.periode.fom,
                             tom = knekkDato.minusDays(1)
                     )
-                    resultat.putIfAbsent(periode, mutableSetOf())
-                    resultat[periode]!!.addAll(rest.knekkpunkttyper)
+                    val uttak = SøktUttak(periode, søktUttaksperiode.oppgittTilsyn)
+                    resultat.putIfAbsent(uttak, mutableSetOf())
+                    resultat[uttak]!!.addAll(rest.knekkpunkttyper)
                     rest = PeriodeMedKnekkpunkttyper(
                             periode = LukketPeriode(
                                     fom = knekkDato,
@@ -33,8 +35,9 @@ internal object PeriodeKnekker {
                     )
                 }
             }
-            resultat.putIfAbsent(rest.periode, mutableSetOf())
-            resultat[rest.periode]!!.addAll(rest.knekkpunkttyper)
+            val uttak = SøktUttak(rest.periode, søktUttaksperiode.oppgittTilsyn)
+            resultat.putIfAbsent(uttak, mutableSetOf())
+            resultat[uttak]!!.addAll(rest.knekkpunkttyper)
 
         }
         return resultat.toMap()

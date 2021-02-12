@@ -10,7 +10,7 @@ object GrunnlagMapper {
 
     fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:Map<Saksnummer, Uttaksplan>): RegelGrunnlag {
 
-        val søknadsperioderSortert = uttaksgrunnlag.søknadsperioder.sortertPåFom()
+        val søknadsperioderSortert = uttaksgrunnlag.søktUttak.sortertPåFom()
 
         val unikeArbeidsforhold = uttaksgrunnlag.arbeid.map { it.arbeidsforhold }.toSet().size
         if (unikeArbeidsforhold != uttaksgrunnlag.arbeid.size) {
@@ -22,10 +22,10 @@ object GrunnlagMapper {
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
                 pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
-                søknadsperioder = søknadsperioderSortert,
+                søktUttak = søknadsperioderSortert,
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
-                lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortertPåFom(),
+                lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
                 andrePartersUttaksplan = andrePartersUttakplan
         )

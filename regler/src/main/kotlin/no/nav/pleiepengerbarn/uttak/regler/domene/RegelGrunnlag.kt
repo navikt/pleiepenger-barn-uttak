@@ -8,7 +8,7 @@ data class RegelGrunnlag(
     val barn: Barn,
     val søker: Søker,
     val pleiebehov: Map<LukketPeriode, Pleiebehov>,
-    val søknadsperioder: List<LukketPeriode>,
+    val søktUttak: List<SøktUttak>,
     val arbeid: List<Arbeid>,
     val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     val lovbestemtFerie: List<LukketPeriode> = listOf(),

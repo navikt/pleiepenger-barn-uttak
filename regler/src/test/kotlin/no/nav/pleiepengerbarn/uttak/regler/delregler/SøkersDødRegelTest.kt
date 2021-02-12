@@ -329,7 +329,7 @@ internal class SøkersDødRegelTest {
                 pleiebehov = mapOf(
                         overordnetPeriode to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(overordnetPeriode),
+                søktUttak = listOf(SøktUttak(overordnetPeriode)),
                 arbeid = listOf()
         )
     }

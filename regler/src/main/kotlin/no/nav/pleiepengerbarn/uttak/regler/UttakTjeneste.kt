@@ -11,7 +11,7 @@ object UttakTjeneste {
         )
 
         val knektePerioder = PeriodeKnekker.knekk(
-                søknadsperioder = grunnlag.søknadsperioder,
+                søktUttak = grunnlag.søktUttak,
                 knekkpunkter = knekkpunkter
         )
 

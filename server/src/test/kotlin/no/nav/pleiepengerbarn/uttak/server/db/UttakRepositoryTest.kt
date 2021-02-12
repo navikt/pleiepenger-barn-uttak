@@ -189,7 +189,7 @@ internal class UttakRepositoryTest {
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                søknadsperioder = listOf(periode),
+                søktUttak = listOf(SøktUttak(periode)),
                 pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
                 arbeid = listOf(
                         Arbeid(

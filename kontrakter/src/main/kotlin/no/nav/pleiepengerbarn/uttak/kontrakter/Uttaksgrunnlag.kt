@@ -16,7 +16,7 @@ data class Uttaksgrunnlag (
     @JsonProperty("behandlingUUID") val behandlingUUID: BehandlingUUID,
     @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
 
-    @JsonProperty("søknadsperioder") val søknadsperioder: List<LukketPeriode>,
+    @JsonProperty("søktUttak") val søktUttak: List<SøktUttak>,
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
     @JsonProperty("tilsynsbehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
@@ -31,4 +31,12 @@ data class Uttaksgrunnlag (
 data class Vilkårsperiode(
     @JsonProperty("periode") val periode: LukketPeriode,
     @JsonProperty("utfall") val utfall: Utfall
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class SøktUttak(
+    @JsonProperty("periode") val periode: LukketPeriode,
+    @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration? = null
 )

@@ -30,30 +30,30 @@ internal object UttaksplanRegler {
 
     internal fun fastsettUttaksplan(
             grunnlag: RegelGrunnlag,
-            knektePerioder: Map<LukketPeriode,Set<KnekkpunktType>>) : Uttaksplan {
+            knektePerioder: Map<SøktUttak,Set<KnekkpunktType>>) : Uttaksplan {
 
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
-        knektePerioder.forEach { (periode, knekkpunktTyper) ->
+        knektePerioder.forEach { (søktUttaksperiode, knekkpunktTyper) ->
             val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
             PeriodeRegler.forEach { regel ->
-                val utfall = regel.kjør(periode = periode, grunnlag = grunnlag)
+                val utfall = regel.kjør(periode = søktUttaksperiode.periode, grunnlag = grunnlag)
                 if (utfall is IkkeOppfylt) {
                     ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
                 }
             }
             if (ikkeOppfyltÅrsaker.isNotEmpty()) {
-                perioder[periode] = UttaksperiodeInfo.avslag(
+                perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.avslag(
                     årsaker = ikkeOppfyltÅrsaker,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
-                    annenPart = grunnlag.annenPart(periode)
+                    annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
                 )
             } else {
-                val grader = finnGrader(periode, grunnlag)
+                val grader = finnGrader(søktUttaksperiode.periode, grunnlag)
 
                 if (grader.årsak.oppfylt) {
-                    perioder[periode] = UttaksperiodeInfo.innvilgelse(
+                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.innvilgelse(
                         uttaksgrad = grader.uttaksgrad,
                         utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},
                         årsak = grader.årsak,
@@ -65,14 +65,14 @@ internal object UttaksplanRegler {
                         ),
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID,
-                        annenPart = grunnlag.annenPart(periode)
+                        annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
                     )
                 } else {
-                    perioder[periode] = UttaksperiodeInfo.avslag(
+                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.avslag(
                         årsaker = setOf(grader.årsak),
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID,
-                        annenPart = grunnlag.annenPart(periode)
+                        annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
                     )
                 }
             }

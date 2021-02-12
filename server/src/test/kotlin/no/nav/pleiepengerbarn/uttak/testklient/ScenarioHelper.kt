@@ -50,7 +50,7 @@ internal fun lagGrunnlag(
         barn = barn,
         saksnummer = saksnummer,
         behandlingUUID = behandlingUUID,
-        søknadsperioder = listOf(søknadsperiode),
+        søktUttak = listOf(SøktUttak(søknadsperiode)),
         arbeid = arbeid,
         pleiebehov = pleiebehov,
         tilsynsperioder = tilsynsperioder

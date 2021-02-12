@@ -541,9 +541,9 @@ internal class BarnsDødRegelTest {
                                 )
                         )
                 ).somArbeid(),
-                søknadsperioder = listOf(
-                        LukketPeriode("2020-01-01/2020-01-20"),
-                        LukketPeriode("2020-01-29/2020-03-01")
+                søktUttak = listOf(
+                        SøktUttak(LukketPeriode("2020-01-01/2020-01-20")),
+                        SøktUttak(LukketPeriode("2020-01-29/2020-03-01"))
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
@@ -580,8 +580,8 @@ internal class BarnsDødRegelTest {
                                 )
                         )
                 ).somArbeid(),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                        SøktUttak(helePerioden)
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100

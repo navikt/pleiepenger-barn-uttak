@@ -188,8 +188,8 @@ internal class UttaksplanReglerKombinasjonsTest {
                                 )
                         )
                 ).somArbeid(),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                        SøktUttak(helePerioden)
                 ),
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100

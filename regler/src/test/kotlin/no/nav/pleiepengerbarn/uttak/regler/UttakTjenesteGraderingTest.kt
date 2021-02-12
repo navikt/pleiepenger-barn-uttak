@@ -28,6 +28,7 @@ internal class UttakTjenesteGraderingTest {
 
 
     private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+    private val helePeriodenSøktUttak = SøktUttak(helePerioden)
 
     @Test
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
@@ -42,8 +43,8 @@ internal class UttakTjenesteGraderingTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(20)
@@ -74,8 +75,8 @@ internal class UttakTjenesteGraderingTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
@@ -102,8 +103,8 @@ internal class UttakTjenesteGraderingTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
@@ -136,7 +137,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
-                        helePerioden
+                        helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(helePerioden to OppfyltPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartOppfyltÅrsak)))
@@ -171,8 +172,8 @@ internal class UttakTjenesteGraderingTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.innvilgelse(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
@@ -208,7 +209,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
-                        helePerioden
+                        helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(35), FULL_DAG.prosent(35)))
@@ -238,7 +239,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
-                        helePerioden
+                        helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4), FULL_DAG.dividedBy(4)))
@@ -269,8 +270,8 @@ internal class UttakTjenesteGraderingTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.prosent(25)))
@@ -343,8 +344,8 @@ TODO: fiks til realistiske arbeidsforhold
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(

@@ -75,7 +75,7 @@ internal class GrunnlagMapperTest {
                     ),
                     saksnummer = "1",
                     behandlingUUID = "2",
-                    søknadsperioder = listOf(LukketPeriode("2020-01-01/2021-01-01")),
+                    søktUttak = listOf(SøktUttak(LukketPeriode("2020-01-01/2021-01-01"))),
                     pleiebehov = mapOf(),
                     arbeid = listOf(
                             Arbeid(

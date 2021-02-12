@@ -19,8 +19,8 @@ internal class UttakTjenesteTest {
 
         private val arbeidsforhold1 = UUID.randomUUID().toString()
 
-        private val aktørIdSøker = "123"
-        private val aktørIdBarn = "456"
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
     }
 
 
@@ -38,8 +38,8 @@ internal class UttakTjenesteTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                        SøktUttak(helePerioden)
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
@@ -68,8 +68,8 @@ internal class UttakTjenesteTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                    SøktUttak(helePerioden)
                 ),
                 lovbestemtFerie = listOf(
                         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
@@ -101,8 +101,8 @@ internal class UttakTjenesteTest {
                 pleiebehov = mapOf(
                         helePerioden to Pleiebehov.PROSENT_200
                 ),
-                søknadsperioder = listOf(
-                        LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7))
+                søktUttak = listOf(
+                    SøktUttak(LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7)))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
@@ -137,7 +137,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                         helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
                 ).somTilsynperioder(),
                 søknadsperioder = listOf(
-                        helePerioden
+                        SøktUttak(helePerioden)
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
@@ -169,7 +169,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                 pleiebehov = mapOf(
                         søknadsperiode to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(søknadsperiode),
+                søktUttak = listOf(SøktUttak(søknadsperiode)),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
                                 periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING),

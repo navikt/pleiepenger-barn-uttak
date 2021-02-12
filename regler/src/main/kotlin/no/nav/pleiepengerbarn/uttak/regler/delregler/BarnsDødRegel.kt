@@ -68,7 +68,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                     dødsdato = null
                             ),
                             andrePartersUttaksplan = mapOf(),
-                            søknadsperioder = grunnlag.søknadsperioder.søknadsperioderEtterDødsdato(
+                            søktUttak = grunnlag.søktUttak.søknadsperioderEtterDødsdato(
                                     dødsdato = dødsdato
                             ),
                             tilsynsperioder = emptyMap(),
@@ -227,20 +227,25 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.oppfyltPeriodeMedNærmesteTom(
  *  - Tar utgangspunkt i de opprinnelige søknadsperiodene og returerer perioder etter dødsfallet
  *  - Om dødsfallet fant sted siste dag i en periode forblir søknadsperiodene som de var
  */
-private fun List<LukketPeriode>.søknadsperioderEtterDødsdato(dødsdato: LocalDate) : List<LukketPeriode> {
+private fun List<SøktUttak>.søknadsperioderEtterDødsdato(dødsdato: LocalDate) : List<SøktUttak> {
     val perioderEtterDødfallet =
-            filter { it.fom.isAfter(dødsdato) }
+            filter { it.periode.fom.isAfter(dødsdato) }
             .toMutableList()
 
     val periodenDødsfalletFantSted =
-            find { it.inneholder(dødsdato) }
-            ?.takeUnless { dødsdato.isEqual(it.tom) }
+            find { it.periode.inneholder(dødsdato) }
+            ?.takeUnless { dødsdato.isEqual(it.periode.tom) }
 
     if (periodenDødsfalletFantSted != null) {
-        perioderEtterDødfallet.add(LukketPeriode(
+        val uttak = SøktUttak(
+            LukketPeriode(
                 fom = dødsdato.plusDays(1),
-                tom = periodenDødsfalletFantSted.tom
-        ))
+                tom = periodenDødsfalletFantSted.periode.tom
+            ),
+            periodenDødsfalletFantSted.oppgittTilsyn
+
+        )
+        perioderEtterDødfallet.add(uttak)
     }
     return perioderEtterDødfallet.toList()
 }
