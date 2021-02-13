@@ -55,10 +55,10 @@ internal class BarnsDødRegel : UttaksplanRegel {
              *      -   Aldri noe tilsynsperioder.
              *      -   Fjerner andre omsorgspersoner.
              *      -  "Taket" på ytelsen totalt sett er nå 1000% (10 personer med 100%)
-             *          Setter derfor tilsynsbehovet alltid til 100% ettersom det kun
+             *          Setter derfor pleiebehovet alltid til 100% ettersom det kun
              *          er den aktuelle søkeren som er med i beregningen. (Ref. punktet over)
              *      -   Om søknadsperiodene går utover 'sorgperioden' vil `GradBeregner` avslå med årsak
-             *          at det er 'UTENOM_TILSYNSBEHOV'.
+             *          at det er 'UTENOM_PLEIEBEHOV'.
              *          Det overstyres her til at årsaken blir 'BARNETS_DØDSFALL' istedenfor
              */
             val perioderEtterDødsfall = UttakTjeneste.uttaksplan(
@@ -75,7 +75,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             pleiebehov = mapOf(sorgperiode to Pleiebehov.PROSENT_100)
                     )
             ).perioder.mapValues { (_,uttaksPeriodeInfo) ->
-                uttaksPeriodeInfo.håndterPeriodeUtenomTilsynsbehov()
+                uttaksPeriodeInfo.håndterPeriodeUtenomPleiebehov()
             }
 
             // Legger til alle periodene etter dødsfallet
@@ -289,8 +289,8 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.fjernAllePerioderEtterD�
     }
 }
 
-private fun UttaksperiodeInfo.håndterPeriodeUtenomTilsynsbehov() : UttaksperiodeInfo {
-    return if (this.utfall == Utfall.IKKE_OPPFYLT && årsaker.size == 1 && årsaker.first() == Årsak.UTENOM_TILSYNSBEHOV) {
+private fun UttaksperiodeInfo.håndterPeriodeUtenomPleiebehov() : UttaksperiodeInfo {
+    return if (this.utfall == Utfall.IKKE_OPPFYLT && årsaker.size == 1 && årsaker.first() == Årsak.UTENOM_PLEIEBEHOV) {
         this.copy(
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL)
         )

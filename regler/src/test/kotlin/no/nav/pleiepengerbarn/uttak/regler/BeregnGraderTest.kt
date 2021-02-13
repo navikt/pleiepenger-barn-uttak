@@ -58,7 +58,7 @@ internal class BeregnGraderTest {
     }
 
     @Test
-    internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men tilsynsbehovet er 200 prosent`() {
+    internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men pleiebehovet er 200 prosent`() {
         val grader = BeregnGrader.beregn(pleiebehov = PROSENT_200, etablertTilsyn = IKKE_ETABLERT_TILSYN, andreSøkeresTilsyn = Prosent(50), arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
         ))

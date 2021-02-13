@@ -8,7 +8,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     FULL_DEKNING(true),
 
     //Ikke oppfylt årsaker
-    UTENOM_TILSYNSBEHOV(false),
+    UTENOM_PLEIEBEHOV(false),
     FOR_LAV_GRAD(false),
     FOR_HØY_TILSYNSGRAD(false),
     LOVBESTEMT_FERIE(false),

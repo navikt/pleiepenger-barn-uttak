@@ -133,8 +133,8 @@ internal class UttakTjenesteGraderingTest {
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 søknadsperioder = listOf(
                         helePeriodenSøktUttak

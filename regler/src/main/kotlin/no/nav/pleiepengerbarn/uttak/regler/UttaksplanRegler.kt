@@ -6,7 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.TilsynsbehovRegel
+import no.nav.pleiepengerbarn.uttak.regler.delregler.PleiebehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
@@ -17,7 +17,7 @@ internal object UttaksplanRegler {
 
     private val PeriodeRegler = linkedSetOf(
             FerieRegel(),
-            TilsynsbehovRegel()
+            PleiebehovRegel()
     )
 
     private val UttaksplanRegler = linkedSetOf(

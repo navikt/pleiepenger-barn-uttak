@@ -278,7 +278,7 @@ internal class SøkersDødRegelTest {
                         LukketPeriode("2020-01-11/2020-01-15") to UttaksperiodeInfo.avslag(
                                 knekkpunktTyper = setOf(),
                                 kildeBehandlingUUID = behandlingUUID,
-                                årsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
+                                årsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
                                 annenPart = AnnenPart.ALENE
                         )
                 )
@@ -308,7 +308,7 @@ internal class SøkersDødRegelTest {
                 uttaksplan = uttaksplan,
                 forventetPeriode = LukketPeriode("2020-01-11/2020-01-15"),
                 forventetIkkeOppfyltÅrsaker = setOf(
-                        Årsak.UTENOM_TILSYNSBEHOV,
+                        Årsak.UTENOM_PLEIEBEHOV,
                         Årsak.SØKERS_DØDSFALL
                 )
         )

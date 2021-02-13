@@ -59,8 +59,8 @@ internal object BeregnGrader {
     }
 
     private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): BigDecimal {
-        val tilsynsbehovprosent = pleiebehov.prosent
-        return tilsynsbehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
+        val pleiebehovprosent = pleiebehov.prosent
+        return pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
     }
 
     private fun avklarUtbetalingsgrader(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): Map<Arbeidsforhold, Utbetalingsgrad> {

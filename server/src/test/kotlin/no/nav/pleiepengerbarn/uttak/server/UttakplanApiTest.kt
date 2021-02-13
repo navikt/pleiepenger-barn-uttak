@@ -55,8 +55,8 @@ internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
         uttaksplan.assertIkkeOppfylt(
                 periode = LukketPeriode("2020-01-09/2020-01-10"),
-                ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_TILSYNSBEHOV),
-                knekkpunktTyper = setOf(KnekkpunktType.TILSYNSBEHOV)
+                ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+                knekkpunktTyper = setOf(KnekkpunktType.PLEIEBEHOV)
         )
     }
 

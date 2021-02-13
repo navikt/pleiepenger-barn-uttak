@@ -88,7 +88,7 @@ internal class UttakTjenesteTest {
     }
 
     @Test
-    fun `En uttaksperiode som fortsetter etter slutt på tilsynsbehov perioden, skal avslås fra slutt på tilsynsbehov perioden`() {
+    fun `En uttaksperiode som fortsetter etter slutt på pleiebehov perioden, skal avslås fra slutt på pleiebehov perioden`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
@@ -114,7 +114,7 @@ internal class UttakTjenesteTest {
 
         assertThat(uttaksplan.perioder).hasSize(2)
         sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_TILSYNSBEHOV))
+        sjekkIkkeOppfylt(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_PLEIEBEHOV))
     }
 
 /*
@@ -130,7 +130,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
+                pleiebehov = mapOf(
                         helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
                 ),
                 tilsynsperioder = mapOf(
