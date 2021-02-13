@@ -93,7 +93,7 @@ internal object BeregnGrader {
         val fordeling = mutableMapOf<Arbeidsforhold, Prosent>()
 
         arbeid.forEach {
-            if (it.value.jobberNå != null) {
+            if (sumTapt != Duration.ZERO) {
                 val tapt = it.value.jobberNormalt - it.value.jobberNå
                 fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8)/BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
@@ -110,6 +110,10 @@ internal object BeregnGrader {
         arbeid.values.forEach {
             sumJobberNå += it.jobberNå
             sumJobberNormalt += it.jobberNormalt
+        }
+
+        if (sumJobberNormalt == Duration.ZERO) {
+            return Prosent.ZERO
         }
 
         val graderingMotInntektstap = HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8) / BigDecimal(sumJobberNormalt.toMillis()) * HUNDRE_PROSENT)
