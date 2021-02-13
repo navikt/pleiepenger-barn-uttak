@@ -28,7 +28,7 @@
         <dependency>
             <groupId>no.nav.pleiepengerbarn.uttak</groupId>
             <artifactId>regler</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Kotlin -->
