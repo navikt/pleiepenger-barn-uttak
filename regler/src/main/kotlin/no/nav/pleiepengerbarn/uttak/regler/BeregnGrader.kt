@@ -17,11 +17,12 @@ internal object BeregnGrader {
     internal fun beregn(
         pleiebehov: Pleiebehov,
         etablertTilsyn: Duration,
+        oppgittTilsyn: Duration? = null,
         andreSøkeresTilsyn: Prosent,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
             ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(pleiebehov, etablertTilsyn)
-        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, andreSøkeresTilsyn, arbeid)
+        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid)
         val fordeling = finnFordeling(arbeid)
         val utbetalingsgrader = avklarUtbetalingsgrader(uttaksgradResultat.uttaksgrad, arbeid, fordeling)
 
@@ -40,14 +41,20 @@ internal object BeregnGrader {
 
     private fun avklarUttaksgrad(pleiebehov: Pleiebehov,
                                  etablertTilsynprosent: Prosent,
+                                 ønsketUttaksgrad: Duration?,
                                  andreSøkeresTilsyn: Prosent,
                                  arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): UttaksgradResultat {
         val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
 
         val graderingMotInntektstap = finnGraderingMotInntektstap(arbeid)
 
-        if (restTilSøker < TJUE_PROSENT || graderingMotInntektstap < TJUE_PROSENT) {
+        val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
+
+        if (restTilSøker < TJUE_PROSENT || graderingMotInntektstap < TJUE_PROSENT || ønsketUttaksgradProsent < TJUE_PROSENT) {
             return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_GRAD)
+        }
+        if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < graderingMotInntektstap) {
+            return UttaksgradResultat(restTilSøker, ønsketUttaksgradProsent, oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE)
         }
         if (restTilSøker < graderingMotInntektstap) {
             return UttaksgradResultat(restTilSøker, restTilSøker, oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN)
@@ -56,6 +63,19 @@ internal object BeregnGrader {
             return UttaksgradResultat(restTilSøker, graderingMotInntektstap.setScale(2, RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.FULL_DEKNING)
         }
         return UttaksgradResultat(restTilSøker, graderingMotInntektstap.setScale(2,RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT)
+    }
+
+    private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
+        if (ønsketUttaksgrad == null) {
+            return HUNDRE_PROSENT
+        }
+        if (ønsketUttaksgrad > FULL_DAG) {
+            return HUNDRE_PROSENT
+        }
+        if (ønsketUttaksgrad < Duration.ZERO) {
+            return Prosent.ZERO
+        }
+        return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
     private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): BigDecimal {
