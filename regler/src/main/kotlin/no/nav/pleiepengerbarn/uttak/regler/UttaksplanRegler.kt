@@ -93,10 +93,16 @@ internal object UttaksplanRegler {
     private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): GraderBeregnet {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
+        val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
         val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
 
-        return BeregnGrader.beregn(pleiebehov = pleiebehov, etablertTilsyn = etablertTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+        return BeregnGrader.beregn(pleiebehov = pleiebehov, etablertTilsyn = etablertTilsyn, oppgittTilsyn = oppgittTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+    }
+
+    private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
+        val søktUttak = this.søktUttak.firstOrNull {it.periode.overlapper(periode)}
+        return søktUttak?.oppgittTilsyn
     }
 
     private fun RegelGrunnlag.finnPleiebehov(periode: LukketPeriode): Pleiebehov {

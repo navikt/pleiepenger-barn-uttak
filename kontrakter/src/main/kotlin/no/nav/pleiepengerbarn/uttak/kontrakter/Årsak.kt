@@ -4,6 +4,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     //Oppfylt årsaker
     GRADERT_MOT_TILSYN(true),
     AVKORTET_MOT_INNTEKT(true),
+    AVKORTET_MOT_SØKERS_ØNSKE(true),
     OPPFYLT_PGA_BARNETS_DØDSFALL(true),
     FULL_DEKNING(true),
 

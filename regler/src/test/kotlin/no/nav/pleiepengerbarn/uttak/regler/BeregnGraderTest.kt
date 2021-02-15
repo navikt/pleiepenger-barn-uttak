@@ -227,6 +227,19 @@ internal class BeregnGraderTest {
         )
     }
 
+    @Test
+    internal fun `100 prosent fravær, men kun 40 prosent pleiebehov`() {
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = IKKE_ETABLERT_TILSYN, oppgittTilsyn = FULL_DAG.prosent(40), andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+            ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+        ))
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_SØKERS_ØNSKE,
+            Prosent(40),
+            ARBEIDSGIVER1 to Prosent(40)
+        )
+    }
+
     private fun GraderBeregnet.assert(årsak: Årsak, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
         assertThat(this.årsak).isEqualTo(årsak)
         assertThat(this.uttaksgrad).isEqualByComparingTo(uttaksgrad)
