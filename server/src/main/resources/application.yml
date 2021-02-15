@@ -47,3 +47,10 @@ springdoc:
   swagger-ui:
     path: /internal/swagger
 
+info:
+  app:
+    name: Pleiepenger barn uttak
+    version: @project.version@
+    encoding: @project.build.sourceEncoding@
+    java:
+      version: @java.version@

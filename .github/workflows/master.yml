@@ -54,11 +54,9 @@ jobs:
           docker push $IMAGE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy dev-gcp
+      - name: Deploy til testmiljø
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.PLEIEPENGER_DEPLOY_KEY }}
-          CLUSTER: dev-gcp
+          CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VARS: nais/dev-gcp.json
-          PRINT_PAYLOAD: true
