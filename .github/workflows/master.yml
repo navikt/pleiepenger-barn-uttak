@@ -59,4 +59,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.PLEIEPENGER_DEPLOY_KEY }}
           CLUSTER: dev-fss
-          RESOURCE: nais/naiserator.yaml
+          RESOURCE: nais/dev-fss.yaml

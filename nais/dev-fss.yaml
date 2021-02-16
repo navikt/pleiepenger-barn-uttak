@@ -23,18 +23,16 @@ spec:
     timeout: 10
   resources:
     limits:
-      cpu: 2000m
-      memory: 2048Mi
-    requests:
       cpu: 500m
       memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
   vault:
     enabled: true
     paths:
-      - kvPath: /serviceuser/data/dev/srvpleiepenger-barn-uttak
-        mountPath: /secret/serviceuser
-      - kvPath: /azuread/data/dev/creds/pleiepenger-barn-uttak
-        mountPath: /var/run/secrets/nais.io/azuread
+      - kvPath: /kv/preprod/pleiepenger-barn-uttak/default
+        mountPath: /var/run/secrets/nais.io/vault
   prometheus:
     enabled: true
     path: /k9/pleiepenger-barn-uttak/internal/actuator/prometheus
