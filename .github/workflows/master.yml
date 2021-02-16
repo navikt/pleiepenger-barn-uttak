@@ -57,6 +57,6 @@ jobs:
       - name: Deploy til testmiljø
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.PLEIEPENGER_DEPLOY_KEY }}
+          APIKEY: ${{ secrets.DEPLOY_KEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/dev-fss.yaml
