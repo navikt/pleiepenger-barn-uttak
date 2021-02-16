@@ -1,0 +1,46 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: pleiepenger-barn-uttak
+  namespace: default
+  labels:
+    team: k9saksbehandling
+spec:
+  image: {{image}}
+  port: 8080
+  team: k9saksbehandling
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 50
+  liveness:
+    path: /k9/pleiepenger-barn-uttak/internal/actuator/health
+    initialDelay: 30
+    timeout: 10
+  readiness:
+    path: /k9/pleiepenger-barn-uttak/internal/actuator/info
+    initialDelay: 30
+    timeout: 10
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: /kv/preprod/pleiepenger-barn-uttak/default
+        mountPath: /var/run/secrets/nais.io/vault
+  prometheus:
+    enabled: true
+    path: /k9/pleiepenger-barn-uttak/internal/actuator/prometheus
+  secureLogs:
+    enabled: true
+  ingresses:
+    - https://pleiepenger-barn-uttak.q1.nais.preprod.local
+    - https://pleiepenger-barn-uttak.nais.preprod.local
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: preprod
