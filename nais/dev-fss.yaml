@@ -44,3 +44,7 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
+    - name: DEFAULTDS_USERNAME
+      value: pleiepenger-barn-uttak
+    - name: DEFAULTDS_URL
+      value: jdbc:postgresql://b27dbvl014.preprod.local:5432/pleiepenger-barn-uttak

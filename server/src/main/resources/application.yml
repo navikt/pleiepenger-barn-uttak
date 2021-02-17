@@ -14,6 +14,11 @@ no.nav:
           accepted_audience: 'pleiepenger-barn-uttak'
 
 
+defaultDS:
+  url:
+  username:
+  password:
+
 #spring:
 #  datasource:
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}

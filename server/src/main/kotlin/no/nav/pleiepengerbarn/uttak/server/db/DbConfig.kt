@@ -16,7 +16,7 @@ class DbConfig {
     @Bean
     @Profile("prodConfig")
     fun dataSource(): DataSource {
-        return createDatasource("spring.datasource", DatasourceRole.ADMIN, getEnvironmentClass(), 15)
+        return createDatasource("defaultDS", DatasourceRole.ADMIN, getEnvironmentClass(), 5)
     }
 
     fun createDatasource(datasourceName: String, role: DatasourceRole, environmentClass: EnvironmentClass, maxPoolSize: Int): DataSource {
