@@ -8,6 +8,7 @@ import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -28,6 +29,10 @@ class UttakplanApi {
         const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val BehandlingUUID = "behandlingUUID"
+
+        private val logger = LoggerFactory.getLogger(this::class.java)
+        private val secureLogger = LoggerFactory.getLogger("secureLogger")
+
     }
 
     @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -35,7 +40,7 @@ class UttakplanApi {
     fun opprettUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
-
+        logger.info("Opprett uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
         return lagUttaksplan(uttaksgrunnlag, true, uriComponentsBuilder)
     }
 
@@ -83,6 +88,7 @@ class UttakplanApi {
         ]
     )
     fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
+        logger.info("Henter uttaksplan for behanding=$behandlingUUID")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
         } catch (e: IllegalArgumentException) {
