@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Duration
 import kotlin.test.fail
@@ -23,10 +22,9 @@ import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(initializers = [DbContainerInitializer::class])
 @ActiveProfiles("postgres")
 @Tag("integration")
-internal class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
+class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
 
