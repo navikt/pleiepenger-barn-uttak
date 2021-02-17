@@ -14,11 +14,11 @@ spec:
     max: 4
     cpuThresholdPercentage: 50
   liveness:
-    path: /k9/pleiepenger-barn-uttak/internal/actuator/health
+    path: /pleiepenger-barn-uttak/internal/actuator/health
     initialDelay: 30
     timeout: 10
   readiness:
-    path: /k9/pleiepenger-barn-uttak/internal/actuator/info
+    path: /pleiepenger-barn-uttak/internal/actuator/info
     initialDelay: 30
     timeout: 10
   resources:
@@ -35,7 +35,7 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
   prometheus:
     enabled: true
-    path: /k9/pleiepenger-barn-uttak/internal/actuator/prometheus
+    path: /pleiepenger-barn-uttak/internal/actuator/prometheus
   secureLogs:
     enabled: true
   ingresses:
