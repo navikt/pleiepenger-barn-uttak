@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalStateException
-import java.time.LocalDate
 
 internal class GrunnlagMapperTest {
 
@@ -67,8 +66,7 @@ internal class GrunnlagMapperTest {
             arbeidsforholdReferanse1: Arbeidsforhold,
             arbeidsforholdReferanse2: Arbeidsforhold) = Uttaksgrunnlag(
                     søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(50)
+                        aktørId = aktørIdSøker
                     ),
                     barn = Barn(
                         aktørId = aktørIdBarn

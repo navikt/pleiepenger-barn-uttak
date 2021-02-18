@@ -6,11 +6,9 @@ import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.transaction.annotation.Transactional
@@ -181,8 +179,7 @@ internal class UttakRepositoryTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
-                    aktørId = aktørIdSøker,
-                    fødselsdato = LocalDate.of(1970, Month.JANUARY, 1)
+                    aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn

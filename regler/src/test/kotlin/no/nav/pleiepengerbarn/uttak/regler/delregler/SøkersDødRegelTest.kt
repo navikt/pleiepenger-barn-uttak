@@ -320,7 +320,6 @@ internal class SøkersDødRegelTest {
                 behandlingUUID = behandlingUUID,
                 søker = Søker(
                         aktørId = aktørIdSøker,
-                        fødselsdato = søkersDødsdato?:LocalDate.now().minusYears(50),
                         dødsdato = søkersDødsdato
                 ),
                 barn = Barn(

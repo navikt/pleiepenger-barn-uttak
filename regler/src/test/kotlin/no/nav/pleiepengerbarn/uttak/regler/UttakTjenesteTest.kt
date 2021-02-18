@@ -29,8 +29,7 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -59,8 +58,7 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -92,8 +90,7 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -160,8 +157,7 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn

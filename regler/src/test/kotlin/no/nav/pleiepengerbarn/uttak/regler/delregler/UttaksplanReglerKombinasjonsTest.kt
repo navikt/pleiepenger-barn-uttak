@@ -27,10 +27,9 @@ internal class UttaksplanReglerKombinasjonsTest {
     @Test
     internal fun `Søker og barn dør samme dag`() {
         val søkersDødsdato = LocalDate.parse("2020-01-09")
-        val søkersFødselsdato = søkersDødsdato.minusYears(50)
 
         val grunnlag = lagRegelGrunnlag(
-                søkersFødselsdato = søkersFødselsdato,
+
                 søkersDødsdato = søkersDødsdato,
                 barnetsDødsdato = søkersDødsdato
         )
@@ -74,10 +73,8 @@ internal class UttaksplanReglerKombinasjonsTest {
     internal fun `Søker dør i sorgperioden etter barnets død`() {
         val barnetsDødsdato = LocalDate.parse("2020-01-09")
         val søkersDødsdato = barnetsDødsdato.plusWeeks(4)
-        val søkersFødselsdato = søkersDødsdato.minusYears(30)
 
         val grunnlag = lagRegelGrunnlag(
-                søkersFødselsdato = søkersFødselsdato,
                 søkersDødsdato = søkersDødsdato,
                 barnetsDødsdato = barnetsDødsdato
         )
@@ -121,51 +118,7 @@ internal class UttaksplanReglerKombinasjonsTest {
         )
     }
 
-    @Test
-    internal fun `Søker dør rett etter fylte 70`() {
-        val søkersDødsdato = LocalDate.parse("2020-01-09")
-        val søkersFødselsdato = søkersDødsdato.minusYears(70).minusDays(2)
-
-        val grunnlag = lagRegelGrunnlag(
-                søkersFødselsdato = søkersFødselsdato,
-                søkersDødsdato = søkersDødsdato,
-                barnetsDødsdato = null
-        )
-
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
-
-        assertEquals(3, uttaksplan.perioder.size)
-
-        // Frem til fylte 70
-        sjekkOppfylt(
-                uttaksplan = uttaksplan,
-                forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventetGrad = forventetGrad,
-                forventedeUtbetalingsgrader = forventedeUtbetalingsgrader,
-                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
-        )
-
-        // Frem til død
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplan,
-                forventetPeriode = LukketPeriode("2020-01-08/2020-01-09"),
-                forventetIkkeOppfyltÅrsaker = setOf(
-                        Årsak.SØKERS_ALDER
-                )
-        )
-        // Etter død
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplan,
-                forventetPeriode = LukketPeriode("2020-01-10/2020-01-12"),
-                forventetIkkeOppfyltÅrsaker = setOf(
-                        Årsak.SØKERS_ALDER,
-                        Årsak.SØKERS_DØDSFALL
-                )
-        )
-    }
-
     private fun lagRegelGrunnlag(
-            søkersFødselsdato: LocalDate,
             søkersDødsdato: LocalDate?,
             barnetsDødsdato: LocalDate?
     ) : RegelGrunnlag {
@@ -173,7 +126,6 @@ internal class UttaksplanReglerKombinasjonsTest {
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         aktørId = aktørIdSøker,
-                        fødselsdato = søkersFødselsdato,
                         dødsdato = søkersDødsdato
                 ),
                 barn = Barn(
