@@ -43,7 +43,8 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Søker etter ikke eksisterende behandling skal føre til exception`() {
-        assertThrows<EmptyResultDataAccessException> {uttakRepository.hent(UUID.randomUUID())}
+        val uttaksplan = uttakRepository.hent(UUID.randomUUID())
+        assertThat(uttaksplan).isNull()
     }
 
     @Test

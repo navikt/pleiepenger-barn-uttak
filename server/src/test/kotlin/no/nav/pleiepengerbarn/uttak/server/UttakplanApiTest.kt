@@ -41,7 +41,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
         uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-01-01/2020-01-08"),

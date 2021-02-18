@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -37,14 +38,14 @@ internal class UttakRepository {
     }
 
     internal fun hent(behandlingId:UUID):Uttaksplan? {
-        val uttaksplanJSON = jdbcTemplate.queryForObject("select uttaksplan from uttaksresultat where behandling_id = ? and slettet=false",
+        return try {
+            val uttaksplanJSON = jdbcTemplate.queryForObject("select uttaksplan from uttaksresultat where behandling_id = ? and slettet=false",
                 uttaksplanRowMapper,
                 behandlingId)
-
-        if (uttaksplanJSON != null) {
-            return fraJSON(uttaksplanJSON)
+            fraJSON(uttaksplanJSON!!)
+        } catch (e: EmptyResultDataAccessException) {
+            null
         }
-        return null
     }
 
     internal fun hent(saksnummer:Saksnummer): Uttaksplan? {
