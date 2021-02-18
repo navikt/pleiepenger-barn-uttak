@@ -14,10 +14,6 @@ no.nav:
           accepted_audience: 'pleiepenger-barn-uttak'
 
 
-defaultDS:
-  url:
-  username:
-  password:
 
 #spring:
 #  datasource:

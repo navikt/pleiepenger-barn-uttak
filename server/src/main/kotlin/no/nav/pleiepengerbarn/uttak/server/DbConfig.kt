@@ -1,26 +1,42 @@
-package no.nav.pleiepengerbarn.uttak.server.db
+package no.nav.pleiepengerbarn.uttak.server
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import no.nav.pleiepengerbarn.uttak.server.db.DatasourceRole
+import no.nav.pleiepengerbarn.uttak.server.db.EnvironmentClass
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 import no.nav.vault.jdbc.hikaricp.VaultError
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.jdbc.core.JdbcTemplate
 import java.util.*
 import javax.sql.DataSource
 
 @Configuration
 class DbConfig {
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(this::class.java)
+    }
+
     @Bean
     @Profile("prodConfig")
-    fun dataSource(): DataSource {
+    fun getDataSource(): DataSource {
         return createDatasource("defaultDS", DatasourceRole.ADMIN, getEnvironmentClass(), 5)
+    }
+
+    @Bean
+    @Profile("prodConfig")
+    fun applicationDataConnection(): JdbcTemplate {
+        return JdbcTemplate(getDataSource())
     }
 
     fun createDatasource(datasourceName: String, role: DatasourceRole, environmentClass: EnvironmentClass, maxPoolSize: Int): DataSource {
         val rolePrefix = getRolePrefix(datasourceName)
+        logger.info("rolePrefix = $rolePrefix")
+        logger.info("envClass = $environmentClass")
         return if (EnvironmentClass.LOCALHOST == environmentClass) {
             val config = initConnectionPoolConfig(datasourceName, null, maxPoolSize)
             val password = getProperty("$datasourceName.password")
