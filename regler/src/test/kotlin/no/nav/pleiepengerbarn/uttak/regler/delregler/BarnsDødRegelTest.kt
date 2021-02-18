@@ -526,8 +526,7 @@ internal class BarnsDødRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(50)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                         aktørId = aktørIdBarn,
@@ -565,8 +564,7 @@ internal class BarnsDødRegelTest {
         return RegelGrunnlag(
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(50)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                         aktørId = aktørIdBarn,

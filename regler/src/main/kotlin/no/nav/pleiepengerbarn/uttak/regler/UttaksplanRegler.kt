@@ -23,9 +23,7 @@ internal object UttaksplanRegler {
     private val UttaksplanRegler = linkedSetOf(
             InngangsvilkårIkkeOppfyltRegel(),
             BarnsDødRegel(),
-            SøkersAlderRegel(),
             SøkersDødRegel()
-
     )
 
     internal fun fastsettUttaksplan(

@@ -34,8 +34,7 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -66,8 +65,7 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -94,8 +92,7 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -163,8 +160,7 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -261,8 +257,7 @@ internal class UttakTjenesteGraderingTest {
     fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
@@ -335,8 +330,7 @@ TODO: fiks til realistiske arbeidsforhold
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn

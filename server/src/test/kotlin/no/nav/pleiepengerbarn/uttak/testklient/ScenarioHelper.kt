@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.testklient
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.time.Duration
-import java.time.LocalDate
 import java.util.*
 
 internal val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
@@ -36,8 +35,7 @@ internal fun lagGrunnlag(
     pleiebehov: Map<LukketPeriode, Pleiebehov>,
     tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     søker: Søker = Søker(
-        aktørId = "123",
-        fødselsdato = LocalDate.parse("2000-01-01")
+        aktørId = "123"
     ),
     barn: Barn  = Barn(
         aktørId = "456"
