@@ -15,7 +15,6 @@ enum class Årsak(val oppfylt: Boolean)  {
     LOVBESTEMT_FERIE(false),
     SØKERS_DØDSFALL(false),
     BARNETS_DØDSFALL(false),
-    SØKERS_ALDER(false),
     INNGANGSVILKÅR_IKKE_OPPFYLT(false)
 
 }
