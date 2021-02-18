@@ -31,7 +31,6 @@ class UttakplanApi {
         const val BehandlingUUID = "behandlingUUID"
 
         private val logger = LoggerFactory.getLogger(this::class.java)
-        private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     }
 
@@ -95,7 +94,7 @@ class UttakplanApi {
             return ResponseEntity.badRequest().build()
         }
 
-        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(uttaksplan)
     }
 
@@ -112,7 +111,7 @@ class UttakplanApi {
         } catch (e: IllegalArgumentException) {
             return ResponseEntity.badRequest().build()
         }
-        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.notFound().build()
+        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
     }
 
