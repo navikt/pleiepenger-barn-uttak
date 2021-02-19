@@ -98,7 +98,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             uttaksgrad = EtHundreProsent,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                             årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                            graderingMotTilsyn = null, //TODO: hva skal vi angi her???
+                            graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                             kildeBehandlingUUID = grunnlag.behandlingUUID,
                             annenPart = grunnlag.annenPart(periode)
