@@ -12,7 +12,7 @@ internal class UttaksplanMergerTest {
     private val behandling2 = UUID.randomUUID().toString()
 
     private val hundreProsent = Prosent(100)
-    private fun oppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.innvilgelse(
+    private fun oppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.oppfylt(
             uttaksgrad = hundreProsent,
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
             årsak = Årsak.AVKORTET_MOT_INNTEKT,
@@ -21,7 +21,7 @@ internal class UttaksplanMergerTest {
             annenPart = AnnenPart.ALENE
     )
 
-    private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.avslag(
+    private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(
             årsaker = setOf(Årsak.FOR_LAV_GRAD),
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,

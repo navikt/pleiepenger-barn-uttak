@@ -587,7 +587,7 @@ internal class BarnsDødRegelTest {
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(
                                 perioder = mapOf(
-                                        helePerioden to UttaksperiodeInfo.innvilgelse(
+                                        helePerioden to UttaksperiodeInfo.oppfylt(
                                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                                 knekkpunktTyper = setOf(),
                                                 uttaksgrad = denAndreOmsorgspersonensGrad,

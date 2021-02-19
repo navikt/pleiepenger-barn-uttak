@@ -40,7 +40,7 @@ internal object UttaksplanRegler {
                 }
             }
             if (ikkeOppfyltÅrsaker.isNotEmpty()) {
-                perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.avslag(
+                perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
                     årsaker = ikkeOppfyltÅrsaker,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
@@ -50,7 +50,7 @@ internal object UttaksplanRegler {
                 val grader = finnGrader(søktUttaksperiode.periode, grunnlag)
 
                 if (grader.årsak.oppfylt) {
-                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.innvilgelse(
+                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.oppfylt(
                         uttaksgrad = grader.uttaksgrad,
                         utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},
                         årsak = grader.årsak,
@@ -65,7 +65,7 @@ internal object UttaksplanRegler {
                         annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
                     )
                 } else {
-                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.avslag(
+                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
                         årsaker = setOf(grader.årsak),
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID,

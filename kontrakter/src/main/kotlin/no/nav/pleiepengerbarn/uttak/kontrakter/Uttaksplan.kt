@@ -51,7 +51,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     companion object {
 
-        fun avslag(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun ikkeOppfylt(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -70,7 +70,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             )
         }
 
-        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
