@@ -22,9 +22,7 @@ internal object UttaksperiodeAsserts {
             assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(utbetalingsgrader.utbetalingsgrad)
         }
 
-//TODO: legg inn igjen oppfylt årsak igjen når den settes riktig
-//        assertThat(oppfyltPeriode.årsak).isEqualTo(forventedeOppfyltÅrsak)
-
+        assertThat(uttaksperiodeInfo.årsaker).isEqualTo(setOf(forventedeOppfyltÅrsak))
     }
 
     internal fun sjekkIkkeOppfylt(

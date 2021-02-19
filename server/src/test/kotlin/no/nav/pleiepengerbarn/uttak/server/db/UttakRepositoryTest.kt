@@ -203,7 +203,7 @@ internal class UttakRepositoryTest {
     private fun dummyUttaksplan(periode:LukketPeriode): Uttaksplan {
         return Uttaksplan(
                 perioder = mapOf(
-                        periode to UttaksperiodeInfo.innvilgelse(
+                        periode to UttaksperiodeInfo.oppfylt(
                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                 uttaksgrad = Prosent(100),
                                 årsak = Årsak.FULL_DEKNING,

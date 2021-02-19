@@ -51,9 +51,12 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     companion object {
 
-        fun avslag(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun ikkeOppfylt(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
-            //TODO: sjekk at alle årsaker er avslag
+            val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
+            require(årsakerMedOppfylt.isEmpty()) {
+                "Kan ikke avslå med årsaker for oppfylt. ($årsakerMedOppfylt)"
+            }
 
             return UttaksperiodeInfo(
                 utfall = Utfall.IKKE_OPPFYLT,
@@ -67,15 +70,17 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             )
         }
 
-        fun innvilgelse(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak? = null, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
-            //TODO: sjekk at årsak er innvilgelse
+            require(årsak.oppfylt) {
+                "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
+            }
 
             return UttaksperiodeInfo(
                 utfall = Utfall.OPPFYLT,
                 uttaksgrad = uttaksgrad,
                 utbetalingsgrader = utbetalingsgrader,
-                årsaker = if (årsak == null) setOf() else setOf(årsak),
+                årsaker = setOf(årsak),
                 graderingMotTilsyn = graderingMotTilsyn,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = kildeBehandlingUUID,

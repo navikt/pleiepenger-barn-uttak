@@ -63,7 +63,7 @@ internal class BarnsDødRegelTest {
         sjekkOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
@@ -75,7 +75,7 @@ internal class BarnsDødRegelTest {
         sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                forventedeOppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
@@ -587,7 +587,7 @@ internal class BarnsDødRegelTest {
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(
                                 perioder = mapOf(
-                                        helePerioden to UttaksperiodeInfo.innvilgelse(
+                                        helePerioden to UttaksperiodeInfo.oppfylt(
                                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                                 knekkpunktTyper = setOf(),
                                                 uttaksgrad = denAndreOmsorgspersonensGrad,

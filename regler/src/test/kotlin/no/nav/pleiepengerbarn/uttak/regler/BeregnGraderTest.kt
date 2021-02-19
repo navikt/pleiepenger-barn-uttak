@@ -51,7 +51,7 @@ internal class BeregnGraderTest {
         ))
 
         grader.assert(
-                Årsak.AVKORTET_MOT_INNTEKT, //TODO: skal det også være gradert mot andres tilsyn?
+                Årsak.AVKORTET_MOT_INNTEKT, //Dersom andre tilsyn og arbeid er likt, så skal årsaken være AVKORTET_MOT_INNTEKT
                 Prosent(50),
                 ARBEIDSGIVER1 to Prosent(50)
         )

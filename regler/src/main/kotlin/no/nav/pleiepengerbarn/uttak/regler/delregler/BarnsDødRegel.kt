@@ -94,11 +94,11 @@ internal class BarnsDødRegel : UttaksplanRegel {
                     )
                     .medArbeidsforholdFraForrigeOppfyltePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
-                        perioder[periode] = UttaksperiodeInfo.innvilgelse(
+                        perioder[periode] = UttaksperiodeInfo.oppfylt(
                             uttaksgrad = EtHundreProsent,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                             årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                            graderingMotTilsyn = null, //TODO: hva skal vi angi her???
+                            graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                             kildeBehandlingUUID = grunnlag.behandlingUUID,
                             annenPart = grunnlag.annenPart(periode)
@@ -269,7 +269,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
                     årsaker = ikkeOppfyltÅrsaker)
             )
         } else {
-            put(it.key, UttaksperiodeInfo.avslag(
+            put(it.key, UttaksperiodeInfo.ikkeOppfylt(
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL),
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
                 kildeBehandlingUUID = grunnlag.behandlingUUID,
