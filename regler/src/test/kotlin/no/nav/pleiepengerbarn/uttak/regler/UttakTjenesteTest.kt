@@ -189,7 +189,7 @@ TODO: fiks når tilsyn er ordentlig implementert
                 forventetPeriode = periode2,
                 forventetGrad = Prosent(80),
                 forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(80)),
-                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
+                forventedeOppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT
         )
     }
 
