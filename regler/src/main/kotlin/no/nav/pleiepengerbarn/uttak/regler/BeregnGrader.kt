@@ -22,7 +22,8 @@ internal object BeregnGrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
             ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(pleiebehov, etablertTilsyn)
-        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid)
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid()
+        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid)
         val fordeling = finnFordeling(arbeid)
         val utbetalingsgrader = avklarUtbetalingsgrader(uttaksgradResultat.uttaksgrad, arbeid, fordeling)
 
@@ -33,6 +34,7 @@ internal object BeregnGrader {
                 andreSøkeresTilsyn = andreSøkeresTilsyn,
                 tilgjengeligForSøker = uttaksgradResultat.restTilSøker
             ),
+            søkersTapteArbeidstid = søkersTapteArbeidstid,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
@@ -43,26 +45,25 @@ internal object BeregnGrader {
                                  etablertTilsynprosent: Prosent,
                                  ønsketUttaksgrad: Duration?,
                                  andreSøkeresTilsyn: Prosent,
-                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): UttaksgradResultat {
+                                 arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+                                 søkersTapteArbeidstid: Prosent): UttaksgradResultat {
         val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
-
-        val graderingMotInntektstap = finnGraderingMotInntektstap(arbeid)
 
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
 
-        if (restTilSøker < TJUE_PROSENT || graderingMotInntektstap < TJUE_PROSENT || ønsketUttaksgradProsent < TJUE_PROSENT) {
+        if (restTilSøker < TJUE_PROSENT || søkersTapteArbeidstid < TJUE_PROSENT || ønsketUttaksgradProsent < TJUE_PROSENT) {
             return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_GRAD)
         }
-        if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < graderingMotInntektstap) {
+        if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < søkersTapteArbeidstid) {
             return UttaksgradResultat(restTilSøker, ønsketUttaksgradProsent, oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE)
         }
-        if (restTilSøker < graderingMotInntektstap) {
+        if (restTilSøker < søkersTapteArbeidstid) {
             return UttaksgradResultat(restTilSøker, restTilSøker, oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN)
         }
         if (arbeid.fulltFravær()) {
-            return UttaksgradResultat(restTilSøker, graderingMotInntektstap.setScale(2, RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.FULL_DEKNING)
+            return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.FULL_DEKNING)
         }
-        return UttaksgradResultat(restTilSøker, graderingMotInntektstap.setScale(2,RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT)
+        return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2,RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT)
     }
 
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
@@ -105,6 +106,7 @@ internal object BeregnGrader {
     }
 
 
+
     private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
         arbeid.values.forEach {
@@ -124,28 +126,7 @@ internal object BeregnGrader {
        return fordeling
     }
 
-    private fun finnGraderingMotInntektstap(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Prosent {
-        var sumJobberNå = Duration.ZERO
-        var sumJobberNormalt = Duration.ZERO
-        arbeid.values.forEach {
-            sumJobberNå += it.jobberNå
-            sumJobberNormalt += it.jobberNormalt
-        }
 
-        if (sumJobberNormalt == Duration.ZERO) {
-            return Prosent.ZERO
-        }
-
-        val graderingMotInntektstap = HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8) / BigDecimal(sumJobberNormalt.toMillis()) * HUNDRE_PROSENT)
-
-        if ( graderingMotInntektstap > HUNDRE_PROSENT) {
-            throw IllegalStateException("Faktisk arbeid > normalt arbeid")
-        }
-        if (graderingMotInntektstap < Prosent.ZERO) {
-            throw IllegalStateException("Negativ gradering mot inntektstap ($graderingMotInntektstap)")
-        }
-        return graderingMotInntektstap
-    }
 
     private fun finnEtablertTilsynsprosent(pleiebehov: Pleiebehov, etablertTilsyn: Duration): Prosent {
         if (etablertTilsyn > FULL_DAG) {
@@ -183,6 +164,7 @@ data class GraderingMotTilsyn(
 
 data class GraderBeregnet(
         val graderingMotTilsyn: GraderingMotTilsyn,
+        val søkersTapteArbeidstid: Prosent,
         val uttaksgrad: Prosent,
         val utbetalingsgrader: Map<Arbeidsforhold, Utbetalingsgrad>,
         val årsak: Årsak
