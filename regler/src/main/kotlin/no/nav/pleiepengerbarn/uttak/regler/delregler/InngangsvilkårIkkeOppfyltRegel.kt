@@ -23,7 +23,7 @@ internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
                     //Legg til inngangsvilkår ikke oppfylt dersom perioden allerede er ikke oppfylt
                     val årsaker = it.value.årsaker.toMutableSet()
                     årsaker.add(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
-                    nyePerioder[it.key] = it.value.copy(årsaker = årsaker)
+                    nyePerioder[it.key] = it.value.copy(årsaker = årsaker, inngangsvilkår = inngangsvilkår)
                 }
             } else {
                 nyePerioder[it.key] = it.value.copy(inngangsvilkår = inngangsvilkår)

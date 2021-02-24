@@ -160,6 +160,63 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
 
+    @Test
+    internal fun `Periode med avslått inngangsvilkår skal ikke være oppfylt`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-20")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-20") to Pleiebehov.PROSENT_100),
+        ).copy(inngangsvilkår = mapOf(
+            "FP_VK_3" to listOf(
+                Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-20"), Utfall.OPPFYLT)
+            ),
+            "FP_VK_2" to listOf(
+                Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-03"), Utfall.OPPFYLT),
+                Vilkårsperiode(LukketPeriode("2020-01-04/2020-01-08"), Utfall.IKKE_OPPFYLT),
+                Vilkårsperiode(LukketPeriode("2020-01-09/2020-01-20"), Utfall.OPPFYLT)
+            ),
+            "K9_VK_1" to listOf(
+                Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-20"), Utfall.OPPFYLT)
+            )
+
+        ))
+
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.perioder).hasSize(3)
+
+        uttaksplan.assertOppfylt(
+            periode = LukketPeriode("2020-01-01/2020-01-03"),
+            grad = HUNDREPROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDREPROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING
+        )
+        uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-04/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
+            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
+        )
+        uttaksplan.assertOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-20"),
+            grad = HUNDREPROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDREPROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING
+        )
+    }
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
