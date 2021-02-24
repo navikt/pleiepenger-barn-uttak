@@ -41,6 +41,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("utfall") val utfall: Utfall,
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
+    @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
     @JsonProperty("årsak") val årsaker: Set<Årsak>,
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
     @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
@@ -51,7 +52,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     companion object {
 
-        fun ikkeOppfylt(årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun ikkeOppfylt(utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -61,7 +62,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             return UttaksperiodeInfo(
                 utfall = Utfall.IKKE_OPPFYLT,
                 uttaksgrad = Prosent.ZERO,
-                utbetalingsgrader = listOf(),
+                utbetalingsgrader = utbetalingsgrader,
+                søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = årsaker,
                 graderingMotTilsyn = null,
                 knekkpunktTyper = knekkpunktTyper,
@@ -70,7 +72,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             )
         }
 
-        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -80,6 +82,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utfall = Utfall.OPPFYLT,
                 uttaksgrad = uttaksgrad,
                 utbetalingsgrader = utbetalingsgrader,
+                søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = setOf(årsak),
                 graderingMotTilsyn = graderingMotTilsyn,
                 knekkpunktTyper = knekkpunktTyper,

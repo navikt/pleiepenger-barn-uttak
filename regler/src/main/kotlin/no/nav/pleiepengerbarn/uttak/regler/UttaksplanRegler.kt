@@ -39,20 +39,23 @@ internal object UttaksplanRegler {
                     ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
                 }
             }
+            val grader = finnGrader(søktUttaksperiode.periode, grunnlag)
             if (ikkeOppfyltÅrsaker.isNotEmpty()) {
                 perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
+                    utbetalingsgrader = grader.tilUtbetalingsgrader(false),
+                    søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     årsaker = ikkeOppfyltÅrsaker,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
                     annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
                 )
             } else {
-                val grader = finnGrader(søktUttaksperiode.periode, grunnlag)
 
                 if (grader.årsak.oppfylt) {
                     perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.oppfylt(
                         uttaksgrad = grader.uttaksgrad,
-                        utbetalingsgrader = grader.utbetalingsgrader.map {Utbetalingsgrader(arbeidsforhold = it.key, utbetalingsgrad = it.value.utbetalingsgrad, normalArbeidstid = it.value.normalArbeidstid, faktiskArbeidstid = it.value.faktiskArbeidstid)},
+                        utbetalingsgrader = grader.tilUtbetalingsgrader(true),
+                        søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                         årsak = grader.årsak,
                         graderingMotTilsyn = GraderingMotTilsyn(
                             pleiebehov = grader.graderingMotTilsyn.pleiebehov.prosent,
@@ -66,6 +69,8 @@ internal object UttaksplanRegler {
                     )
                 } else {
                     perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
+                        utbetalingsgrader = grader.tilUtbetalingsgrader(false),
+                        søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                         årsaker = setOf(grader.årsak),
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID,
@@ -85,6 +90,18 @@ internal object UttaksplanRegler {
         }
 
         return uttaksplan
+    }
+
+    private fun GraderBeregnet.tilUtbetalingsgrader(oppfylt: Boolean): List<Utbetalingsgrader> {
+        return this.utbetalingsgrader.map {
+            val utbetalingsgrad  = if (oppfylt) it.value.utbetalingsgrad else BigDecimal.ZERO
+            Utbetalingsgrader(
+                arbeidsforhold = it.key,
+                utbetalingsgrad = utbetalingsgrad,
+                normalArbeidstid = it.value.normalArbeidstid,
+                faktiskArbeidstid = it.value.faktiskArbeidstid
+            )
+        }
     }
 
     private fun finnGrader(periode: LukketPeriode, grunnlag: RegelGrunnlag): GraderBeregnet {
@@ -134,18 +151,5 @@ internal object UttaksplanRegler {
         return andreSøkeresTilsynsgrad
     }
 
-    private fun RegelGrunnlag.finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
-        val arbeidPerArbeidsforhold = mutableMapOf<Arbeidsforhold, ArbeidsforholdPeriodeInfo>()
-        this.arbeid.forEach { arbeid ->
-            val periodeFunnet = arbeid.perioder.keys.firstOrNull {  it.overlapper(periode)}
-            if (periodeFunnet != null) {
-                val info = arbeid.perioder[periodeFunnet]
-                if (info != null) {
-                    arbeidPerArbeidsforhold[arbeid.arbeidsforhold] = info
-                }
-            }
-        }
-        return arbeidPerArbeidsforhold
-    }
 
 }

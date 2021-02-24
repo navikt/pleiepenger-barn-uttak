@@ -15,6 +15,7 @@ internal class UttaksplanMergerTest {
     private fun oppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.oppfylt(
             uttaksgrad = hundreProsent,
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
+            søkersTapteArbeidstid = Prosent(100),
             årsak = Årsak.AVKORTET_MOT_INNTEKT,
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,
@@ -22,6 +23,8 @@ internal class UttaksplanMergerTest {
     )
 
     private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(
+            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent.ZERO).somUtbetalingsgrader(),
+            søkersTapteArbeidstid = Prosent(100),
             årsaker = setOf(Årsak.FOR_LAV_GRAD),
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,

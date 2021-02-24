@@ -5,6 +5,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.EtHundreProsent
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.finnSøkersTapteArbeidstid
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.perioderSomIkkeInngårI
@@ -94,8 +95,11 @@ internal class BarnsDødRegel : UttaksplanRegel {
                     )
                     .medArbeidsforholdFraForrigeOppfyltePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
+                        val arbeidForPeriode = grunnlag.finnArbeidPerArbeidsforhold(periode)
+                        val søkersTapteArbeidstid = arbeidForPeriode.finnSøkersTapteArbeidstid()
                         perioder[periode] = UttaksperiodeInfo.oppfylt(
                             uttaksgrad = EtHundreProsent,
+                            søkersTapteArbeidstid = søkersTapteArbeidstid,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                             årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
                             graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
@@ -269,7 +273,19 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
                     årsaker = ikkeOppfyltÅrsaker)
             )
         } else {
+            val arbeidForPeriode = grunnlag.finnArbeidPerArbeidsforhold(it.key)
+            val søkersTapteArbeidstid = arbeidForPeriode.finnSøkersTapteArbeidstid()
+            val utbetalingsgrader = arbeidForPeriode.map {arbeidEntry ->
+                Utbetalingsgrader(
+                    arbeidsforhold = arbeidEntry.key,
+                    normalArbeidstid = arbeidEntry.value.jobberNormalt,
+                    faktiskArbeidstid = arbeidEntry.value.jobberNå,
+                    utbetalingsgrad = Prosent.ZERO
+                )
+            }
             put(it.key, UttaksperiodeInfo.ikkeOppfylt(
+                utbetalingsgrader = utbetalingsgrader,
+                søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL),
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
                 kildeBehandlingUUID = grunnlag.behandlingUUID,

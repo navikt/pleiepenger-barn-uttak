@@ -104,7 +104,16 @@ internal class UttakTjenesteGraderingTest {
                     helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.oppfylt(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
+                        "999" to Uttaksplan(perioder = mapOf(
+                            helePerioden to UttaksperiodeInfo.oppfylt(
+                                kildeBehandlingUUID = nesteBehandlingId(),
+                                uttaksgrad = Prosent(40),
+                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                                søkersTapteArbeidstid = Prosent(40),
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
+                                annenPart = AnnenPart.ALENE
+                            )
+                        ))
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
@@ -172,7 +181,17 @@ internal class UttakTjenesteGraderingTest {
                     helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.oppfylt(kildeBehandlingUUID = nesteBehandlingId(), uttaksgrad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(), annenPart = AnnenPart.ALENE)))
+                        "999" to Uttaksplan(perioder = mapOf(
+                            helePerioden to UttaksperiodeInfo.oppfylt(
+                                kildeBehandlingUUID = nesteBehandlingId(),
+                                uttaksgrad = Prosent(40),
+                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                                søkersTapteArbeidstid = Prosent(40),
+                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                knekkpunktTyper = setOf(),
+                                annenPart = AnnenPart.ALENE
+                            )
+                        ))
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)
