@@ -205,15 +205,15 @@ internal class UttakRepositoryTest {
                 perioder = mapOf(
                         periode to UttaksperiodeInfo.oppfylt(
                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
-                                uttaksgrad = Prosent(100),
+                                uttaksgrad = Prosent(100).setScale(2),
                                 årsak = Årsak.FULL_DEKNING,
                                 knekkpunktTyper = setOf(),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,
-                                        utbetalingsgrad = Prosent(100),
+                                        utbetalingsgrad = Prosent(100).setScale(2),
                                         normalArbeidstid = FULL_DAG,
                                         faktiskArbeidstid = Duration.ZERO)),
-                                søkersTapteArbeidstid = Prosent(100),
+                                søkersTapteArbeidstid = Prosent(100).setScale(2),
                                 annenPart = AnnenPart.ALENE)
                 )
         )

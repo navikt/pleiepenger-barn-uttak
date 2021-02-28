@@ -8,7 +8,10 @@ import no.nav.pleiepengerbarn.uttak.testklient.testClientMotLokalServer
 
 fun main() {
     val grunnlag = lagGrunnlag(periode = "2020-01-01/2020-01-10")
-        .copy(inngangsvilkår = mapOf("FP_VK_2" to listOf(Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-10"), Utfall.OPPFYLT))))
+        .copy(inngangsvilkår = mapOf(
+            "FP_VK_2" to listOf(Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-10"), Utfall.OPPFYLT)),
+            "FP_VK_3" to listOf(Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-10"), Utfall.IKKE_OPPFYLT)),
+        ))
     testClientMotLokalServer().opprettUttaksplan(grunnlag)
     println("Opprettet uttaksplan for behandlingUUID = ${grunnlag.behandlingUUID}")
 }
