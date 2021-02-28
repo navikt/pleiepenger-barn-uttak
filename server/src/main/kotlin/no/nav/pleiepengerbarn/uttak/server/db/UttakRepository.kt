@@ -57,7 +57,6 @@ internal class UttakRepository {
         val uttaksresultatId = keyHolder.key as Long
 
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
-        println("uttaksresultatId=$uttaksresultatId")
     }
 
     internal fun hent(behandlingId:UUID):Uttaksplan? {
