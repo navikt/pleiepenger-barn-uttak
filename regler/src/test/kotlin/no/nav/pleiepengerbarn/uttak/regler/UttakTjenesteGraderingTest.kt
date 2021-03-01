@@ -111,6 +111,7 @@ internal class UttakTjenesteGraderingTest {
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
+                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                 annenPart = AnnenPart.ALENE
                             )
                         ))
@@ -188,6 +189,7 @@ internal class UttakTjenesteGraderingTest {
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                 knekkpunktTyper = setOf(),
                                 annenPart = AnnenPart.ALENE
                             )

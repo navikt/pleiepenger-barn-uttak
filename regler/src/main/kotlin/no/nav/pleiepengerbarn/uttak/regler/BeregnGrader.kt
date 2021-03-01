@@ -28,6 +28,7 @@ internal object BeregnGrader {
         val utbetalingsgrader = avklarUtbetalingsgrader(uttaksgradResultat.uttaksgrad, arbeid, fordeling)
 
         return GraderBeregnet(
+            pleiebehov = pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsynsprosent,
@@ -163,6 +164,7 @@ data class GraderingMotTilsyn(
 )
 
 data class GraderBeregnet(
+        val pleiebehov: Pleiebehov,
         val graderingMotTilsyn: GraderingMotTilsyn,
         val søkersTapteArbeidstid: Prosent,
         val uttaksgrad: Prosent,

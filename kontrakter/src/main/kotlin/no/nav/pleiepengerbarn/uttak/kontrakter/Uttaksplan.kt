@@ -44,6 +44,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
     @JsonProperty("årsak") val årsaker: Set<Årsak>,
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
+    @JsonProperty("pleiebehov") val pleiebehov: Prosent,
     @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
     @JsonProperty("knekkpunktTyper") val knekkpunktTyper: Set<KnekkpunktType> = setOf(),
     @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID,
@@ -52,7 +53,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     companion object {
 
-        fun ikkeOppfylt(utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsaker: Set<Årsak>, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun ikkeOppfylt(utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsaker: Set<Årsak>, pleiebehov: Prosent, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -65,6 +66,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = årsaker,
+                pleiebehov = pleiebehov,
                 graderingMotTilsyn = null,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = kildeBehandlingUUID,
@@ -72,7 +74,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             )
         }
 
-        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsak: Årsak, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
+        fun oppfylt(uttaksgrad: Prosent, utbetalingsgrader: List<Utbetalingsgrader>, søkersTapteArbeidstid: Prosent, årsak: Årsak, pleiebehov: Prosent, graderingMotTilsyn: GraderingMotTilsyn? = null, knekkpunktTyper: Set<KnekkpunktType>, kildeBehandlingUUID: BehandlingUUID, annenPart: AnnenPart): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -84,6 +86,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = setOf(årsak),
+                pleiebehov = pleiebehov,
                 graderingMotTilsyn = graderingMotTilsyn,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = kildeBehandlingUUID,
@@ -99,7 +102,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class GraderingMotTilsyn(
-    @JsonProperty("pleiebehov") val pleiebehov: Prosent,
+    @Deprecated("Bruk pleiebehov direkte på periode istedet.") @JsonProperty("pleiebehov") val pleiebehov: Prosent,
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent

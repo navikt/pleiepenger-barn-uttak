@@ -49,10 +49,11 @@ internal class UttaksperiodeRepository {
 
             var graderingMotTilsyn: GraderingMotTilsyn? = null
             val pleiebehov = rs.getBigDecimal("pleiebehov") //TODO: pleiebehov bør flyttes utenfor GraderMotTilsyn eller fjern optional på GraderMotTilsyn i uttaksperiode.
-            if (pleiebehov != null) {
+            val etablertTilsyn = rs.getBigDecimal("etablert_tilsyn")
+            if (etablertTilsyn != null) {
                 graderingMotTilsyn = GraderingMotTilsyn(
                     pleiebehov = pleiebehov,
-                    etablertTilsyn = rs.getBigDecimal("etablert_tilsyn"),
+                    etablertTilsyn = etablertTilsyn,
                     andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
                     tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker")
                 )
@@ -70,12 +71,12 @@ internal class UttaksperiodeRepository {
                     utbetalingsgrader = listOf(), //Blir lagt til litt lengre nede
                     søkersTapteArbeidstid = rs.getBigDecimal("sokers_tapte_arbeidstid"),
                     årsaker = årsakerFraJSON(rs.getString("aarsaker")).toSet(),
+                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
                     inngangsvilkår = inngangsvilkårFraJSON(rs.getString("inngangsvilkar")),
                     graderingMotTilsyn = graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyperFraJSON(rs.getString("knekkpunkt_typer")).toSet(),
                     kildeBehandlingUUID = rs.getString("kilde_behandling_uuid"),
                     annenPart = AnnenPart.valueOf(rs.getString("annen_part"))
-
                 )
             )
         }
@@ -117,7 +118,7 @@ internal class UttaksperiodeRepository {
             .addValue("uttaksresultat_id", uttaksperiodeId)
             .addValue("fom", periode.fom)
             .addValue("tom", periode.tom)
-            .addValue("pleiebehov", info.graderingMotTilsyn?.pleiebehov)
+            .addValue("pleiebehov", info.pleiebehov)
             .addValue("etablert_tilsyn", info.graderingMotTilsyn?.etablertTilsyn)
             .addValue("andre_sokeres_tilsyn", info.graderingMotTilsyn?.andreSøkeresTilsyn)
             .addValue("tilgjengelig_for_soker", info.graderingMotTilsyn?.tilgjengeligForSøker)

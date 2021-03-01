@@ -31,4 +31,15 @@ data class RegelGrunnlag(
         return arbeidPerArbeidsforhold
     }
 
+
+    fun finnPleiebehov(periode: LukketPeriode): Pleiebehov {
+        val pleiebehovPeriode = this.pleiebehov.keys.firstOrNull {it.overlapper(periode)}
+        return if (pleiebehovPeriode != null) {
+            this.pleiebehov[pleiebehovPeriode] ?: Pleiebehov.PROSENT_0
+        } else {
+            Pleiebehov.PROSENT_0
+        }
+    }
+
+
 }
