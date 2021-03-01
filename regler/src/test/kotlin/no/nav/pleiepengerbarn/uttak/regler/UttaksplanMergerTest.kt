@@ -17,6 +17,7 @@ internal class UttaksplanMergerTest {
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
             søkersTapteArbeidstid = Prosent(100),
             årsak = Årsak.AVKORTET_MOT_INNTEKT,
+            pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,
             annenPart = AnnenPart.ALENE
@@ -26,6 +27,7 @@ internal class UttaksplanMergerTest {
             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent.ZERO).somUtbetalingsgrader(),
             søkersTapteArbeidstid = Prosent(100),
             årsaker = setOf(Årsak.FOR_LAV_GRAD),
+            pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,
             annenPart = AnnenPart.ALENE

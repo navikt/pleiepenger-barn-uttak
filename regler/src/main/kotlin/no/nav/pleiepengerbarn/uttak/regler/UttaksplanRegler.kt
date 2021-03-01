@@ -45,6 +45,7 @@ internal object UttaksplanRegler {
                     utbetalingsgrader = grader.tilUtbetalingsgrader(false),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     årsaker = ikkeOppfyltÅrsaker,
+                    pleiebehov = grader.pleiebehov.prosent,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
                     annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
@@ -57,8 +58,9 @@ internal object UttaksplanRegler {
                         utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                         søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                         årsak = grader.årsak,
+                        pleiebehov = grader.pleiebehov.prosent,
                         graderingMotTilsyn = GraderingMotTilsyn(
-                            pleiebehov = grader.graderingMotTilsyn.pleiebehov.prosent,
+                            pleiebehov = grader.pleiebehov.prosent,
                             etablertTilsyn = grader.graderingMotTilsyn.etablertTilsyn,
                             andreSøkeresTilsyn = grader.graderingMotTilsyn.andreSøkeresTilsyn,
                             tilgjengeligForSøker = grader.graderingMotTilsyn.tilgjengeligForSøker
@@ -72,6 +74,7 @@ internal object UttaksplanRegler {
                         utbetalingsgrader = grader.tilUtbetalingsgrader(false),
                         søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                         årsaker = setOf(grader.årsak),
+                        pleiebehov = grader.pleiebehov.prosent,
                         knekkpunktTyper = knekkpunktTyper,
                         kildeBehandlingUUID = grunnlag.behandlingUUID,
                         annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
@@ -117,15 +120,6 @@ internal object UttaksplanRegler {
     private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
         val søktUttak = this.søktUttak.firstOrNull {it.periode.overlapper(periode)}
         return søktUttak?.oppgittTilsyn
-    }
-
-    private fun RegelGrunnlag.finnPleiebehov(periode: LukketPeriode): Pleiebehov {
-        val pleiebehovPeriode = this.pleiebehov.keys.firstOrNull {it.overlapper(periode)}
-        return if (pleiebehovPeriode != null) {
-            this.pleiebehov[pleiebehovPeriode] ?: Pleiebehov.PROSENT_0
-        } else {
-            Pleiebehov.PROSENT_0
-        }
     }
 
     private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {

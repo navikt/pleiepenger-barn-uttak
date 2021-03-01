@@ -101,7 +101,8 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             uttaksgrad = EtHundreProsent,
                             søkersTapteArbeidstid = søkersTapteArbeidstid,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
-                            årsak= Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                            årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent, //Setter pleiebehov til 100 for perioder som opprettes pga barnets død
                             graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                             kildeBehandlingUUID = grunnlag.behandlingUUID,
@@ -287,6 +288,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL),
+                pleiebehov = grunnlag.finnPleiebehov(it.key).prosent,
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
                 kildeBehandlingUUID = grunnlag.behandlingUUID,
                 annenPart = grunnlag.annenPart(it.key)
