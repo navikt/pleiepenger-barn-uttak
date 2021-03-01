@@ -40,8 +40,8 @@ internal class UttakRepository {
         val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
         val sql = """
             insert into uttaksresultat 
-            (id, saksnummer, behandling_id, regel_grunnlag, uttaksplan, slettet, opprettet_tid) 
-            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :uttaksplan, :slettet, :opprettet_tid)            
+            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid) 
+            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid)            
         """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -49,7 +49,6 @@ internal class UttakRepository {
             .addValue("saksnummer", saksnummer)
             .addValue("behandling_id", behandlingId)
             .addValue("regel_grunnlag", tilJSON(regelGrunnlag))
-            .addValue("uttaksplan", tilJSON(uttaksplan))
             .addValue("slettet", false)
             .addValue("opprettet_tid", opprettetTidspunkt)
 
@@ -124,9 +123,5 @@ internal class UttakRepository {
         jsonObject.value = jsonString
         return jsonObject
     }
-/*
-    private fun fraJSON(json:String):Uttaksplan {
-        return mapper.readValue(json, Uttaksplan::class.java)
-    }
-*/
+
 }
