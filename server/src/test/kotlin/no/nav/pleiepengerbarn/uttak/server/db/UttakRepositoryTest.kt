@@ -207,7 +207,7 @@ internal class UttakRepositoryTest {
                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
                                 uttaksgrad = Prosent(100).setScale(2),
                                 årsak = Årsak.FULL_DEKNING,
-                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                                pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2),
                                 knekkpunktTyper = setOf(),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,
