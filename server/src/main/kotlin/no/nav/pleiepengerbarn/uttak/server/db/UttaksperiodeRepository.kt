@@ -71,7 +71,7 @@ internal class UttaksperiodeRepository {
                     utbetalingsgrader = listOf(), //Blir lagt til litt lengre nede
                     søkersTapteArbeidstid = rs.getBigDecimal("sokers_tapte_arbeidstid"),
                     årsaker = årsakerFraJSON(rs.getString("aarsaker")).toSet(),
-                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                    pleiebehov = pleiebehov,
                     inngangsvilkår = inngangsvilkårFraJSON(rs.getString("inngangsvilkar")),
                     graderingMotTilsyn = graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyperFraJSON(rs.getString("knekkpunkt_typer")).toSet(),
