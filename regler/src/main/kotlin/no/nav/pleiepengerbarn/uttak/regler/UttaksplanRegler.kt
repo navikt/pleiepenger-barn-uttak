@@ -60,7 +60,6 @@ internal object UttaksplanRegler {
                         årsak = grader.årsak,
                         pleiebehov = grader.pleiebehov.prosent,
                         graderingMotTilsyn = GraderingMotTilsyn(
-                            pleiebehov = grader.pleiebehov.prosent,
                             etablertTilsyn = grader.graderingMotTilsyn.etablertTilsyn,
                             andreSøkeresTilsyn = grader.graderingMotTilsyn.andreSøkeresTilsyn,
                             tilgjengeligForSøker = grader.graderingMotTilsyn.tilgjengeligForSøker
