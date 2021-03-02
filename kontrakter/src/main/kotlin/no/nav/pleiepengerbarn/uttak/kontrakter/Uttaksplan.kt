@@ -102,7 +102,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class GraderingMotTilsyn(
-    @Deprecated("Bruk pleiebehov direkte på periode istedet.") @JsonProperty("pleiebehov") val pleiebehov: Prosent,
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent

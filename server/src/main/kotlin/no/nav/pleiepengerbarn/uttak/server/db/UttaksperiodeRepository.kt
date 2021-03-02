@@ -48,11 +48,10 @@ internal class UttaksperiodeRepository {
         val uttaksperiodeMapper = RowMapper { rs, _ ->
 
             var graderingMotTilsyn: GraderingMotTilsyn? = null
-            val pleiebehov = rs.getBigDecimal("pleiebehov") //TODO: pleiebehov bør flyttes utenfor GraderMotTilsyn eller fjern optional på GraderMotTilsyn i uttaksperiode.
+            val pleiebehov = rs.getBigDecimal("pleiebehov")
             val etablertTilsyn = rs.getBigDecimal("etablert_tilsyn")
             if (etablertTilsyn != null) {
                 graderingMotTilsyn = GraderingMotTilsyn(
-                    pleiebehov = pleiebehov,
                     etablertTilsyn = etablertTilsyn,
                     andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
                     tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker")
