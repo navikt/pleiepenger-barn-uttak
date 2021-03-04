@@ -42,7 +42,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
-    @JsonProperty("årsak") val årsaker: Set<Årsak>,
+    @JsonProperty("årsaker") val årsaker: Set<Årsak>,
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
     @JsonProperty("pleiebehov") val pleiebehov: Prosent,
     @JsonProperty("graderingMotTilsyn") val graderingMotTilsyn: GraderingMotTilsyn?,
