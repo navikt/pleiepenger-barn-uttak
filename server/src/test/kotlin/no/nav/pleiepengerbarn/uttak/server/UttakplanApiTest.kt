@@ -19,7 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Duration
 import kotlin.test.fail
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("postgres")
@@ -216,6 +215,25 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.FULL_DEKNING
         )
     }
+
+
+    @Test
+    internal fun `Feil i input til uttaksplan skal gi bad request`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD2, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = Duration.ZERO)))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+        ).copy(behandlingUUID = "tull og tøys")
+
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
