@@ -7,6 +7,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
+import no.nav.pleiepengerbarn.uttak.regler.sjekk
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,6 +54,10 @@ class UttakplanApi {
     }
 
     private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
+        val valideringsfeil = uttaksgrunnlag.sjekk()
+        if (valideringsfeil.isNotEmpty()) {
+            throw ValideringException("Valideringsfeil: $valideringsfeil")
+        }
         val andrePartersUttaksplaner = mutableMapOf<Saksnummer, Uttaksplan>()
         uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
             val uttaksplan = uttakRepository.hent(saksnummer)
