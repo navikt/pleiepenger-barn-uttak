@@ -6,7 +6,9 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
+private val TI_PROSENT = Prosent(10)
 private val TJUE_PROSENT = Prosent(20)
+private val ÅTTI_PROSENT = Prosent(80)
 private val HUNDRE_PROSENT = Prosent(100)
 
 private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
@@ -49,6 +51,9 @@ internal object BeregnGrader {
                                  arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
                                  søkersTapteArbeidstid: Prosent): UttaksgradResultat {
         val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
+        if (etablertTilsynprosent > ÅTTI_PROSENT) {
+            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_HØY_TILSYNSGRAD)
+        }
 
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
 
@@ -82,6 +87,10 @@ internal object BeregnGrader {
 
     private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): BigDecimal {
         val pleiebehovprosent = pleiebehov.prosent
+        if (etablertTilsynsprosent < TI_PROSENT) {
+            //TODO: bør vi ha en årsak på hvorfor etablert tilsyn under 10% ignoreres? kanskje noe tilsvarende også for nattevåk og beredskap
+            return pleiebehovprosent - andreSøkeresTilsyn
+        }
         return pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
     }
 

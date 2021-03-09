@@ -114,30 +114,28 @@ internal class UttakTjenesteTest {
         sjekkIkkeOppfylt(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_PLEIEBEHOV))
     }
 
-/*
-TODO: fiks når tilsyn er ordentlig implementert
     @Test
     fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for høy tilsynsgrad`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
                 ).somTilsynperioder(),
-                søknadsperioder = listOf(
+                søktUttak = listOf(
                         SøktUttak(helePerioden)
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
                 ).somArbeid()
         )
 
@@ -145,9 +143,8 @@ TODO: fiks når tilsyn er ordentlig implementert
 
         assertThat(uttaksplan.perioder).hasSize(2)
         sjekkOppfylt(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsaker.FOR_HØY_TILSYNSGRAD))
+        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsak.FOR_HØY_TILSYNSGRAD))
     }
-*/
 
     @Test
     fun `Får jobbet siste halvdel av en perioder`() {
@@ -193,27 +190,25 @@ TODO: fiks når tilsyn er ordentlig implementert
         )
     }
 
-/*
-TODO: fiks når tilsyn er ordentlig implementert
     @Test
-    fun `Det skal ikke avkortes mot tilsyn under 10%`() {
+    fun `Det skal ikke avkortes mot tilsyn under 10 prosent`() {
         val periode = LukketPeriode("2020-03-09/2020-03-15")
 
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        periode to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(periode),
+                søktUttak = listOf(SøktUttak(periode)),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                periode to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG)
+                                periode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)
                         )
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
@@ -233,53 +228,6 @@ TODO: fiks når tilsyn er ordentlig implementert
         )
 
     }
- */
-
-
-/*
-TODO: fiks når tilsyn er ordentlig implementert
-    @Test
-    fun `Kan rapportere mer tilsyn enn virketimer i perioden`() {
-        val periode = LukketPeriode("2020-03-09/2020-03-15")
-        val virketimer = periode.antallVirketimer()
-
-        val grunnlag = RegelGrunnlag(
-                søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                tilsynsbehov = mapOf(
-                        periode to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
-                ),
-                søknadsperioder = listOf(periode),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(
-                                periode to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG, FULL_DAG)
-                        )
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        periode to TilsynPeriodeInfo(
-                                lengde = virketimer.times(2)
-                        )
-                )
-        )
-        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
-
-        assertThat(uttaksplan.perioder).hasSize(1)
-
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplan,
-                forventetPeriode = periode,
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_HØY_TILSYNSGRAD)
-        )
-    }
-
-
-
- */
 
     private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
 
