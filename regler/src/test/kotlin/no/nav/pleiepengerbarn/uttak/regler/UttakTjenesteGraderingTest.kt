@@ -20,10 +20,9 @@ internal class UttakTjenesteGraderingTest {
         private val arbeidsforhold1 = UUID.randomUUID().toString()
         private val arbeidsforhold2 = UUID.randomUUID().toString()
         private val arbeidsforhold3 = UUID.randomUUID().toString()
-        private val arbeidsforhold4 = UUID.randomUUID().toString()
 
-        private val aktørIdSøker = "123"
-        private val aktørIdBarn = "456"
+        private const val aktørIdSøker = "123"
+        private const val aktørIdBarn = "456"
     }
 
 
@@ -51,7 +50,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingUUID()
 
         )
 
@@ -79,7 +78,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
                 ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -106,7 +105,7 @@ internal class UttakTjenesteGraderingTest {
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(
                             helePerioden to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = nesteBehandlingId(),
+                                kildeBehandlingUUID = nesteBehandlingUUID(),
                                 uttaksgrad = Prosent(40),
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
@@ -119,7 +118,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
                 ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -128,29 +127,36 @@ internal class UttakTjenesteGraderingTest {
         sjekkOppfylt(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT)
     }
 
-    /*
-    TODO: utkommentert til tilsyn er implementert
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Pleiebehov(TilsynsbehovStørrelse.PROSENT_100)
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
+                søktUttak = listOf(
                         helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to OppfyltPeriode(grad = Prosent(40), utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(), årsak = annenPartOppfyltÅrsak)))
+                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.oppfylt(
+                            uttaksgrad = Prosent(40),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                            årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                            knekkpunktTyper = setOf(),
+                            annenPart = AnnenPart.ALENE,
+                            kildeBehandlingUUID = UUID.randomUUID().toString(),
+                            pleiebehov = Prosent(100),
+                            søkersTapteArbeidstid = Prosent(40)
+                        )))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4L), FULL_DAG.dividedBy(4L)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(40)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(30)
@@ -163,8 +169,6 @@ internal class UttakTjenesteGraderingTest {
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN)
     }
-
-     */
 
     @Test
     fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
@@ -184,7 +188,7 @@ internal class UttakTjenesteGraderingTest {
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(
                             helePerioden to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = nesteBehandlingId(),
+                                kildeBehandlingUUID = nesteBehandlingUUID(),
                                 uttaksgrad = Prosent(40),
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
@@ -198,7 +202,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)
                 ).somTilsynperioder(),
-                behandlingUUID = nesteBehandlingId(),
+                behandlingUUID = nesteBehandlingUUID(),
                 arbeid = listOf(Arbeid(Arbeidsforhold(type="frilans"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))))
 
         )
@@ -209,27 +213,24 @@ internal class UttakTjenesteGraderingTest {
         sjekkIkkeOppfylt(uttaksplan, helePerioden, setOf(Årsak.FOR_LAV_GRAD))
     }
 
-    /*
-
-     TODO: legg inn igjen når tilsyn er implementert
     @Test
     fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
+                søktUttak = listOf(
                         helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(35), FULL_DAG.prosent(35)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(65)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(30)
@@ -245,24 +246,24 @@ internal class UttakTjenesteGraderingTest {
     @Test
     fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
+                søktUttak = listOf(
                         helePeriodenSøktUttak
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.dividedBy(4), FULL_DAG.dividedBy(4)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(60)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        helePerioden to Prosent(30)
+                        helePerioden to Prosent(70)
                 ).somTilsynperioder()
         )
 
@@ -271,8 +272,6 @@ internal class UttakTjenesteGraderingTest {
         assertThat(uttaksplan.perioder).hasSize(1)
         sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN)
     }
-*/
-
 
     @Test
     fun `En uttaksperiode med gradering i en deltidsjobb`() {
@@ -292,7 +291,7 @@ internal class UttakTjenesteGraderingTest {
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.prosent(25)))
                 ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -301,51 +300,45 @@ internal class UttakTjenesteGraderingTest {
         sjekkOppfylt(uttaksplan, helePerioden, Prosent(50), mapOf(arbeidsforhold1 to Prosent(50)), Årsak.AVKORTET_MOT_INNTEKT)
     }
 
-/*
-
-TODO: fiks til realistiske arbeidsforhold
     @Test
-    fun `En uttaksperioder med fire arbeidsforhold som skal vurderes til gradering mot arbeid`() {
+    fun `En uttaksperioder med tre arbeidsforhold som skal vurderes til gradering mot arbeid`() {
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
+                behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        enUke to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        enUke to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        enUke
+                søktUttak = listOf(
+                        SøktUttak(enUke)
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(40), FULL_DAG.prosent(40))),
-                        arbeidsforhold2 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(20), FULL_DAG.prosent(20))),
-                        arbeidsforhold3 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(80), FULL_DAG.prosent(80))),
-                        arbeidsforhold4 to mapOf(enUke to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(0), FULL_DAG.prosent(0)))
+                        arbeidsforhold1 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(3), Duration.ZERO)), // 0 % arbeid
+                        arbeidsforhold2 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(2), Duration.ofHours(1))), // 50 % arbeid
+                        arbeidsforhold3 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(4), Duration.ofHours(3))), // 75 % arbeid
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
-                        enUke to Prosent(40)
+                        enUke to Prosent(40) // 40 % etabelert tilsyn
                 ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, enUke, Prosent(52), mapOf(
-                arbeidsforhold1 to Prosent(60),
-                arbeidsforhold2 to Prosent(80),
-                arbeidsforhold3 to Prosent(20),
-                arbeidsforhold4 to Prosent(100)
+        sjekkOppfylt(uttaksplan, enUke, Prosent(56), mapOf(
+                arbeidsforhold1 to Prosent(100),
+                arbeidsforhold2 to Prosent(50),
+                arbeidsforhold3 to Prosent(25),
         ), Årsak.AVKORTET_MOT_INNTEKT)
 
     }
 
 
- */
 
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
@@ -369,7 +362,7 @@ TODO: fiks til realistiske arbeidsforhold
                                 LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70))
                         )
                 ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+                behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -380,29 +373,27 @@ TODO: fiks til realistiske arbeidsforhold
         sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(30), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
     }
 
-    /*
-    TODO: utkommentert til tilsyn er implementert
     @Test
     fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                behandlingUUID =nesteBehandlingUUID(),
                 søker = Søker(
-                        aktørId = aktørIdSøker,
-                        fødselsdato = LocalDate.now().minusYears(20)
+                        aktørId = aktørIdSøker
                 ),
                 barn = Barn(
                     aktørId = aktørIdBarn
                 ),
-                tilsynsbehov = mapOf(
-                        helePerioden to Tilsynsbehov(TilsynsbehovStørrelse.PROSENT_100)
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
-                søknadsperioder = listOf(
-                        helePerioden
+                søktUttak = listOf(
+                        SøktUttak(helePerioden)
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(10), søkersTilsyn = FULL_DAG.prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(20), søkersTilsyn = FULL_DAG.prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, taptArbeidstid = FULL_DAG.prosent(30), søkersTilsyn = FULL_DAG.prosent(30))
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(10)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(20)),
+                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(30))
                         )
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
@@ -418,9 +409,8 @@ TODO: fiks til realistiske arbeidsforhold
         sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
         sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), Årsak.GRADERT_MOT_TILSYN)
     }
-     */
 
-    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
+    private fun nesteBehandlingUUID(): BehandlingUUID = UUID.randomUUID().toString()
 
 
 }
