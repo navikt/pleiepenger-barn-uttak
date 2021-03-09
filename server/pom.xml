@@ -13,7 +13,7 @@
 
     <properties>
         <springdoc.version>1.5.5</springdoc.version>
-        <logback.logstash.version>6.4</logback.logstash.version>
+        <logback.logstash.version>6.6</logback.logstash.version>
         <postgres.version>42.2.19</postgres.version>
     </properties>
 
