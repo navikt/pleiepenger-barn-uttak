@@ -10,12 +10,24 @@ enum class Utfall {
     IKKE_OPPFYLT
 }
 
+/**
+ * Angir om det finnes uttak fra andre parter.
+ */
 enum class AnnenPart {
     ALENE,
     MED_ANDRE,
     VENTER_ANDRE //TODO: skal vi ha med denne?
 }
 
+/**
+ * Årsaker til at etablert tilsyn skal overses.
+ */
+enum class OverseEtablertTilsynÅrsak {
+    FOR_LAVT,
+    NATTEVÅK,
+    BEREDSKAP,
+    NATTEVÅK_OG_BEREDSKAP
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -103,6 +115,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class GraderingMotTilsyn(
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
+    @JsonProperty("overseEtablertTilsynÅrsak") val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
 )

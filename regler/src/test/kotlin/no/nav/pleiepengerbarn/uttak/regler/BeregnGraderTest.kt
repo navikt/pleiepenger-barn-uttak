@@ -29,6 +29,7 @@ internal class BeregnGraderTest {
                 HUNDRE_PROSENT,
                 ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
     }
 
     @Test
@@ -56,6 +57,21 @@ internal class BeregnGraderTest {
                 ARBEIDSGIVER1 to Prosent(50)
         )
     }
+
+    @Test
+    internal fun `Under 10 prosent etablert tilsyn skal ikke tas med`() {
+        val grader = BeregnGrader.beregn(pleiebehov = PROSENT_100, etablertTilsyn = Duration.ofMinutes(15), andreSøkeresTilsyn = NULL_PROSENT, arbeid = mapOf(
+            ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+        ))
+
+        grader.assert(
+            Årsak.FULL_DEKNING,
+            HUNDRE_PROSENT,
+            ARBEIDSGIVER1 to HUNDRE_PROSENT
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isEqualTo(OverseEtablertTilsynÅrsak.FOR_LAVT)
+    }
+
 
     @Test
     internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men pleiebehovet er 200 prosent`() {

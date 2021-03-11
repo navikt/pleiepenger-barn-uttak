@@ -6,7 +6,8 @@ data class UttaksgradResultat(
     val restTilSøker: Prosent,
     val uttaksgrad: Prosent,
     val oppfyltÅrsak: Årsak? = null,
-    val ikkeOppfyltÅrsak: Årsak? = null
+    val ikkeOppfyltÅrsak: Årsak? = null,
+    val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
 ) {
     init {
         //Enten oppfylt årsak eller ikke oppfylt årsak

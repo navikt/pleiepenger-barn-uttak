@@ -35,7 +35,8 @@ internal object BeregnGrader {
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsynsprosent,
                 andreSøkeresTilsyn = andreSøkeresTilsyn,
-                tilgjengeligForSøker = uttaksgradResultat.restTilSøker
+                tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
+                overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
@@ -50,26 +51,26 @@ internal object BeregnGrader {
                                  andreSøkeresTilsyn: Prosent,
                                  arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
                                  søkersTapteArbeidstid: Prosent): UttaksgradResultat {
-        val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
+        val (restTilSøker, overseEtablertTilsynÅrsak) = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
         if (etablertTilsynprosent > ÅTTI_PROSENT) {
-            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_HØY_TILSYNSGRAD)
+            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_HØY_TILSYNSGRAD, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
 
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
 
         if (restTilSøker < TJUE_PROSENT || søkersTapteArbeidstid < TJUE_PROSENT || ønsketUttaksgradProsent < TJUE_PROSENT) {
-            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_GRAD)
+            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_GRAD, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
         if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < søkersTapteArbeidstid) {
-            return UttaksgradResultat(restTilSøker, ønsketUttaksgradProsent, oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE)
+            return UttaksgradResultat(restTilSøker, ønsketUttaksgradProsent, oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
         if (restTilSøker < søkersTapteArbeidstid) {
-            return UttaksgradResultat(restTilSøker, restTilSøker, oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN)
+            return UttaksgradResultat(restTilSøker, restTilSøker, oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
         if (arbeid.fulltFravær()) {
-            return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.FULL_DEKNING)
+            return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.FULL_DEKNING, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
-        return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2,RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT)
+        return UttaksgradResultat(restTilSøker, søkersTapteArbeidstid.setScale(2,RoundingMode.HALF_UP), oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
     }
 
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
@@ -85,13 +86,12 @@ internal object BeregnGrader {
         return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
-    private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): BigDecimal {
+    private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): Pair<BigDecimal, OverseEtablertTilsynÅrsak?> {
         val pleiebehovprosent = pleiebehov.prosent
-        if (etablertTilsynsprosent < TI_PROSENT) {
-            //TODO: bør vi ha en årsak på hvorfor etablert tilsyn under 10% ignoreres? kanskje noe tilsvarende også for nattevåk og beredskap
-            return pleiebehovprosent - andreSøkeresTilsyn
+        if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
+            return Pair(pleiebehovprosent - andreSøkeresTilsyn, OverseEtablertTilsynÅrsak.FOR_LAVT)
         }
-        return pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
+        return Pair(pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn, null)
     }
 
     private fun avklarUtbetalingsgrader(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): Map<Arbeidsforhold, Utbetalingsgrad> {
@@ -168,6 +168,7 @@ data class Utbetalingsgrad(
 data class GraderingMotTilsyn(
     val pleiebehov: Pleiebehov,
     val etablertTilsyn: Prosent,
+    val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
     val andreSøkeresTilsyn: Prosent,
     val tilgjengeligForSøker: Prosent
 )
