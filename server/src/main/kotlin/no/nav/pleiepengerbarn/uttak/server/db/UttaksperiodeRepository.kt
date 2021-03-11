@@ -40,7 +40,7 @@ internal class UttaksperiodeRepository {
                 id, fom, tom,
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
                 uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid,
-                inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part
+                inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -51,10 +51,13 @@ internal class UttaksperiodeRepository {
             val pleiebehov = rs.getBigDecimal("pleiebehov")
             val etablertTilsyn = rs.getBigDecimal("etablert_tilsyn")
             if (etablertTilsyn != null) {
+                val overseEtablertTilsynÅrsakString = rs.getString("overse_etablert_tilsyn_arsak")
+                val overseEtablertTilsynÅrsak = if (overseEtablertTilsynÅrsakString != null) OverseEtablertTilsynÅrsak.valueOf(overseEtablertTilsynÅrsakString) else null
                 graderingMotTilsyn = GraderingMotTilsyn(
                     etablertTilsyn = etablertTilsyn,
                     andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
-                    tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker")
+                    tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker"),
+                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
                 )
             }
 
@@ -106,10 +109,10 @@ internal class UttaksperiodeRepository {
             insert into 
                 uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn,
                     tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, inngangsvilkar, knekkpunkt_typer,
-                    kilde_behandling_uuid, annen_part)
+                    kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak)
                 values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn,
                     :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :inngangsvilkar, :knekkpunkt_typer,
-                    :kilde_behandling_uuid, :annen_part::annen_part)
+                    :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak)
        
         """.trimIndent()
         val keyHolder = GeneratedKeyHolder()
@@ -129,6 +132,7 @@ internal class UttaksperiodeRepository {
             .addValue("knekkpunkt_typer", tilJSON(info.knekkpunktTyper))
             .addValue("kilde_behandling_uuid", UUID.fromString(info.kildeBehandlingUUID))
             .addValue("annen_part", info.annenPart.toString())
+            .addValue("overse_etablert_tilsyn_arsak", info.graderingMotTilsyn?.overseEtablertTilsynÅrsak, Types.OTHER)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long
