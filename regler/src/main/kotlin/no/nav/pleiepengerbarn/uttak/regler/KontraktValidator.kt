@@ -26,6 +26,10 @@ fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     if (sjekkOmDetFinnesOverlappendePerioder(tilsynsperioder.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_TILSYNSPERIODER)}
     // Sjekk søkt uttak
     sjekkSøktUttakOverlappendePerioder(søktUttak) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_SØKT_UTTAK)}
+    // Sjekk beredskap
+    if (sjekkOmDetFinnesOverlappendePerioder(beredskapsperioder)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_BEREDSKAPSPERIODER)}
+    // Sjekk nattevåk
+    if (sjekkOmDetFinnesOverlappendePerioder(nattevåksperioder)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)}
 
     return valideringsfeil
 }

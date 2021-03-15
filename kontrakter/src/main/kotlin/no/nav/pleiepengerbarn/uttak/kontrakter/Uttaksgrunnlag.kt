@@ -22,7 +22,9 @@ data class Uttaksgrunnlag (
 
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
-    @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf()
+    @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
+    @JsonProperty("beredskapsperioder") val beredskapsperioder: Set<LukketPeriode> = setOf(),
+    @JsonProperty("nattevåksperioder") val nattevåksperioder: Set<LukketPeriode> = setOf()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -152,6 +152,36 @@ internal class KontraktValidatorTest {
     }
 
     @Test
+    internal fun `Overlapp beredskapsperioder`() {
+        val grunnlag = grunnlag()
+            .copy(beredskapsperioder = setOf(
+                helePerioden,
+                helePerioden.plusDager(2)
+            ))
+
+        val valideringsfeil = grunnlag.sjekk()
+
+        assertThat(valideringsfeil).hasSize(1)
+        assertThat(valideringsfeil).contains(Valideringsfeil.OVERLAPP_MELLOM_BEREDSKAPSPERIODER)
+
+    }
+
+    @Test
+    internal fun `Overlapp nattevåksperioder`() {
+        val grunnlag = grunnlag()
+            .copy(nattevåksperioder = setOf(
+                helePerioden,
+                helePerioden.plusDager(3)
+            ))
+
+        val valideringsfeil = grunnlag.sjekk()
+
+        assertThat(valideringsfeil).hasSize(1)
+        assertThat(valideringsfeil).contains(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)
+
+    }
+
+    @Test
     internal fun `Grunnlag med flere valideringsfeil`() {
         val grunnlag = grunnlag().copy(
             andrePartersSaksnummer = listOf("987", "987"),
