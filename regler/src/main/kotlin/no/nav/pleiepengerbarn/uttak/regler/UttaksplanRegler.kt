@@ -9,11 +9,18 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.PleiebehovRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.time.Duration
 
 internal object UttaksplanRegler {
+
+    private val TI_PROSENT = Prosent(10)
+    private val HUNDRE_PROSENT = Prosent(100)
+
+    private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
+
 
     private val PeriodeRegler = linkedSetOf(
             FerieRegel(),
@@ -113,8 +120,33 @@ internal object UttaksplanRegler {
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
         val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
+        val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
 
-        return BeregnGrader.beregn(pleiebehov = pleiebehov, etablertTilsyn = etablertTilsyn, oppgittTilsyn = oppgittTilsyn, andreSøkeresTilsyn = andreSøkeresTilsyn, arbeid = arbeidPerArbeidsforhold)
+        return BeregnGrader.beregn(
+            pleiebehov = pleiebehov,
+            etablertTilsyn = etablertTilsyn,
+            oppgittTilsyn = oppgittTilsyn,
+            andreSøkeresTilsyn = andreSøkeresTilsyn,
+            arbeid = arbeidPerArbeidsforhold,
+            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+        )
+    }
+
+    private fun RegelGrunnlag.avklarOverseEtablertTilsynÅrsak(periode: LukketPeriode, etablertTilsyn: Duration): OverseEtablertTilsynÅrsak? {
+        val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+        if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
+            return OverseEtablertTilsynÅrsak.FOR_LAVT
+        }
+        val overlappBeredskap = this.beredskapsperioder.overlappendePeriode(periode)
+        val overlappNattevåk = nattevåksperioder.overlappendePeriode(periode)
+        if (overlappBeredskap != null && overlappNattevåk != null) {
+            return OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP
+        } else if (overlappBeredskap != null) {
+            return OverseEtablertTilsynÅrsak.BEREDSKAP
+        } else if (overlappNattevåk != null) {
+            return OverseEtablertTilsynÅrsak.NATTEVÅK
+        }
+        return null
     }
 
     private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {

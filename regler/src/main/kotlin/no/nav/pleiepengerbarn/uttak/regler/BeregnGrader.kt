@@ -6,7 +6,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-private val TI_PROSENT = Prosent(10)
+
 private val TJUE_PROSENT = Prosent(20)
 private val ÅTTI_PROSENT = Prosent(80)
 private val HUNDRE_PROSENT = Prosent(100)
@@ -21,11 +21,12 @@ internal object BeregnGrader {
         etablertTilsyn: Duration,
         oppgittTilsyn: Duration? = null,
         andreSøkeresTilsyn: Prosent,
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
-            ): GraderBeregnet {
+    ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(pleiebehov, etablertTilsyn)
         val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid()
-        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid)
+        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid, overseEtablertTilsynÅrsak)
         val fordeling = finnFordeling(arbeid)
         val utbetalingsgrader = avklarUtbetalingsgrader(uttaksgradResultat.uttaksgrad, arbeid, fordeling)
 
@@ -50,8 +51,10 @@ internal object BeregnGrader {
                                  ønsketUttaksgrad: Duration?,
                                  andreSøkeresTilsyn: Prosent,
                                  arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-                                 søkersTapteArbeidstid: Prosent): UttaksgradResultat {
-        val (restTilSøker, overseEtablertTilsynÅrsak) = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn)
+                                 søkersTapteArbeidstid: Prosent,
+                                 overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
+    ): UttaksgradResultat {
+        val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
         if (etablertTilsynprosent > ÅTTI_PROSENT) {
             return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_HØY_TILSYNSGRAD, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
@@ -86,12 +89,12 @@ internal object BeregnGrader {
         return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
-    private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent): Pair<BigDecimal, OverseEtablertTilsynÅrsak?> {
+    private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent, overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?): BigDecimal {
         val pleiebehovprosent = pleiebehov.prosent
-        if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
-            return Pair(pleiebehovprosent - andreSøkeresTilsyn, OverseEtablertTilsynÅrsak.FOR_LAVT)
+        if (overseEtablertTilsynÅrsak != null) {
+            return pleiebehovprosent - andreSøkeresTilsyn
         }
-        return Pair(pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn, null)
+        return pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
     }
 
     private fun avklarUtbetalingsgrader(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): Map<Arbeidsforhold, Utbetalingsgrad> {

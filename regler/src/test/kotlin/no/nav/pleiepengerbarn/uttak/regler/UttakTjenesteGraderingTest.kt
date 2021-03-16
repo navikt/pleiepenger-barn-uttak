@@ -30,7 +30,7 @@ internal class UttakTjenesteGraderingTest {
     private val helePeriodenSøktUttak = SøktUttak(helePerioden)
 
     @Test
-    fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
+    internal fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -61,7 +61,77 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
+    internal fun `En uttaksperiode med overlappende tilsynsperiode som er under 10 prosent skal ikke føre til redusert grad`() {
+        val grunnlag = RegelGrunnlag(
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(9)
+            ).somTilsynperioder(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
+
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.FOR_LAVT)
+    }
+
+    @Test
+    internal fun `En uttaksperiode med overlappende tilsynsperiode så skal periodene som overlapper med beredskap og nattevåk ikke få redusert grad`() {
+        val perioden = LukketPeriode("2020-01-01/2020-01-20")
+        val grunnlag = RegelGrunnlag(
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                perioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                SøktUttak(perioden)
+            ),
+            tilsynsperioder = mapOf(
+                perioden to Prosent(60)
+            ).somTilsynperioder(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(perioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID(),
+            beredskapsperioder = setOf(LukketPeriode("2020-01-05/2020-01-12")),
+            nattevåksperioder = setOf(LukketPeriode("2020-01-08/2020-01-15"))
+
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-04"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-05/2020-01-07"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.BEREDSKAP)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-08/2020-01-12"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-13/2020-01-15"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-20"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+    }
+
+
+    @Test
+    internal fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -88,7 +158,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
+    internal fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -128,7 +198,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
+    internal fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
@@ -171,7 +241,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
+    internal fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -214,7 +284,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
+    internal fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
@@ -244,7 +314,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
+    internal fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
@@ -274,7 +344,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperiode med gradering i en deltidsjobb`() {
+    internal fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -301,7 +371,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En uttaksperioder med tre arbeidsforhold som skal vurderes til gradering mot arbeid`() {
+    internal fun `En uttaksperioder med tre arbeidsforhold som skal vurderes til gradering mot arbeid`() {
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
                 behandlingUUID = nesteBehandlingUUID(),
@@ -341,7 +411,7 @@ internal class UttakTjenesteGraderingTest {
 
 
     @Test
-    fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
+    internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -374,7 +444,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
+    internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 behandlingUUID =nesteBehandlingUUID(),
                 søker = Søker(
