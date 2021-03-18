@@ -27,7 +27,9 @@ object GrunnlagMapper {
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
-                andrePartersUttaksplan = andrePartersUttakplan
+                andrePartersUttaksplan = andrePartersUttakplan,
+                beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
+                nattevåksperioder = uttaksgrunnlag.nattevåksperioder
         )
     }
 

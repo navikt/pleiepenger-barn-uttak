@@ -64,7 +64,7 @@ internal fun <T>LukketPeriode.perioderSomIkkeInngårI(perioder: Map<LukketPeriod
     return inngårIkke.toList()
 }
 
-internal fun List<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
+internal fun Collection<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
     it.overlapper(periode)
 }
 

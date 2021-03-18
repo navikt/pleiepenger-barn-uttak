@@ -27,12 +27,22 @@ internal object KnekkpunktUtleder {
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
+        finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder)
+        finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
+    }
+
+    private fun finnForNattevåk(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, nattevåksperioder: Set<LukketPeriode>) {
+        nattevåksperioder.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.NATTEVÅKSPERIODE)}
+    }
+
+    private fun finnForBeredskap(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, beredskapsperioder: Set<LukketPeriode>) {
+        beredskapsperioder.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.BEREDSKAPSPERIODE)}
     }
 
     private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Duration>) {

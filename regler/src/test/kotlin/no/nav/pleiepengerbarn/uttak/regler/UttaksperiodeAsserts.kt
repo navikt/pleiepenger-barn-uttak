@@ -11,7 +11,8 @@ internal object UttaksperiodeAsserts {
         forventetPeriode: LukketPeriode,
         forventetGrad:Prosent,
         forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
-        forventedeOppfyltÅrsak: Årsak) {
+        forventedeOppfyltÅrsak: Årsak,
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
         assertThat(uttaksperiodeInfo).isNotNull()
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.OPPFYLT)
@@ -23,6 +24,9 @@ internal object UttaksperiodeAsserts {
         }
 
         assertThat(uttaksperiodeInfo.årsaker).isEqualTo(setOf(forventedeOppfyltÅrsak))
+        if (overseEtablertTilsynÅrsak != null) {
+            assertThat(uttaksperiodeInfo.graderingMotTilsyn!!.overseEtablertTilsynÅrsak).isEqualTo(overseEtablertTilsynÅrsak)
+        }
     }
 
     internal fun sjekkIkkeOppfylt(

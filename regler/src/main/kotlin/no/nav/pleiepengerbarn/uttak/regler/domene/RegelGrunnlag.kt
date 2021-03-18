@@ -14,7 +14,9 @@ data class RegelGrunnlag(
     val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     val lovbestemtFerie: List<LukketPeriode> = listOf(),
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
-    val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf()
+    val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
+    val beredskapsperioder: Set<LukketPeriode> = setOf(),
+    val nattevåksperioder: Set<LukketPeriode> = setOf()
 ) {
 
     internal fun finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
