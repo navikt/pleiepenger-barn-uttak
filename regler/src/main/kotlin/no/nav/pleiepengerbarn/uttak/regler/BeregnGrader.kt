@@ -6,14 +6,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-
-private val TJUE_PROSENT = Prosent(20)
-private val ÅTTI_PROSENT = Prosent(80)
-private val HUNDRE_PROSENT = Prosent(100)
-
-private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
-
-
 internal object BeregnGrader {
 
     internal fun beregn(
@@ -156,8 +148,6 @@ internal object BeregnGrader {
     }
 
 }
-
-private fun Duration.prosent(prosent: Prosent): Duration = Duration.ofMillis( (BigDecimal(this.toMillis()).setScale(8) * prosent / HUNDRE_PROSENT).toLong() )
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
 private fun ArbeidsforholdPeriodeInfo.fulltFravær() = jobberNå == Duration.ZERO

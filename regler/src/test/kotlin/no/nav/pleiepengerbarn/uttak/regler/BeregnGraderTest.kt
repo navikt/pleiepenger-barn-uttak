@@ -9,11 +9,8 @@ import java.time.Duration
 
 internal class BeregnGraderTest {
 
-    private val NULL_PROSENT = Prosent.ZERO
-    private val HUNDRE_PROSENT = Prosent(100)
     private val IKKE_ETABLERT_TILSYN = Duration.ZERO
     private val INGENTING = Duration.ZERO
-    private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
     private val ARBEIDSGIVER1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "987654321")
 

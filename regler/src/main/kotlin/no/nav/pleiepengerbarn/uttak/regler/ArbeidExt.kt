@@ -7,8 +7,6 @@ import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.Duration
 
-private val HUNDRE_PROSENT = Prosent(100)
-
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO

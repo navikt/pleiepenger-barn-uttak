@@ -2,8 +2,8 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
+import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
-import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel.Companion.EtHundreProsent
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.finnSøkersTapteArbeidstid
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.*
@@ -16,10 +16,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 internal class BarnsDødRegel : UttaksplanRegel {
-
-    internal companion object {
-        internal val EtHundreProsent = Prosent(100)
-    }
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
         val dødsdato = grunnlag.barn.dødsdato ?: return uttaksplan
@@ -98,7 +94,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                         val arbeidForPeriode = grunnlag.finnArbeidPerArbeidsforhold(periode)
                         val søkersTapteArbeidstid = arbeidForPeriode.finnSøkersTapteArbeidstid()
                         perioder[periode] = UttaksperiodeInfo.oppfylt(
-                            uttaksgrad = EtHundreProsent,
+                            uttaksgrad = HUNDRE_PROSENT,
                             søkersTapteArbeidstid = søkersTapteArbeidstid,
                             utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                             årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
@@ -204,7 +200,7 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.arbeidsforholdFraForrigeOppfyl
     return oppfyltPeriodeMedNærmesteTom(periode.fom)
             .utbetalingsgrader
             .map {
-                it.copy(utbetalingsgrad = EtHundreProsent)
+                it.copy(utbetalingsgrad = HUNDRE_PROSENT)
             }
 }
 

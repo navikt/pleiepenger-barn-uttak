@@ -16,12 +16,6 @@ import java.time.Duration
 
 internal object UttaksplanRegler {
 
-    private val TI_PROSENT = Prosent(10)
-    private val HUNDRE_PROSENT = Prosent(100)
-
-    private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
-
-
     private val PeriodeRegler = linkedSetOf(
             FerieRegel(),
             PleiebehovRegel()
