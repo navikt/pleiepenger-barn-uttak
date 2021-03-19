@@ -26,75 +26,85 @@ internal object UttaksplanRegler {
             BarnsDødRegel()
     )
 
-    internal fun fastsettUttaksplan(
-            grunnlag: RegelGrunnlag,
-            knektePerioder: Map<SøktUttak,Set<KnekkpunktType>>) : Uttaksplan {
-
+    internal fun fastsettUttaksplan(grunnlag: RegelGrunnlag, knektePerioder: Map<SøktUttak,Set<KnekkpunktType>>) : Uttaksplan {
+        // Fastsett periode
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
-
         knektePerioder.forEach { (søktUttaksperiode, knekkpunktTyper) ->
-            val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
-            PeriodeRegler.forEach { regel ->
-                val utfall = regel.kjør(periode = søktUttaksperiode.periode, grunnlag = grunnlag)
-                if (utfall is IkkeOppfylt) {
-                    ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
-                }
+            val ikkeOppfyltÅrsaker = fastsettPeriodeRegler(søktUttaksperiode.periode, grunnlag)
+            fastsettGrader(perioder, søktUttaksperiode.periode, grunnlag, knekkpunktTyper, ikkeOppfyltÅrsaker)
+        }
+        //Fastsett uttaksplan
+        return fastsettUttaksplanRegler(perioder, grunnlag)
+    }
+
+    private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): MutableSet<Årsak> {
+        val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
+        PeriodeRegler.forEach { regel ->
+            val utfall = regel.kjør(periode = søktUttaksperiode, grunnlag = grunnlag)
+            if (utfall is IkkeOppfylt) {
+                ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
             }
-            val grader = finnGrader(søktUttaksperiode.periode, grunnlag)
-            if (ikkeOppfyltÅrsaker.isNotEmpty()) {
-                perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
+        }
+        return ikkeOppfyltÅrsaker
+    }
+
+    private fun fastsettGrader(
+        perioder: MutableMap<LukketPeriode, UttaksperiodeInfo>,
+        søktUttaksperiode: LukketPeriode,
+        grunnlag: RegelGrunnlag,
+        knekkpunktTyper: Set<KnekkpunktType>,
+        ikkeOppfyltÅrsaker: Set<Årsak>)
+    {
+        val grader = finnGrader(søktUttaksperiode, grunnlag)
+        if (ikkeOppfyltÅrsaker.isNotEmpty()) {
+            perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
+                utbetalingsgrader = grader.tilUtbetalingsgrader(false),
+                søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
+                årsaker = ikkeOppfyltÅrsaker,
+                pleiebehov = grader.pleiebehov.prosent,
+                knekkpunktTyper = knekkpunktTyper,
+                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                annenPart = grunnlag.annenPart(søktUttaksperiode)
+            )
+        } else {
+
+            if (grader.årsak.oppfylt) {
+                perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
+                    uttaksgrad = grader.uttaksgrad,
+                    utbetalingsgrader = grader.tilUtbetalingsgrader(true),
+                    søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
+                    årsak = grader.årsak,
+                    pleiebehov = grader.pleiebehov.prosent,
+                    graderingMotTilsyn = grader.graderingMotTilsyn,
+                    knekkpunktTyper = knekkpunktTyper,
+                    kildeBehandlingUUID = grunnlag.behandlingUUID,
+                    annenPart = grunnlag.annenPart(søktUttaksperiode)
+                )
+            } else {
+                perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                     utbetalingsgrader = grader.tilUtbetalingsgrader(false),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
-                    årsaker = ikkeOppfyltÅrsaker,
+                    årsaker = setOf(grader.årsak),
                     pleiebehov = grader.pleiebehov.prosent,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
-                    annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
+                    annenPart = grunnlag.annenPart(søktUttaksperiode)
                 )
-            } else {
-
-                if (grader.årsak.oppfylt) {
-                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.oppfylt(
-                        uttaksgrad = grader.uttaksgrad,
-                        utbetalingsgrader = grader.tilUtbetalingsgrader(true),
-                        søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
-                        årsak = grader.årsak,
-                        pleiebehov = grader.pleiebehov.prosent,
-                        graderingMotTilsyn = GraderingMotTilsyn(
-                            etablertTilsyn = grader.graderingMotTilsyn.etablertTilsyn,
-                            overseEtablertTilsynÅrsak = grader.graderingMotTilsyn.overseEtablertTilsynÅrsak,
-                            andreSøkeresTilsyn = grader.graderingMotTilsyn.andreSøkeresTilsyn,
-                            tilgjengeligForSøker = grader.graderingMotTilsyn.tilgjengeligForSøker
-                        ),
-                        knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.behandlingUUID,
-                        annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
-                    )
-                } else {
-                    perioder[søktUttaksperiode.periode] = UttaksperiodeInfo.ikkeOppfylt(
-                        utbetalingsgrader = grader.tilUtbetalingsgrader(false),
-                        søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
-                        årsaker = setOf(grader.årsak),
-                        pleiebehov = grader.pleiebehov.prosent,
-                        knekkpunktTyper = knekkpunktTyper,
-                        kildeBehandlingUUID = grunnlag.behandlingUUID,
-                        annenPart = grunnlag.annenPart(søktUttaksperiode.periode)
-                    )
-                }
             }
         }
+    }
 
-        var uttaksplan = Uttaksplan(perioder = perioder)
-
+    private fun fastsettUttaksplanRegler(perioder: Map<LukketPeriode, UttaksperiodeInfo>, grunnlag: RegelGrunnlag): Uttaksplan {
+        var uttaksplan = Uttaksplan(perioder)
         UttaksplanRegler.forEach {uttaksplanRegler ->
             uttaksplan = uttaksplanRegler.kjør(
-                    uttaksplan = uttaksplan,
-                    grunnlag = grunnlag
+                uttaksplan = uttaksplan,
+                grunnlag = grunnlag
             )
         }
-
         return uttaksplan
     }
+
 
     private fun GraderBeregnet.tilUtbetalingsgrader(oppfylt: Boolean): List<Utbetalingsgrader> {
         return this.utbetalingsgrader.map {
@@ -170,6 +180,5 @@ internal object UttaksplanRegler {
         }
         return andreSøkeresTilsynsgrad
     }
-
 
 }
