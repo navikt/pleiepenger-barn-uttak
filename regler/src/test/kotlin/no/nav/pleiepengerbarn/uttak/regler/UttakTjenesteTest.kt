@@ -14,7 +14,6 @@ import java.util.*
 internal class UttakTjenesteTest {
 
     private companion object {
-        private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
         private val INGENTING = Duration.ZERO
 
         private val arbeidsforhold1 = UUID.randomUUID().toString()
