@@ -67,7 +67,8 @@ internal class BarnsDødRegelTest {
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
-                )
+                ),
+                annenPart = AnnenPart.MED_ANDRE
         )
         // Forventer at perioden er delt i to. Første TOM dødsfall lik
         // Den andre perioden har man fått 50% ettersom det ikke er avkortet mot annen
@@ -79,7 +80,8 @@ internal class BarnsDødRegelTest {
                 forventetGrad = Prosent(20),
                 forventedeUtbetalingsgrader = mapOf(
                         "123" to Prosent(20)
-                )
+                ),
+                annenPart = AnnenPart.MED_ANDRE
         )
         sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,

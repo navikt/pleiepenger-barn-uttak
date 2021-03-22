@@ -16,7 +16,7 @@ enum class Utfall {
 enum class AnnenPart {
     ALENE,
     MED_ANDRE,
-    VENTER_ANDRE //TODO: skal vi ha med denne?
+    VENTER_ANDRE
 }
 
 /**

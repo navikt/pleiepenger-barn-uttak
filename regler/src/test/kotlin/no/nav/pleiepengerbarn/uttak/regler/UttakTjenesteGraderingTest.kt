@@ -193,7 +193,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT, annenPart = AnnenPart.MED_ANDRE)
     }
 
     @Test
@@ -236,7 +236,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN, annenPart = AnnenPart.MED_ANDRE)
     }
 
     @Test

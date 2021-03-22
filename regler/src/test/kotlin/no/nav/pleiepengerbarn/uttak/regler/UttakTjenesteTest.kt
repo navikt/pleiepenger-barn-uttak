@@ -228,6 +228,35 @@ internal class UttakTjenesteTest {
 
     }
 
+    @Test
+    fun `Dersom søker angir at annen part også skal søke for samme perioder, så skal dette settes i annen part på perioden`() {
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+        val grunnlag = RegelGrunnlag(
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_200
+            ),
+            søktUttak = listOf(
+                SøktUttak(helePerioden, venterAnnenPart = true)
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingId()
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, annenPart = AnnenPart.VENTER_ANDRE)
+    }
+
+
     private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
 
 }

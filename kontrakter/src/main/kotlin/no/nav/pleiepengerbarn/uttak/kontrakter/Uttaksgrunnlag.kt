@@ -40,5 +40,6 @@ data class Vilkårsperiode(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class SøktUttak(
     @JsonProperty("periode") val periode: LukketPeriode,
-    @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration? = null
+    @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration? = null,
+    @JsonProperty("venterAnnenPart") val venterAnnenPart: Boolean = false
 )
