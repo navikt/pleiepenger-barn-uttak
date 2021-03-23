@@ -9,7 +9,7 @@
 		<sha1></sha1>
 		<changelist>-SNAPSHOT</changelist>
 		<java.version>1.8</java.version>
-		<kotlin.version>1.4.31</kotlin.version>
+		<kotlin.version>1.4.32</kotlin.version>
 		<threeten-extra.version>1.5.0</threeten-extra.version>
 	</properties>
 
