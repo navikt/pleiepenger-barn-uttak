@@ -10,8 +10,11 @@ enum class Årsak(val oppfylt: Boolean)  {
 
     //Ikke oppfylt årsaker
     UTENOM_PLEIEBEHOV(false),
-    FOR_LAV_GRAD(false),
-    FOR_HØY_TILSYNSGRAD(false),
+    FOR_LAV_REST_PGA_ETABLERT_TILSYN(false),
+    FOR_LAV_REST_PGA_ANDRE_SØKERE(false),
+    FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE(false),
+    FOR_LAV_TAPT_ARBEIDSTID(false),
+    FOR_LAV_ØNSKET_UTTAKSGRAD(false),
     LOVBESTEMT_FERIE(false),
     BARNETS_DØDSFALL(false),
     INNGANGSVILKÅR_IKKE_OPPFYLT(false)

@@ -142,7 +142,7 @@ internal class UttakTjenesteTest {
 
         assertThat(uttaksplan.perioder).hasSize(2)
         sjekkOppfylt(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsak.FOR_HØY_TILSYNSGRAD))
+        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN))
     }
 
     @Test
