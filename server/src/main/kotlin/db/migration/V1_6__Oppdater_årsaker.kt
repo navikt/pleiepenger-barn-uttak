@@ -7,6 +7,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
+import org.postgresql.util.PGobject
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -28,7 +29,7 @@ class V1_6__Oppdater_årsaker : BaseJavaMigration() {
 
         val hentÅrsakerSql = """
             select 
-                id, aarsaker
+                id, aarsaker, overse_etablert_tilsyn_arsak, etablert_tilsyn, andre_sokeres_tilsyn
             from uttaksperiode
         """.trimIndent()
 
@@ -64,7 +65,7 @@ class V1_6__Oppdater_årsaker : BaseJavaMigration() {
             set aarsaker = :aarsaker
             where id = :periode_id
         """.trimIndent()
-        jdbcTemplate.update(sql, mapOf("aarsaker" to nyeÅrsaker, "periode_id" to periodeId))
+        jdbcTemplate.update(sql, mapOf("aarsaker" to tilJSON(nyeÅrsaker), "periode_id" to periodeId))
     }
 
     private fun migrerÅrsaker(årsakerOgTilsyn: ÅrsakerOgTilsyn): Pair<Boolean, Set<Årsak>> {
@@ -110,6 +111,14 @@ class V1_6__Oppdater_årsaker : BaseJavaMigration() {
             }
         }
         return null
+    }
+
+    private fun tilJSON(obj:Any): PGobject {
+        val jsonString = mapper.writeValueAsString(obj) ?: ""
+        val jsonObject = PGobject()
+        jsonObject.type = "json"
+        jsonObject.value = jsonString
+        return jsonObject
     }
 
 }
