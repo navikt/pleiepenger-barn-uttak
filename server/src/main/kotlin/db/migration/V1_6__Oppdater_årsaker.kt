@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
+import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
@@ -40,8 +41,8 @@ class V1_6__Oppdater_årsaker : BaseJavaMigration() {
             ÅrsakerOgTilsyn(
                     periodeId = rs.getLong("id"),
                     årsakerSomJsonString = rs.getString("aarsaker"),
-                    etablertTilsyn = rs.getBigDecimal("etablert_tilsyn"),
-                    andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
+                    etablertTilsyn = rs.getBigDecimal("etablert_tilsyn") ?: NULL_PROSENT,
+                    andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn") ?: NULL_PROSENT,
                     overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
             )
         }
