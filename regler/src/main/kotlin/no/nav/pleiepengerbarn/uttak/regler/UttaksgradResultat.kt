@@ -11,7 +11,8 @@ data class UttaksgradResultat(
 ) {
     init {
         //Enten oppfylt årsak eller ikke oppfylt årsak
-        require(!(oppfyltÅrsak == null && ikkeOppfyltÅrsak == null) && !(oppfyltÅrsak != null && ikkeOppfyltÅrsak != null)) {"Enten oppfylt årsak eller ikke oppfylt årsak skal være satt, ikke begge eller ingen."}
+        require(!(oppfyltÅrsak == null && ikkeOppfyltÅrsak == null)) {"Både oppfylt årsak eller ikke oppfylt årsak kan ikke være null."}
+        require(!(oppfyltÅrsak != null && ikkeOppfyltÅrsak != null)) {"Enten må oppfylt årsak eller ikke oppfylt årsak være satt."}
     }
 
     fun årsak(): Årsak {

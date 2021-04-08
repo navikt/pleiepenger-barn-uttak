@@ -125,7 +125,7 @@ internal class BarnsDødRegelTest {
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanFørRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-12"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
         )
 
         // Forventer at perioden er delt i to. Første TOM dødsfall lik
@@ -133,12 +133,12 @@ internal class BarnsDødRegelTest {
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
         )
         sjekkIkkeOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventetPeriode = LukketPeriode("2020-01-08/2020-01-12"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_GRAD, Årsak.BARNETS_DØDSFALL)
+                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE, Årsak.BARNETS_DØDSFALL)
         )
     }
 

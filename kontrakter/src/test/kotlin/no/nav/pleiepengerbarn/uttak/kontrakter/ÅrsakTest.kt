@@ -9,7 +9,7 @@ internal class ÅrsakTest {
     @Test
     internal fun `Sjekk at ingen av årsakene er for lange til å persisteres`() {
         Årsak.values().map { it.name } .forEach {
-            assertThat(it).hasSizeLessThanOrEqualTo(40)
+            assertThat(it).hasSizeLessThanOrEqualTo(60)
         }
     }
 
