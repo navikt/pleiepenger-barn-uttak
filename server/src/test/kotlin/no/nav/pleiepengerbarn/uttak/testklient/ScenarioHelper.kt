@@ -7,8 +7,6 @@ import java.util.*
 internal val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
 internal val INGENTING = Duration.ZERO
 
-internal val HUNDREPROSENT = Prosent(100)
-
 internal val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
 
 internal val ARBEIDSFORHOLD1 = Arbeidsforhold(type="arbeidsgiver", organisasjonsnummer = "123456789")

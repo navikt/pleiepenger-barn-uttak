@@ -1,0 +1,1 @@
+alter table UTTAKSRESULTAT add column slettet_tid timestamptz;

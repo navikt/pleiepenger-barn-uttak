@@ -120,5 +120,23 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
     }
 
+    @DeleteMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        description = "Slett siste uttaksplan for behandling.",
+        parameters = [
+            Parameter(name ="behandlingUUID", description = "UUID for behandling hvor siste uttaksplan som skal slettes.")
+        ]
+    )
+    fun slettUttaksplab(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
+        logger.info("Sletter uttaksplan for behanding=$behandlingUUID")
+        val behandlingUUIDParsed = try {
+            UUID.fromString(behandlingUUID)
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.badRequest().build()
+        }
+        uttakRepository.slett(behandlingUUIDParsed)
+        return ResponseEntity.ok().build()
+    }
+
 }
 

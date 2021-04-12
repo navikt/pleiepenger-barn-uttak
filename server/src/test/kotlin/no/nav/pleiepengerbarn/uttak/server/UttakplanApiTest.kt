@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import no.nav.pleiepengerbarn.uttak.testklient.ARBEIDSFORHOLD1
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
@@ -47,9 +48,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttaksplan.assertOppfylt(
                 periode = LukketPeriode("2020-01-01/2020-01-08"),
-                grad = HUNDREPROSENT,
+                grad = HUNDRE_PROSENT,
                 gradPerArbeidsforhold = mapOf(
-                    ARBEIDSFORHOLD1 to HUNDREPROSENT
+                    ARBEIDSFORHOLD1 to HUNDRE_PROSENT
                 ),
                 oppfyltÅrsak = Årsak.FULL_DEKNING
         )
@@ -195,9 +196,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttaksplan.assertOppfylt(
             periode = LukketPeriode("2020-01-01/2020-01-03"),
-            grad = HUNDREPROSENT,
+            grad = HUNDRE_PROSENT,
             gradPerArbeidsforhold = mapOf(
-                ARBEIDSFORHOLD1 to HUNDREPROSENT
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
             ),
             oppfyltÅrsak = Årsak.FULL_DEKNING
         )
@@ -208,9 +209,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
         uttaksplan.assertOppfylt(
             periode = LukketPeriode("2020-01-09/2020-01-20"),
-            grad = HUNDREPROSENT,
+            grad = HUNDRE_PROSENT,
             gradPerArbeidsforhold = mapOf(
-                ARBEIDSFORHOLD1 to HUNDREPROSENT
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
             ),
             oppfyltÅrsak = Årsak.FULL_DEKNING
         )
@@ -235,6 +236,38 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
 
+
+
+    @Test
+    internal fun `Uttaksplan kan ikke hentes opp etter at den er slettet`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG.prosent(70), jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+        )
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = periode,
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING
+        )
+
+        testClient.slettUttaksplan(grunnlag.behandlingUUID)
+
+        val uttaksplanResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(uttaksplanResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+    }
+
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -242,7 +275,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         return postResponse.body ?: fail("Mangler uttaksplan")
     }
 
-    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDREPROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDREPROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
+    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {

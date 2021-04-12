@@ -23,6 +23,10 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
         return restTemplate.exchange(UttakplanApi.FullUttaksplanForTilkjentYtelsePath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), ForenkletUttaksplan::class.java)
     }
 
+    internal fun slettUttaksplan(behandlingUUID: BehandlingUUID) {
+        return restTemplate.delete(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID")
+    }
+
 }
 
 internal fun testClientMotLokalServer(): PleiepengerBarnUttakTestClient {

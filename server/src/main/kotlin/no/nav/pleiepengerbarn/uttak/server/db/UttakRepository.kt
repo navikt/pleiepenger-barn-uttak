@@ -71,6 +71,10 @@ internal class UttakRepository {
         }
     }
 
+    internal fun slett(behandlingId: UUID) {
+        slettTidligereUttaksplan(behandlingId)
+    }
+
     internal fun hent(saksnummer:Saksnummer): Uttaksplan? {
         val sisteBehandlingUUID = finnForrigeBehandlingUUID(saksnummer, null)
         if (sisteBehandlingUUID != null) {
@@ -110,9 +114,10 @@ internal class UttakRepository {
 
 
     private fun slettTidligereUttaksplan(behandlingId: UUID) {
+        val slettetTid = OffsetDateTime.now(ZoneOffset.UTC)
         jdbcTemplate.update(
-            "update uttaksresultat set slettet=true where behandling_id=:behandling_id",
-            mapOf("behandling_id" to behandlingId)
+            "update uttaksresultat set slettet=true, slettet_tid=:slettet_tid where behandling_id=:behandling_id and slettet=false",
+            mapOf("behandling_id" to behandlingId, "slettet_tid" to slettetTid)
         )
     }
 
