@@ -135,7 +135,7 @@ class UttakplanApi {
             return ResponseEntity.badRequest().build()
         }
         uttakRepository.slett(behandlingUUIDParsed)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 
 }
