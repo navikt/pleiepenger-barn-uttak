@@ -108,6 +108,15 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
     }
 
+    @JsonProperty("søkersTapteTimer")
+    fun getSøkersTapteTimer(): Duration {
+        var sumNormalTid = Duration.ZERO
+        var sumFaktiskTid = Duration.ZERO
+        utbetalingsgrader.forEach { sumNormalTid += it.normalArbeidstid }
+        utbetalingsgrader.forEach { if (it.faktiskArbeidstid != null) sumFaktiskTid += it.faktiskArbeidstid }
+        return sumNormalTid - sumFaktiskTid
+    }
+
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

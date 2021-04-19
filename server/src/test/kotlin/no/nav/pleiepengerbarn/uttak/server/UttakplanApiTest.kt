@@ -235,9 +235,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
 
-
-
-
     @Test
     internal fun `Uttaksplan kan ikke hentes opp etter at den er slettet`() {
         val periode = LukketPeriode("2020-10-12/2020-10-16")
@@ -266,7 +263,31 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplanResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
 
+    @Test
+    internal fun `En uttaksperiode med avkorting mot inntekt`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD2, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = Duration.ofHours(1)))),
+                Arbeid(ARBEIDSFORHOLD3, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = Duration.ofHours(2)))),
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+        )
 
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = periode,
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD2 to Prosent(67),
+                ARBEIDSFORHOLD3 to Prosent(33)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT
+        )
+        uttaksplan.assertSøkersTaptArbeid(periode, Prosent(50), Duration.ofHours(3))
+    }
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
@@ -288,6 +309,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             }
             else -> fail("Perioden $periode er ikke oppfylt")
         }
+    }
+
+    private fun Uttaksplan.assertSøkersTaptArbeid(periode: LukketPeriode, søkersTapteArbeidstid: Prosent, søkersTapteTimer: Duration) {
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        assertThat(periodeInfo.søkersTapteArbeidstid).isEqualByComparingTo(søkersTapteArbeidstid)
+        assertThat(periodeInfo.getSøkersTapteTimer()).isEqualTo(søkersTapteTimer)
     }
 
     private fun Uttaksplan.assertIkkeOppfylt(periode: LukketPeriode, ikkeOppfyltÅrsaker: Set<Årsak> = setOf(), knekkpunktTyper: Set<KnekkpunktType> = setOf()) {
