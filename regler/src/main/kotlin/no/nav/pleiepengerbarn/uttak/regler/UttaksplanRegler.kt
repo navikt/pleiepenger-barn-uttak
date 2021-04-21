@@ -8,7 +8,6 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import java.math.BigDecimal
 import java.time.Duration
@@ -54,6 +53,8 @@ internal object UttaksplanRegler {
         ikkeOppfyltÅrsaker: Set<Årsak>)
     {
         val grader = finnGrader(søktUttaksperiode, grunnlag)
+        val nattevåk = grunnlag.finnNattevåk(søktUttaksperiode)
+        val beredskap = grunnlag.finnBeredskap(søktUttaksperiode)
         if (ikkeOppfyltÅrsaker.isNotEmpty()) {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = grader.tilUtbetalingsgrader(false),
@@ -62,10 +63,11 @@ internal object UttaksplanRegler {
                 pleiebehov = grader.pleiebehov.prosent,
                 knekkpunktTyper = knekkpunktTyper,
                 kildeBehandlingUUID = grunnlag.behandlingUUID,
-                annenPart = grunnlag.annenPart(søktUttaksperiode)
+                annenPart = grunnlag.annenPart(søktUttaksperiode),
+                nattevåk = nattevåk,
+                beredskap = beredskap
             )
         } else {
-
             if (grader.årsak.oppfylt) {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
                     uttaksgrad = grader.uttaksgrad,
@@ -76,7 +78,9 @@ internal object UttaksplanRegler {
                     graderingMotTilsyn = grader.graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
-                    annenPart = grunnlag.annenPart(søktUttaksperiode)
+                    annenPart = grunnlag.annenPart(søktUttaksperiode),
+                    nattevåk = nattevåk,
+                    beredskap = beredskap
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -86,7 +90,9 @@ internal object UttaksplanRegler {
                     pleiebehov = grader.pleiebehov.prosent,
                     knekkpunktTyper = knekkpunktTyper,
                     kildeBehandlingUUID = grunnlag.behandlingUUID,
-                    annenPart = grunnlag.annenPart(søktUttaksperiode)
+                    annenPart = grunnlag.annenPart(søktUttaksperiode),
+                    nattevåk = nattevåk,
+                    beredskap = beredskap
                 )
             }
         }
@@ -139,13 +145,13 @@ internal object UttaksplanRegler {
         if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
             return OverseEtablertTilsynÅrsak.FOR_LAVT
         }
-        val overlappBeredskap = this.beredskapsperioder.overlappendePeriode(periode)
-        val overlappNattevåk = nattevåksperioder.overlappendePeriode(periode)
-        if (overlappBeredskap != null && overlappNattevåk != null) {
+        val nattevåk = this.finnNattevåk(periode)
+        val beredskap = this.finnBeredskap(periode)
+        if (nattevåk == Utfall.OPPFYLT && beredskap == Utfall.OPPFYLT) {
             return OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP
-        } else if (overlappBeredskap != null) {
+        } else if (beredskap == Utfall.OPPFYLT) {
             return OverseEtablertTilsynÅrsak.BEREDSKAP
-        } else if (overlappNattevåk != null) {
+        } else if (nattevåk == Utfall.OPPFYLT) {
             return OverseEtablertTilsynÅrsak.NATTEVÅK
         }
         return null

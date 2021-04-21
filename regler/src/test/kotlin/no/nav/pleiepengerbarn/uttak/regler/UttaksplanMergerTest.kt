@@ -20,7 +20,9 @@ internal class UttaksplanMergerTest {
             pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,
-            annenPart = AnnenPart.ALENE
+            annenPart = AnnenPart.ALENE,
+            nattevåk = null,
+            beredskap = null
     )
 
     private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(
@@ -30,7 +32,9 @@ internal class UttaksplanMergerTest {
             pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),
             kildeBehandlingUUID = behandlingUUID,
-            annenPart = AnnenPart.ALENE
+            annenPart = AnnenPart.ALENE,
+            nattevåk = null,
+            beredskap = null
     )
 
 

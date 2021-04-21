@@ -597,7 +597,9 @@ internal class BarnsDødRegelTest {
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
                                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                                annenPart = AnnenPart.ALENE
+                                                annenPart = AnnenPart.ALENE,
+                                                nattevåk = null,
+                                                beredskap = null
                                         )
                                 )
                         )

@@ -154,9 +154,9 @@ internal class KontraktValidatorTest {
     @Test
     internal fun `Overlapp beredskapsperioder`() {
         val grunnlag = grunnlag()
-            .copy(beredskapsperioder = setOf(
-                helePerioden,
-                helePerioden.plusDager(2)
+            .copy(beredskapsperioder = mapOf(
+                helePerioden to Utfall.OPPFYLT,
+                helePerioden.plusDager(2) to Utfall.OPPFYLT
             ))
 
         val valideringsfeil = grunnlag.sjekk()
@@ -169,9 +169,9 @@ internal class KontraktValidatorTest {
     @Test
     internal fun `Overlapp nattevåksperioder`() {
         val grunnlag = grunnlag()
-            .copy(nattevåksperioder = setOf(
-                helePerioden,
-                helePerioden.plusDager(3)
+            .copy(nattevåksperioder = mapOf(
+                helePerioden to Utfall.OPPFYLT,
+                helePerioden.plusDager(3) to Utfall.OPPFYLT
             ))
 
         val valideringsfeil = grunnlag.sjekk()

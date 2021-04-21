@@ -113,8 +113,8 @@ internal class UttakTjenesteGraderingTest {
                 arbeidsforhold1 to mapOf(perioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
             ).somArbeid(),
             behandlingUUID = nesteBehandlingUUID(),
-            beredskapsperioder = setOf(LukketPeriode("2020-01-05/2020-01-12")),
-            nattevåksperioder = setOf(LukketPeriode("2020-01-08/2020-01-15"))
+            beredskapsperioder = mapOf(LukketPeriode("2020-01-05/2020-01-12") to Utfall.OPPFYLT),
+            nattevåksperioder = mapOf(LukketPeriode("2020-01-08/2020-01-15") to Utfall.OPPFYLT)
 
         )
 
@@ -180,7 +180,9 @@ internal class UttakTjenesteGraderingTest {
                                 søkersTapteArbeidstid = Prosent(40),
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                annenPart = AnnenPart.ALENE
+                                annenPart = AnnenPart.ALENE,
+                                nattevåk = null,
+                                beredskap = null
                             )
                         ))
                 ),
@@ -221,7 +223,9 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             kildeBehandlingUUID = UUID.randomUUID().toString(),
                             pleiebehov = Prosent(100),
-                            søkersTapteArbeidstid = Prosent(40)
+                            søkersTapteArbeidstid = Prosent(40),
+                            nattevåk = null,
+                            beredskap = null
                         )))
                 ),
                 arbeid = mapOf(
@@ -264,7 +268,9 @@ internal class UttakTjenesteGraderingTest {
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                 knekkpunktTyper = setOf(),
-                                annenPart = AnnenPart.ALENE
+                                annenPart = AnnenPart.ALENE,
+                                nattevåk = null,
+                                beredskap = null
                             )
                         ))
                 ),

@@ -12,7 +12,7 @@ fun main() {
         .copy(
             inngangsvilkår = mapOf("FP_VK_2" to listOf(Vilkårsperiode(LukketPeriode("2020-01-01/2020-01-10"), Utfall.OPPFYLT))),
             tilsynsperioder = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Duration.ofHours(5)),
-            nattevåksperioder = setOf(LukketPeriode("2020-01-06/2020-01-10"))
+            nattevåksperioder = mapOf(LukketPeriode("2020-01-06/2020-01-10") to Utfall.OPPFYLT)
 
         )
     testClientMotLokalServer().opprettUttaksplan(grunnlag)

@@ -92,6 +92,8 @@ internal class BarnsDødRegel : UttaksplanRegel {
                     .medArbeidsforholdFraForrigeOppfyltePeriode(perioder)
                     .forEach { (periode, arbeidsforholdMedUttbetalingsgrader) ->
                         val arbeidForPeriode = grunnlag.finnArbeidPerArbeidsforhold(periode)
+                        val nattevåk = grunnlag.finnNattevåk(periode)
+                        val beredskap = grunnlag.finnBeredskap(periode)
                         val søkersTapteArbeidstid = arbeidForPeriode.finnSøkersTapteArbeidstid()
                         perioder[periode] = UttaksperiodeInfo.oppfylt(
                             uttaksgrad = HUNDRE_PROSENT,
@@ -102,7 +104,9 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
                             knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
                             kildeBehandlingUUID = grunnlag.behandlingUUID,
-                            annenPart = grunnlag.annenPart(periode)
+                            annenPart = grunnlag.annenPart(periode),
+                            nattevåk = nattevåk,
+                            beredskap = beredskap
                         )
                     }
         }
@@ -280,6 +284,8 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
                     utbetalingsgrad = Prosent.ZERO
                 )
             }
+            val nattevåk = grunnlag.finnNattevåk(it.key)
+            val beredskap = grunnlag.finnBeredskap(it.key)
             put(it.key, UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
@@ -287,7 +293,9 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
                 pleiebehov = grunnlag.finnPleiebehov(it.key).prosent,
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
                 kildeBehandlingUUID = grunnlag.behandlingUUID,
-                annenPart = grunnlag.annenPart(it.key)
+                annenPart = grunnlag.annenPart(it.key),
+                nattevåk = nattevåk,
+                beredskap = beredskap
             ))
         }
     }
