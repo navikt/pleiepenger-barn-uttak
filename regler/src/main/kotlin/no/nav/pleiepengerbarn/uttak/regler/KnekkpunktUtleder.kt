@@ -27,8 +27,8 @@ internal object KnekkpunktUtleder {
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
-        finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder)
-        finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder)
+        finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
+        finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->

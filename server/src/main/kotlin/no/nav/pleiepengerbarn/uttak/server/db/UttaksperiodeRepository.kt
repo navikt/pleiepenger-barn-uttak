@@ -40,7 +40,8 @@ internal class UttaksperiodeRepository {
                 id, fom, tom,
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
                 uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid,
-                inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak
+                inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
+                nattevåk, beredskap
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -78,7 +79,9 @@ internal class UttaksperiodeRepository {
                     graderingMotTilsyn = graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyperFraJSON(rs.getString("knekkpunkt_typer")).toSet(),
                     kildeBehandlingUUID = rs.getString("kilde_behandling_uuid"),
-                    annenPart = AnnenPart.valueOf(rs.getString("annen_part"))
+                    annenPart = AnnenPart.valueOf(rs.getString("annen_part")),
+                    nattevåk = tilUtfall(rs.getString("nattevåk")),
+                    beredskap = tilUtfall(rs.getString("beredskap"))
                 )
             )
         }
@@ -103,16 +106,23 @@ internal class UttaksperiodeRepository {
 
     }
 
+    private fun tilUtfall(utfallString: String?): Utfall? {
+        if (utfallString == null) {
+            return null
+        }
+        return Utfall.valueOf(utfallString)
+    }
 
     private fun lagrePeriode(uttaksperiodeId: Long, periode: LukketPeriode, info: UttaksperiodeInfo): Long {
         val sql = """
             insert into 
                 uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn,
                     tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, inngangsvilkar, knekkpunkt_typer,
-                    kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak)
+                    kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap)
                 values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn,
                     :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :inngangsvilkar, :knekkpunkt_typer,
-                    :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak)
+                    :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
+                    :nattevåk::utfall, :beredskap::utfall)
        
         """.trimIndent()
         val keyHolder = GeneratedKeyHolder()
@@ -133,6 +143,8 @@ internal class UttaksperiodeRepository {
             .addValue("kilde_behandling_uuid", UUID.fromString(info.kildeBehandlingUUID))
             .addValue("annen_part", info.annenPart.toString())
             .addValue("overse_etablert_tilsyn_arsak", info.graderingMotTilsyn?.overseEtablertTilsynÅrsak, Types.OTHER)
+            .addValue("nattevåk", info.nattevåk?.name, Types.OTHER)
+            .addValue("beredskap", info.beredskap?.name, Types.OTHER)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long

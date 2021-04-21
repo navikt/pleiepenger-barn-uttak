@@ -27,9 +27,9 @@ fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     // Sjekk søkt uttak
     sjekkSøktUttakOverlappendePerioder(søktUttak) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_SØKT_UTTAK)}
     // Sjekk beredskap
-    if (sjekkOmDetFinnesOverlappendePerioder(beredskapsperioder)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_BEREDSKAPSPERIODER)}
+    if (sjekkOmDetFinnesOverlappendePerioder(beredskapsperioder.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_BEREDSKAPSPERIODER)}
     // Sjekk nattevåk
-    if (sjekkOmDetFinnesOverlappendePerioder(nattevåksperioder)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)}
+    if (sjekkOmDetFinnesOverlappendePerioder(nattevåksperioder.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)}
 
     return valideringsfeil
 }

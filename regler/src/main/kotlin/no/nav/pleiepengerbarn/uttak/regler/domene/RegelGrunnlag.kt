@@ -15,8 +15,8 @@ data class RegelGrunnlag(
     val lovbestemtFerie: List<LukketPeriode> = listOf(),
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
-    val beredskapsperioder: Set<LukketPeriode> = setOf(),
-    val nattevåksperioder: Set<LukketPeriode> = setOf()
+    val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
+    val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf()
 ) {
 
     internal fun finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
@@ -43,5 +43,20 @@ data class RegelGrunnlag(
         }
     }
 
+    fun finnNattevåk(periode: LukketPeriode): Utfall? {
+        val overlappendePeriode = this.nattevåksperioder.keys.firstOrNull {it.overlapper(periode)}
+        if (overlappendePeriode != null) {
+            return nattevåksperioder[overlappendePeriode]
+        }
+        return null
+    }
+
+    fun finnBeredskap(periode: LukketPeriode): Utfall? {
+        val overlappendePeriode = this.beredskapsperioder.keys.firstOrNull {it.overlapper(periode)}
+        if (overlappendePeriode != null) {
+            return beredskapsperioder[overlappendePeriode]
+        }
+        return null
+    }
 
 }
