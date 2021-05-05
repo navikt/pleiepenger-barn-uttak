@@ -289,6 +289,35 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertSøkersTaptArbeid(periode, Prosent(50), Duration.ofHours(3))
     }
 
+    @Test
+    internal fun `2 søkere med etablert tilsyn hvor søker 2 skal få redusert uttaksgrad pga tilsyn`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlagSøker1 = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
+        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "1")
+
+        val uttaksplanSøker1 = grunnlagSøker1.opprettUttaksplan()
+
+
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
+        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2", andrePartersSaksnummer = listOf("1"))
+
+        val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
+
+        assertThat(uttaksplanSøker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplanSøker2.perioder.keys.first()).isEqualTo(periode)
+        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualTo(Prosent(60))
+    }
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)

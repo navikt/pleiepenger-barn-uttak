@@ -90,7 +90,9 @@ internal object BeregnGrader {
         if (overseEtablertTilsynÅrsak != null) {
             return pleiebehovprosent - andreSøkeresTilsyn
         }
-        return pleiebehovprosent - etablertTilsynsprosent - andreSøkeresTilsyn
+        val gradertMotTilsyn = HUNDRE_PROSENT - etablertTilsynsprosent
+        val restTilSøker = pleiebehovprosent - (etablertTilsynsprosent*(pleiebehovprosent / HUNDRE_PROSENT)) - andreSøkeresTilsyn
+        return minOf(gradertMotTilsyn, restTilSøker)
     }
 
     private fun utledForLavGradÅrsak(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent, overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?): Årsak? {
@@ -138,8 +140,6 @@ internal object BeregnGrader {
         return utbetalingsgrader
     }
 
-
-
     private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
         arbeid.values.forEach {
@@ -159,8 +159,6 @@ internal object BeregnGrader {
        return fordeling
     }
 
-
-
     private fun finnEtablertTilsynsprosent(pleiebehov: Pleiebehov, etablertTilsyn: Duration): Prosent {
         if (etablertTilsyn > FULL_DAG) {
             return HUNDRE_PROSENT
@@ -168,11 +166,7 @@ internal object BeregnGrader {
         if (etablertTilsyn < Duration.ZERO) {
             return Prosent.ZERO
         }
-        val etablertTilsynProsent = BigDecimal(etablertTilsyn.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
-        if (pleiebehov == Pleiebehov.PROSENT_200) {
-            return etablertTilsynProsent * BigDecimal(2)
-        }
-        return etablertTilsynProsent
+        return BigDecimal(etablertTilsyn.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
 }
