@@ -86,6 +86,9 @@ internal object BeregnGrader {
     }
 
     private fun finnRestTilSøker(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent, overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?): BigDecimal {
+        if (pleiebehov == Pleiebehov.PROSENT_0) {
+            return Prosent.ZERO
+        }
         val pleiebehovprosent = pleiebehov.prosent
         if (overseEtablertTilsynÅrsak != null) {
             return pleiebehovprosent - andreSøkeresTilsyn
