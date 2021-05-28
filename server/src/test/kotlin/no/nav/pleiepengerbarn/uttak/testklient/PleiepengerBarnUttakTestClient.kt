@@ -12,19 +12,25 @@ import org.springframework.http.ResponseEntity
 internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRestTemplate) {
 
     internal fun opprettUttaksplan(grunnlag: Uttaksgrunnlag): ResponseEntity<Uttaksplan> {
-        return restTemplate.exchange(UttakplanApi.UttaksplanPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, HttpHeaders()), Uttaksplan::class.java)
+        return restTemplate.exchange(UttakplanApi.UttaksplanPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, headers()), Uttaksplan::class.java)
     }
 
     internal fun hentUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
-        return restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), Uttaksplan::class.java)
+        return restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(headers()), Uttaksplan::class.java)
     }
 
     internal fun hentForenkletUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
-        return restTemplate.exchange(UttakplanApi.FullUttaksplanForTilkjentYtelsePath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(HttpHeaders()), ForenkletUttaksplan::class.java)
+        return restTemplate.exchange(UttakplanApi.FullUttaksplanForTilkjentYtelsePath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(headers()), ForenkletUttaksplan::class.java)
     }
 
     internal fun slettUttaksplan(behandlingUUID: BehandlingUUID) {
-        return restTemplate.delete(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID")
+        restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.DELETE, HttpEntity<Any>(headers()), Unit::class.java)
+    }
+
+    private fun headers():HttpHeaders {
+        val headers = HttpHeaders()
+        headers.put("Nav-Psb-Uttak-Token", listOf(""))
+        return headers
     }
 
 }
