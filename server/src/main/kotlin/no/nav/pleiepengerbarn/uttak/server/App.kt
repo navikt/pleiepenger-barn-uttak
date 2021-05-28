@@ -8,7 +8,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 class App
 
 fun main(args: Array<String>) {
-    System.setProperty("psb_uttak_token", System.getProperty("NAV_PSB_UTTAK_TOKEN"))
     val app = SpringApplicationBuilder(App::class.java)
         .profiles("prodConfig")
         .build()
