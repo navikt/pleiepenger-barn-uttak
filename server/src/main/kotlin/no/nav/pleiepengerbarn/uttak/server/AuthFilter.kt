@@ -11,10 +11,10 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class AuthFilter : Filter {
 
-
     companion object {
         private const val livenessPath = "/pleiepenger-barn-uttak/internal/actuator/health"
         private const val readinessPath = "/pleiepenger-barn-uttak/internal/actuator/info"
+        private const val prometheusPath = "/pleiepenger-barn-uttak/internal/actuator/prometheus"
         private val logger = LoggerFactory.getLogger(this::class.java)
     }
 
@@ -27,7 +27,7 @@ class AuthFilter : Filter {
         val request = req as HttpServletRequest
         val response = res as HttpServletResponse
 
-        val hoppOverAuthFilter = request.requestURI in listOf(livenessPath, readinessPath)
+        val hoppOverAuthFilter = request.requestURI in listOf(livenessPath, readinessPath, prometheusPath)
 
         if (!hoppOverAuthFilter && sharedSecret != request.getHeader("Nav-Psb-Uttak-Token")) {
             logger.warn("Ingen adgang til: ${request.requestURI}")
