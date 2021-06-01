@@ -29,7 +29,7 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
 
     private fun headers():HttpHeaders {
         val headers = HttpHeaders()
-        headers.put("Nav-Psb-Uttak-Token", listOf(""))
+        headers.put("Nav-Psb-Uttak-Token", listOf("no_secret"))
         return headers
     }
 

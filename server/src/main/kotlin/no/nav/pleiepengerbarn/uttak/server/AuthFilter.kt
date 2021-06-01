@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class AuthFilter : Filter {
 
-    @Value("\${NAV_PSB_UTTAK_TOKEN:}")
+    @Value("\${NAV_PSB_UTTAK_TOKEN:no_secret}")
     private lateinit var sharedSecret
             : String
 
