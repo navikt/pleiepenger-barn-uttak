@@ -29,7 +29,7 @@ class AuthFilter : Filter {
 
         val hoppOverAuthFilter = request.requestURI in listOf(livenessPath, readinessPath, prometheusPath)
 
-        if (!hoppOverAuthFilter && sharedSecret != request.getHeader("Nav-Psb-Uttak-Token")) {
+        if (!hoppOverAuthFilter && sharedSecret != request.getHeader("NAV_PSB_UTTAK_TOKEN")) {
             logger.warn("Ingen adgang til: ${request.requestURI}")
             response.sendError(403)
             return
