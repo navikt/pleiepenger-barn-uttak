@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.IOException
@@ -10,8 +11,12 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class AuthFilter : Filter {
 
-    private val livenessPath = "/pleiepenger-barn-uttak/internal/actuator/health"
-    private val readinessPath = "/pleiepenger-barn-uttak/internal/actuator/info"
+
+    companion object {
+        private const val livenessPath = "/pleiepenger-barn-uttak/internal/actuator/health"
+        private const val readinessPath = "/pleiepenger-barn-uttak/internal/actuator/info"
+        private val logger = LoggerFactory.getLogger(this::class.java)
+    }
 
     @Value("\${NAV_PSB_UTTAK_TOKEN:no_secret}")
     private lateinit var sharedSecret
@@ -25,6 +30,7 @@ class AuthFilter : Filter {
         val hoppOverAuthFilter = request.requestURI in listOf(livenessPath, readinessPath)
 
         if (!hoppOverAuthFilter && sharedSecret != request.getHeader("Nav-Psb-Uttak-Token")) {
+            logger.warn("Ingen adgang til: ${request.requestURI}")
             response.sendError(403)
             return
         }
