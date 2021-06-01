@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.Helger
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.finnSøkersTapteArbeidstid
@@ -95,19 +96,24 @@ internal class BarnsDødRegel : UttaksplanRegel {
                         val nattevåk = grunnlag.finnNattevåk(periode)
                         val beredskap = grunnlag.finnBeredskap(periode)
                         val søkersTapteArbeidstid = arbeidForPeriode.finnSøkersTapteArbeidstid()
-                        perioder[periode] = UttaksperiodeInfo.oppfylt(
-                            uttaksgrad = HUNDRE_PROSENT,
-                            søkersTapteArbeidstid = søkersTapteArbeidstid,
-                            utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
-                            årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
-                            pleiebehov = Pleiebehov.PROSENT_100.prosent, //Setter pleiebehov til 100 for perioder som opprettes pga barnets død
-                            graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
-                            knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
-                            kildeBehandlingUUID = grunnlag.behandlingUUID,
-                            annenPart = grunnlag.annenPart(periode),
-                            nattevåk = nattevåk,
-                            beredskap = beredskap
-                        )
+                        val perioderUtenHelg = Helger.fjern(listOf(SøktUttak(periode, null)))
+                        perioderUtenHelg.map {it.periode} .forEach { periodeUtenHelg ->
+
+                            perioder[periodeUtenHelg] = UttaksperiodeInfo.oppfylt(
+                                uttaksgrad = HUNDRE_PROSENT,
+                                søkersTapteArbeidstid = søkersTapteArbeidstid,
+                                utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
+                                årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                                pleiebehov = Pleiebehov.PROSENT_100.prosent, //Setter pleiebehov til 100 for perioder som opprettes pga barnets død
+                                graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
+                                knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
+                                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                                annenPart = grunnlag.annenPart(periodeUtenHelg),
+                                nattevåk = nattevåk,
+                                beredskap = beredskap
+                            )
+                        }
+
                     }
         }
 

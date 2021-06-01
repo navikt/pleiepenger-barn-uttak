@@ -55,8 +55,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(80.00), mapOf(arbeidsforhold1 to Prosent(80.00)), Årsak.GRADERT_MOT_TILSYN)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(80.00),
+            mapOf(arbeidsforhold1 to Prosent(80.00)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
     @Test
@@ -86,8 +98,21 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.FOR_LAVT)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING,
+            OverseEtablertTilsynÅrsak.FOR_LAVT
+        )
     }
 
     @Test
@@ -120,12 +145,13 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(5)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-04"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-05/2020-01-07"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.BEREDSKAP)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-08/2020-01-12"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-13/2020-01-15"), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-20"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-03"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-06/2020-01-07"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.BEREDSKAP)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-08/2020-01-10"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-13/2020-01-15"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-17"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-20/2020-01-20"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
     }
 
 
@@ -152,8 +178,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(25),
+            mapOf(arbeidsforhold1 to Prosent(25)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
     }
 
     @Test
@@ -194,8 +232,19 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(25), mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(25),
+            mapOf(arbeidsforhold1 to Prosent(25)), Årsak.AVKORTET_MOT_INNTEKT
+        )
     }
 
     @Test
@@ -222,7 +271,7 @@ internal class UttakTjenesteGraderingTest {
                             knekkpunktTyper = setOf(),
                             annenPart = AnnenPart.ALENE,
                             kildeBehandlingUUID = UUID.randomUUID().toString(),
-                            pleiebehov = Prosent(100),
+                            pleiebehov = HUNDRE_PROSENT,
                             søkersTapteArbeidstid = Prosent(40),
                             nattevåk = null,
                             beredskap = null
@@ -239,8 +288,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(30),
+            mapOf(arbeidsforhold1 to Prosent(30)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
     @Test
@@ -284,8 +345,18 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkIkkeOppfylt(uttaksplan, helePerioden, setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE))
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkIkkeOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE)
+        )
     }
 
     @Test
@@ -314,8 +385,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(35), mapOf(arbeidsforhold1 to Prosent(35)), Årsak.AVKORTET_MOT_INNTEKT)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(35),
+            mapOf(arbeidsforhold1 to Prosent(35)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
     }
 
     @Test
@@ -344,8 +427,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(30), mapOf(arbeidsforhold1 to Prosent(30)), Årsak.GRADERT_MOT_TILSYN)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(30),
+            mapOf(arbeidsforhold1 to Prosent(30)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
     @Test
@@ -371,8 +466,20 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(50), mapOf(arbeidsforhold1 to Prosent(50)), Årsak.AVKORTET_MOT_INNTEKT)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(50),
+            mapOf(arbeidsforhold1 to Prosent(50)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
     }
 
     @Test
@@ -404,16 +511,23 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, enUke, Prosent(56), mapOf(
-                arbeidsforhold1 to Prosent(100),
+        assertThat(uttaksplan.perioder).hasSize(2)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-07")
+            ),
+            Prosent(56),
+            mapOf(
+                arbeidsforhold1 to HUNDRE_PROSENT,
                 arbeidsforhold2 to Prosent(50),
                 arbeidsforhold3 to Prosent(25),
-        ), Årsak.AVKORTET_MOT_INNTEKT)
+            ),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
 
     }
-
-
 
     @Test
     internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
@@ -442,10 +556,35 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(3)
-        sjekkIkkeOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID))
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(20), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(30), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkIkkeOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-09")
+            ),
+            setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID)
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-10/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17")
+            ),
+            Prosent(20),
+            mapOf(arbeidsforhold1 to Prosent(20)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            Prosent(30),
+            mapOf(arbeidsforhold1 to Prosent(30)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
     }
 
     @Test
@@ -478,11 +617,13 @@ internal class UttakTjenesteGraderingTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(4)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)), Prosent(80), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(), Årsak.GRADERT_MOT_TILSYN)
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3)), Prosent(90), mapOf(arbeidsforhold1 to Prosent(90)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(arbeidsforhold1 to Prosent(90)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 10)), Prosent(80), mapOf(arbeidsforhold1 to Prosent(80)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 13), LocalDate.of(2020, Month.JANUARY, 17)), Prosent(80), mapOf(arbeidsforhold1 to Prosent(80)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(arbeidsforhold1 to Prosent(70)), Årsak.AVKORTET_MOT_INNTEKT)
+        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 27), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), Årsak.GRADERT_MOT_TILSYN)
     }
 
     private fun nesteBehandlingUUID(): BehandlingUUID = UUID.randomUUID().toString()

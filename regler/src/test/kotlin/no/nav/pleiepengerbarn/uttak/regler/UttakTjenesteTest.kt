@@ -47,8 +47,19 @@ internal class UttakTjenesteTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING)
     }
 
 
@@ -79,9 +90,27 @@ internal class UttakTjenesteTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkOppfylt(uttaksplan, helePerioden.copy(tom = LocalDate.of(2020, Month.JANUARY, 14)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = LocalDate.of(2020, Month.JANUARY, 15)), setOf(Årsak.LOVBESTEMT_FERIE))
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-14")
+            ),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING
+        )
+        sjekkIkkeOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-15/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            setOf(Årsak.LOVBESTEMT_FERIE)
+        )
     }
 
     @Test
@@ -108,9 +137,21 @@ internal class UttakTjenesteTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkOppfylt(uttaksplan, helePerioden, Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, LukketPeriode(helePerioden.tom.plusDays(1), helePerioden.tom.plusDays(7)), setOf(Årsak.UTENOM_PLEIEBEHOV))
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING
+        )
+        sjekkIkkeOppfylt(uttaksplan, LukketPeriode("2020-02-03/2020-02-07"), setOf(Årsak.UTENOM_PLEIEBEHOV))
     }
 
     @Test
@@ -140,16 +181,33 @@ internal class UttakTjenesteTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(2)
-        sjekkOppfylt(uttaksplan, helePerioden.copy(tom = helePerioden.fom.plusDays(15).minusDays(1)), Prosent(100), mapOf(arbeidsforhold1 to Prosent(100)), Årsak.FULL_DEKNING)
-        sjekkIkkeOppfylt(uttaksplan, helePerioden.copy(fom = helePerioden.fom.plusDays(15)), setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN))
+        assertThat(uttaksplan.perioder).hasSize(6)
+        sjekkOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-15")
+            ),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING)
+        sjekkIkkeOppfylt(
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-16/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN)
+        )
     }
 
     @Test
     fun `Får jobbet siste halvdel av en perioder`() {
         val søknadsperiode = LukketPeriode("2020-03-09/2020-03-22")
-        val periode1 = LukketPeriode("2020-03-09/2020-03-15")
-        val periode2 = LukketPeriode("2020-03-16/2020-03-22")
+        val periode1 = LukketPeriode("2020-03-09/2020-03-13")
+        val periode2 = LukketPeriode("2020-03-16/2020-03-20")
 
         val grunnlag = RegelGrunnlag(
                 søker = Søker(
@@ -176,8 +234,8 @@ internal class UttakTjenesteTest {
         sjekkOppfylt(
                 uttaksplan = uttaksplan,
                 forventetPeriode = periode1,
-                forventetGrad = Prosent(100),
-                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
+                forventetGrad = HUNDRE_PROSENT,
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
                 forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
         sjekkOppfylt(
@@ -220,9 +278,9 @@ internal class UttakTjenesteTest {
 
         sjekkOppfylt(
                 uttaksplan = uttaksplan,
-                forventetPeriode = periode,
-                forventetGrad = Prosent(100),
-                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)),
+                forventetPeriode = LukketPeriode("2020-03-09/2020-03-13"),
+                forventetGrad = HUNDRE_PROSENT,
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
                 forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
 

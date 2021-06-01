@@ -8,16 +8,32 @@ internal object UttaksperiodeAsserts {
 
     internal fun sjekkOppfylt(
         uttaksplan: Uttaksplan,
+        forventedePerioder: List<LukketPeriode>,
+        forventetGrad:Prosent,
+        forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
+        forventedeOppfyltÅrsak: Årsak,
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null
+    ) {
+        forventedePerioder.forEach { forventetPeriode ->
+            sjekkOppfylt(uttaksplan, forventetPeriode, forventetGrad, forventedeUtbetalingsgrader, forventedeOppfyltÅrsak, overseEtablertTilsynÅrsak)
+        }
+    }
+
+
+    internal fun sjekkOppfylt(
+        uttaksplan: Uttaksplan,
         forventetPeriode: LukketPeriode,
         forventetGrad:Prosent,
         forventedeUtbetalingsgrader: Map<String,Prosent> = mapOf(),
         forventedeOppfyltÅrsak: Årsak,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null) {
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null
+    ) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
-        assertThat(uttaksperiodeInfo).isNotNull()
+        assertThat(uttaksperiodeInfo).withFailMessage("Fant ikke periode: $forventetPeriode").isNotNull()
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.OPPFYLT)
         assertThat(uttaksperiodeInfo.uttaksgrad).isEqualByComparingTo(forventetGrad)
 
+        assertThat(uttaksperiodeInfo.utbetalingsgrader).hasSize(forventedeUtbetalingsgrader.keys.size)
         forventedeUtbetalingsgrader.somUtbetalingsgrader().forEach { forventet ->
             val utbetalingsgrader = uttaksperiodeInfo.utbetalingsgrader.hentForArbeidsforhold(forventet.arbeidsforhold)
             assertThat(forventet.utbetalingsgrad).isEqualByComparingTo(utbetalingsgrader.utbetalingsgrad)
@@ -31,10 +47,21 @@ internal object UttaksperiodeAsserts {
 
     internal fun sjekkIkkeOppfylt(
         uttaksplan: Uttaksplan,
+        forventedePerioder: List<LukketPeriode>,
+        forventetIkkeOppfyltÅrsaker:Set<Årsak>
+    ) {
+        forventedePerioder.forEach { forventetPeriode ->
+            sjekkIkkeOppfylt(uttaksplan, forventetPeriode, forventetIkkeOppfyltÅrsaker)
+        }
+    }
+
+
+    internal fun sjekkIkkeOppfylt(
+        uttaksplan: Uttaksplan,
         forventetPeriode: LukketPeriode,
         forventetIkkeOppfyltÅrsaker:Set<Årsak>) {
         val uttaksperiodeInfo = uttaksplan.perioder.forsikreAtDetIkkeErSortedMap()[forventetPeriode]
-        assertNotNull(uttaksperiodeInfo)
+        assertThat(uttaksperiodeInfo).withFailMessage("Fant ikke periode: $forventetPeriode").isNotNull()
         assertThat(uttaksperiodeInfo!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
         assertThat(uttaksperiodeInfo.årsaker).isEqualTo(forventetIkkeOppfyltÅrsaker)
     }
