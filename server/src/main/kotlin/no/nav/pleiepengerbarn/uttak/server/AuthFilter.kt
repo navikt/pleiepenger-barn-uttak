@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class AuthFilter : Filter {
 
+    private val livenessPath = "/pleiepenger-barn-uttak/internal/actuator/health"
+    private val readinessPath = "/pleiepenger-barn-uttak/internal/actuator/info"
+
     @Value("\${NAV_PSB_UTTAK_TOKEN:no_secret}")
     private lateinit var sharedSecret
             : String
@@ -18,7 +21,10 @@ class AuthFilter : Filter {
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) {
         val request = req as HttpServletRequest
         val response = res as HttpServletResponse
-        if (sharedSecret != request.getHeader("Nav-Psb-Uttak-Token")) {
+
+        val hoppOverAuthFilter = request.requestURI in listOf(livenessPath, readinessPath)
+
+        if (!hoppOverAuthFilter && sharedSecret != request.getHeader("Nav-Psb-Uttak-Token")) {
             response.sendError(403)
             return
         }
