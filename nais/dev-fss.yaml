@@ -31,7 +31,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /kv/preprod/pleiepenger-barn-uttak/default
+      - kvPath: /kv/preprod/fss/pleiepenger-barn-uttak/default
         mountPath: /var/run/secrets/nais.io/vault
   prometheus:
     enabled: true
