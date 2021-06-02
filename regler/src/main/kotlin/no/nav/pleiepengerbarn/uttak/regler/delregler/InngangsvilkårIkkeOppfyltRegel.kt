@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 
 internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
@@ -13,7 +12,7 @@ internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
 
         val perioder = uttaksplan.perioder.sortertPåFom()
         perioder.forEach {
-            val (utfall, inngangsvilkår) = sjekkInngangsvilkår(it.key, grunnlag)
+            val (utfall, inngangsvilkår) = grunnlag.sjekkInngangsvilkår(it.key)
             if (utfall == Utfall.IKKE_OPPFYLT) {
                 //Inngangsvilkår ikke oppfylt
                 if (it.value.utfall == Utfall.OPPFYLT) {
@@ -33,29 +32,4 @@ internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
         return uttaksplan.copy(perioder = nyePerioder)
     }
 
-    private fun sjekkInngangsvilkår(periode: LukketPeriode, grunnlag: RegelGrunnlag): Pair<Utfall, Map<String, Utfall>> {
-        val inngangsvilkårForPeriode = grunnlag.inngangsvilkår.inngangsvilkårForPeriode(periode)
-        val utfallInngangsvikår = inngangsvilkårForPeriode.utfallInngangsvilkår()
-        return Pair(utfallInngangsvikår, inngangsvilkårForPeriode)
-    }
-
-}
-
-private fun Map<String, List<Vilkårsperiode>>.inngangsvilkårForPeriode(periode: LukketPeriode): Map<String, Utfall> {
-    val inngangsvilkår = mutableMapOf<String, Utfall>()
-    this.forEach { (vilkårskode, perioder) ->
-        perioder.forEach { vilkårsperiode ->
-            if (vilkårsperiode.periode.overlapper(periode)) {
-                inngangsvilkår[vilkårskode] = vilkårsperiode.utfall
-            }
-        }
-    }
-    return inngangsvilkår
-}
-
-private fun Map<String, Utfall>.utfallInngangsvilkår(): Utfall {
-    if (this.values.any { it == Utfall.IKKE_OPPFYLT }) {
-        return Utfall.IKKE_OPPFYLT
-    }
-    return Utfall.OPPFYLT
 }

@@ -30,11 +30,9 @@ internal class BarnsDødRegel : UttaksplanRegel {
                 uttaksperiodeDaBarnetDøde = uttaksperiodeDaBarnetDøde
         )
 
-        val dødeIEnOppfyltPeriode = perioder
-                .inneholder(dødsdato)
-                ?.takeIf { it.value.utfall == Utfall.OPPFYLT } != null
+        val rettTilPleiepengerVedDødsfall = grunnlag.rettTilPleiepengerVedDødsfall(dødsdato)
 
-        if (!dødeIEnOppfyltPeriode) {
+        if (!rettTilPleiepengerVedDødsfall) {
             perioder.avslåAllePerioderEtterDødsfallet(
                     dødsdato = dødsdato,
                     grunnlag = grunnlag
@@ -121,6 +119,17 @@ internal class BarnsDødRegel : UttaksplanRegel {
                 perioder = perioder
         )
     }
+}
+
+private fun RegelGrunnlag.rettTilPleiepengerVedDødsfall(dødsdato: LocalDate): Boolean {
+    val harPleiebehov = pleiebehov.any { (periode, behov) -> periode.inneholder(dødsdato) && behov in listOf(Pleiebehov.PROSENT_100, Pleiebehov.PROSENT_200)}
+    if (harPleiebehov) {
+        val (utfallInngangsvilkår, _) = sjekkInngangsvilkår(LukketPeriode(dødsdato, dødsdato))
+        if (utfallInngangsvilkår == Utfall.OPPFYLT) {
+            return true
+        }
+    }
+    return false
 }
 
 /**

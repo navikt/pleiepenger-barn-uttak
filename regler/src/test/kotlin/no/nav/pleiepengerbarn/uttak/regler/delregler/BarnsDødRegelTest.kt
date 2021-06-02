@@ -110,6 +110,7 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
+    @Disabled("Tror denne skal utgå. Regner med at man skal få sorgedager selv om andre har uttak.")
     internal fun `Om barnet dør i en periode man har fått avslag grunnet annen omsorgsperson forblir det et avslag`() {
         val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
                 denAndreOmsorgspersonensGrad = Prosent(81)
@@ -151,7 +152,6 @@ internal class BarnsDødRegelTest {
     }
 
     @Test
-    @Disabled("TODO: Fungerer ikke med bortklipping av helger. Må finne bedre løsning når dødsdato er i helg.")
     internal fun `Om barnet dør i midten av en oppfylt periode gradert mot tilsyn`() {
         val grunnlag = lagGrunnlag(
                 dødeIEnPeriodeGradertMotTilsyn = true
@@ -168,7 +168,7 @@ internal class BarnsDødRegelTest {
 
         val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertEquals(10, uttaksplanEtterRegelkjøring.perioder.size)
+        assertEquals(14, uttaksplanEtterRegelkjøring.perioder.size)
 
 
         // 1. Opprinnelige Periode
@@ -278,7 +278,7 @@ internal class BarnsDødRegelTest {
         sjekkOppfylt(
                 uttaksplan = uttaksplanEtterRegelkjøring,
                 forventedePerioder = listOf(
-                    LukketPeriode("2020-03-03/2020-03-07"),
+                    LukketPeriode("2020-03-02/2020-03-06"),
                     LukketPeriode("2020-03-09/2020-03-13"),
                     LukketPeriode("2020-03-16/2020-03-20"),
                     LukketPeriode("2020-03-23/2020-03-27")
@@ -608,6 +608,7 @@ internal class BarnsDødRegelTest {
                         SøktUttak(LukketPeriode("2020-01-29/2020-03-01"))
                 ),
                 pleiebehov = mapOf(
+//                    helePerioden.copy(tom = helePerioden.tom.plusWeeks(6)) to Pleiebehov.PROSENT_100
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
                 tilsynsperioder = mapOf(
