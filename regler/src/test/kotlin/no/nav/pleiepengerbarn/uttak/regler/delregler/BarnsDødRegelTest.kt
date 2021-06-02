@@ -12,7 +12,6 @@ import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import no.nav.pleiepengerbarn.uttak.regler.somUtbetalingsgrader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -106,48 +105,6 @@ internal class BarnsDødRegelTest {
                 forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
                 forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
-        )
-    }
-
-    @Test
-    @Disabled("Tror denne skal utgå. Regner med at man skal få sorgedager selv om andre har uttak.")
-    internal fun `Om barnet dør i en periode man har fått avslag grunnet annen omsorgsperson forblir det et avslag`() {
-        val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
-                denAndreOmsorgspersonensGrad = Prosent(81)
-        )
-        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
-                aktørId = aktørIdBarn,
-                dødsdato = null
-        ))
-
-        val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
-
-
-        assertEquals(1, uttaksplanFørRegelkjøring.perioder.size)
-
-        val uttaksplanEtterRegelkjøring = UttakTjeneste.uttaksplan(grunnlag)
-
-
-        assertEquals(2, uttaksplanEtterRegelkjøring.perioder.size)
-
-        // 1. Opprinnelig periode
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplanFørRegelkjøring,
-                forventetPeriode = LukketPeriode("2020-01-06/2020-01-10"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
-        )
-
-        // Forventer at perioden er delt i to. Første TOM dødsfall lik
-        // Den andre perioden er lik med har også fått en ny IkkeOppfyltÅrsak 'BARNETS_DØDSFALL'
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplanEtterRegelkjøring,
-                forventetPeriode = LukketPeriode("2020-01-06/2020-01-07"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
-        )
-        sjekkIkkeOppfylt(
-                uttaksplan = uttaksplanEtterRegelkjøring,
-                forventetPeriode = LukketPeriode("2020-01-08/2020-01-10"),
-                forventetIkkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE, Årsak.BARNETS_DØDSFALL)
         )
     }
 
