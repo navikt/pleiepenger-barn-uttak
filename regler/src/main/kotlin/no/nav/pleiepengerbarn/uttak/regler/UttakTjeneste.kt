@@ -10,13 +10,16 @@ object UttakTjeneste {
                 regelGrunnlag = grunnlag
         )
 
+        val søktUttakUtenHelger = Helger.fjern(grunnlag.søktUttak)
+        val oppdatertGrunnlag = grunnlag.copy(søktUttak = søktUttakUtenHelger)
+
         val knektePerioder = PeriodeKnekker.knekk(
-                søktUttak = grunnlag.søktUttak,
+                søktUttak = søktUttakUtenHelger,
                 knekkpunkter = knekkpunkter
         )
 
         return UttaksplanRegler.fastsettUttaksplan(
-                grunnlag = grunnlag,
+                grunnlag = oppdatertGrunnlag,
                 knektePerioder = knektePerioder
         )
     }

@@ -59,4 +59,30 @@ data class RegelGrunnlag(
         return null
     }
 
+
+    fun sjekkInngangsvilkår(periode: LukketPeriode): Pair<Utfall, Map<String, Utfall>> {
+        val inngangsvilkårForPeriode = inngangsvilkårForPeriode(periode)
+        val utfallInngangsvikår = inngangsvilkårForPeriode.utfallInngangsvilkår()
+        return Pair(utfallInngangsvikår, inngangsvilkårForPeriode)
+    }
+
+    private fun inngangsvilkårForPeriode(periode: LukketPeriode): Map<String, Utfall> {
+        val inngangsvilkårForPeriode = mutableMapOf<String, Utfall>()
+        inngangsvilkår.forEach { (vilkårskode, perioder) ->
+            perioder.forEach { vilkårsperiode ->
+                if (vilkårsperiode.periode.overlapper(periode)) {
+                    inngangsvilkårForPeriode[vilkårskode] = vilkårsperiode.utfall
+                }
+            }
+        }
+        return inngangsvilkårForPeriode
+    }
+
+    private fun Map<String, Utfall>.utfallInngangsvilkår(): Utfall {
+        if (this.values.any { it == Utfall.IKKE_OPPFYLT }) {
+            return Utfall.IKKE_OPPFYLT
+        }
+        return Utfall.OPPFYLT
+    }
+
 }

@@ -47,7 +47,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
         uttaksplan.assertOppfylt(
-                periode = LukketPeriode("2020-01-01/2020-01-08"),
+                perioder = listOf(LukketPeriode("2020-01-01/2020-01-03"), LukketPeriode("2020-01-06/2020-01-08")),
                 grad = HUNDRE_PROSENT,
                 gradPerArbeidsforhold = mapOf(
                     ARBEIDSFORHOLD1 to HUNDRE_PROSENT
@@ -93,8 +93,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-10").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-11/2020-01-20").opprettUttaksplan()
 
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-10"))
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-11/2020-01-20"))
+        assertThat(uttaksplan.perioder).hasSize(4)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"))
     }
 
     @Test
@@ -104,9 +107,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
 
-        assertThat(uttaksplan.perioder).hasSize(2)
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-20"))
+        assertThat(uttaksplan.perioder).hasSize(5)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"))
     }
 
     @Test
@@ -116,10 +122,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
 
-        assertThat(uttaksplan.perioder).hasSize(3)
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-06"))
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-12"))
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-20"))
+        assertThat(uttaksplan.perioder).hasSize(5)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-06"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"))
     }
 
 
@@ -130,8 +138,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
 
-        assertThat(uttaksplan.perioder).hasSize(1)
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-20"))
+        assertThat(uttaksplan.perioder).hasSize(4)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-10"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"))
     }
 
     @Test
@@ -150,11 +161,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
         assertThat(uttaksplan.perioder).hasSize(3)
 
-        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-04"))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"))
         uttaksplan.assertIkkeOppfylt(
-            periode = LukketPeriode("2020-01-05/2020-01-08"),
-            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
-            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-09/2020-01-10"))
     }
@@ -192,7 +202,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        assertThat(uttaksplan.perioder).hasSize(3)
+        assertThat(uttaksplan.perioder).hasSize(5)
 
         uttaksplan.assertOppfylt(
             periode = LukketPeriode("2020-01-01/2020-01-03"),
@@ -203,12 +213,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.FULL_DEKNING
         )
         uttaksplan.assertIkkeOppfylt(
-            periode = LukketPeriode("2020-01-04/2020-01-08"),
-            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
-            knekkpunktTyper = setOf(KnekkpunktType.INNGANGSVILKÅR_IKKE_OPPFYLT)
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
         )
         uttaksplan.assertOppfylt(
-            periode = LukketPeriode("2020-01-09/2020-01-20"),
+            perioder = listOf(LukketPeriode("2020-01-09/2020-01-10"), LukketPeriode("2020-01-13/2020-01-17"), LukketPeriode("2020-01-20/2020-01-20")),
             grad = HUNDRE_PROSENT,
             gradPerArbeidsforhold = mapOf(
                 ARBEIDSFORHOLD1 to HUNDRE_PROSENT
@@ -300,7 +309,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
         ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "1")
 
-        val uttaksplanSøker1 = grunnlagSøker1.opprettUttaksplan()
+        grunnlagSøker1.opprettUttaksplan()
 
 
         val grunnlagSøker2 = lagGrunnlag(
@@ -323,6 +332,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
         Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
         return postResponse.body ?: fail("Mangler uttaksplan")
+    }
+
+    private fun Uttaksplan.assertOppfylt(perioder: List<LukketPeriode>, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
+        perioder.forEach { assertOppfylt(it, grad, gradPerArbeidsforhold, oppfyltÅrsak) }
     }
 
     private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING) {
