@@ -95,7 +95,11 @@ internal object BeregnGrader {
         }
         val gradertMotTilsyn = HUNDRE_PROSENT - etablertTilsynsprosent
         val restTilSøker = pleiebehovprosent - (etablertTilsynsprosent*(pleiebehovprosent / HUNDRE_PROSENT)) - andreSøkeresTilsyn
-        return minOf(gradertMotTilsyn, restTilSøker)
+        val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, restTilSøker)
+        if (minsteAvRestTilSøkerOgGraderingMotTilsyn < Prosent.ZERO) {
+            return Prosent.ZERO;
+        }
+        return minsteAvRestTilSøkerOgGraderingMotTilsyn
     }
 
     private fun utledForLavGradÅrsak(pleiebehov: Pleiebehov, etablertTilsynsprosent: Prosent, andreSøkeresTilsyn: Prosent, overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?): Årsak? {
