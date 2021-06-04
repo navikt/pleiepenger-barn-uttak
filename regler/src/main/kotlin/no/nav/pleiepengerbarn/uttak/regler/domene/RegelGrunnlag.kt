@@ -16,7 +16,8 @@ data class RegelGrunnlag(
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
-    val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf()
+    val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
+    val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf()
 ) {
 
     internal fun finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
@@ -60,6 +61,17 @@ data class RegelGrunnlag(
     }
 
 
+    fun finnOverseEtablertTilsynÅrsak(nattevåk: Utfall?, beredskap: Utfall?): OverseEtablertTilsynÅrsak? {
+        if (nattevåk == Utfall.OPPFYLT && beredskap == Utfall.OPPFYLT) {
+            return OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP
+        } else if (beredskap == Utfall.OPPFYLT) {
+            return OverseEtablertTilsynÅrsak.BEREDSKAP
+        } else if (nattevåk == Utfall.OPPFYLT) {
+            return OverseEtablertTilsynÅrsak.NATTEVÅK
+        }
+        return null
+    }
+
     fun sjekkInngangsvilkår(periode: LukketPeriode): Pair<Utfall, Map<String, Utfall>> {
         val inngangsvilkårForPeriode = inngangsvilkårForPeriode(periode)
         val utfallInngangsvikår = inngangsvilkårForPeriode.utfallInngangsvilkår()
@@ -84,5 +96,7 @@ data class RegelGrunnlag(
         }
         return Utfall.OPPFYLT
     }
+
+
 
 }

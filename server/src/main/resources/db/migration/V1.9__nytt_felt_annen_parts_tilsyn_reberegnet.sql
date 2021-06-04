@@ -1,0 +1,1 @@
+alter table uttaksperiode add column andre_sokeres_tilsyn_reberegnet boolean default false;

@@ -29,6 +29,7 @@ internal object KnekkpunktUtleder {
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
         finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
+        finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritet.keys)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
@@ -37,19 +38,23 @@ internal object KnekkpunktUtleder {
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
     }
 
-    private fun finnForNattevåk(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, nattevåksperioder: Set<LukketPeriode>) {
+    private fun finnForKravprioritet(knekkpunktMap: KnekkpunktMap, kravprioritetsperioder: Set<LukketPeriode>) {
+        kravprioritetsperioder.forEach { finnForPeriode(knekkpunktMap, it, KnekkpunktType.KRAVPRIORITETSPERIODE)}
+    }
+
+    private fun finnForNattevåk(knekkpunkMap: KnekkpunktMap, nattevåksperioder: Set<LukketPeriode>) {
         nattevåksperioder.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.NATTEVÅKSPERIODE)}
     }
 
-    private fun finnForBeredskap(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, beredskapsperioder: Set<LukketPeriode>) {
+    private fun finnForBeredskap(knekkpunkMap: KnekkpunktMap, beredskapsperioder: Set<LukketPeriode>) {
         beredskapsperioder.forEach { finnForPeriode(knekkpunkMap, it, KnekkpunktType.BEREDSKAPSPERIODE)}
     }
 
-    private fun finnForTilsynsperiode(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, tilsyn: Map<LukketPeriode, Duration>) {
+    private fun finnForTilsynsperiode(knekkpunkMap: KnekkpunktMap, tilsyn: Map<LukketPeriode, Duration>) {
         tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
     }
 
-    private fun finnForFerie(knekkpunktMap:KnekkpunktMap, ferier:List<LukketPeriode>) {
+    private fun finnForFerie(knekkpunktMap: KnekkpunktMap, ferier:List<LukketPeriode>) {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
     }
 

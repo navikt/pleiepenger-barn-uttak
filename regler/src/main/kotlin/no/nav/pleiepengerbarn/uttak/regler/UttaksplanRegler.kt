@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
@@ -128,7 +127,7 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val andreSøkeresTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
+        val andrePartersTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
 
@@ -136,7 +135,7 @@ internal object UttaksplanRegler {
             pleiebehov = pleiebehov,
             etablertTilsyn = etablertTilsyn,
             oppgittTilsyn = oppgittTilsyn,
-            andreSøkeresTilsyn = andreSøkeresTilsyn,
+            andreSøkeresTilsyn = andrePartersTilsyn.second,
             arbeid = arbeidPerArbeidsforhold,
             overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
         )
@@ -149,14 +148,7 @@ internal object UttaksplanRegler {
         }
         val nattevåk = this.finnNattevåk(periode)
         val beredskap = this.finnBeredskap(periode)
-        if (nattevåk == Utfall.OPPFYLT && beredskap == Utfall.OPPFYLT) {
-            return OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP
-        } else if (beredskap == Utfall.OPPFYLT) {
-            return OverseEtablertTilsynÅrsak.BEREDSKAP
-        } else if (nattevåk == Utfall.OPPFYLT) {
-            return OverseEtablertTilsynÅrsak.NATTEVÅK
-        }
-        return null
+        return finnOverseEtablertTilsynÅrsak(nattevåk, beredskap)
     }
 
     private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
@@ -171,20 +163,6 @@ internal object UttaksplanRegler {
         } else {
             Duration.ZERO
         }
-    }
-
-    private fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): BigDecimal {
-        var andreSøkeresTilsynsgrad = BigDecimal.ZERO
-        this.andrePartersUttaksplan.values.forEach { uttaksplan ->
-            val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapper(periode)}
-            if (overlappendePeriode != null) {
-                val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
-                if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.OPPFYLT) {
-                    andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
-                }
-            }
-        }
-        return andreSøkeresTilsynsgrad
     }
 
 }

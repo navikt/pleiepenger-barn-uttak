@@ -11,5 +11,6 @@ enum class KnekkpunktType {
     ARBEID,
     SØKERS_DØDSFALL,
     BARNETS_DØDSFALL,
-    SØKERS_ALDER
+    SØKERS_ALDER,
+    KRAVPRIORITETSPERIODE
 }
