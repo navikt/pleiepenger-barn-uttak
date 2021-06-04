@@ -127,7 +127,7 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val andrePartersTilsyn = grunnlag.finnAndreSøkeresTilsyn(periode)
+        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
 
@@ -135,7 +135,8 @@ internal object UttaksplanRegler {
             pleiebehov = pleiebehov,
             etablertTilsyn = etablertTilsyn,
             oppgittTilsyn = oppgittTilsyn,
-            andreSøkeresTilsyn = andrePartersTilsyn.second,
+            andreSøkeresTilsyn = andrePartersTilsyn,
+            andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
             arbeid = arbeidPerArbeidsforhold,
             overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
         )

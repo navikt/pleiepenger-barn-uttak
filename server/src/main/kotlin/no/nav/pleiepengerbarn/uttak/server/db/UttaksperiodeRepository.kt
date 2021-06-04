@@ -41,7 +41,7 @@ internal class UttaksperiodeRepository {
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
                 uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid,
                 inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
-                nattevåk, beredskap
+                nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -58,7 +58,8 @@ internal class UttaksperiodeRepository {
                     etablertTilsyn = etablertTilsyn,
                     andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
                     tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker"),
-                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
+                    andreSøkeresTilsynReberegnet = rs.getBoolean("andre_sokeres_tilsyn_reberegnet")
                 )
             }
 
@@ -116,10 +117,10 @@ internal class UttaksperiodeRepository {
     private fun lagrePeriode(uttaksperiodeId: Long, periode: LukketPeriode, info: UttaksperiodeInfo): Long {
         val sql = """
             insert into 
-                uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn,
+                uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, andre_sokeres_tilsyn_reberegnet,
                     tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, inngangsvilkar, knekkpunkt_typer,
                     kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap)
-                values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn,
+                values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn, :andre_sokeres_tilsyn_reberegnet,
                     :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :inngangsvilkar, :knekkpunkt_typer,
                     :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
                     :nattevåk::utfall, :beredskap::utfall)
@@ -133,6 +134,7 @@ internal class UttaksperiodeRepository {
             .addValue("pleiebehov", info.pleiebehov)
             .addValue("etablert_tilsyn", info.graderingMotTilsyn?.etablertTilsyn)
             .addValue("andre_sokeres_tilsyn", info.graderingMotTilsyn?.andreSøkeresTilsyn)
+            .addValue("andre_sokeres_tilsyn_reberegnet", info.graderingMotTilsyn?.andreSøkeresTilsynReberegnet ?: false)
             .addValue("tilgjengelig_for_soker", info.graderingMotTilsyn?.tilgjengeligForSøker)
             .addValue("uttaksgrad", info.uttaksgrad)
             .addValue("aarsaker", tilJSON(info.årsaker))

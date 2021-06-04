@@ -153,5 +153,6 @@ data class GraderingMotTilsyn(
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("overseEtablertTilsynÅrsak") val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
+    @JsonProperty("andreSøkeresTilsynReberegnet") val andreSøkeresTilsynReberegnet: Boolean,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
 )

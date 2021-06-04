@@ -13,6 +13,7 @@ internal object BeregnGrader {
         etablertTilsyn: Duration,
         oppgittTilsyn: Duration? = null,
         andreSøkeresTilsyn: Prosent,
+        andreSøkeresTilsynReberegnet: Boolean,
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
@@ -27,6 +28,7 @@ internal object BeregnGrader {
             graderingMotTilsyn = GraderingMotTilsyn(
                 etablertTilsyn = etablertTilsynsprosent,
                 andreSøkeresTilsyn = andreSøkeresTilsyn,
+                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
                 tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
                 overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),

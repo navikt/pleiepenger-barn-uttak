@@ -56,6 +56,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsyn(periode: LukketPeriode, pl
                 etablertTilsyn,
                 null /* TODO */,
                 sumAndreSøkeresTilsyn,
+                true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
                 finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
                 annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid())
             sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
