@@ -17,7 +17,7 @@ internal object BeregnGrader {
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
-        val etablertTilsynsprosent = finnEtablertTilsynsprosent(pleiebehov, etablertTilsyn)
+        val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
         val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid()
         val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid, overseEtablertTilsynÅrsak)
         val fordeling = finnFordeling(arbeid)
@@ -33,6 +33,7 @@ internal object BeregnGrader {
                 overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
+            oppgittTilsyn = oppgittTilsyn,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
@@ -99,7 +100,7 @@ internal object BeregnGrader {
         val restTilSøker = pleiebehovprosent - (etablertTilsynsprosent*(pleiebehovprosent / HUNDRE_PROSENT)) - andreSøkeresTilsyn
         val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, restTilSøker)
         if (minsteAvRestTilSøkerOgGraderingMotTilsyn < Prosent.ZERO) {
-            return Prosent.ZERO;
+            return Prosent.ZERO
         }
         return minsteAvRestTilSøkerOgGraderingMotTilsyn
     }
@@ -168,7 +169,7 @@ internal object BeregnGrader {
        return fordeling
     }
 
-    private fun finnEtablertTilsynsprosent(pleiebehov: Pleiebehov, etablertTilsyn: Duration): Prosent {
+    private fun finnEtablertTilsynsprosent(etablertTilsyn: Duration): Prosent {
         if (etablertTilsyn > FULL_DAG) {
             return HUNDRE_PROSENT
         }
@@ -193,6 +194,7 @@ data class GraderBeregnet(
         val pleiebehov: Pleiebehov,
         val graderingMotTilsyn: GraderingMotTilsyn,
         val søkersTapteArbeidstid: Prosent,
+        val oppgittTilsyn: Duration?,
         val uttaksgrad: Prosent,
         val utbetalingsgrader: Map<Arbeidsforhold, Utbetalingsgrad>,
         val årsak: Årsak

@@ -16,6 +16,7 @@ internal class UttaksplanMergerTest {
             uttaksgrad = hundreProsent,
             utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
             søkersTapteArbeidstid = Prosent(100),
+            oppgittTilsyn = null,
             årsak = Årsak.AVKORTET_MOT_INNTEKT,
             pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),
@@ -28,6 +29,7 @@ internal class UttaksplanMergerTest {
     private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(
             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent.ZERO).somUtbetalingsgrader(),
             søkersTapteArbeidstid = Prosent(100),
+            oppgittTilsyn = null,
             årsaker = setOf(Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN),
             pleiebehov = Pleiebehov.PROSENT_100.prosent,
             knekkpunktTyper = setOf(),

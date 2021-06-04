@@ -58,6 +58,7 @@ internal object UttaksplanRegler {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = grader.tilUtbetalingsgrader(false),
                 søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
+                oppgittTilsyn = grader.oppgittTilsyn,
                 årsaker = ikkeOppfyltÅrsaker,
                 pleiebehov = grader.pleiebehov.prosent,
                 graderingMotTilsyn = grader.graderingMotTilsyn,
@@ -73,6 +74,7 @@ internal object UttaksplanRegler {
                     uttaksgrad = grader.uttaksgrad,
                     utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
+                    oppgittTilsyn = grader.oppgittTilsyn,
                     årsak = grader.årsak,
                     pleiebehov = grader.pleiebehov.prosent,
                     graderingMotTilsyn = grader.graderingMotTilsyn,
@@ -86,6 +88,7 @@ internal object UttaksplanRegler {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                     utbetalingsgrader = grader.tilUtbetalingsgrader(false),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
+                    oppgittTilsyn = grader.oppgittTilsyn,
                     årsaker = setOf(grader.årsak),
                     pleiebehov = grader.pleiebehov.prosent,
                     graderingMotTilsyn = grader.graderingMotTilsyn,

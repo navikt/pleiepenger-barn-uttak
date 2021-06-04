@@ -216,6 +216,7 @@ internal class UttakTjenesteGraderingTest {
                                 uttaksgrad = Prosent(40),
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
+                                oppgittTilsyn = null,
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                 annenPart = AnnenPart.ALENE,
@@ -273,6 +274,7 @@ internal class UttakTjenesteGraderingTest {
                             kildeBehandlingUUID = UUID.randomUUID().toString(),
                             pleiebehov = HUNDRE_PROSENT,
                             søkersTapteArbeidstid = Prosent(40),
+                            oppgittTilsyn = null,
                             nattevåk = null,
                             beredskap = null
                         )))
@@ -326,6 +328,7 @@ internal class UttakTjenesteGraderingTest {
                                 uttaksgrad = Prosent(40),
                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                 søkersTapteArbeidstid = Prosent(40),
+                                oppgittTilsyn = null,
                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                 knekkpunktTyper = setOf(),

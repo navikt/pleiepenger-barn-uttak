@@ -215,6 +215,7 @@ internal class UttakRepositoryTest {
                                         normalArbeidstid = FULL_DAG,
                                         faktiskArbeidstid = Duration.ZERO)),
                                 søkersTapteArbeidstid = Prosent(100).setScale(2),
+                                oppgittTilsyn = null,
                                 annenPart = AnnenPart.ALENE,
                                 nattevåk = null,
                                 beredskap = null)

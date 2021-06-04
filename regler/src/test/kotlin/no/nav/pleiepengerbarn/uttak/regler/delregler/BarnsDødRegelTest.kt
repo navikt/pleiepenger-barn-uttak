@@ -616,6 +616,7 @@ internal class BarnsDødRegelTest {
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),
                                                 søkersTapteArbeidstid = Prosent(100),
+                                                oppgittTilsyn = null,
                                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
                                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 annenPart = AnnenPart.ALENE,

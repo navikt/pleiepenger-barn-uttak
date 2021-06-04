@@ -54,7 +54,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsyn(periode: LukketPeriode, pl
             val graderBeregnet = BeregnGrader.beregn(
                 pleiebehov,
                 etablertTilsyn,
-                null /* TODO */,
+                annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
                 sumAndreSøkeresTilsyn,
                 true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
                 finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
