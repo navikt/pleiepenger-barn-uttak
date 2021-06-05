@@ -327,6 +327,35 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualTo(Prosent(60))
     }
 
+    @Test
+    internal fun `2 søkere med forskjellig etablert tilsyn`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlagSøker1 = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
+        ).copy(tilsynsperioder = mapOf(periode to Duration.ofHours(4)), saksnummer = "1")
+
+        grunnlagSøker1.opprettUttaksplan()
+
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = periode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
+        ).copy(tilsynsperioder = mapOf(periode to Duration.ofHours(6)), saksnummer = "2", andrePartersSaksnummer = listOf("1"), kravprioritet = mapOf(periode to listOf("1")))
+
+        val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
+
+        assertThat(uttaksplanSøker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplanSøker2.perioder.keys.first()).isEqualTo(periode)
+        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualTo(Prosent(20))
+        assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue()
+    }
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)

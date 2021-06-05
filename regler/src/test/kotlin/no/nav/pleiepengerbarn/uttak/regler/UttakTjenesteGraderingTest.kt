@@ -249,7 +249,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    internal fun `En uttaksperiode med tilsyn og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
+    internal fun `En uttaksperiode med tilsyn og uttak på annen part skal overstyres av søkers etablerte tilsyn`() {
         val grunnlag = RegelGrunnlag(
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
@@ -259,17 +259,24 @@ internal class UttakTjenesteGraderingTest {
                     aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
+                        helePerioden to Pleiebehov.PROSENT_200
                 ),
                 søktUttak = listOf(
                         helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
                         "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.oppfylt(
-                            uttaksgrad = Prosent(40),
+                            uttaksgrad = Prosent(60),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                            årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                            årsak = Årsak.GRADERT_MOT_TILSYN,
                             knekkpunktTyper = setOf(),
+                            graderingMotTilsyn = GraderingMotTilsyn(
+                                etablertTilsyn = Prosent(40),
+                                overseEtablertTilsynÅrsak = null,
+                                andreSøkeresTilsyn = NULL_PROSENT,
+                                andreSøkeresTilsynReberegnet = false,
+                                tilgjengeligForSøker = Prosent(60)
+                            ),
                             annenPart = AnnenPart.ALENE,
                             kildeBehandlingUUID = UUID.randomUUID().toString(),
                             pleiebehov = HUNDRE_PROSENT,
@@ -280,12 +287,12 @@ internal class UttakTjenesteGraderingTest {
                         )))
                 ),
                 arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(40)))
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(30)))
                 ).somArbeid(),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(30)
-                ).somTilsynperioder()
-
+                ).somTilsynperioder(),
+                kravprioritet = mapOf(helePerioden to listOf("999"))
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -300,9 +307,9 @@ internal class UttakTjenesteGraderingTest {
                 LukketPeriode("2020-01-20/2020-01-24"),
                 LukketPeriode("2020-01-27/2020-01-31")
             ),
-            Prosent(30),
-            mapOf(arbeidsforhold1 to Prosent(30)),
-            Årsak.GRADERT_MOT_TILSYN
+            Prosent(70),
+            mapOf(arbeidsforhold1 to Prosent(70)),
+            Årsak.AVKORTET_MOT_INNTEKT
         )
     }
 
@@ -342,7 +349,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Prosent(45)
                 ).somTilsynperioder(),
                 behandlingUUID = nesteBehandlingUUID(),
-                arbeid = listOf(Arbeid(Arbeidsforhold(type="frilans"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))))
+                arbeid = listOf(Arbeid(Arbeidsforhold(type="frilans"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING)))),
+                kravprioritet = mapOf(helePerioden to listOf("999"))
 
         )
 

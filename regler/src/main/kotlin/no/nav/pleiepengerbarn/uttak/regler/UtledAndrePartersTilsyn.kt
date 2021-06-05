@@ -12,17 +12,19 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
     val søkersBeredskap = finnBeredskap(periode)
     val søkersPleiebehov = finnPleiebehov(periode)
 
-    val etablertTilsynEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn == søkersEtablertTilsyn.prosentAvFullDag()}
-    val nattevåkEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk == søkersNattevåk }
-    val beredskapEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap == søkersBeredskap }
-    val pleiebehovEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.pleiebehov == søkersPleiebehov.prosent }
+    val etablertTilsynEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo ->
+        søkersEtablertTilsyn.prosentAvFullDag().compareTo(uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn ?: Prosent.ZERO) != 0
+    }
+    val nattevåkEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
+    val beredskapEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
+    val pleiebehovEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.pleiebehov != søkersPleiebehov.prosent }
 
     val måReberegneAndrePartersTilsyn = true in listOf(etablertTilsynEndret, nattevåkEndret, beredskapEndret, pleiebehovEndret)
 
     val andrePartersTilsyn = if (måReberegneAndrePartersTilsyn) {
-        finnAndreSøkeresTilsynFraUttaksperioder(periode)
-    } else {
         reberegnAndreSøkeresTilsyn(periode, søkersPleiebehov, søkersEtablertTilsyn, søkersNattevåk, søkersBeredskap)
+    } else {
+        finnAndreSøkeresTilsynFraUttaksperioder(periode)
     }
     return Pair(måReberegneAndrePartersTilsyn, andrePartersTilsyn)
 }
@@ -41,7 +43,7 @@ private fun Uttaksplan.finnOverlappendeUttaksperiode(periode: LukketPeriode): Ut
 }
 
 private fun RegelGrunnlag.reberegnAndreSøkeresTilsyn(periode: LukketPeriode, pleiebehov: Pleiebehov, etablertTilsyn: Duration, nattevåkUtfall: Utfall?, beredskapUtfall: Utfall?): Prosent {
-    val kravprioritetPeriode = kravprioritet.keys.firstOrNull {periode.overlapper(it)}
+    val kravprioritetPeriode = kravprioritet.keys.firstOrNull {it.overlapper(periode)}
         ?: return Prosent.ZERO
 
     val kravprioritetListe = kravprioritet[kravprioritetPeriode]
