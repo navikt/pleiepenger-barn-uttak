@@ -44,10 +44,13 @@ internal class BarnsDødRegelTest {
         val grunnlag = lagGrunnlagMedAnnenOmsorgsperson(
                 denAndreOmsorgspersonensGrad = Prosent(80)
         )
-        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(barn = Barn(
+        val grunnlagUtenBarnetsDødsdato = grunnlag.copy(
+            barn = Barn(
                 aktørId = aktørIdBarn,
                 dødsdato = null
-        ))
+            ),
+//            tilsynsperioder = mapOf(LukketPeriode("2020-01-06/2020-01-10") to FULL_DAG.prosent(80) )
+        )
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
 
@@ -565,7 +568,6 @@ internal class BarnsDødRegelTest {
                         SøktUttak(LukketPeriode("2020-01-29/2020-03-01"))
                 ),
                 pleiebehov = mapOf(
-//                    helePerioden.copy(tom = helePerioden.tom.plusWeeks(6)) to Pleiebehov.PROSENT_100
                         helePerioden to Pleiebehov.PROSENT_100
                 ),
                 tilsynsperioder = mapOf(
@@ -616,11 +618,19 @@ internal class BarnsDødRegelTest {
                                                         "123" to Prosent(100)
                                                 ).somUtbetalingsgrader(),
                                                 søkersTapteArbeidstid = Prosent(100),
+                                                oppgittTilsyn = null,
                                                 årsak = Årsak.AVKORTET_MOT_INNTEKT,
                                                 pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
-                                                beredskap = null
+                                                beredskap = null,
+                                                graderingMotTilsyn = GraderingMotTilsyn(
+                                                    etablertTilsyn = Prosent.ZERO,
+                                                    overseEtablertTilsynÅrsak = null,
+                                                    andreSøkeresTilsyn = Prosent.ZERO,
+                                                    andreSøkeresTilsynReberegnet = false,
+                                                    tilgjengeligForSøker = Prosent(80)
+                                                )
                                         )
                                 )
                         )

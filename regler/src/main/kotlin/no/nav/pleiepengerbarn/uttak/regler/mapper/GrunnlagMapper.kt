@@ -29,7 +29,8 @@ object GrunnlagMapper {
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
                 andrePartersUttaksplan = andrePartersUttakplan,
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
-                nattevåksperioder = uttaksgrunnlag.nattevåksperioder
+                nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
+                kravprioritet = uttaksgrunnlag.kravprioritet
         )
     }
 

@@ -54,6 +54,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
+    @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration?,
     @JsonProperty("årsaker") val årsaker: Set<Årsak>,
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, Utfall> = mapOf(),
     @JsonProperty("pleiebehov") val pleiebehov: Prosent,
@@ -70,6 +71,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
         fun ikkeOppfylt(
             utbetalingsgrader: List<Utbetalingsgrader>,
             søkersTapteArbeidstid: Prosent,
+            oppgittTilsyn: Duration?,
             årsaker: Set<Årsak>,
             pleiebehov: Prosent,
             graderingMotTilsyn: GraderingMotTilsyn? = null,
@@ -89,6 +91,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 uttaksgrad = Prosent.ZERO,
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
+                oppgittTilsyn = oppgittTilsyn,
                 årsaker = årsaker,
                 pleiebehov = pleiebehov,
                 graderingMotTilsyn = graderingMotTilsyn,
@@ -104,6 +107,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             uttaksgrad: Prosent,
             utbetalingsgrader: List<Utbetalingsgrader>,
             søkersTapteArbeidstid: Prosent,
+            oppgittTilsyn: Duration?,
             årsak: Årsak,
             pleiebehov: Prosent,
             graderingMotTilsyn: GraderingMotTilsyn? = null,
@@ -122,6 +126,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 uttaksgrad = uttaksgrad,
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
+                oppgittTilsyn = oppgittTilsyn,
                 årsaker = setOf(årsak),
                 pleiebehov = pleiebehov,
                 graderingMotTilsyn = graderingMotTilsyn,
@@ -153,5 +158,6 @@ data class GraderingMotTilsyn(
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("overseEtablertTilsynÅrsak") val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
+    @JsonProperty("andreSøkeresTilsynReberegnet") val andreSøkeresTilsynReberegnet: Boolean,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
 )

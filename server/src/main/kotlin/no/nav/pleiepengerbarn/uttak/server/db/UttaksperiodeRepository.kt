@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
 import java.sql.Types
+import java.time.Duration
 import java.util.*
 
 @Repository
@@ -39,9 +40,9 @@ internal class UttaksperiodeRepository {
             select 
                 id, fom, tom,
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
-                uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid,
+                uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn,
                 inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
-                nattevåk, beredskap
+                nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -58,9 +59,12 @@ internal class UttaksperiodeRepository {
                     etablertTilsyn = etablertTilsyn,
                     andreSøkeresTilsyn = rs.getBigDecimal("andre_sokeres_tilsyn"),
                     tilgjengeligForSøker = rs.getBigDecimal("tilgjengelig_for_soker"),
-                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
+                    andreSøkeresTilsynReberegnet = rs.getBoolean("andre_sokeres_tilsyn_reberegnet")
                 )
             }
+            val oppgittTilsynString = rs.getString("oppgitt_tilsyn")
+            val oppgittTilsyn = if (oppgittTilsynString != null) Duration.parse(oppgittTilsynString) else null
 
             PeriodeOgUttaksperiodeInfo(
                 uttaksperiodeId = rs.getLong("id"),
@@ -73,6 +77,7 @@ internal class UttaksperiodeRepository {
                     uttaksgrad = rs.getBigDecimal("uttaksgrad"),
                     utbetalingsgrader = listOf(), //Blir lagt til litt lengre nede
                     søkersTapteArbeidstid = rs.getBigDecimal("sokers_tapte_arbeidstid"),
+                    oppgittTilsyn = oppgittTilsyn,
                     årsaker = årsakerFraJSON(rs.getString("aarsaker")).toSet(),
                     pleiebehov = pleiebehov,
                     inngangsvilkår = inngangsvilkårFraJSON(rs.getString("inngangsvilkar")),
@@ -116,11 +121,11 @@ internal class UttaksperiodeRepository {
     private fun lagrePeriode(uttaksperiodeId: Long, periode: LukketPeriode, info: UttaksperiodeInfo): Long {
         val sql = """
             insert into 
-                uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn,
-                    tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, inngangsvilkar, knekkpunkt_typer,
+                uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, andre_sokeres_tilsyn_reberegnet,
+                    tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn, inngangsvilkar, knekkpunkt_typer,
                     kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap)
-                values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn,
-                    :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :inngangsvilkar, :knekkpunkt_typer,
+                values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn, :andre_sokeres_tilsyn_reberegnet,
+                    :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :oppgitt_tilsyn, :inngangsvilkar, :knekkpunkt_typer,
                     :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
                     :nattevåk::utfall, :beredskap::utfall)
        
@@ -133,11 +138,13 @@ internal class UttaksperiodeRepository {
             .addValue("pleiebehov", info.pleiebehov)
             .addValue("etablert_tilsyn", info.graderingMotTilsyn?.etablertTilsyn)
             .addValue("andre_sokeres_tilsyn", info.graderingMotTilsyn?.andreSøkeresTilsyn)
+            .addValue("andre_sokeres_tilsyn_reberegnet", info.graderingMotTilsyn?.andreSøkeresTilsynReberegnet ?: false)
             .addValue("tilgjengelig_for_soker", info.graderingMotTilsyn?.tilgjengeligForSøker)
             .addValue("uttaksgrad", info.uttaksgrad)
             .addValue("aarsaker", tilJSON(info.årsaker))
             .addValue("utfall", info.utfall.toString(), Types.OTHER)
             .addValue("sokers_tapte_arbeidstid", info.søkersTapteArbeidstid)
+            .addValue("oppgitt_tilsyn", info.oppgittTilsyn?.toString())
             .addValue("inngangsvilkar", tilJSON(info.inngangsvilkår))
             .addValue("knekkpunkt_typer", tilJSON(info.knekkpunktTyper))
             .addValue("kilde_behandling_uuid", UUID.fromString(info.kildeBehandlingUUID))

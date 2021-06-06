@@ -21,7 +21,7 @@ internal fun Map<String, Prosent>.somUtbetalingsgrader() = map { (ref,utbetaling
                     arbeidsforholdId = ref
             ),
             utbetalingsgrad = utbetalingsgrad,
-            normalArbeidstid = Duration.ZERO, //NB: Brukes ikke i sammenligning i test
+            normalArbeidstid = FULL_DAG, //NB: Brukes ikke i sammenligning i test
             faktiskArbeidstid = Duration.ZERO //NB: Brukes ikke i sammenligning i test
     )
 }

@@ -100,6 +100,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                             perioder[periodeUtenHelg] = UttaksperiodeInfo.oppfylt(
                                 uttaksgrad = HUNDRE_PROSENT,
                                 søkersTapteArbeidstid = søkersTapteArbeidstid,
+                                oppgittTilsyn = null,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
                                 årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent, //Setter pleiebehov til 100 for perioder som opprettes pga barnets død
@@ -304,6 +305,7 @@ private fun SortedMap<LukketPeriode, UttaksperiodeInfo>.avslåAllePerioderEtterD
             put(it.key, UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
+                oppgittTilsyn = null,
                 årsaker = setOf(Årsak.BARNETS_DØDSFALL),
                 pleiebehov = grunnlag.finnPleiebehov(it.key).prosent,
                 knekkpunktTyper = periodeInfo.knekkpunktTyper,
