@@ -17,6 +17,7 @@ spec:
     path: /pleiepenger-barn-uttak/internal/actuator/health
     initialDelay: 30
     timeout: 10
+    failureThreshold: 27
   readiness:
     path: /pleiepenger-barn-uttak/internal/actuator/info
     initialDelay: 30
