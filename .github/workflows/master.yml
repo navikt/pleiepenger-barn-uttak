@@ -38,12 +38,14 @@ jobs:
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
-        run: mvn --settings ./.m2/settings.xml deploy -DskipTests=true -Dmaven.wagon.http.pool=false
+        run: |
+          mvn --settings ./.m2/settings.xml deploy -DskipTests=true -Dmaven.wagon.http.pool=false
+          echo "TAG=$TIMESTAMP-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
       - name: Sette Docker image navn og tag
         env:
           DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
         run: |
-          echo "IMAGE=$DOCKER_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "IMAGE=$DOCKER_IMAGE:$TAG" >> $GITHUB_ENV
           echo "LATEST=$DOCKER_IMAGE:latest" >> $GITHUB_ENV
       - name: Bygge Docker image
         run: docker build . --pull --tag $IMAGE --tag $LATEST
@@ -54,9 +56,54 @@ jobs:
           docker push $IMAGE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy til testmiljø
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.DEPLOY_KEY }}
-          CLUSTER: dev-fss
-          RESOURCE: nais/dev-fss.yaml
+
+      - name: Lukk gamle issues
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['deployment']
+            }).then(response => {
+              response.data.forEach(issue => {
+                github.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed'
+                });
+              });
+            });
+
+      -  name: Opprett deployment issue
+         id: createdeployissue
+         if: success()
+         uses: actions/github-script@v4
+         with:
+           github-token: ${{secrets.GITHUB_TOKEN}}
+           script: |
+             github.issues.create( {
+               owner: context.issue.owner,
+               repo: context.issue.repo,
+               labels: ['deployment'],
+               body: 'Kommenter enten "/promote dev-fss default" eller "/promote prod-fss default"',
+               title: 'Deploy av ${{ env.TAG }}'})
+             .then(response => {
+                     core.setOutput('number', response.data.number);
+              });
+
+      - name: Trigger deploy av k9-sak
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const issue = { owner: context.issue.owner,
+                            repo: context.issue.repo,
+                            issue_number: ${{ steps.createdeployissue.outputs.number }} }
+            github.issues.createComment({...issue,
+                                    title: 'Deploy av ${{ env.TAG }}',
+                                    body: '/promote dev-fss default'})
+
