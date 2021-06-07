@@ -3,7 +3,7 @@ on:
     types: [created]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  IMAGE_BASE: ghcr.io/${{ github.repository }}
+  IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/server
 
 jobs:
   promote:
@@ -27,7 +27,7 @@ jobs:
           echo "IMAGE=$IMAGE_BASE:$(echo '${{  github.event.issue.title }}' | awk '{print $NF}')" >> $GITHUB_ENV
           echo "CLUSTER=$(echo '${{github.event.comment.body}}' | cut -d' ' -f2)" >> $GITHUB_ENV
           echo "NAMESPACE=$(echo '${{github.event.comment.body}}' | cut -d' ' -f3)" >> $GITHUB_ENV
-         
+
       - name: Sjekk ut kode
         uses: actions/checkout@v1
         with:
@@ -38,8 +38,8 @@ jobs:
         env:
           APIKEY: ${{ secrets.DEPLOY_KEY }}
           CLUSTER: ${{ env.CLUSTER }}
-          RESOURCE: deploy/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.yml
-          
+          RESOURCE: nais/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.yml
+
       - name: Oppdater kommentar med deployment status ved feil
         if: failure()
         uses: actions/github-script@v4
@@ -52,7 +52,7 @@ jobs:
             github.issues.createComment({...issue,
                                     title: 'Deploy av ${{ env.TAG }}',
                                     body: 'promote til ${{ env.CLUSTER }} ${{ env.NAMESPACE }} feilet'})
-                                  
+
       - name: Oppdater kommentar med deployment status
         if: success()
         uses: actions/github-script@v4
