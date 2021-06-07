@@ -42,6 +42,8 @@ spec:
     - https://pleiepenger-barn-uttak.q1.nais.preprod.local
     - https://pleiepenger-barn-uttak.nais.preprod.local
   env:
+    - name: APP_NAME
+      value: "pleiepenger-barn-uttak"
     - name: SPRING_PROFILES_ACTIVE
       value: preprod
     - name: DEFAULTDS_USERNAME

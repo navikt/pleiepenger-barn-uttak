@@ -41,6 +41,8 @@ spec:
   ingresses:
     - https://k9-psb-uttak.intern.nav.no
   env:
+    - name: APP_NAME
+      value: "pleiepenger-barn-uttak"
     - name: SPRING_PROFILES_ACTIVE
       value: prod
     - name: DEFAULTDS_USERNAME
