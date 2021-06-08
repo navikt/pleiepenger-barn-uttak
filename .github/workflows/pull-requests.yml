@@ -10,11 +10,10 @@ jobs:
       - name: Hente kode
         uses: actions/checkout@v2
       - name: Sette opp Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: '11.x'
+          distribution: 'adopt'
       - name: Bygge JAR
-        run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml -Dchangelist= -Dsha1=-$(echo $GITHUB_SHA | cut -c1-7)
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
+        run: mvn install --batch-mode -DtrimStackTrace=false
+
