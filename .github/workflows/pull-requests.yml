@@ -1,6 +1,14 @@
 name: Pull request bygg
 
-on: [pull_request_target]
+on:
+  pull_request_target:
+    paths-ignore:
+      - '**.md'
+      - '**.MD'
+      - '.gitignore'
+      - 'LICENCE'
+      - 'CODEOWNERS'
+      - 'dev/**'
 
 jobs:
   docker-and-nais-deploy:
