@@ -87,6 +87,25 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Avslag pga ferie`() {
+        val søknadsperiode = LukketPeriode("2021-06-01/2021-06-04")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD2, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(lovbestemtFerie = listOf(LukketPeriode("2021-06-01/2021-06-01"), LukketPeriode("2021-06-03/2021-06-03")))
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertIkkeOppfylt(periode = LukketPeriode("2021-06-01/2021-06-01"), ikkeOppfyltÅrsaker = setOf(Årsak.LOVBESTEMT_FERIE))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-06-02/2021-06-02"), grad = HUNDRE_PROSENT, gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD2 to HUNDRE_PROSENT), oppfyltÅrsak = Årsak.FULL_DEKNING)
+        uttaksplan.assertIkkeOppfylt(periode = LukketPeriode("2021-06-03/2021-06-03"), ikkeOppfyltÅrsaker = setOf(Årsak.LOVBESTEMT_FERIE), knekkpunktTyper = setOf(KnekkpunktType.LOVBESTEMT_FERIE))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-06-04/2021-06-04"), grad = HUNDRE_PROSENT, gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD2 to HUNDRE_PROSENT), oppfyltÅrsak = Årsak.FULL_DEKNING)
+    }
+
+    @Test
     internal fun `Flere behandlinger med uttak etter hverandre`() {
         val saksnummer = nesteSaksnummer()
 
