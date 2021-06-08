@@ -18,9 +18,10 @@ jobs:
       - name: Hente kode
         uses: actions/checkout@v2
       - name: Sette opp Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: '11.x'
+          distribution: 'adopt'
       - name: Bygge JAR
         env:
           GITHUB_USERNAME: x-access-token
