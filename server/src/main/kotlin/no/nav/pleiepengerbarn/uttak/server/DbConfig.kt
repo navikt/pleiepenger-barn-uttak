@@ -51,7 +51,7 @@ class DbConfig {
     fun getEnvironmentClass(): EnvironmentClass {
         var cluster = System.getProperty("nais.cluster.name", System.getenv("NAIS_CLUSTER_NAME"))
         if (cluster != null) {
-            cluster = cluster.substring(0, cluster.indexOf("-")).toUpperCase()
+            cluster = cluster.substring(0, cluster.indexOf("-")).uppercase()
             return if ("DEV".equals(cluster, ignoreCase = true)) {
                 EnvironmentClass.PREPROD
             } else EnvironmentClass.valueOf(cluster)
@@ -87,11 +87,11 @@ class DbConfig {
     }
 
     private fun getRole(rolePrefix: String, role: DatasourceRole): String {
-        return "$rolePrefix-${role.name.toLowerCase()}"
+        return "$rolePrefix-${role.name.lowercase()}"
     }
 
     private fun getProperty(key: String): String {
-        return System.getProperty(key, System.getenv(key.toUpperCase(Locale.getDefault()).replace('.', '_')))
+        return System.getProperty(key, System.getenv(key.uppercase(Locale.getDefault()).replace('.', '_')))
     }
 
     private fun createVaultDatasource(config: HikariConfig, mountPath: String, role: String): DataSource {

@@ -5,6 +5,6 @@ enum class EnvironmentClass {
     LOCALHOST, PREPROD, PROD;
 
     open fun mountPath(): String {
-        return "postgresql/" + name.toLowerCase() + "-fss"
+        return "postgresql/" + name.lowercase() + "-fss"
     }
 }
