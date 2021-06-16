@@ -17,7 +17,7 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
     }
     val nattevåkEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
     val beredskapEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
-    val pleiebehovEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.pleiebehov != søkersPleiebehov.prosent }
+    val pleiebehovEndret = andrePartersUttaksplan.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.pleiebehov.compareTo(søkersPleiebehov.prosent) != 0 }
 
     val måReberegneAndrePartersTilsyn = true in listOf(etablertTilsynEndret, nattevåkEndret, beredskapEndret, pleiebehovEndret)
 
