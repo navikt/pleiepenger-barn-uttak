@@ -2,12 +2,19 @@ package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.familie.log.filter.LogFilter
 import org.springframework.boot.Banner
+import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
+@EntityScan("no.nav.pleiepengerbarn.uttak")
+@ConfigurationPropertiesScan("no.nav.pleiepengerbarn.uttak")
+@ComponentScan("no.nav.pleiepengerbarn.uttak")
 class App {
 
     @Bean
