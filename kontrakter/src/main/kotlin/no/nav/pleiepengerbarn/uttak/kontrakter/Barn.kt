@@ -11,5 +11,6 @@ import java.time.LocalDate
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Barn(
         @JsonProperty("aktørId") val aktørId: String,
-        @JsonProperty("dødsdato") val dødsdato: LocalDate? = null
+        @JsonProperty("dødsdato") val dødsdato: LocalDate? = null,
+        @JsonProperty("rettVedDød") val rettVedDød:RettVedDød? = null
 )

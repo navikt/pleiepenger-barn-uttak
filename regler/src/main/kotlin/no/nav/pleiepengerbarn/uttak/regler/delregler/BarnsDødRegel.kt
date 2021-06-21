@@ -338,6 +338,6 @@ private fun UttaksperiodeInfo.håndterPeriodeUtenomPleiebehov() : UttaksperiodeI
 
 private fun RegelGrunnlag.utledSorgperiode() = LukketPeriode(
     fom = barn.dagenEtterDødsfall(),
-    tom = barn.dagenEtterDødsfall().plusWeeks(6)
+    tom = barn.dagenEtterDødsfall().plusWeeks(barn.rettVedDød?.uker ?: 0L)
 )
 private fun Barn.dagenEtterDødsfall() = dødsdato!!.plusDays(1)

@@ -49,7 +49,6 @@ internal class BarnsDødRegelTest {
                 aktørId = aktørIdBarn,
                 dødsdato = null
             ),
-//            tilsynsperioder = mapOf(LukketPeriode("2020-01-06/2020-01-10") to FULL_DAG.prosent(80) )
         )
 
         val uttaksplanFørRegelkjøring = UttakTjeneste.uttaksplan(grunnlagUtenBarnetsDødsdato)
@@ -553,7 +552,8 @@ internal class BarnsDødRegelTest {
                 ),
                 barn = Barn(
                         aktørId = aktørIdBarn,
-                        dødsdato = barnetsDødsdato
+                        dødsdato = barnetsDødsdato,
+                        rettVedDød = RettVedDød.RETT_6_UKER
                 ),
                 arbeid = mapOf(
                         "123" to mapOf(
@@ -591,7 +591,8 @@ internal class BarnsDødRegelTest {
                 ),
                 barn = Barn(
                         aktørId = aktørIdBarn,
-                        dødsdato = barnetsDødsdato
+                        dødsdato = barnetsDødsdato,
+                        rettVedDød = RettVedDød.RETT_6_UKER
                 ),
                 arbeid = mapOf(
                         "123" to mapOf(
