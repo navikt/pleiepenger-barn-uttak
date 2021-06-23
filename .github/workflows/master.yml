@@ -33,7 +33,7 @@ jobs:
           GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
         run: |
           mvn verify --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false -Drevision= -Dchangelist= -Dsha1="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"
-          echo "TAG=$TIMESTAMP-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "TAG=$(expr $(date +%Y%m%d%H%M%S))-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
           
       - name: Bygg og last opp Docker image
         run: |
