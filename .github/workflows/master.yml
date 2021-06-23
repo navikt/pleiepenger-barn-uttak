@@ -10,6 +10,10 @@ on:
       - 'LICENCE'
       - 'CODEOWNERS'
 
+env:
+  DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
+  IMAGE_BASE_CR: ghcr.io/${{ github.repository }}/server
+  
 jobs:
   docker-and-nais-deploy:
     name: Laste opp docker image og deploye app
@@ -22,40 +26,23 @@ jobs:
         with:
           java-version: '11.x'
           distribution: 'adopt'
+          
       - name: Bygge JAR
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
-        run: mvn package --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false -Drevision= -Dchangelist= -Dsha1="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"
-      - name: Setting version
-        run: |
-          export GIT_COMMIT_HASH=$(git log -n 1 --pretty=format:'%h')
-          export BUILD_DATE=$(date +%Y%m%d%H%M%S)
-          export VERSION=1.0_${BUILD_DATE}_${GIT_COMMIT_HASH}
-          echo "Setting version $VERSION"
-          mvn versions:set -DnewVersion="$VERSION"
-          mvn versions:commit
-          echo "TIMESTAMP=$(expr $(date +%Y%m%d%H%M%S))" >> $GITHUB_ENV
-      - name: Deploy kontrakter to Github Package repo
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
-        run: |
-          mvn --settings ./.m2/settings.xml deploy -DskipTests=true -Dmaven.wagon.http.pool=false
-          echo "TAG=$TIMESTAMP-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-      - name: Sette Docker image navn og tag
-        env:
-          DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/server
-        run: |
-          echo "IMAGE=$DOCKER_IMAGE:${TAG}" >> $GITHUB_ENV
-          echo "LATEST=$DOCKER_IMAGE:latest" >> $GITHUB_ENV
+        run: mvn verify --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false -Drevision= -Dchangelist= -Dsha1="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"
+
       - name: Bygge Docker image
         run: docker build . --pull --tag $IMAGE --tag $LATEST
+        
       - name: Laste opp Docker image
         run: |
+          docker build --pull --tag ${IMAGE_BASE_CR}:${TAG} --tag ${IMAGE_BASE_CR}:latest --tag ${DOCKER_IMAGE}:${TAG} --tag ${DOCKER_IMAGE}:latest .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username "x-access-token" --password-stdin ghcr.io
           echo "$GITHUB_TOKEN" | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
-          docker push $LATEST
-          docker push $IMAGE
+          docker push ${IMAGE_BASE_CR} --all-tags
+          docker push ${DOCKER_IMAGE} --all-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
