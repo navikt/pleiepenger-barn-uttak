@@ -104,7 +104,7 @@ internal class BarnsDødRegelTest {
                     LukketPeriode("2020-02-10/2020-02-14"),
                     LukketPeriode("2020-02-17/2020-02-19")
                 ),
-                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER,
                 forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )
@@ -242,7 +242,7 @@ internal class BarnsDødRegelTest {
                     LukketPeriode("2020-03-16/2020-03-20"),
                     LukketPeriode("2020-03-23/2020-03-27")
                 ),
-                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER,
                 forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )
@@ -314,7 +314,7 @@ internal class BarnsDødRegelTest {
                     LukketPeriode("2020-01-21/2020-01-24"),
                     LukketPeriode("2020-01-27/2020-01-28")
                 ),
-                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                forventedeOppfyltÅrsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER,
                 forventetGrad = forventetGradOppfyltÅrsakBarnetsDødsfall,
                 forventedeUtbetalingsgrader = forventetUtbetalingsgraderOppfyltÅrsakBarnetsDødsfall
         )

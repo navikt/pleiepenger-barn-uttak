@@ -12,6 +12,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.inneholder
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.perioderSomIkkeInngårI
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåTom
+import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -102,7 +103,7 @@ internal class BarnsDødRegel : UttaksplanRegel {
                                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                                 oppgittTilsyn = null,
                                 utbetalingsgrader = arbeidsforholdMedUttbetalingsgrader,
-                                årsak = Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL,
+                                årsak = grunnlag.finnÅrsakForSorgperiode(),
                                 pleiebehov = Pleiebehov.PROSENT_100.prosent, //Setter pleiebehov til 100 for perioder som opprettes pga barnets død
                                 graderingMotTilsyn = null, //Skal ikke ta hensyn til gradering mot tilsyn i sorgperioden, så derfor ikke relevant
                                 knekkpunktTyper = setOf(KnekkpunktType.BARNETS_DØDSFALL),
@@ -119,6 +120,14 @@ internal class BarnsDødRegel : UttaksplanRegel {
         return uttaksplan.copy(
                 perioder = perioder
         )
+    }
+}
+
+private fun RegelGrunnlag.finnÅrsakForSorgperiode(): Årsak {
+    return when(this.barn.rettVedDød) {
+        RettVedDød.RETT_6_UKER -> Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER
+        RettVedDød.RETT_12_UKER -> Årsak.OPPFYLT_PGA_BARNETS_DØDSFALL_12_UKER
+        null -> throw IllegalStateException("Skal alltid ha satt dette rettVedDød dersom barnet er dødt.")
     }
 }
 
