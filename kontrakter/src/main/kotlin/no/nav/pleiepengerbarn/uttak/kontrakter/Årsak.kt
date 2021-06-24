@@ -5,7 +5,10 @@ enum class Årsak(val oppfylt: Boolean)  {
     GRADERT_MOT_TILSYN(true),
     AVKORTET_MOT_INNTEKT(true),
     AVKORTET_MOT_SØKERS_ØNSKE(true),
+    @Deprecated("Bruk OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER eller OPPFYLT_PGA_BARNETS_DØDSFALL_12_UKER i stedet for OPPFYLT_PGA_BARNETS_DØDSFALL")
     OPPFYLT_PGA_BARNETS_DØDSFALL(true),
+    OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER(true),
+    OPPFYLT_PGA_BARNETS_DØDSFALL_12_UKER(true),
     FULL_DEKNING(true),
 
     //Ikke oppfylt årsaker
