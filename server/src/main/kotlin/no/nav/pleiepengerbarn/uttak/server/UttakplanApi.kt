@@ -49,7 +49,7 @@ class UttakplanApi {
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
-
+        logger.info("Simulerer uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
         return lagUttaksplan(uttaksgrunnlag, false, uriComponentsBuilder)
     }
 
@@ -111,6 +111,7 @@ class UttakplanApi {
         ]
     )
     fun hentFullUttaksplanForTilkjentYtelse(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
+        logger.info("Henter forenklet uttaksplan for behanding=$behandlingUUID")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
         } catch (e: IllegalArgumentException) {
