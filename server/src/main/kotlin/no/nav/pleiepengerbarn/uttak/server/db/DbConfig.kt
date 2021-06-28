@@ -1,9 +1,7 @@
-package no.nav.pleiepengerbarn.uttak.server
+package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.pleiepengerbarn.uttak.server.db.DatasourceRole
-import no.nav.pleiepengerbarn.uttak.server.db.EnvironmentClass
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 import no.nav.vault.jdbc.hikaricp.VaultError
 import org.slf4j.LoggerFactory
