@@ -195,6 +195,26 @@ internal class KontraktValidatorTest {
         assertThat(valideringsfeil).contains(Valideringsfeil.BEHANDLING_UUID_FORMATFEIL)
     }
 
+    @Test
+    internal fun `Grunnlag med arbeidsforhold hvor normalt arbeid er 0`() {
+        val grunnlag = grunnlag().copy(
+            arbeid = listOf(
+                Arbeid(arbeidsgiver1(), mapOf(
+                    helePerioden to ArbeidsforholdPeriodeInfo(jobberNormalt = fullDag, jobberNå = Duration.ZERO)
+                )),
+                Arbeid(arbeidsgiver2(), mapOf(
+                    helePerioden to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ZERO, jobberNå = Duration.ZERO)
+                ))
+
+            )
+        )
+
+        val valideringsfeil = grunnlag.sjekk()
+
+        assertThat(valideringsfeil).hasSize(1)
+        assertThat(valideringsfeil).contains(Valideringsfeil.JOBBER_NORMALT_MÅ_VÆRE_STØRRE_ENN_NULL)
+    }
+
 
     private fun grunnlag(): Uttaksgrunnlag {
         return Uttaksgrunnlag(
@@ -226,6 +246,9 @@ internal class KontraktValidatorTest {
         return Arbeidsforhold("AG", "123456789", null, null)
     }
 
+    private fun arbeidsgiver2(): Arbeidsforhold {
+        return Arbeidsforhold("AG", "987654321", null, null)
+    }
 
 }
 
