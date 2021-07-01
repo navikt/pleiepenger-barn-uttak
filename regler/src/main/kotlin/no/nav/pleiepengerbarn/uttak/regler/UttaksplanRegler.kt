@@ -3,7 +3,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
-import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødRegel
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
@@ -14,12 +13,14 @@ import java.time.Duration
 internal object UttaksplanRegler {
 
     private val PeriodeRegler = linkedSetOf(
-            FerieRegel()
+            FerieRegel(),
+            BarnsDødPeriodeRegel()
     )
 
     private val UttaksplanRegler = linkedSetOf(
             InngangsvilkårIkkeOppfyltRegel(),
-            BarnsDødRegel()
+// NB: erstartet inntil videre med  BarnsDødPeriodeRegel
+// BarnsDødRegel()
     )
 
     internal fun fastsettUttaksplan(grunnlag: RegelGrunnlag, knektePerioder: Map<SøktUttak,Set<KnekkpunktType>>) : Uttaksplan {
@@ -33,15 +34,23 @@ internal object UttaksplanRegler {
         return fastsettUttaksplanRegler(perioder, grunnlag)
     }
 
-    private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): MutableSet<Årsak> {
-        val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
+    private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): Set<Årsak> {
+        val årsaker = mutableSetOf<Årsak>()
+        var overstyrtÅrsak: Årsak? = null
         PeriodeRegler.forEach { regel ->
             val utfall = regel.kjør(periode = søktUttaksperiode, grunnlag = grunnlag)
             if (utfall is IkkeOppfylt) {
-                ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
+                årsaker.addAll(utfall.årsaker)
+            } else if (utfall is TilBeregningAvGrad) {
+                if (utfall.overstyrtÅrsak != null) {
+                    overstyrtÅrsak = utfall.overstyrtÅrsak
+                }
             }
         }
-        return ikkeOppfyltÅrsaker
+        if (overstyrtÅrsak != null) {
+            return setOf(overstyrtÅrsak!!)
+        }
+        return årsaker
     }
 
     private fun fastsettGrader(
@@ -49,11 +58,12 @@ internal object UttaksplanRegler {
         søktUttaksperiode: LukketPeriode,
         grunnlag: RegelGrunnlag,
         knekkpunktTyper: Set<KnekkpunktType>,
-        ikkeOppfyltÅrsaker: Set<Årsak>)
+        årsaker: Set<Årsak>)
     {
         val grader = finnGrader(søktUttaksperiode, grunnlag)
         val nattevåk = grunnlag.finnNattevåk(søktUttaksperiode)
         val beredskap = grunnlag.finnBeredskap(søktUttaksperiode)
+        val ikkeOppfyltÅrsaker = årsaker.filter { !it.oppfylt } .toSet()
         if (ikkeOppfyltÅrsaker.isNotEmpty()) {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = grader.tilUtbetalingsgrader(false),
@@ -70,12 +80,17 @@ internal object UttaksplanRegler {
             )
         } else {
             if (grader.årsak.oppfylt) {
+                val årsak = if (årsaker.size == 1) {
+                    årsaker.first()
+                } else {
+                    grader.årsak
+                }
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
                     uttaksgrad = grader.uttaksgrad,
                     utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     oppgittTilsyn = grader.oppgittTilsyn,
-                    årsak = grader.årsak,
+                    årsak = årsak,
                     pleiebehov = grader.pleiebehov.prosent,
                     graderingMotTilsyn = grader.graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyper,

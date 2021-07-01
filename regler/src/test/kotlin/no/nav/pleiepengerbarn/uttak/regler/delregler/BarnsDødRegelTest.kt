@@ -12,11 +12,13 @@ import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import no.nav.pleiepengerbarn.uttak.regler.somUtbetalingsgrader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
+@Disabled
 internal class BarnsDødRegelTest {
     private companion object {
         private val forventetGradVedAvkortingMotArbeid = Prosent(50)
