@@ -30,12 +30,21 @@ internal object KnekkpunktUtleder {
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
         finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
         finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritet.keys)
+        finnForBarnsDød(knekkpunkMap, regelGrunnlag.barn)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
+    }
+
+    private fun finnForBarnsDød(knekkpunktMap: KnekkpunktMap, barn: Barn) {
+        if (barn.dødsdato != null) {
+            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1), KnekkpunktType.BARNETS_DØDSFALL)
+            val antallUker = barn.rettVedDød?.uker ?: 0
+            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1).plusWeeks(antallUker), KnekkpunktType.BARNETS_DØDSFALL)
+        }
     }
 
     private fun finnForKravprioritet(knekkpunktMap: KnekkpunktMap, kravprioritetsperioder: Set<LukketPeriode>) {

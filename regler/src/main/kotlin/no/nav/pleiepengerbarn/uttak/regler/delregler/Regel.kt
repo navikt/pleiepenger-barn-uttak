@@ -12,7 +12,7 @@ internal class IkkeOppfylt(
     internal val årsaker: Set<Årsak>
 ) : Regelutfall
 internal class TilBeregningAvGrad(
-    internal val overstyrtÅrsak: Årsak? = null
+    val overstyrtÅrsak: Årsak? = null
 ) : Regelutfall
 
 internal interface UttaksplanRegel {
