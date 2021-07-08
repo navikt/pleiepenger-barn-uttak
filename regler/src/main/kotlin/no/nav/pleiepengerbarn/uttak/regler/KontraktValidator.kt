@@ -4,7 +4,6 @@ import no.nav.fpsak.tidsserie.LocalDateSegment
 import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.lang.IllegalArgumentException
-import java.time.Duration
 import java.util.*
 
 
@@ -17,7 +16,6 @@ fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     // Sjekk arbeid
     sjekkUnikeArbeidsforhold(arbeid) {valideringsfeil.add(Valideringsfeil.ARBEIDSFORHOLD_ER_IKKE_UNIKE)}
     sjekkOverlappArbeidsperioder(arbeid) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_ARBEIDSPERIODER)}
-    sjekkJobberNormalt(arbeid) {valideringsfeil.add(Valideringsfeil.JOBBER_NORMALT_MÅ_VÆRE_STØRRE_ENN_NULL)}
     // Sjekk innngangsvilkår
     sjekkOverlappInngangsvilkår(inngangsvilkår) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_INNGANGSVILKÅRPERIODER)}
     // Sjekk ferie
@@ -76,13 +74,6 @@ private fun sjekkOmDetFinnesOverlappendePerioder(perioder: Collection<LukketPeri
 private fun sjekkUnikeArbeidsforhold(arbeidListe: List<Arbeid>, f: () -> Unit) {
     val antallUnikeArbeidsforhold = arbeidListe.map {it.arbeidsforhold} .toSet().size
     if (arbeidListe.size != antallUnikeArbeidsforhold) {
-        f()
-    }
-}
-
-private fun sjekkJobberNormalt(arbeidListe: List<Arbeid>, f: () -> Unit) {
-    val arbeidsInfoListe = arbeidListe.flatMap { arbeid -> arbeid.perioder.values }
-    if  (arbeidsInfoListe.any { arbeidsInfo -> arbeidsInfo.jobberNormalt <= Duration.ZERO }) {
         f()
     }
 }
