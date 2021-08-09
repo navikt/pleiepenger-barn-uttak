@@ -91,8 +91,8 @@ class UttakplanApi {
             Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
         ]
     )
-    fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
-        logger.info("Henter uttaksplan for behanding=$behandlingUUID")
+    fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID, @RequestParam slåSammenLikePerioder: Boolean = false): ResponseEntity<Uttaksplan> {
+        logger.info("Henter uttaksplan for behanding=$behandlingUUID slåSammenLikePerioder=$slåSammenLikePerioder")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
         } catch (e: IllegalArgumentException) {
@@ -100,6 +100,9 @@ class UttakplanApi {
         }
 
         val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.noContent().build()
+        if (slåSammenLikePerioder) {
+            return ResponseEntity.ok(uttaksplan.slåSammenLikePerioder())
+        }
         return ResponseEntity.ok(uttaksplan)
     }
 
