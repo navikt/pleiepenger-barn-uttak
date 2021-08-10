@@ -73,7 +73,7 @@ private fun List<LukketPeriode>.slåSammenDersomBareHelgMellom(): List<LukketPer
             nyPeriode = LukketPeriode(nyPeriode!!.fom, periode.tom)
         } else {
             nyePerioder.add(nyPeriode!!)
-            nyPeriode = null
+            nyPeriode = periode
         }
     }
     if (nyPeriode != null) {
