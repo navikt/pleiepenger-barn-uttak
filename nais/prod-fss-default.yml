@@ -2,7 +2,7 @@ apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
   name: pleiepenger-barn-uttak
-  namespace: default
+  namespace: k9saksbehandling
   labels:
     team: k9saksbehandling
 spec:
@@ -32,7 +32,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /kv/prod/fss/pleiepenger-barn-uttak/default
+      - kvPath: /kv/prod/fss/pleiepenger-barn-uttak/k9saksbehandling
         mountPath: /var/run/secrets/nais.io/vault
   prometheus:
     enabled: true
