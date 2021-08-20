@@ -6,7 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
 import java.time.Duration
 
@@ -171,12 +171,12 @@ internal object UttaksplanRegler {
     }
 
     private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
-        val søktUttak = this.søktUttak.firstOrNull {it.periode.overlapper(periode)}
+        val søktUttak = this.søktUttak.firstOrNull {it.periode.overlapperHelt(periode)}
         return søktUttak?.oppgittTilsyn
     }
 
     private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
-        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapper(periode)}
+        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapperHelt(periode)}
         return if (etablertTilsynPeriode != null) {
             this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
         } else {

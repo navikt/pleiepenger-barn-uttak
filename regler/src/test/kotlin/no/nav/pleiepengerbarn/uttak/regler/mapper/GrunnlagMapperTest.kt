@@ -27,7 +27,8 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = mapOf()
+                    andrePartersUttakplan = mapOf(),
+                    forrigeUttaksplan = null
             )
         }
     }
@@ -42,7 +43,8 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = mapOf()
+                    andrePartersUttakplan = mapOf(),
+                    forrigeUttaksplan = null
             )
         }
     }
@@ -58,7 +60,8 @@ internal class GrunnlagMapperTest {
                                     type = "frilans"
                             )
                     ),
-                    andrePartersUttakplan = mapOf()
+                    andrePartersUttakplan = mapOf(),
+                    forrigeUttaksplan = null
             )
     }
 

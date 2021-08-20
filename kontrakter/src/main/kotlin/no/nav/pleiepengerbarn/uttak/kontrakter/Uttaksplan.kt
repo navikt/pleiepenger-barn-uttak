@@ -29,6 +29,10 @@ enum class OverseEtablertTilsynÅrsak {
     NATTEVÅK_OG_BEREDSKAP
 }
 
+enum class Endringsstatus {
+    NY, ENDRET, UENDRET
+}
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -63,7 +67,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("kildeBehandlingUUID") val kildeBehandlingUUID: BehandlingUUID,
     @JsonProperty("annenPart") val annenPart: AnnenPart,
     @JsonProperty("nattevåk") val nattevåk: Utfall?,
-    @JsonProperty("beredskap") val beredskap: Utfall?
+    @JsonProperty("beredskap") val beredskap: Utfall?,
+    @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null
 ) {
 
     companion object {

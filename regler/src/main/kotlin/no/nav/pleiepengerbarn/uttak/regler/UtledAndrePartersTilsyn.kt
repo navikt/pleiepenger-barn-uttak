@@ -2,7 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapper
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
 import java.time.Duration
 
@@ -38,12 +38,12 @@ private fun Map<Saksnummer, Uttaksplan>.endret(periode: LukketPeriode, sjekkSøk
 
 
 private fun Uttaksplan.finnOverlappendeUttaksperiode(periode: LukketPeriode): UttaksperiodeInfo? {
-    val uttaksperiode = perioder.keys.firstOrNull { it.overlapper(periode) } ?: return null
+    val uttaksperiode = perioder.keys.firstOrNull { it.overlapperHelt(periode) } ?: return null
     return perioder[uttaksperiode]
 }
 
 private fun RegelGrunnlag.reberegnAndreSøkeresTilsyn(periode: LukketPeriode, pleiebehov: Pleiebehov, etablertTilsyn: Duration, nattevåkUtfall: Utfall?, beredskapUtfall: Utfall?): Prosent {
-    val kravprioritetPeriode = kravprioritet.keys.firstOrNull {it.overlapper(periode)}
+    val kravprioritetPeriode = kravprioritet.keys.firstOrNull {it.overlapperHelt(periode)}
         ?: return Prosent.ZERO
 
     val kravprioritetListe = kravprioritet[kravprioritetPeriode]
@@ -77,7 +77,7 @@ private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, Arbeidsforh
 }
 
 private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
-    val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapper(periode)}
+    val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapperHelt(periode)}
     return if (etablertTilsynPeriode != null) {
         this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
     } else {
@@ -92,7 +92,7 @@ private fun Duration.prosentAvFullDag(): Prosent {
 private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: LukketPeriode): BigDecimal {
     var andreSøkeresTilsynsgrad = BigDecimal.ZERO
     this.andrePartersUttaksplan.values.forEach { uttaksplan ->
-        val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapper(periode)}
+        val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapperHelt(periode)}
         if (overlappendePeriode != null) {
             val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
             if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.OPPFYLT) {
