@@ -25,9 +25,10 @@ internal object KnekkpunktUtleder {
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForPleiebehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
-        if (regelGrunnlag.forrigeUttaksplan != null) {
-            finnForForrigeUttaksplan(knekkpunkMap, regelGrunnlag.forrigeUttaksplan)
-        }
+//ROLLBACK
+//        if (regelGrunnlag.forrigeUttaksplan != null) {
+//            finnForForrigeUttaksplan(knekkpunkMap, regelGrunnlag.forrigeUttaksplan)
+//        }
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)

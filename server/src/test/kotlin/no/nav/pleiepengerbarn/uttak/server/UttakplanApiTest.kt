@@ -188,12 +188,20 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         lagGrunnlag(saksnummer, "2020-01-07/2020-01-12").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
 
+        assertThat(uttaksplan.perioder).hasSize(4)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"), endringsstatus = Endringsstatus.NY)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-10"), endringsstatus = Endringsstatus.NY)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"), endringsstatus = Endringsstatus.NY)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"), endringsstatus = Endringsstatus.NY)
+        /*
+        //ROLLBACK
         assertThat(uttaksplan.perioder).hasSize(5)
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"), endringsstatus = Endringsstatus.NY)
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-06/2020-01-06"), endringsstatus = Endringsstatus.NY)
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-07/2020-01-10"), endringsstatus = Endringsstatus.UENDRET)
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-17"), endringsstatus = Endringsstatus.NY)
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"), endringsstatus = Endringsstatus.NY)
+         */
     }
 
     @Test
@@ -430,7 +438,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             Utfall.OPPFYLT -> {
                 assertThat(periodeInfo.årsaker).isEqualTo(setOf(oppfyltÅrsak))
                 assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
-                assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
+//ROLLBACK
+//                assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
                 gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
@@ -452,7 +461,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             Utfall.IKKE_OPPFYLT -> {
                 assertThat(periodeInfo.årsaker).isEqualTo(ikkeOppfyltÅrsaker)
                 assertThat(periodeInfo.knekkpunktTyper).isEqualTo(knekkpunktTyper)
-                assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
+//ROLLBACK
+//                assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
             }
             else -> fail("Perioden $periode er oppfylt")
         }
