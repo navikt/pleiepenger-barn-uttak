@@ -66,6 +66,7 @@ class UtbetalingsgradRepository {
             select ug.uttaksperiode_id, ug.arbeidstype, ug.organisasjonsnummer, ug.aktoer_id, ug.arbeidsforhold_id, ug.normal_arbeidstid, ug.faktisk_arbeidstid, ug.utbetalingsgrad
             from uttaksresultat ur, uttaksperiode up, utbetalingsgrad ug
             where ur.id = ? and ur.id = up.uttaksresultat_id and up.id = ug.uttaksperiode_id
+            order by ug.arbeidstype, ug.organisasjonsnummer, ug.aktoer_id, ug.arbeidsforhold_id
         """.trimIndent()
 
 

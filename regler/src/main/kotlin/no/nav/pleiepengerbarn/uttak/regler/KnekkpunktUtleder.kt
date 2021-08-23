@@ -25,6 +25,9 @@ internal object KnekkpunktUtleder {
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForPleiebehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
+        if (regelGrunnlag.forrigeUttaksplan != null) {
+            finnForForrigeUttaksplan(knekkpunkMap, regelGrunnlag.forrigeUttaksplan)
+        }
         finnForTilsynsperiode(knekkpunkMap, regelGrunnlag.tilsynsperioder)
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
@@ -37,6 +40,12 @@ internal object KnekkpunktUtleder {
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
+    }
+
+    private fun finnForForrigeUttaksplan(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, forrigeUttaksplan: Uttaksplan) {
+        forrigeUttaksplan.perioder.forEach { (periode ,_) ->
+            finnForPeriode(knekkpunkMap, periode, KnekkpunktType.FORRIGE_UTTAKPLAN)
+        }
     }
 
     private fun finnForBarnsDød(knekkpunktMap: KnekkpunktMap, barn: Barn) {

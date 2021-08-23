@@ -3,7 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlappendePeriode
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 
 internal class FerieRegel : PeriodeRegel {
 
@@ -13,4 +13,9 @@ internal class FerieRegel : PeriodeRegel {
         }
         return TilBeregningAvGrad()
     }
+}
+
+
+private fun Collection<LukketPeriode>.overlappendePeriode(periode: LukketPeriode) = find {
+    it.overlapperHelt(periode)
 }

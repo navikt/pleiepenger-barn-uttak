@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.EndringsstatusOppdaterer
 import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
 import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
@@ -65,13 +66,15 @@ class UttakplanApi {
                 andrePartersUttaksplaner[saksnummer] = uttaksplan
             }
         }
-        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner)
+
+        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplaner, forrigeUttaksplan)
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
-        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         if (forrigeUttaksplan != null) {
             uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan)
         }
+        uttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, uttaksplan)
 
         if (lagre) {
             uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
