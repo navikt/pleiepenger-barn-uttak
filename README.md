@@ -42,6 +42,7 @@ Toppnivået i en uttaksplan heter Uttaksresultat. Et uttaksresultat inneholder u
 |beredskap|Utfall for om beredskap vurdering. Null dersom ikke vurdert.|
 |andre_sokeres_tilsyn_reberegnet|Er andre søkeres tilsyn rebregnet for pga av endrede fakta.|
 |oppgitt_tilsyn|Hvor mye har søker oppgitt av den ønsker som max uttaksgrad. Brukes av søker for å la deler av pleiebehovet være igjen til andre parter.|
+|endringsstatus|Angir om en perioder er ny, endret eller uendret i behandlingen som denne uttaksplanen tilhører. Lovlige verdier: NY, ENDRET, UENDRET eller null. Vil være null for perioder som er opprettet før dette feltet ble innført.|
 
 
 ### Utbetalingsgrad
