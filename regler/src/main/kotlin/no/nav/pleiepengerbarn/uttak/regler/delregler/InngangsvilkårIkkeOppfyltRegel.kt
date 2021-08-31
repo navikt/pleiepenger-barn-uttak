@@ -11,21 +11,21 @@ internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
         val perioder = uttaksplan.perioder.sortertPåFom()
-        perioder.forEach {
-            val (utfall, inngangsvilkår) = grunnlag.sjekkInngangsvilkår(it.key)
-            if (utfall == Utfall.IKKE_OPPFYLT) {
+        perioder.forEach { (periode, info) ->
+            val (utfallInngangsvilkår, inngangsvilkår) = grunnlag.sjekkInngangsvilkår(periode)
+            if (utfallInngangsvilkår == Utfall.IKKE_OPPFYLT) {
                 //Inngangsvilkår ikke oppfylt
-                if (it.value.utfall == Utfall.OPPFYLT) {
+                if (info.utfall == Utfall.OPPFYLT) {
                     //Sett til ikke oppfylt dersom oppfylt
-                    nyePerioder[it.key] = it.value.copy(årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT), utfall = Utfall.IKKE_OPPFYLT, inngangsvilkår = inngangsvilkår)
+                    nyePerioder[periode] = info.copy(årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT), utfall = Utfall.IKKE_OPPFYLT, inngangsvilkår = inngangsvilkår)
                 } else {
                     //Legg til inngangsvilkår ikke oppfylt dersom perioden allerede er ikke oppfylt
-                    val årsaker = it.value.årsaker.toMutableSet()
+                    val årsaker = info.årsaker.toMutableSet()
                     årsaker.add(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)
-                    nyePerioder[it.key] = it.value.copy(årsaker = årsaker, inngangsvilkår = inngangsvilkår)
+                    nyePerioder[periode] = info.copy(årsaker = årsaker, inngangsvilkår = inngangsvilkår)
                 }
             } else {
-                nyePerioder[it.key] = it.value.copy(inngangsvilkår = inngangsvilkår)
+                nyePerioder[periode] = info.copy(inngangsvilkår = inngangsvilkår)
             }
         }
 
