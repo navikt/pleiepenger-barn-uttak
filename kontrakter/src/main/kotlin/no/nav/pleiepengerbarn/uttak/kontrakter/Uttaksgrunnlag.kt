@@ -17,6 +17,7 @@ data class Uttaksgrunnlag (
     @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
 
     @JsonProperty("søktUttak") val søktUttak: List<SøktUttak>,
+    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
     @JsonProperty("pleiebehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
