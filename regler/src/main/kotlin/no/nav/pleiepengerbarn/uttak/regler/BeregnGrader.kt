@@ -143,7 +143,7 @@ internal object BeregnGrader {
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             val timerDekket = taptArbeidstidSomDekkes.prosent(fordelingsprosent)
             if (info.jobberNormalt > Duration.ZERO) {
-                val utbetalingsgrad = BigDecimal(timerDekket.toMillis()).setScale(2) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+                val utbetalingsgrad = BigDecimal(timerDekket.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
             }
         }
@@ -161,7 +161,7 @@ internal object BeregnGrader {
         arbeid.forEach {
             if (sumTapt != Duration.ZERO) {
                 val tapt = it.value.jobberNormalt - it.value.jobberNå
-                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8)/BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
+                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8, RoundingMode.HALF_UP)/BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
                 fordeling[it.key] = Prosent.ZERO
             }
@@ -177,7 +177,7 @@ internal object BeregnGrader {
         if (etablertTilsyn < Duration.ZERO) {
             return Prosent.ZERO
         }
-        return BigDecimal(etablertTilsyn.toMillis()).setScale(2) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+        return BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
 }

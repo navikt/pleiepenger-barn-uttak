@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import java.math.RoundingMode
 
 object EndringsstatusOppdaterer {
 
@@ -41,12 +42,12 @@ private fun UttaksperiodeInfo.sammenlign(infoFraForrige: UttaksperiodeInfo) =
  * Setter alle BigDecimal felter til 2 desimaler og nullstiller felter som ikke er viktig for sammenligning av perioder ifm setting av uttaksperiodetype.
  */
 private fun UttaksperiodeInfo.nullstillUviktigeFelt(): UttaksperiodeInfo {
-    val oppdaterteUtbetalingsgrader = this.utbetalingsgrader.map { it.copy(utbetalingsgrad = it.utbetalingsgrad.setScale(2)) }
+    val oppdaterteUtbetalingsgrader = this.utbetalingsgrader.map { it.copy(utbetalingsgrad = it.utbetalingsgrad.setScale(2, RoundingMode.HALF_UP)) }
     val oppdatertGraderingMotTilsyn = if (this.graderingMotTilsyn != null) {
         val gmt = this.graderingMotTilsyn!!
         gmt.copy(
-            etablertTilsyn = gmt.etablertTilsyn.setScale(2),
-            andreSøkeresTilsyn = gmt.andreSøkeresTilsyn.setScale(2),
+            etablertTilsyn = gmt.etablertTilsyn.setScale(2, RoundingMode.HALF_UP),
+            andreSøkeresTilsyn = gmt.andreSøkeresTilsyn.setScale(2, RoundingMode.HALF_UP),
             tilgjengeligForSøker = gmt.tilgjengeligForSøker
         )
     } else {
@@ -56,9 +57,9 @@ private fun UttaksperiodeInfo.nullstillUviktigeFelt(): UttaksperiodeInfo {
         kildeBehandlingUUID = "",
         knekkpunktTyper = setOf(),
         endringsstatus = null,
-        uttaksgrad = this.uttaksgrad.setScale(2),
-        søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2),
-        pleiebehov = this.pleiebehov.setScale(2),
+        uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
+        søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
+        pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
         utbetalingsgrader = oppdaterteUtbetalingsgrader,
         graderingMotTilsyn = oppdatertGraderingMotTilsyn
     )

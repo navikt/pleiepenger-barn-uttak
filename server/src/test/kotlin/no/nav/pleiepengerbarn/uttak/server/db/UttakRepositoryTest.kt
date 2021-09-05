@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.transaction.annotation.Transactional
+import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
@@ -205,16 +206,16 @@ internal class UttakRepositoryTest {
                 perioder = mapOf(
                         periode to UttaksperiodeInfo.oppfylt(
                                 kildeBehandlingUUID = UUID.randomUUID().toString(),
-                                uttaksgrad = Prosent(100).setScale(2),
+                                uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                                 årsak = Årsak.FULL_DEKNING,
-                                pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2),
+                                pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
                                 knekkpunktTyper = setOf(),
                                 utbetalingsgrader = listOf(Utbetalingsgrader(
                                         arbeidsforhold = arbeidsforhold1,
-                                        utbetalingsgrad = Prosent(100).setScale(2),
+                                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                                         normalArbeidstid = FULL_DAG,
                                         faktiskArbeidstid = Duration.ZERO)),
-                                søkersTapteArbeidstid = Prosent(100).setScale(2),
+                                søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                                 oppgittTilsyn = null,
                                 annenPart = AnnenPart.ALENE,
                                 nattevåk = null,
