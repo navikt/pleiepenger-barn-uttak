@@ -10,7 +10,7 @@ object UttaksplanMerger {
         val timelineForrigeUttaksplan = lagTimeline(forrigeUttaksplan)
         val timelineForrigeUttaksplanMinusTrukketUttak = fjernTrukketUttak(timelineForrigeUttaksplan, trukketUttak)
         val timelineNyUttaksplan = lagTimeline(nyUttaksplan)
-        return  lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
+        return lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
     }
 
     private fun lagTimeline(uttaksplan:Uttaksplan): LocalDateTimeline<UttaksperiodeInfo> {
@@ -29,7 +29,7 @@ object UttaksplanMerger {
 
     private fun fjernTrukketUttak(timelineForrigeUttaksplan: LocalDateTimeline<UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>): LocalDateTimeline<UttaksperiodeInfo> {
         val timelineTrukketUttak = LocalDateTimeline(trukketUttak.map { LocalDateSegment(it.fom, it.tom, null) })
-        return  timelineForrigeUttaksplan.disjoint(timelineTrukketUttak)
+        return timelineForrigeUttaksplan.disjoint(timelineTrukketUttak)
     }
 
 }
