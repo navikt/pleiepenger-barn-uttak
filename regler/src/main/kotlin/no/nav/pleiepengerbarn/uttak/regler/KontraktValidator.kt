@@ -30,8 +30,19 @@ fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     if (sjekkOmDetFinnesOverlappendePerioder(beredskapsperioder.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_BEREDSKAPSPERIODER)}
     // Sjekk nattevåk
     if (sjekkOmDetFinnesOverlappendePerioder(nattevåksperioder.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)}
+    // Sjekk trukket uttak
+    if (sjekkOmDetFinnesOverlappendePerioder(trukketUttak)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_TRUKKET_UTTAKSPERIODER)}
+    if (!valideringsfeil.contains(Valideringsfeil.OVERLAPP_MELLOM_SØKT_UTTAK) && !valideringsfeil.contains(Valideringsfeil.OVERLAPP_MELLOM_TRUKKET_UTTAKSPERIODER)) {
+        if (sjekkOmDetFinnesOverlappMellomSøktUttakOgTrukketUttak(søktUttak.map {it.periode}, trukketUttak)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_SØKT_UTTAK_OG_TRUKKET_UTTAK)}
+    }
 
     return valideringsfeil
+}
+
+private fun sjekkOmDetFinnesOverlappMellomSøktUttakOgTrukketUttak(søktUttak: List<LukketPeriode>, trukketUttak: List<LukketPeriode>): Boolean {
+    val søktUttakTimeline = LocalDateTimeline(søktUttak.map {LocalDateSegment(it.fom, it.tom, null)})
+    val trukketUttakTimeline = LocalDateTimeline(trukketUttak.map {LocalDateSegment(it.fom, it.tom, null)})
+    return søktUttakTimeline.intersects(trukketUttakTimeline)
 }
 
 private fun sjekkSøktUttakOverlappendePerioder(søktUttak: List<SøktUttak>, f: () -> Unit) {

@@ -72,7 +72,7 @@ class UttakplanApi {
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {
-            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan)
+            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan, regelGrunnlag.trukketUttak)
         }
         uttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, uttaksplan)
 

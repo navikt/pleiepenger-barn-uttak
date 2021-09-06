@@ -51,7 +51,7 @@ internal class UttaksplanMergerTest {
                 mapOf(LukketPeriode("2020-01-15/2020-02-10") to oppfylt(behandling2))
         )
 
-        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2)
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf())
 
         assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-14") to oppfylt(behandling1),
@@ -69,7 +69,7 @@ internal class UttaksplanMergerTest {
                 mapOf(LukketPeriode("2020-01-17/2020-03-31") to oppfylt(behandling2))
         )
 
-        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2)
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf())
 
         assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-16") to oppfylt(behandling1),
@@ -90,7 +90,7 @@ internal class UttaksplanMergerTest {
                 )
         )
 
-        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2)
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf())
 
         assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-15") to oppfylt(behandling2),
@@ -109,12 +109,50 @@ internal class UttaksplanMergerTest {
                 mapOf(LukketPeriode("2020-01-10/2020-01-20") to ikkeOppfylt(behandling2))
         )
 
-        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2)
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf())
 
         assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
                 LukketPeriode("2020-01-01/2020-01-09") to oppfylt(behandling1),
                 LukketPeriode("2020-01-10/2020-01-20") to ikkeOppfylt(behandling2),
                 LukketPeriode("2020-01-21/2020-01-31") to oppfylt(behandling1)
+        )))
+    }
+
+    @Test
+    fun `Søker trekker uttak fra tidligere uttaksplan`() {
+        val uttaksplan1 =  Uttaksplan(
+            mapOf(LukketPeriode("2020-01-01/2020-01-31") to oppfylt(behandling1))
+        )
+
+        val uttaksplan2 =  Uttaksplan(
+            mapOf()
+        )
+
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf(LukketPeriode("2020-01-10/2020-01-20")))
+        assertThat(sammenslåttUttaksplan.perioder.keys.size).isEqualTo(2)
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
+            LukketPeriode("2020-01-01/2020-01-09") to oppfylt(behandling1),
+            LukketPeriode("2020-01-21/2020-01-31") to oppfylt(behandling1)
+        )))
+    }
+
+    @Test
+    fun `Søker trekker uttak fra tidligere uttaksplan og legget til nytt uttak`() {
+        val uttaksplan1 =  Uttaksplan(
+            mapOf(LukketPeriode("2020-01-01/2020-01-31") to oppfylt(behandling1))
+        )
+
+        val uttaksplan2 =  Uttaksplan(
+            mapOf(LukketPeriode("2020-02-01/2020-02-20") to oppfylt(behandling2))
+        )
+
+        val sammenslåttUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(uttaksplan1, uttaksplan2, listOf(LukketPeriode("2020-01-10/2020-01-20")))
+        assertThat(sammenslåttUttaksplan.perioder.keys.size).isEqualTo(3)
+        assertThat(sammenslåttUttaksplan).isEqualTo(Uttaksplan(mapOf(
+            LukketPeriode("2020-01-01/2020-01-09") to oppfylt(behandling1),
+            LukketPeriode("2020-01-21/2020-01-31") to oppfylt(behandling1),
+            LukketPeriode("2020-02-01/2020-02-20") to oppfylt(behandling2)
+
         )))
     }
 

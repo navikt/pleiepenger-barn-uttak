@@ -6,10 +6,11 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 
 object UttaksplanMerger {
 
-    fun slåSammenUttaksplaner(forrigeUttaksplan: Uttaksplan, nyUttaksplan: Uttaksplan): Uttaksplan {
+    fun slåSammenUttaksplaner(forrigeUttaksplan: Uttaksplan, nyUttaksplan: Uttaksplan, trukketUttak: List<LukketPeriode>): Uttaksplan {
         val timelineForrigeUttaksplan = lagTimeline(forrigeUttaksplan)
+        val timelineForrigeUttaksplanMinusTrukketUttak = fjernTrukketUttak(timelineForrigeUttaksplan, trukketUttak)
         val timelineNyUttaksplan = lagTimeline(nyUttaksplan)
-        return  lagSammenslåttUttaksplan(timelineForrigeUttaksplan, timelineNyUttaksplan)
+        return lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
     }
 
     private fun lagTimeline(uttaksplan:Uttaksplan): LocalDateTimeline<UttaksperiodeInfo> {
@@ -26,4 +27,11 @@ object UttaksplanMerger {
         return Uttaksplan(perioder)
     }
 
+    private fun fjernTrukketUttak(timelineForrigeUttaksplan: LocalDateTimeline<UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>): LocalDateTimeline<UttaksperiodeInfo> {
+        val timelineTrukketUttak = LocalDateTimeline(trukketUttak.map { LocalDateSegment(it.fom, it.tom, null) })
+        return timelineForrigeUttaksplan.disjoint(timelineTrukketUttak)
+    }
+
 }
+
+

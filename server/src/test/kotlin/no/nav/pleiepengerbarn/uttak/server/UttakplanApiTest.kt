@@ -413,6 +413,31 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue()
     }
 
+    @Test
+    internal fun `Endringsøknad som inkluderer at en periode er trukket`() {
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(saksnummer, "2020-01-01/2020-01-20").opprettUttaksplan()
+        val uttaksplan = lagGrunnlag(saksnummer, "2020-01-15/2020-01-30").copy(
+            trukketUttak = listOf(LukketPeriode("2020-01-06/2020-01-08")),
+            tilsynsperioder = mapOf(LukketPeriode("2020-01-15/2020-01-30") to Duration.ofHours(4))
+        ).opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(7)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"), endringsstatus = Endringsstatus.UENDRET)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-09/2020-01-10"), endringsstatus = Endringsstatus.UENDRET)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-13/2020-01-14"), endringsstatus = Endringsstatus.UENDRET)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-15/2020-01-17"), endringsstatus = Endringsstatus.ENDRET,
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-20/2020-01-20"), endringsstatus = Endringsstatus.ENDRET,
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-21/2020-01-24"), endringsstatus = Endringsstatus.NY,
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-27/2020-01-30"), endringsstatus = Endringsstatus.NY,
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
+    }
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
