@@ -195,6 +195,30 @@ internal class KontraktValidatorTest {
         assertThat(valideringsfeil).contains(Valideringsfeil.BEHANDLING_UUID_FORMATFEIL)
     }
 
+    @Test
+    internal fun `Grunnlag med overlappende trukket uttaksperioder`() {
+        val grunnlag = grunnlag().copy(
+            trukketUttak = listOf(LukketPeriode("2021-02-01/2021-02-10"), LukketPeriode("2021-02-05/2021-02-15"))
+        )
+
+        val valideringsfeil = grunnlag.sjekk()
+
+        assertThat(valideringsfeil).hasSize(1)
+        assertThat(valideringsfeil).contains(Valideringsfeil.OVERLAPP_MELLOM_TRUKKET_UTTAKSPERIODER)
+    }
+
+    @Test
+    internal fun `Grunnlag med overlapp mellom søkt og trukket uttaksperioder`() {
+        val grunnlag = grunnlag().copy(
+            trukketUttak = listOf(LukketPeriode("2021-01-05/2021-02-15"))
+        )
+
+        val valideringsfeil = grunnlag.sjekk()
+
+        assertThat(valideringsfeil).hasSize(1)
+        assertThat(valideringsfeil).contains(Valideringsfeil.OVERLAPP_MELLOM_SØKT_UTTAK_OG_TRUKKET_UTTAK)
+    }
+
     private fun grunnlag(): Uttaksgrunnlag {
         return Uttaksgrunnlag(
             barn = Barn(aktørId = "123"),
@@ -223,10 +247,6 @@ internal class KontraktValidatorTest {
 
     private fun arbeidsgiver1(): Arbeidsforhold {
         return Arbeidsforhold("AG", "123456789", null, null)
-    }
-
-    private fun arbeidsgiver2(): Arbeidsforhold {
-        return Arbeidsforhold("AG", "987654321", null, null)
     }
 
 }

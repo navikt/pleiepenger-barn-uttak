@@ -23,6 +23,7 @@ object GrunnlagMapper {
                 søker = uttaksgrunnlag.søker,
                 pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
                 søktUttak = søknadsperioderSortert,
+                trukketUttak = uttaksgrunnlag.trukketUttak,
                 arbeid = uttaksgrunnlag.arbeid,
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
