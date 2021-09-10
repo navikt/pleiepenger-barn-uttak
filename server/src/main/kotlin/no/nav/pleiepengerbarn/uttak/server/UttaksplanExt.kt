@@ -57,7 +57,7 @@ internal fun Uttaksplan.slåSammenLikePerioder(): Uttaksplan {
         }
     }
 
-    return Uttaksplan(perioder = nyePerioder)
+    return Uttaksplan(perioder = nyePerioder, trukketUttak = this.trukketUttak)
 }
 
 private fun List<LukketPeriode>.slåSammenDersomBareHelgMellom(): List<LukketPeriode> {

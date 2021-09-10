@@ -37,7 +37,8 @@ enum class Endringsstatus {
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan(
-        @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf()
+    @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
+    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

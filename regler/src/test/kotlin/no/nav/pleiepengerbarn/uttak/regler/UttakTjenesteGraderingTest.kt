@@ -210,20 +210,23 @@ internal class UttakTjenesteGraderingTest {
                     helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(
-                            helePerioden to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = nesteBehandlingUUID(),
-                                uttaksgrad = Prosent(40),
-                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                                søkersTapteArbeidstid = Prosent(40),
-                                oppgittTilsyn = null,
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
-                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                annenPart = AnnenPart.ALENE,
-                                nattevåk = null,
-                                beredskap = null
-                            )
-                        ))
+                        "999" to Uttaksplan(
+                            perioder = mapOf(
+                                helePerioden to UttaksperiodeInfo.oppfylt(
+                                    kildeBehandlingUUID = nesteBehandlingUUID(),
+                                    uttaksgrad = Prosent(40),
+                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                                    søkersTapteArbeidstid = Prosent(40),
+                                    oppgittTilsyn = null,
+                                    årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
+                                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                                    annenPart = AnnenPart.ALENE,
+                                    nattevåk = null,
+                                    beredskap = null
+                                )
+                            ),
+                            trukketUttak = listOf()
+                        )
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
@@ -265,26 +268,31 @@ internal class UttakTjenesteGraderingTest {
                         helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(helePerioden to UttaksperiodeInfo.oppfylt(
-                            uttaksgrad = Prosent(60),
-                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                            årsak = Årsak.GRADERT_MOT_TILSYN,
-                            knekkpunktTyper = setOf(),
-                            graderingMotTilsyn = GraderingMotTilsyn(
-                                etablertTilsyn = Prosent(40),
-                                overseEtablertTilsynÅrsak = null,
-                                andreSøkeresTilsyn = NULL_PROSENT,
-                                andreSøkeresTilsynReberegnet = false,
-                                tilgjengeligForSøker = Prosent(60)
+                        "999" to Uttaksplan(
+                            perioder = mapOf(
+                                helePerioden to UttaksperiodeInfo.oppfylt(
+                                    uttaksgrad = Prosent(60),
+                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                                    årsak = Årsak.GRADERT_MOT_TILSYN,
+                                    knekkpunktTyper = setOf(),
+                                    graderingMotTilsyn = GraderingMotTilsyn(
+                                        etablertTilsyn = Prosent(40),
+                                        overseEtablertTilsynÅrsak = null,
+                                        andreSøkeresTilsyn = NULL_PROSENT,
+                                        andreSøkeresTilsynReberegnet = false,
+                                        tilgjengeligForSøker = Prosent(60)
+                                    ),
+                                    annenPart = AnnenPart.ALENE,
+                                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                                    pleiebehov = HUNDRE_PROSENT,
+                                    søkersTapteArbeidstid = Prosent(40),
+                                    oppgittTilsyn = null,
+                                    nattevåk = null,
+                                    beredskap = null
+                                )
                             ),
-                            annenPart = AnnenPart.ALENE,
-                            kildeBehandlingUUID = UUID.randomUUID().toString(),
-                            pleiebehov = HUNDRE_PROSENT,
-                            søkersTapteArbeidstid = Prosent(40),
-                            oppgittTilsyn = null,
-                            nattevåk = null,
-                            beredskap = null
-                        )))
+                            trukketUttak = listOf()
+                        )
                 ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(30)))
@@ -329,21 +337,24 @@ internal class UttakTjenesteGraderingTest {
                     helePeriodenSøktUttak
                 ),
                 andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(perioder = mapOf(
-                            helePerioden to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = nesteBehandlingUUID(),
-                                uttaksgrad = Prosent(40),
-                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                                søkersTapteArbeidstid = Prosent(40),
-                                oppgittTilsyn = null,
-                                årsak = Årsak.AVKORTET_MOT_INNTEKT,
-                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                knekkpunktTyper = setOf(),
-                                annenPart = AnnenPart.ALENE,
-                                nattevåk = null,
-                                beredskap = null
-                            )
-                        ))
+                        "999" to Uttaksplan(
+                            perioder = mapOf(
+                                helePerioden to UttaksperiodeInfo.oppfylt(
+                                    kildeBehandlingUUID = nesteBehandlingUUID(),
+                                    uttaksgrad = Prosent(40),
+                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                                    søkersTapteArbeidstid = Prosent(40),
+                                    oppgittTilsyn = null,
+                                    årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                                    knekkpunktTyper = setOf(),
+                                    annenPart = AnnenPart.ALENE,
+                                    nattevåk = null,
+                                    beredskap = null
+                                )
+                            ),
+                            trukketUttak = listOf()
+                        )
                 ),
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(45)

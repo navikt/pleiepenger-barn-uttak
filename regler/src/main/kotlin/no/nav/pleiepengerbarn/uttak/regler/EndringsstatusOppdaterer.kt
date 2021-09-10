@@ -26,7 +26,7 @@ object EndringsstatusOppdaterer {
             oppdatertePerioder[periode] = infoFraNyUttaksplan.copy(endringsstatus = endringsstatus)
         }
 
-        return Uttaksplan(perioder = oppdatertePerioder)
+        return nyUttaksplan.copy(perioder = oppdatertePerioder)
     }
 
 }

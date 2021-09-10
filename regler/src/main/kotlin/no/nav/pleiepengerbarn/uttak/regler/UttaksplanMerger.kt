@@ -10,7 +10,8 @@ object UttaksplanMerger {
         val timelineForrigeUttaksplan = lagTimeline(forrigeUttaksplan)
         val timelineForrigeUttaksplanMinusTrukketUttak = fjernTrukketUttak(timelineForrigeUttaksplan, trukketUttak)
         val timelineNyUttaksplan = lagTimeline(nyUttaksplan)
-        return lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
+        val uttaksperioder = lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
+        return Uttaksplan(perioder = uttaksperioder, trukketUttak = trukketUttak)
     }
 
     private fun lagTimeline(uttaksplan:Uttaksplan): LocalDateTimeline<UttaksperiodeInfo> {
@@ -18,13 +19,13 @@ object UttaksplanMerger {
         return LocalDateTimeline(segmenter)
     }
 
-    private fun lagSammenslåttUttaksplan(timelineForrigeUttaksplan: LocalDateTimeline<UttaksperiodeInfo>, timelineNyUttaksplan: LocalDateTimeline<UttaksperiodeInfo>): Uttaksplan {
+    private fun lagSammenslåttUttaksplan(timelineForrigeUttaksplan: LocalDateTimeline<UttaksperiodeInfo>, timelineNyUttaksplan: LocalDateTimeline<UttaksperiodeInfo>): Map<LukketPeriode, UttaksperiodeInfo> {
         val sammenslåttTimeline = timelineNyUttaksplan.crossJoin(timelineForrigeUttaksplan).compress()
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
         sammenslåttTimeline.toSegments().forEach {
             perioder[LukketPeriode(it.fom, it.tom)] = it.value
         }
-        return Uttaksplan(perioder)
+        return perioder
     }
 
     private fun fjernTrukketUttak(timelineForrigeUttaksplan: LocalDateTimeline<UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>): LocalDateTimeline<UttaksperiodeInfo> {
