@@ -119,7 +119,7 @@ internal object UttaksplanRegler {
     }
 
     private fun fastsettUttaksplanRegler(perioder: Map<LukketPeriode, UttaksperiodeInfo>, grunnlag: RegelGrunnlag): Uttaksplan {
-        var uttaksplan = Uttaksplan(perioder)
+        var uttaksplan = Uttaksplan(perioder, grunnlag.trukketUttak)
         UttaksplanRegler.forEach {uttaksplanRegler ->
             uttaksplan = uttaksplanRegler.kjør(
                 uttaksplan = uttaksplan,

@@ -27,7 +27,7 @@ internal class UttaksplanExtTest {
             periode1 to dummyUttaksperiodeInfo(),
             periode2 to dummyUttaksperiodeInfo(),
             periode3 to dummyUttaksperiodeInfo()
-        ))
+        ), trukketUttak = listOf())
 
         val nyUttaksplan = uttaksplan.slåSammenLikePerioder()
 
@@ -44,7 +44,7 @@ internal class UttaksplanExtTest {
             periode1 to dummyUttaksperiodeInfo(),
             periode2 to dummyUttaksperiodeInfo(),
             periode3 to dummyUttaksperiodeInfo()
-        ))
+        ), trukketUttak = listOf())
 
         val nyUttaksplan = uttaksplan.slåSammenLikePerioder()
 

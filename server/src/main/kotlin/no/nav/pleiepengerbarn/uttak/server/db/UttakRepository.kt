@@ -29,6 +29,9 @@ internal class UttakRepository {
     private lateinit var uttaksperiodeRepository: UttaksperiodeRepository
 
     @Autowired
+    private lateinit var trukketUttaksperiodeRepository: TrukketUttaksperiodeRepository
+
+    @Autowired
     private lateinit var mapper: ObjectMapper
 
     private companion object {
@@ -56,6 +59,7 @@ internal class UttakRepository {
         val uttaksresultatId = keyHolder.key as Long
 
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
+        trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, regelGrunnlag.trukketUttak)
     }
 
     internal fun hent(behandlingId:UUID):Uttaksplan? {
@@ -65,7 +69,8 @@ internal class UttakRepository {
                 mapOf("behandling_id" to behandlingId),
                 uttaksplanRowMapper)
             val perioder = uttaksperiodeRepository.hentPerioder(uttaksresultatId!!)
-            Uttaksplan(perioder = perioder)
+            val trukketUttaksperioder = trukketUttaksperiodeRepository.hentTrukketUttaksperioder(uttaksresultatId)
+            Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder)
         } catch (e: EmptyResultDataAccessException) {
             null
         }

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.Duration
+import java.time.LocalDate
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -435,6 +436,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-27/2020-01-30"), endringsstatus = Endringsstatus.NY,
             oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN, grad = Prosent(47), gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(47)))
+        assertThat(uttaksplan.trukketUttak).hasSize(1)
+        assertThat(uttaksplan.trukketUttak[0].fom).isEqualTo(LocalDate.parse("2020-01-06"))
+        assertThat(uttaksplan.trukketUttak[0].tom).isEqualTo(LocalDate.parse("2020-01-08"))
     }
 
 

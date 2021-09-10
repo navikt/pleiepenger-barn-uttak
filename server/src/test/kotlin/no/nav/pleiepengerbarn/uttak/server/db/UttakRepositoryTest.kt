@@ -203,25 +203,26 @@ internal class UttakRepositoryTest {
 
     private fun dummyUttaksplan(periode:LukketPeriode): Uttaksplan {
         return Uttaksplan(
-                perioder = mapOf(
-                        periode to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = UUID.randomUUID().toString(),
-                                uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                årsak = Årsak.FULL_DEKNING,
-                                pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
-                                knekkpunktTyper = setOf(),
-                                utbetalingsgrader = listOf(Utbetalingsgrader(
-                                        arbeidsforhold = arbeidsforhold1,
-                                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                        normalArbeidstid = FULL_DAG,
-                                        faktiskArbeidstid = Duration.ZERO)),
-                                søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                oppgittTilsyn = null,
-                                annenPart = AnnenPart.ALENE,
-                                nattevåk = null,
-                                beredskap = null)
+            perioder = mapOf(
+                    periode to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = UUID.randomUUID().toString(),
+                            uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            årsak = Årsak.FULL_DEKNING,
+                            pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                            knekkpunktTyper = setOf(),
+                            utbetalingsgrader = listOf(Utbetalingsgrader(
+                                    arbeidsforhold = arbeidsforhold1,
+                                    utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                                    normalArbeidstid = FULL_DAG,
+                                    faktiskArbeidstid = Duration.ZERO)),
+                            søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            oppgittTilsyn = null,
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null)
 
-                )
+            ),
+            trukketUttak = listOf()
         )
     }
 
