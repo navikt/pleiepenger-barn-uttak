@@ -15,7 +15,7 @@ internal class GrunnlagMapperTest {
     @Test
     internal fun `Duplikate arbeidsforholdreferanser med info satt skal feile`() {
         val arbeidsforholdReferanse = Arbeidsforhold(
-                type = "Sjømann",
+                type = "SN",
                 organisasjonsnummer = "123",
                 aktørId = "345",
                 arbeidsforholdId = "678"
@@ -54,10 +54,10 @@ internal class GrunnlagMapperTest {
         GrunnlagMapper.tilRegelGrunnlag(
                     uttaksgrunnlag = lagUttaksgrunnag(
                             arbeidsforholdReferanse1 = Arbeidsforhold(
-                                    type = "selvstendig"
+                                    type = "SN"
                             ),
                             arbeidsforholdReferanse2 = Arbeidsforhold(
-                                    type = "frilans"
+                                    type = "FL"
                             )
                     ),
                     andrePartersUttakplan = mapOf(),

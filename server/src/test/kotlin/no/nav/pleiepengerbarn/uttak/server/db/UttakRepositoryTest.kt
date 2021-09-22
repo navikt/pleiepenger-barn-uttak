@@ -31,7 +31,7 @@ internal class UttakRepositoryTest {
         private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
         private val heleMars = LukketPeriode(LocalDate.of(2020, Month.MARCH, 1), LocalDate.of(2020, Month.MARCH, 31))
 
-        private val arbeidsforhold1 = Arbeidsforhold(type = "arbeidsgiver", organisasjonsnummer = "123456789")
+        private val arbeidsforhold1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
 
         private const val aktørIdSøker = "123"
         private const val aktørIdBarn = "456"

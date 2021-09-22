@@ -7,7 +7,7 @@ internal fun Map<String, Map<LukketPeriode, ArbeidsforholdPeriodeInfo>>.somArbei
         = map { (ref, perioder ) ->
     Arbeid(
             arbeidsforhold = Arbeidsforhold(
-                    type = "arbeidsforhold",
+                    type = "AT",
                     arbeidsforholdId = ref
             ),
             perioder = perioder
@@ -17,7 +17,7 @@ internal fun Map<String, Map<LukketPeriode, ArbeidsforholdPeriodeInfo>>.somArbei
 internal fun Map<String, Prosent>.somUtbetalingsgrader() = map { (ref,utbetalingsgrad) ->
     Utbetalingsgrader(
             arbeidsforhold = Arbeidsforhold(
-                    type = "arbeidsforhold",
+                    type = "AT",
                     arbeidsforholdId = ref
             ),
             utbetalingsgrad = utbetalingsgrad,

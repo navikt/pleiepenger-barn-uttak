@@ -441,6 +441,53 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplan.trukketUttak[0].tom).isEqualTo(LocalDate.parse("2020-01-08"))
     }
 
+    @Test
+    internal fun `Søker med AT og SN og det er bare nok timer igjen til AT`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        //Lager uttak for søker 1 som bruker opp 50%
+        val grunnlagSøker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = "1001"
+        )
+        val uttaksplanSøker1 = opprettUttak(grunnlagSøker1)
+
+        //Lager uttak for søker 2 som har både AT og SN. AT skal prioriteres foran SN.
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(SELVSTENDIG1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofMinutes(12), jobberNå = INGENTING))),
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = "1002",
+        ).copy(andrePartersSaksnummer = listOf("1001"), kravprioritet = mapOf(søknadsperiode to listOf("1001")))
+        val uttaksplanSøker2 = opprettUttak(grunnlagSøker2)
+
+        uttaksplanSøker2.assertOppfylt(
+            perioder = listOf(søknadsperiode),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                SELVSTENDIG1 to Prosent.ZERO,
+                ARBEIDSFORHOLD1 to Prosent(51)
+            ),
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    private fun opprettUttak(grunnlag: Uttaksgrunnlag): Uttaksplan {
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID, true)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        return hentResponse.body ?: fail("Mangler uttaksplan")
+    }
+
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
