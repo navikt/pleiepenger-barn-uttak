@@ -360,7 +360,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to Prosent(45)
                 ).somTilsynperioder(),
                 behandlingUUID = nesteBehandlingUUID(),
-                arbeid = listOf(Arbeid(Arbeidsforhold(type="frilans"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING)))),
+                arbeid = listOf(Arbeid(Arbeidsforhold(type="FL"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING)))),
                 kravprioritet = mapOf(helePerioden to listOf("999"))
 
         )
