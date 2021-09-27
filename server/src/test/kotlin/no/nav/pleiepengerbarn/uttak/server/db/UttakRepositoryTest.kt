@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.server.db
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
+import no.nav.pleiepengerbarn.uttak.testklient.nesteSaksnummer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -178,6 +179,7 @@ internal class UttakRepositoryTest {
 
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                     aktørId = aktørIdSøker

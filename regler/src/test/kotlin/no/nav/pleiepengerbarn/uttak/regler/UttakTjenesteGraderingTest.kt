@@ -31,6 +31,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -74,6 +75,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med overlappende tilsynsperiode som er under 10 prosent skal ikke føre til redusert grad`() {
         val grunnlag = RegelGrunnlag(
+            saksnummer = nesteSaksnummer(),
             søker = Søker(
                 aktørId = aktørIdSøker
             ),
@@ -119,6 +121,7 @@ internal class UttakTjenesteGraderingTest {
     internal fun `En uttaksperiode med overlappende tilsynsperiode så skal periodene som overlapper med beredskap og nattevåk ikke få redusert grad`() {
         val perioden = LukketPeriode("2020-01-01/2020-01-20")
         val grunnlag = RegelGrunnlag(
+            saksnummer = nesteSaksnummer(),
             søker = Søker(
                 aktørId = aktørIdSøker
             ),
@@ -158,6 +161,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -197,6 +201,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -254,6 +259,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med tilsyn og uttak på annen part skal overstyres av søkers etablerte tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -324,6 +330,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -384,6 +391,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -426,6 +434,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -468,6 +477,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -508,6 +518,7 @@ internal class UttakTjenesteGraderingTest {
     internal fun `En uttaksperioder med tre arbeidsforhold som skal vurderes til gradering mot arbeid`() {
         val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = nesteBehandlingUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -554,6 +565,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -612,6 +624,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID =nesteBehandlingUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -648,9 +661,7 @@ internal class UttakTjenesteGraderingTest {
         sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 27), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), Årsak.GRADERT_MOT_TILSYN)
     }
 
-    private fun nesteBehandlingUUID(): BehandlingUUID = UUID.randomUUID().toString()
-
-
 }
 
-
+private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
+private fun nesteBehandlingUUID(): BehandlingUUID = UUID.randomUUID().toString()
