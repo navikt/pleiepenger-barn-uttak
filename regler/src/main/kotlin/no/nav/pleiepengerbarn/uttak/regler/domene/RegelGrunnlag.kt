@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.domene
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
@@ -20,7 +21,8 @@ data class RegelGrunnlag(
     val forrigeUttaksplan: Uttaksplan? = null,
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
-    val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf()
+    val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf(),
+    val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf()
 ) {
 
     internal fun finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {

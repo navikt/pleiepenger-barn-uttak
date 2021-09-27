@@ -33,7 +33,8 @@ object GrunnlagMapper {
                 forrigeUttaksplan = forrigeUttaksplan,
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
-                kravprioritet = uttaksgrunnlag.kravprioritet
+                kravprioritet = uttaksgrunnlag.kravprioritet,
+                kravprioritetForBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger
         )
     }
 

@@ -32,7 +32,8 @@ internal object KnekkpunktUtleder {
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
         finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
-        finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritet.keys)
+        finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritet.keys) //TODO: fjern når man har gått over til behandling istedet for saksnummer
+        finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritetForBehandlinger.keys)
         finnForBarnsDød(knekkpunkMap, regelGrunnlag.barn)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
 
