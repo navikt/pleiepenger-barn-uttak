@@ -5,6 +5,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
 
 data class RegelGrunnlag(
+    val saksnummer: Saksnummer,
     val behandlingUUID: BehandlingUUID,
     val barn: Barn,
     val søker: Søker,

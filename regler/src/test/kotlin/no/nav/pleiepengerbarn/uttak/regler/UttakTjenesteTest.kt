@@ -27,6 +27,7 @@ internal class UttakTjenesteTest {
     fun `Enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -67,6 +68,7 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som delvis overlapper med ferie`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -117,6 +119,7 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som fortsetter etter slutt på pleiebehov perioden, skal avslås fra slutt på pleiebehov perioden`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -158,6 +161,7 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for høy tilsynsgrad`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -210,6 +214,7 @@ internal class UttakTjenesteTest {
         val periode2 = LukketPeriode("2020-03-16/2020-03-20")
 
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -252,6 +257,7 @@ internal class UttakTjenesteTest {
         val periode = LukketPeriode("2020-03-09/2020-03-15")
 
         val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
                 behandlingUUID = UUID.randomUUID().toString(),
                 søker = Søker(
                         aktørId = aktørIdSøker
@@ -286,6 +292,7 @@ internal class UttakTjenesteTest {
 
     }
 
-    private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
-
 }
+
+private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
+private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()

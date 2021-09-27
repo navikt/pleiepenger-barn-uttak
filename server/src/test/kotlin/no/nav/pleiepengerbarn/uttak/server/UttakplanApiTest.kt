@@ -376,42 +376,45 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
-        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2", andrePartersSaksnummer = listOf("1"))
+        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2", andrePartersSaksnummer = listOf("2", "1"))
 
         val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
 
         assertThat(uttaksplanSøker2.perioder.keys).hasSize(1)
         assertThat(uttaksplanSøker2.perioder.keys.first()).isEqualTo(periode)
-        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualTo(Prosent(60))
+        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(60))
     }
 
     @Test
     internal fun `2 søkere med forskjellig etablert tilsyn`() {
-        val periode = LukketPeriode("2020-10-12/2020-10-16")
-        val grunnlagSøker1 = lagGrunnlag(
-            søknadsperiode = periode,
+        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
+
+        // Opprett uttaksplan 1 for søker 1
+        val saksnummerSøker1 = nesteSaksnummer()
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
             arbeid = listOf(
-                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
-            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
-        ).copy(tilsynsperioder = mapOf(periode to Duration.ofHours(4)), saksnummer = "1")
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(4)), saksnummer = saksnummerSøker1)
+        val uttaksplan1Søker1 = grunnlag1Søker1.opprettUttaksplan()
 
-        grunnlagSøker1.opprettUttaksplan()
-
+        // Opprett Uttaksplan 1 for søker 2
+        val saksnummerSøker2 = nesteSaksnummer()
         val grunnlagSøker2 = lagGrunnlag(
-            søknadsperiode = periode,
+            søknadsperiode = søknadsperiode,
             arbeid = listOf(
-                Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
-            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
-        ).copy(tilsynsperioder = mapOf(periode to Duration.ofHours(6)), saksnummer = "2", andrePartersSaksnummer = listOf("1"), kravprioritet = mapOf(periode to listOf("1")))
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(2)), saksnummer = saksnummerSøker2, andrePartersSaksnummer = listOf(saksnummerSøker1), kravprioritet = mapOf(søknadsperiode to listOf(saksnummerSøker2, saksnummerSøker1)))
+        val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
 
-        val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
-
-        assertThat(uttaksplanSøker2.perioder.keys).hasSize(1)
-        assertThat(uttaksplanSøker2.perioder.keys.first()).isEqualTo(periode)
-        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualTo(Prosent(20))
-        assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue()
+        assertThat(uttaksplan1Søker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplan1Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
+        assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(73))
+        assertThat(uttaksplan1Søker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue()
     }
 
     @Test
@@ -454,7 +457,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             saksnummer = "1001"
         )
-        val uttaksplanSøker1 = opprettUttak(grunnlagSøker1)
+        val uttaksplanSøker1 = grunnlagSøker1.opprettUttaksplan()
 
         //Lager uttak for søker 2 som har både AT og SN. AT skal prioriteres foran SN.
         val grunnlagSøker2 = lagGrunnlag(
@@ -466,7 +469,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             saksnummer = "1002",
         ).copy(andrePartersSaksnummer = listOf("1001"), kravprioritet = mapOf(søknadsperiode to listOf("1001")))
-        val uttaksplanSøker2 = opprettUttak(grunnlagSøker2)
+        val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
 
         uttaksplanSøker2.assertOppfylt(
             perioder = listOf(søknadsperiode),
@@ -480,20 +483,13 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
-    private fun opprettUttak(grunnlag: Uttaksgrunnlag): Uttaksplan {
-        val postResponse = testClient.opprettUttaksplan(grunnlag)
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID, true)
-        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
-        return hentResponse.body ?: fail("Mangler uttaksplan")
-    }
-
-
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val hentResponse = testClient.hentUttaksplan(this.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
-        return postResponse.body ?: fail("Mangler uttaksplan")
+        return hentResponse.body ?: fail("Mangler uttaksplan")
     }
 
     private fun Uttaksplan.assertOppfylt(perioder: List<LukketPeriode>, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING, endringsstatus: Endringsstatus) {

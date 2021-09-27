@@ -38,6 +38,7 @@ internal class BarnsDødPeriodeRegelTest {
 
     private fun grunnlagMedDødtBarn(dødsdatoBarn: LocalDate, rettVedDød: RettVedDød): RegelGrunnlag {
         return RegelGrunnlag(
+            saksnummer = nesteSaksnummer(),
             barn = Barn(aktørId = "123", dødsdato = dødsdatoBarn, rettVedDød = rettVedDød),
             //Feltene nedenfor er ikke relevante for testen
             behandlingUUID = UUID.randomUUID().toString(),
@@ -49,3 +50,5 @@ internal class BarnsDødPeriodeRegelTest {
     }
 
 }
+
+private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)

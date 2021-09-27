@@ -50,21 +50,31 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsyn(periode: LukketPeriode, pl
     val kravprioritetListe = kravprioritet[kravprioritetPeriode]
 
     var sumAndreSøkeresTilsyn = Prosent.ZERO
-    kravprioritetListe?.forEach { saksnummer ->
-        val uttaksplan = andrePartersUttaksplan[saksnummer]
-        val annenPartsOverlappendePeriodeInfo = uttaksplan?.finnOverlappendeUttaksperiode(periode)
-        if (annenPartsOverlappendePeriodeInfo != null) {
-            val graderBeregnet = BeregnGrader.beregn(
-                pleiebehov,
-                etablertTilsyn,
-                annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
-                sumAndreSøkeresTilsyn,
-                true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
-                finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
-                annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid())
-            sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
+
+    //TODO: må skrives om når vi får inn kravliste med behandlingId istedet.
+    if (kravprioritetListe != null) {
+        for (saksnummer in kravprioritetListe) {
+            if (saksnummer == this.saksnummer) {
+                break
+            } else if (andrePartersUttaksplan.contains(saksnummer)) {
+                val uttaksplan = andrePartersUttaksplan[saksnummer]
+                val annenPartsOverlappendePeriodeInfo = uttaksplan?.finnOverlappendeUttaksperiode(periode)
+                if (annenPartsOverlappendePeriodeInfo != null) {
+                    val graderBeregnet = BeregnGrader.beregn(
+                        pleiebehov,
+                        etablertTilsyn,
+                        annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
+                        sumAndreSøkeresTilsyn,
+                        true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
+                        finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
+                        annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid()
+                    )
+                    sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
+                }
+            }
         }
     }
+
 
     return sumAndreSøkeresTilsyn
 }

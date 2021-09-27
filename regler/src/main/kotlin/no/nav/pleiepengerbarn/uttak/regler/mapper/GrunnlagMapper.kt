@@ -18,6 +18,7 @@ object GrunnlagMapper {
         }
 
         return RegelGrunnlag(
+                saksnummer = uttaksgrunnlag.saksnummer,
                 behandlingUUID = uttaksgrunnlag.behandlingUUID,
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
