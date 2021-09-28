@@ -26,7 +26,9 @@ data class Uttaksgrunnlag (
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     @JsonProperty("beredskapsperioder") val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("nattevåksperioder") val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
-    @JsonProperty("kravprioritet") val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf()
+    @JsonProperty("kravprioritet") val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf(),
+    @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf()
+
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
