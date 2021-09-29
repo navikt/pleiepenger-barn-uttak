@@ -5,10 +5,16 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
+import java.util.*
 
 object GrunnlagMapper {
 
-    fun tilRegelGrunnlag(uttaksgrunnlag: Uttaksgrunnlag, andrePartersUttakplan:Map<Saksnummer, Uttaksplan>, forrigeUttaksplan: Uttaksplan?): RegelGrunnlag {
+    fun tilRegelGrunnlag(
+        uttaksgrunnlag: Uttaksgrunnlag,
+        andrePartersUttakplan:Map<Saksnummer, Uttaksplan>,
+        andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
+        forrigeUttaksplan: Uttaksplan?
+    ): RegelGrunnlag {
 
         val søknadsperioderSortert = uttaksgrunnlag.søktUttak.sortertPåFom()
 
@@ -30,6 +36,7 @@ object GrunnlagMapper {
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
                 andrePartersUttaksplan = andrePartersUttakplan,
+                andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
                 forrigeUttaksplan = forrigeUttaksplan,
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
+import java.util.*
 
 data class RegelGrunnlag(
     val saksnummer: Saksnummer,
@@ -18,6 +19,7 @@ data class RegelGrunnlag(
     val lovbestemtFerie: List<LukketPeriode> = listOf(),
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     val andrePartersUttaksplan: Map<Saksnummer, Uttaksplan> = mapOf(),
+    val andrePartersUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
     val forrigeUttaksplan: Uttaksplan? = null,
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
