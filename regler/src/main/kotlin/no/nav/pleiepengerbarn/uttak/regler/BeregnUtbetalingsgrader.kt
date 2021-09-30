@@ -63,7 +63,7 @@ object BeregnUtbetalingsgrader {
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             if (info.jobberNormalt > Duration.ZERO) {
-                val timerForbrukt = taptArbeidstidSomDekkes.prosent(fordelingsprosent)
+                val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.jobberNormalt - info.jobberNå)
                 val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
                 sumTimerForbrukt += timerForbrukt
@@ -71,6 +71,8 @@ object BeregnUtbetalingsgrader {
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(utbetalingsgrader, taptArbeidstidSomDekkes - sumTimerForbrukt)
     }
+
+    private fun min(duration1: Duration, duration2: Duration) = if (duration1 <duration2) duration1 else duration2
 
     private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
