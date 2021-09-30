@@ -464,7 +464,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
                 Arbeid(SELVSTENDIG1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofMinutes(12), jobberNå = INGENTING))),
-                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             saksnummer = "1002",
@@ -479,6 +479,33 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ARBEIDSFORHOLD1 to Prosent(51)
             ),
             oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
+    internal fun `Søker med AT og SN og det er nok timer igjen til begge`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(SELVSTENDIG1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = INGENTING))),
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(6))))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = nesteSaksnummer()
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(søknadsperiode),
+            grad = Prosent(45),
+            gradPerArbeidsforhold = mapOf(
+                SELVSTENDIG1 to HUNDRE_PROSENT,
+                ARBEIDSFORHOLD1 to Prosent(25)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
     }
