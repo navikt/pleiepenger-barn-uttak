@@ -174,16 +174,6 @@
                     </delimiters>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <environmentVariables>
-                        <BEREGN_GRADER_EXPERIMENTAL>true</BEREGN_GRADER_EXPERIMENTAL>
-                    </environmentVariables>
-                </configuration>
-            </plugin>
-
         </plugins>
         <resources>
             <resource>

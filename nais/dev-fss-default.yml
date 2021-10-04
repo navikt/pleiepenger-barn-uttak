@@ -62,6 +62,3 @@ spec:
     - name: APPDYNAMICS_AGENT_ACCOUNT_NAME
       value: NON-PROD
 
-    # Feature toggles
-    - name: BEREGN_GRADER_EXPERIMENTAL
-      value: "true"
