@@ -1,6 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.mapper
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -11,7 +11,6 @@ object GrunnlagMapper {
 
     fun tilRegelGrunnlag(
         uttaksgrunnlag: Uttaksgrunnlag,
-        andrePartersUttakplan:Map<Saksnummer, Uttaksplan>,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
         forrigeUttaksplan: Uttaksplan?
     ): RegelGrunnlag {
@@ -23,9 +22,14 @@ object GrunnlagMapper {
             throw IllegalStateException("Arbeidsforholdene i grunnlaget må være unike.")
         }
 
+        val kravprioritetForBehandlinger = mutableMapOf<LukketPeriode, List<UUID>>()
+        uttaksgrunnlag.kravprioritetForBehandlinger.forEach { (periode, kravprio) ->
+            kravprioritetForBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
+        }
+
         return RegelGrunnlag(
                 saksnummer = uttaksgrunnlag.saksnummer,
-                behandlingUUID = uttaksgrunnlag.behandlingUUID,
+                behandlingUUID = UUID.fromString(uttaksgrunnlag.behandlingUUID),
                 barn = uttaksgrunnlag.barn,
                 søker = uttaksgrunnlag.søker,
                 pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
@@ -35,13 +39,11 @@ object GrunnlagMapper {
                 tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
-                andrePartersUttaksplan = andrePartersUttakplan,
                 andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
                 forrigeUttaksplan = forrigeUttaksplan,
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
-                kravprioritet = uttaksgrunnlag.kravprioritet,
-                kravprioritetForBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger
+                kravprioritetForBehandlinger = kravprioritetForBehandlinger
         )
     }
 

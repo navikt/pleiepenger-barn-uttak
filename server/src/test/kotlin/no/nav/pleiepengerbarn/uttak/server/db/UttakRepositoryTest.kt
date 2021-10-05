@@ -180,7 +180,7 @@ internal class UttakRepositoryTest {
     private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
         return RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID().toString(),
+                behandlingUUID = UUID.randomUUID(),
                 søker = Søker(
                     aktørId = aktørIdSøker
                 ),

@@ -41,7 +41,7 @@ internal class BarnsDødPeriodeRegelTest {
             saksnummer = nesteSaksnummer(),
             barn = Barn(aktørId = "123", dødsdato = dødsdatoBarn, rettVedDød = rettVedDød),
             //Feltene nedenfor er ikke relevante for testen
-            behandlingUUID = UUID.randomUUID().toString(),
+            behandlingUUID = UUID.randomUUID(),
             søker = Søker("456"),
             pleiebehov = mapOf(),
             søktUttak = listOf(),

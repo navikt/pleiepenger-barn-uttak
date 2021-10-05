@@ -2,16 +2,17 @@ package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import java.util.*
 
 
 fun RegelGrunnlag.annenPart(periode: LukketPeriode): AnnenPart {
-    if (this.andrePartersUttaksplan.overlapperHelt(periode)) {
+    if (this.andrePartersUttaksplanPerBehandling.overlapperHelt(periode)) {
         return AnnenPart.MED_ANDRE
     }
     return AnnenPart.ALENE
 }
 
-private fun Map<Saksnummer, Uttaksplan>.overlapperHelt(periode: LukketPeriode): Boolean {
+private fun Map<UUID, Uttaksplan>.overlapperHelt(periode: LukketPeriode): Boolean {
     this.values.forEach { uttaksplan ->
         uttaksplan.perioder.forEach { uttaksperiode ->
             if (uttaksperiode.key.overlapperHelt(periode)) {
