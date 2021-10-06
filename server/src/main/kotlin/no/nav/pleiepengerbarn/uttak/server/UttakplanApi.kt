@@ -60,17 +60,9 @@ class UttakplanApi {
             throw ValideringException("Valideringsfeil: $valideringsfeil")
         }
 
-        //TODO denne bolken med kode skal etterhvert erstartes av koden nedenfor
-        val andrePartersUttaksplanerPerSak = mutableMapOf<Saksnummer, Uttaksplan>()
-        uttaksgrunnlag.andrePartersSaksnummer.forEach { saksnummer ->
-            val uttaksplan = uttakRepository.hent(saksnummer)
-            if (uttaksplan != null) {
-                andrePartersUttaksplanerPerSak[saksnummer] = uttaksplan
-            }
-        }
-
+        val unikeBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten().toSet().map {UUID.fromString(it)}
         val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
-        uttaksgrunnlag.andrePartersBehandling.map {UUID.fromString(it)} .forEach { behandlingUUID ->
+        unikeBehandlinger .forEach { behandlingUUID ->
             val uttaksplan = uttakRepository.hent(behandlingUUID)
             if (uttaksplan != null) {
                 andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
@@ -78,7 +70,7 @@ class UttakplanApi {
         }
 
         val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
-        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerSak, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
+        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {

@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalStateException
+import java.util.*
 
 internal class GrunnlagMapperTest {
 
@@ -27,7 +28,6 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = mapOf(),
                     andrePartersUttakplanPerBehandling = mapOf(),
                     forrigeUttaksplan = null
             )
@@ -44,7 +44,6 @@ internal class GrunnlagMapperTest {
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
                     ),
-                    andrePartersUttakplan = mapOf(),
                     andrePartersUttakplanPerBehandling = mapOf(),
                     forrigeUttaksplan = null
             )
@@ -62,7 +61,6 @@ internal class GrunnlagMapperTest {
                                     type = "FL"
                             )
                     ),
-                    andrePartersUttakplan = mapOf(),
                     andrePartersUttakplanPerBehandling = mapOf(),
                     forrigeUttaksplan = null
             )
@@ -78,7 +76,7 @@ internal class GrunnlagMapperTest {
                         aktørId = aktørIdBarn
                     ),
                     saksnummer = "1",
-                    behandlingUUID = "2",
+                    behandlingUUID = UUID.randomUUID().toString(),
                     søktUttak = listOf(SøktUttak(LukketPeriode("2020-01-01/2021-01-01"))),
                     pleiebehov = mapOf(),
                     arbeid = listOf(

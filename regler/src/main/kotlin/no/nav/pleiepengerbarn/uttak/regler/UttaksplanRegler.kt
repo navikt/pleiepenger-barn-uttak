@@ -75,7 +75,7 @@ internal object UttaksplanRegler {
                 pleiebehov = grader.pleiebehov.prosent,
                 graderingMotTilsyn = grader.graderingMotTilsyn,
                 knekkpunktTyper = knekkpunktTyper,
-                kildeBehandlingUUID = grunnlag.behandlingUUID,
+                kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                 annenPart = grunnlag.annenPart(søktUttaksperiode),
                 nattevåk = nattevåk,
                 beredskap = beredskap
@@ -96,7 +96,7 @@ internal object UttaksplanRegler {
                     pleiebehov = grader.pleiebehov.prosent,
                     graderingMotTilsyn = grader.graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyper,
-                    kildeBehandlingUUID = grunnlag.behandlingUUID,
+                    kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap
@@ -110,7 +110,7 @@ internal object UttaksplanRegler {
                     pleiebehov = grader.pleiebehov.prosent,
                     graderingMotTilsyn = grader.graderingMotTilsyn,
                     knekkpunktTyper = knekkpunktTyper,
-                    kildeBehandlingUUID = grunnlag.behandlingUUID,
+                    kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap

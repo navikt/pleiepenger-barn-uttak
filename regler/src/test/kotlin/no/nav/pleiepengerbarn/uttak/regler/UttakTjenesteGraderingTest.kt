@@ -214,11 +214,11 @@ internal class UttakTjenesteGraderingTest {
                 søktUttak = listOf(
                     helePeriodenSøktUttak
                 ),
-                andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(
+                andrePartersUttaksplanPerBehandling = mapOf(
+                        nesteBehandlingUUID() to Uttaksplan(
                             perioder = mapOf(
                                 helePerioden to UttaksperiodeInfo.oppfylt(
-                                    kildeBehandlingUUID = nesteBehandlingUUID(),
+                                    kildeBehandlingUUID = nesteBehandlingUUID().toString(),
                                     uttaksgrad = Prosent(40),
                                     utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                     søkersTapteArbeidstid = Prosent(40),
@@ -258,6 +258,7 @@ internal class UttakTjenesteGraderingTest {
 
     @Test
     internal fun `En uttaksperiode med tilsyn og uttak på annen part skal overstyres av søkers etablerte tilsyn`() {
+        val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val grunnlag = RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
                 behandlingUUID = nesteBehandlingUUID(),
@@ -273,8 +274,8 @@ internal class UttakTjenesteGraderingTest {
                 søktUttak = listOf(
                         helePeriodenSøktUttak
                 ),
-                andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(
+                andrePartersUttaksplanPerBehandling = mapOf(
+                        annenPartsBehandlingUUID to Uttaksplan(
                             perioder = mapOf(
                                 helePerioden to UttaksperiodeInfo.oppfylt(
                                     uttaksgrad = Prosent(60),
@@ -289,7 +290,7 @@ internal class UttakTjenesteGraderingTest {
                                         tilgjengeligForSøker = Prosent(60)
                                     ),
                                     annenPart = AnnenPart.ALENE,
-                                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                                    kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                                     pleiebehov = HUNDRE_PROSENT,
                                     søkersTapteArbeidstid = Prosent(40),
                                     oppgittTilsyn = null,
@@ -306,7 +307,7 @@ internal class UttakTjenesteGraderingTest {
                 tilsynsperioder = mapOf(
                         helePerioden to Prosent(30)
                 ).somTilsynperioder(),
-                kravprioritet = mapOf(helePerioden to listOf("999"))
+                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -329,6 +330,7 @@ internal class UttakTjenesteGraderingTest {
 
     @Test
     internal fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
+        val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val grunnlag = RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
                 søker = Søker(
@@ -343,11 +345,11 @@ internal class UttakTjenesteGraderingTest {
                 søktUttak = listOf(
                     helePeriodenSøktUttak
                 ),
-                andrePartersUttaksplan = mapOf(
-                        "999" to Uttaksplan(
+                andrePartersUttaksplanPerBehandling = mapOf(
+                        annenPartsBehandlingUUID to Uttaksplan(
                             perioder = mapOf(
                                 helePerioden to UttaksperiodeInfo.oppfylt(
-                                    kildeBehandlingUUID = nesteBehandlingUUID(),
+                                    kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                                     uttaksgrad = Prosent(40),
                                     utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                                     søkersTapteArbeidstid = Prosent(40),
@@ -368,7 +370,7 @@ internal class UttakTjenesteGraderingTest {
                 ).somTilsynperioder(),
                 behandlingUUID = nesteBehandlingUUID(),
                 arbeid = listOf(Arbeid(Arbeidsforhold(type="FL"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING)))),
-                kravprioritet = mapOf(helePerioden to listOf("999"))
+                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
 
         )
 
@@ -664,4 +666,4 @@ internal class UttakTjenesteGraderingTest {
 }
 
 private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
-private fun nesteBehandlingUUID(): BehandlingUUID = UUID.randomUUID().toString()
+private fun nesteBehandlingUUID() = UUID.randomUUID()

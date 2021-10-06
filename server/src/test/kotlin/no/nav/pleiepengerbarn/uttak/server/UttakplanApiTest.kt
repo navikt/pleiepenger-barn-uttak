@@ -402,13 +402,19 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         // Opprett Uttaksplan 1 for søker 2
         val saksnummerSøker2 = nesteSaksnummer()
+        val behandlingUUIDSøker2 = nesteBehandlingId()
         val grunnlagSøker2 = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
                 Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
-        ).copy(tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(2)), saksnummer = saksnummerSøker2, andrePartersSaksnummer = listOf(saksnummerSøker1), kravprioritet = mapOf(søknadsperiode to listOf(saksnummerSøker2, saksnummerSøker1)))
+        ).copy(
+            tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(2)),
+            saksnummer = saksnummerSøker2,
+            behandlingUUID = behandlingUUIDSøker2,
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, grunnlag1Søker1.behandlingUUID))
+        )
         val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
 
         assertThat(uttaksplan1Søker2.perioder.keys).hasSize(1)
@@ -468,7 +474,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             saksnummer = "1002",
-        ).copy(andrePartersSaksnummer = listOf("1001"), kravprioritet = mapOf(søknadsperiode to listOf("1001")))
+        ).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(grunnlagSøker1.behandlingUUID)))
         val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
 
         uttaksplanSøker2.assertOppfylt(

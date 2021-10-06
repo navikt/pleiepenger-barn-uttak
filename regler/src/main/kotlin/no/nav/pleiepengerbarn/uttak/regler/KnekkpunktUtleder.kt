@@ -24,7 +24,7 @@ internal object KnekkpunktUtleder {
         finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForPleiebehov(knekkpunkMap, regelGrunnlag.pleiebehov)
-        finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplan)
+        finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplanPerBehandling)
         if (regelGrunnlag.forrigeUttaksplan != null) {
             finnForForrigeUttaksplan(knekkpunkMap, regelGrunnlag.forrigeUttaksplan)
         }
@@ -32,7 +32,6 @@ internal object KnekkpunktUtleder {
         finnForArbeid(knekkpunkMap, regelGrunnlag.arbeid)
         finnForBeredskap(knekkpunkMap, regelGrunnlag.beredskapsperioder.keys)
         finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
-        finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritet.keys) //TODO: fjern når man har gått over til behandling istedet for saksnummer
         finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritetForBehandlinger.keys)
         finnForBarnsDød(knekkpunkMap, regelGrunnlag.barn)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
@@ -96,7 +95,7 @@ internal object KnekkpunktUtleder {
         pleiebehov.entries.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.PLEIEBEHOV)}
     }
 
-    private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:Map<Saksnummer, Uttaksplan>) {
+    private fun finnForAnnenPartsUttaksplan(knekkpunktMap:KnekkpunktMap, andrePartersUttaksplan:Map<UUID, Uttaksplan>) {
         andrePartersUttaksplan.forEach { (_, uttaksplan) ->
             uttaksplan.perioder.forEach {finnForPeriode(knekkpunktMap, it.key, KnekkpunktType.ANNEN_PARTS_UTTAK)}
         }

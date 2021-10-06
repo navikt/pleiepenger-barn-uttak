@@ -162,7 +162,7 @@ internal class UttakTjenesteTest {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID().toString(),
+                behandlingUUID = UUID.randomUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -258,7 +258,7 @@ internal class UttakTjenesteTest {
 
         val grunnlag = RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID().toString(),
+                behandlingUUID = UUID.randomUUID(),
                 søker = Søker(
                         aktørId = aktørIdSøker
                 ),
@@ -295,4 +295,4 @@ internal class UttakTjenesteTest {
 }
 
 private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
-private fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()
+private fun nesteBehandlingId() = UUID.randomUUID()
