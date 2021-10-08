@@ -39,6 +39,8 @@ internal fun lagGrunnlag(
     barn: Barn  = Barn(
         aktørId = "456"
     ),
+    nattevåk: Map<LukketPeriode, Utfall> = mapOf(),
+    bereskap: Map<LukketPeriode, Utfall> = mapOf(),
     saksnummer: Saksnummer = nesteSaksnummer(),
     behandlingUUID: BehandlingUUID = nesteBehandlingId()
 ): Uttaksgrunnlag {
@@ -50,7 +52,9 @@ internal fun lagGrunnlag(
         søktUttak = listOf(SøktUttak(søknadsperiode)),
         arbeid = arbeid,
         pleiebehov = pleiebehov,
-        tilsynsperioder = tilsynsperioder
+        tilsynsperioder = tilsynsperioder,
+        nattevåksperioder = nattevåk,
+        beredskapsperioder = bereskap
     )
 }
 

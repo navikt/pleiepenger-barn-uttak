@@ -516,6 +516,85 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
+    @Test
+    internal fun `Endringssøknad som overlapper og forlengder`() {
+        val etablertTilsyn = mapOf(
+            LukketPeriode("2021-08-02/2021-08-05") to Duration.parse("PT3H"),
+            LukketPeriode("2021-08-06/2021-08-06") to Duration.parse("PT5H"),
+            LukketPeriode("2021-08-09/2021-08-12") to Duration.parse("PT3H"),
+            LukketPeriode("2021-08-13/2021-08-13") to Duration.parse("PT5H"),
+            LukketPeriode("2021-08-16/2021-08-19") to Duration.parse("PT3H"),
+            LukketPeriode("2021-08-20/2021-08-20") to Duration.parse("PT5H"),
+            LukketPeriode("2021-08-23/2021-08-26") to Duration.parse("PT3H"),
+            LukketPeriode("2021-08-27/2021-08-27") to Duration.parse("PT5H"),
+            LukketPeriode("2021-08-30/2021-08-31") to Duration.parse("PT3H")
+        )
+
+        val søknadsperiode1 = LukketPeriode("2021-08-02/2021-08-31")
+        val søknadsperiode2 = LukketPeriode("2021-08-02/2021-09-03")
+        val saksnummer = nesteSaksnummer()
+
+        lagGrunnlag(
+            søknadsperiode = søknadsperiode1,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(3).plusMinutes(36))))
+            ),
+            pleiebehov = mapOf(søknadsperiode1 to Pleiebehov.PROSENT_100),
+            tilsynsperioder = etablertTilsyn,
+            nattevåk = mapOf(LukketPeriode("2021-08-02/2021-08-31") to Utfall.OPPFYLT),
+            saksnummer = saksnummer
+        ).opprettUttaksplan()
+
+
+        val uttaksplan = lagGrunnlag(
+            søknadsperiode = søknadsperiode2,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(
+                    LukketPeriode(søknadsperiode1.fom, søknadsperiode2.tom) to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(3).plusMinutes(36)))
+                )
+            ),
+            pleiebehov = mapOf(
+                LukketPeriode("2021-08-02/2021-08-29") to Pleiebehov.PROSENT_100,
+                LukketPeriode("2021-08-30/2021-09-03") to Pleiebehov.PROSENT_0
+            ),
+            tilsynsperioder = etablertTilsyn,
+            nattevåk = mapOf(LukketPeriode("2021-08-02/2021-08-31") to Utfall.OPPFYLT),
+            saksnummer = saksnummer
+        ).opprettUttaksplan()
+
+
+        assertThat(uttaksplan.perioder).hasSize(10)
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(
+                LukketPeriode("2021-08-02/2021-08-05"),
+                LukketPeriode("2021-08-06/2021-08-06"),
+                LukketPeriode("2021-08-09/2021-08-12"),
+                LukketPeriode("2021-08-13/2021-08-13"),
+                LukketPeriode("2021-08-16/2021-08-19"),
+                LukketPeriode("2021-08-20/2021-08-20"),
+                LukketPeriode("2021-08-23/2021-08-26"),
+                LukketPeriode("2021-08-27/2021-08-27")
+            ),
+            grad = Prosent(55),
+            gradPerArbeidsforhold = mapOf(ARBEIDSFORHOLD1 to Prosent(55)),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2021-08-30/2021-08-31"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(),
+            endringsstatus = Endringsstatus.ENDRET
+        )
+        uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2021-09-01/2021-09-03"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.TILSYNSPERIODE, KnekkpunktType.NATTEVÅKSPERIODE),
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)

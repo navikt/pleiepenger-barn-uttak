@@ -48,7 +48,7 @@ private fun UttaksperiodeInfo.nullstillUviktigeFelt(): UttaksperiodeInfo {
         gmt.copy(
             etablertTilsyn = gmt.etablertTilsyn.setScale(2, RoundingMode.HALF_UP),
             andreSøkeresTilsyn = gmt.andreSøkeresTilsyn.setScale(2, RoundingMode.HALF_UP),
-            tilgjengeligForSøker = gmt.tilgjengeligForSøker
+            tilgjengeligForSøker = gmt.tilgjengeligForSøker.setScale(2, RoundingMode.HALF_UP)
         )
     } else {
         null
