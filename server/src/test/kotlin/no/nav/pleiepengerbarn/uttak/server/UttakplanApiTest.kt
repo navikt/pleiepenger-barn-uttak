@@ -595,6 +595,50 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
+    @Test
+    internal fun `To paralelle behandling og så revurdering av den første med kravprioritet`() {
+        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(2))))
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid =  listOf(arbeidSøker1),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = nesteBehandlingId(),
+            saksnummer = nesteSaksnummer())
+
+
+        grunnlag1Søker1.opprettUttaksplan()
+
+
+        val arbeidSøker2 = Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(4))))
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid =  listOf(arbeidSøker2),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = nesteBehandlingId(),
+            saksnummer = nesteSaksnummer())
+
+
+        grunnlagSøker2.opprettUttaksplan()
+
+        val grunnlag2Søker1BehandlingId = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid =  listOf(arbeidSøker1),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = grunnlag2Søker1BehandlingId,
+            saksnummer = grunnlag1Søker1.saksnummer
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(grunnlag2Søker1BehandlingId, grunnlagSøker2.behandlingUUID))
+        )
+
+        val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        uttakplan2søker1.assertOppfylt(søknadsperiode, Prosent(75), mapOf(ARBEIDSFORHOLD1 to Prosent(75)), Årsak.AVKORTET_MOT_INNTEKT, Endringsstatus.UENDRET)
+    }
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
