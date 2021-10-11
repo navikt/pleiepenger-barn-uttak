@@ -54,9 +54,12 @@ private fun UttaksperiodeInfo.nullstillUviktigeFelt(): UttaksperiodeInfo {
         null
     }
     return this.copy(
+        // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
         kildeBehandlingUUID = "",
         knekkpunktTyper = setOf(),
         endringsstatus = null,
+        annenPart = AnnenPart.ALENE,
+        // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
         uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
         søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
         pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
