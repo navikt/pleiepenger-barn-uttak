@@ -15,13 +15,14 @@ enum class Arbeidstype(val kode: String) {
     SELVSTENDIG_NÆRINGSDRIVENDE("SN"),
     IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
     KUN_YTELSE("BA"),
-    INAKTIV("MIDL_INAKTIV")
+    INAKTIV("MIDL_INAKTIV"),
+    SYKEPENGER_AV_DAGPENGER("SP_AV_DP")
 }
 
 private val AKTIVITETS_GRUPPER = listOf(
     setOf(Arbeidstype.ARBEIDSTAKER),
     setOf(Arbeidstype.FRILANSER),
-    setOf(Arbeidstype.DAGPENGER),
+    setOf(Arbeidstype.DAGPENGER, Arbeidstype.SYKEPENGER_AV_DAGPENGER),
     setOf(Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE),
     setOf(
         Arbeidstype.IKKE_YRKESAKTIV,
