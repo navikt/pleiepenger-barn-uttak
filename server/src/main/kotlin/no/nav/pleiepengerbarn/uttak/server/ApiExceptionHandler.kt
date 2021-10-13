@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import no.nav.pleiepengerbarn.uttak.regler.ValideringException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

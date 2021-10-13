@@ -1,4 +1,4 @@
-package no.nav.pleiepengerbarn.uttak.server
+package no.nav.pleiepengerbarn.uttak.regler
 
 import java.lang.RuntimeException
 
