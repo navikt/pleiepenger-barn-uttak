@@ -639,6 +639,36 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
 
+    @Test
+    internal fun `Simulering av samme grunnlag skal gi at uttaksplanen ikke er endret`() {
+        val grunnlag = lagGrunnlag(periode = "2021-09-20/2021-09-24")
+        grunnlag.opprettUttaksplan()
+
+        val uttaksplanEndret = grunnlag.simulering()
+
+        assertThat(uttaksplanEndret).isFalse
+    }
+
+    @Test
+    internal fun `Simulering skal gi at uttaksplanen er endret når annen parts uttak er vedtatt`() {
+        val grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24")
+        grunnlagSøker1.opprettUttaksplan()
+
+        val grunnlagSøker2 = lagGrunnlag(periode = "2021-09-20/2021-09-21").copy(
+            arbeid = listOf(Arbeid(ARBEIDSFORHOLD4, mapOf(LukketPeriode("2021-09-20/2021-09-21") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))),
+            søker = Søker("124")
+        )
+        grunnlagSøker2.opprettUttaksplan()
+
+        val uttaksplanEndret = grunnlagSøker1.copy(
+            kravprioritetForBehandlinger = mapOf(
+                LukketPeriode("2021-09-20/2021-09-21") to listOf(grunnlagSøker2.behandlingUUID, grunnlagSøker1.behandlingUUID)
+            )
+        ).simulering()
+        assertThat(uttaksplanEndret).isTrue
+    }
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -646,6 +676,13 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
         return hentResponse.body ?: fail("Mangler uttaksplan")
+    }
+
+    private fun Uttaksgrunnlag.simulering(): Boolean {
+        val postResponse = testClient.simulerUttaksplan(this)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val simulering = postResponse.body ?: fail("Mangler simulering")
+        return simulering.uttakplanEndret
     }
 
     private fun Uttaksplan.assertOppfylt(perioder: List<LukketPeriode>, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING, endringsstatus: Endringsstatus) {

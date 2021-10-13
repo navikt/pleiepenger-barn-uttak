@@ -6,8 +6,14 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.lang.IllegalArgumentException
 import java.util.*
 
+fun  Uttaksgrunnlag.valider() {
+    val valideringsfeil = this.sjekk()
+    if (valideringsfeil.isNotEmpty()) {
+        throw ValideringException("Valideringsfeil: $valideringsfeil")
+    }
+}
 
-fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
+internal fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     val valideringsfeil = mutableSetOf<Valideringsfeil>()
     // Sjekk andre parters saksnummer
     andrePartersSaksnummer.apply { if (this.toSet().size != this.size) valideringsfeil.add(Valideringsfeil.ANDRE_PARTERS_SAKSNUMMER_DUPLIKAT) } //TODO fjernes når det er godt over til å bruke behandling istedet for sak

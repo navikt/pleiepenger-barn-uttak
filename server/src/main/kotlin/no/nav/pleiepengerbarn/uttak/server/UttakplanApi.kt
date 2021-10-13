@@ -4,11 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.EndringsstatusOppdaterer
-import no.nav.pleiepengerbarn.uttak.regler.UttakTjeneste
-import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
+import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
-import no.nav.pleiepengerbarn.uttak.regler.sjekk
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,24 +39,30 @@ class UttakplanApi {
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
         logger.info("Opprett uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
-        return lagUttaksplan(uttaksgrunnlag, true, uriComponentsBuilder)
+        uttaksgrunnlag.valider()
+        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        val nyUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, true)
+        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
+
+        return ResponseEntity
+            .created(uri)
+            .body(nyUttaksplan)
     }
 
     @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
-            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
         logger.info("Simulerer uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
-        return lagUttaksplan(uttaksgrunnlag, false, uriComponentsBuilder)
+        uttaksgrunnlag.valider()
+        val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
+        val uttaksplanEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        return ResponseEntity.ok(Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret))
     }
 
-    private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, lagre: Boolean, uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
-        val valideringsfeil = uttaksgrunnlag.sjekk()
-        if (valideringsfeil.isNotEmpty()) {
-            throw ValideringException("Valideringsfeil: $valideringsfeil")
-        }
-
+    private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, forrigeUttaksplan: Uttaksplan?, lagre: Boolean): Uttaksplan {
         val unikeBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten().toSet().map {UUID.fromString(it)}
         val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
         unikeBehandlinger .forEach { behandlingUUID ->
@@ -69,7 +72,6 @@ class UttakplanApi {
             }
         }
 
-        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
@@ -82,11 +84,7 @@ class UttakplanApi {
             uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
         }
 
-        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
-
-        return ResponseEntity
-                .created(uri)
-                .body(uttaksplan)
+        return uttaksplan
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
