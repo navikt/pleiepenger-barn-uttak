@@ -64,7 +64,7 @@ object BeregnUtbetalingsgrader {
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             if (info.jobberNormalt > Duration.ZERO) {
-                val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.jobberNormalt - info.jobberNå)
+                val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.taptArbeid())
                 val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
                 sumTimerForbrukt += timerForbrukt
@@ -78,13 +78,13 @@ object BeregnUtbetalingsgrader {
     private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
         arbeid.values.forEach {
-            sumTapt += (it.jobberNormalt - it.jobberNå)
+            sumTapt += it.taptArbeid()
         }
         val fordeling = mutableMapOf<Arbeidsforhold, Prosent>()
 
         arbeid.forEach {
             if (sumTapt != Duration.ZERO) {
-                val tapt = it.value.jobberNormalt - it.value.jobberNå
+                val tapt = it.value.taptArbeid()
                 fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8, RoundingMode.HALF_UP)/BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
                 fordeling[it.key] = Prosent.ZERO
@@ -116,6 +116,14 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforhold
         }
     }
 }
+
+private fun ArbeidsforholdPeriodeInfo.taptArbeid(): Duration {
+    if (jobberNå > jobberNormalt) {
+        return Duration.ZERO
+    }
+    return jobberNormalt - jobberNå
+}
+
 
 private data class UtbetalingsgraderOgGjenværendeTimerSomDekkes(
     val utbetalingsgrad: Map<Arbeidsforhold, Utbetalingsgrad>,

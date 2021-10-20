@@ -668,6 +668,43 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplanEndret).isTrue
     }
 
+    @Test
+    internal fun `Jobber nå er større enn normalt jobber skal føre til 0 utbetalingsgrad`() {
+        val grunnlag = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(
+            arbeid = listOf(Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2021-09-20/2021-09-24") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(110)))))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertIkkeOppfylt(LukketPeriode("2021-09-20/2021-09-24"), setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID), setOf(), Endringsstatus.NY)
+        assertThat(uttaksplan.perioder).hasSize(1)
+        val periode = uttaksplan.perioder[LukketPeriode("2021-09-20/2021-09-24")]!!
+        assertThat(periode.uttaksgrad).isEqualByComparingTo(Prosent(0))
+        assertThat(periode.utbetalingsgrader).hasSize(1)
+        assertThat(periode.utbetalingsgrader[0].utbetalingsgrad).isEqualByComparingTo(Prosent(0))
+    }
+
+
+    @Test
+    internal fun `Jobber nå er større enn normalt jobber hos en arbeidsgiver mens den jobber ikke hos den andre`() {
+        val grunnlag = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2021-09-20/2021-09-24") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = Duration.ofHours(4)))),
+                Arbeid(ARBEIDSFORHOLD4, mapOf(LukketPeriode("2021-09-20/2021-09-24") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = Duration.ZERO)))
+            )
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2021-09-20/2021-09-24"),
+            Prosent(50),
+            mapOf(
+                ARBEIDSFORHOLD1 to Prosent(0),
+                ARBEIDSFORHOLD4 to Prosent(100)
+            ),
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Endringsstatus.NY
+        )
+    }
 
     private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)

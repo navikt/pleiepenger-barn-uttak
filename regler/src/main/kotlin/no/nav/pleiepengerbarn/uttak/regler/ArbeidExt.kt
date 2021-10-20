@@ -16,6 +16,10 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
         sumJobberNormalt += it.jobberNormalt
     }
 
+    if (sumJobberNå > sumJobberNormalt) {
+        sumJobberNå = sumJobberNormalt
+    }
+
     if (sumJobberNormalt == Duration.ZERO) {
         return Prosent.ZERO
     }
@@ -26,7 +30,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
         throw IllegalStateException("Faktisk arbeid > normalt arbeid")
     }
     if (søkersTapteArbeidstid < Prosent.ZERO) {
-        throw IllegalStateException("Negativ gradering mot inntektstap ($søkersTapteArbeidstid)")
+        return Prosent.ZERO
     }
     return søkersTapteArbeidstid
 }
