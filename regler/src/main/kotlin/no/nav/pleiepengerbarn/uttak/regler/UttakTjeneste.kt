@@ -26,7 +26,7 @@ object UttakTjeneste {
 
     fun erResultatEndret(forrigeUttaksplan: Uttaksplan?, simulertUttaksplan: Uttaksplan): Boolean {
         if (forrigeUttaksplan == null) {
-            throw IllegalStateException("Fant ingen uttaksplan å sammenligne med")
+            return true //Alt er nytt, derfor endret
         }
         return simulertUttaksplan.perioder.any { (simulertPeriode, simulertInfo) ->
             val forrigeInfo = forrigeUttaksplan.perioder[simulertPeriode]
