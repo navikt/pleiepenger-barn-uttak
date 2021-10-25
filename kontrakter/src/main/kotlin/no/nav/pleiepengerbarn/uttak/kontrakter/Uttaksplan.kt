@@ -36,7 +36,7 @@ enum class Endringsstatus {
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-data class Uttaksplan(
+data class Uttaksplan @JsonCreator constructor(
     @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf()
 )
@@ -44,7 +44,7 @@ data class Uttaksplan(
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-data class Utbetalingsgrader(
+data class Utbetalingsgrader @JsonCreator constructor(
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
     @JsonProperty("normalArbeidstid") val normalArbeidstid: Duration,
     @JsonProperty("faktiskArbeidstid") val faktiskArbeidstid: Duration?,
@@ -160,7 +160,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-data class GraderingMotTilsyn(
+data class GraderingMotTilsyn @JsonCreator constructor(
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("overseEtablertTilsynÅrsak") val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
