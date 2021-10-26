@@ -398,7 +398,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
         ).copy(tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(4)), saksnummer = saksnummerSøker1)
-        val uttaksplan1Søker1 = grunnlag1Søker1.opprettUttaksplan()
+        grunnlag1Søker1.opprettUttaksplan()
 
         // Opprett Uttaksplan 1 for søker 2
         val saksnummerSøker2 = nesteSaksnummer()
@@ -420,7 +420,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplan1Søker2.perioder.keys).hasSize(1)
         assertThat(uttaksplan1Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
         assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(73))
-        assertThat(uttaksplan1Søker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue()
+        assertThat(uttaksplan1Søker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue
     }
 
     @Test
@@ -463,7 +463,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             saksnummer = "1001"
         )
-        val uttaksplanSøker1 = grunnlagSøker1.opprettUttaksplan()
+        grunnlagSøker1.opprettUttaksplan()
 
         //Lager uttak for søker 2 som har både AT og SN. AT skal prioriteres foran SN.
         val grunnlagSøker2 = lagGrunnlag(
@@ -515,6 +515,37 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             endringsstatus = Endringsstatus.NY
         )
     }
+
+
+    @Test
+    internal fun `Søker med AT, FL og SN og kun AT skal få utbetalingsgrad`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-04")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(SELVSTENDIG1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(2), jobberNå = Duration.ofHours(5)))),
+                Arbeid(FRILANS1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(2), jobberNå = Duration.ofHours(2)))),
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(2), jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = nesteSaksnummer()
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(søknadsperiode),
+            grad = Prosent(33),
+            gradPerArbeidsforhold = mapOf(
+                SELVSTENDIG1 to Prosent(0),
+                FRILANS1 to Prosent(0),
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
 
     @Test
     internal fun `Endringssøknad som overlapper og forlengder`() {

@@ -13,8 +13,8 @@ internal val ARBEIDSFORHOLD1 = Arbeidsforhold(type = "AT", organisasjonsnummer =
 internal val ARBEIDSFORHOLD2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val ARBEIDSFORHOLD3 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "121212121")
+internal val FRILANS1 = Arbeidsforhold(type = "FL")
 internal val ARBEIDSFORHOLD4 = Arbeidsforhold(type="AT", organisasjonsnummer = "987654321")
-//internal val ARBEIDSFORHOLD5 = Arbeidsforhold(type="AT", organisasjonsnummer = "987654321", arbeidsforholdId = UUID.randomUUID().toString())
 
 internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String): Uttaksgrunnlag {
     val søknadsperiode = LukketPeriode(periode)
