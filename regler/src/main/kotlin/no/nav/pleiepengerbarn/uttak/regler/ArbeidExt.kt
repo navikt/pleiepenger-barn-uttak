@@ -12,7 +12,11 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
     this.values.forEach {
-        sumJobberNå += it.jobberNå
+        sumJobberNå += if (it.jobberNå > it.jobberNormalt) {
+            it.jobberNormalt //Aldri tell mer enn max per dag
+        } else {
+            it.jobberNå
+        }
         sumJobberNormalt += it.jobberNormalt
     }
 
