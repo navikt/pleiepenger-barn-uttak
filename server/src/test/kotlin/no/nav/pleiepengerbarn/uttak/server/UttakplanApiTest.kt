@@ -208,10 +208,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100)
         ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
 
-        val postResponse = testClient.opprettUttaksplan(grunnlag)
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
-        assertThat(uttaksplan.perioder).hasSize(3)
+        val uttaksplan = grunnlag.opprettUttaksplan()
 
         uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"), endringsstatus = Endringsstatus.NY)
         uttaksplan.assertIkkeOppfylt(
@@ -786,6 +783,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 assertThat(periodeInfo.årsaker).isEqualTo(ikkeOppfyltÅrsaker)
                 assertThat(periodeInfo.knekkpunktTyper).isEqualTo(knekkpunktTyper)
                 assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
+                assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(Prosent(0))
+                periodeInfo.utbetalingsgrader.forEach {
+                    assertThat(it.utbetalingsgrad).isEqualByComparingTo(Prosent(0))
+                }
             }
             else -> fail("Perioden $periode er oppfylt")
         }
