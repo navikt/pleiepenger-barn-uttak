@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler.delregler
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
+import java.math.RoundingMode
 
 internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
 
@@ -17,7 +18,13 @@ internal class InngangsvilkårIkkeOppfyltRegel : UttaksplanRegel {
                 //Inngangsvilkår ikke oppfylt
                 if (info.utfall == Utfall.OPPFYLT) {
                     //Sett til ikke oppfylt dersom oppfylt
-                    nyePerioder[periode] = info.copy(årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT), utfall = Utfall.IKKE_OPPFYLT, inngangsvilkår = inngangsvilkår)
+                    nyePerioder[periode] = info.copy(
+                        årsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
+                        utfall = Utfall.IKKE_OPPFYLT,
+                        inngangsvilkår = inngangsvilkår,
+                        uttaksgrad = Prosent(0).setScale(2, RoundingMode.HALF_UP),
+                        utbetalingsgrader = info.utbetalingsgrader.map {it.copy(utbetalingsgrad = Prosent(0).setScale(2, RoundingMode.HALF_UP))}
+                    )
                 } else {
                     //Legg til inngangsvilkår ikke oppfylt dersom perioden allerede er ikke oppfylt
                     val årsaker = info.årsaker.toMutableSet()
