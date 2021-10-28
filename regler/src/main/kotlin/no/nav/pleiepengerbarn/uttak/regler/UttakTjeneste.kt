@@ -28,9 +28,16 @@ object UttakTjeneste {
         if (forrigeUttaksplan == null) {
             return true //Alt er nytt, derfor endret
         }
+
+        val forrigeUttaksplanPerioder = forrigeUttaksplan.perioder.keys
+        val simulertePerioder = simulertUttaksplan.perioder.keys
+        if (forrigeUttaksplanPerioder != simulertePerioder) {
+            return true // ikke samme perioder i forrige uttaksplan og simulert
+        }
+
         return simulertUttaksplan.perioder.any { (simulertPeriode, simulertInfo) ->
-            val forrigeInfo = forrigeUttaksplan.perioder[simulertPeriode]
-                ?: return true // Perioden fantes ikke i forrige uttaksplan
+            val forrigeInfo = forrigeUttaksplan.perioder[simulertPeriode]!! //Kan ikke være null fordi vi sammenligner periodene over
+
             if (!simulertInfo.sammenlign(forrigeInfo)) {
                 return true // Perioden har forskjellig resultat
             }
