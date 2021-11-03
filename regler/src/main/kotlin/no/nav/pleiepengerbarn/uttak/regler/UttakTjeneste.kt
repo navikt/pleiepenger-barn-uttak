@@ -35,14 +35,7 @@ object UttakTjeneste {
             return true // ikke samme perioder i forrige uttaksplan og simulert
         }
 
-        return simulertUttaksplan.perioder.any { (simulertPeriode, simulertInfo) ->
-            val forrigeInfo = forrigeUttaksplan.perioder[simulertPeriode]!! //Kan ikke være null fordi vi sammenligner periodene over
-
-            if (!simulertInfo.sammenlign(forrigeInfo)) {
-                return true // Perioden har forskjellig resultat
-            }
-            return false // Resultatet er uendret
-        }
+        return simulertUttaksplan.perioder.any { (simulertPeriode, simulertInfo) -> !simulertInfo.sammenlign(forrigeUttaksplan.perioder[simulertPeriode]!!) } 
     }
 
 }
