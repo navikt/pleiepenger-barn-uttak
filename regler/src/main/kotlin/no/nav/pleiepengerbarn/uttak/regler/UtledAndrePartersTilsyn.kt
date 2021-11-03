@@ -34,7 +34,7 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
 private fun Map<UUID, Uttaksplan>.endret(periode: LukketPeriode, sjekkSøkersVerdi: (UttaksperiodeInfo) -> Boolean): Boolean {
     return this.any { (_, uttaksplan) ->
         val periodeInfo = uttaksplan.finnOverlappendeUttaksperiode(periode)
-        return periodeInfo != null && sjekkSøkersVerdi(periodeInfo)
+        periodeInfo != null && sjekkSøkersVerdi(periodeInfo)
     }
 }
 
