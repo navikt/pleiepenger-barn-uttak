@@ -24,46 +24,4 @@ object UttakTjeneste {
         )
     }
 
-    fun erResultatEndret(forrigeUttaksplan: Uttaksplan?, simulertUttaksplan: Uttaksplan): Boolean {
-        if (forrigeUttaksplan == null) {
-            return true //Alt er nytt, derfor endret
-        }
-
-        val forrigeUttaksplanPerioder = forrigeUttaksplan.perioder.keys
-        val simulertePerioder = simulertUttaksplan.perioder.keys
-        if (forrigeUttaksplanPerioder != simulertePerioder) {
-            return true // ikke samme perioder i forrige uttaksplan og simulert
-        }
-
-        return simulertUttaksplan.perioder.any { (simulertPeriode, simulertInfo) -> !simulertInfo.sammenlign(forrigeUttaksplan.perioder[simulertPeriode]!!) } 
-    }
-
-}
-
-private fun UttaksperiodeInfo.sammenlign(annenUttaksperiodeInfo: UttaksperiodeInfo): Boolean {
-    if (this.utfall != annenUttaksperiodeInfo.utfall) {
-        return false
-    }
-    if (this.uttaksgrad.compareTo(annenUttaksperiodeInfo.uttaksgrad) != 0) {
-        return false
-    }
-    val andreUtbetalingsgrader = annenUttaksperiodeInfo.utbetalingsgrader.tilMap()
-    val utbetalingsgrader = this.utbetalingsgrader.tilMap()
-    for (arbeidsforhold in utbetalingsgrader.keys) {
-        if (utbetalingsgrader[arbeidsforhold]!!.compareTo(andreUtbetalingsgrader[arbeidsforhold]) != 0) {
-            return false
-        }
-    }
-    if (this.årsaker != annenUttaksperiodeInfo.årsaker) {
-        return false
-    }
-
-    return true // Ingen forskjeller
-}
-
-
-private fun List<Utbetalingsgrader>.tilMap(): Map<Arbeidsforhold, Prosent> {
-    val utbetalingsgradMap = mutableMapOf<Arbeidsforhold, Prosent>()
-    this.forEach { utbetalingsgradMap[it.arbeidsforhold] = it.utbetalingsgrad }
-    return utbetalingsgradMap
 }

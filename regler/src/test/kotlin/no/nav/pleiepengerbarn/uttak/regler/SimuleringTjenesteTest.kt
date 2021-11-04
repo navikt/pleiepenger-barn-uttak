@@ -1,12 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.*
 
-internal class UttakTjenesteSimuleringTest {
+
+internal class SimuleringTjenesteTest {
 
     private companion object {
         private val INGENTING = Duration.ZERO
@@ -18,18 +19,18 @@ internal class UttakTjenesteSimuleringTest {
         val forrigeUttaksplan = Uttaksplan()
         val simulertUttaksplan = Uttaksplan()
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isFalse
+        Assertions.assertThat(resultatEndret).isFalse
     }
 
     @Test
     fun `Forrige uttaksplan er null skal gi endring`() {
         val simulertUttaksplan = Uttaksplan()
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(null, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(null, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isTrue
     }
 
     @Test
@@ -51,13 +52,38 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isFalse
+        Assertions.assertThat(resultatEndret).isFalse
     }
 
     @Test
     fun `Forskjellige perioder skal gi endring`() {
+        val forrigeUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode("2020-10-01/2020-10-02") to oppfylt(),
+                LukketPeriode("2020-10-05/2020-10-09") to oppfylt(),
+                LukketPeriode("2020-10-12/2020-10-16") to oppfylt(),
+                LukketPeriode("2020-10-19/2020-10-23") to oppfylt(),
+                LukketPeriode("2020-10-26/2020-10-30") to oppfylt(),
+            )
+        )
+        val simulertUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode("2020-10-05/2020-10-09") to oppfylt(),
+                LukketPeriode("2020-10-12/2020-10-16") to oppfylt(),
+                LukketPeriode("2020-10-19/2020-10-23") to oppfylt(),
+                LukketPeriode("2020-10-26/2020-10-30") to oppfylt(),
+            )
+        )
+
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+
+        Assertions.assertThat(resultatEndret).isTrue
+    }
+
+    @Test
+    fun `Forskjellige perioder som kan slås sammen skal gi ikke endring`() {
         val forrigeUttaksplan = Uttaksplan(
             perioder = mapOf(
                 LukketPeriode("2020-10-05/2020-10-09") to oppfylt(),
@@ -76,10 +102,37 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isFalse
     }
+
+
+    @Test
+    fun `Forskjellige perioder som ikke kan slås sammen pga forskjellig info skal gi endring`() {
+        val forrigeUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode("2020-10-05/2020-10-09") to oppfylt(),
+                LukketPeriode("2020-10-12/2020-10-16") to oppfylt(),
+                LukketPeriode("2020-10-19/2020-10-23") to oppfylt(),
+                LukketPeriode("2020-10-26/2020-10-30") to oppfylt(),
+            )
+        )
+        val simulertUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode("2020-10-05/2020-10-09") to oppfylt(),
+                LukketPeriode("2020-10-12/2020-10-16") to oppfylt(),
+                LukketPeriode("2020-10-19/2020-10-20") to ikkeOppfylt(Årsak.FOR_LAV_ØNSKET_UTTAKSGRAD),
+                LukketPeriode("2020-10-21/2020-10-23") to oppfylt(),
+                LukketPeriode("2020-10-26/2020-10-30") to oppfylt(),
+            )
+        )
+
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+
+        Assertions.assertThat(resultatEndret).isTrue
+    }
+
 
     @Test
     fun `Samme periode med forskjellig uttaksgrad skal gi endring`() {
@@ -94,9 +147,9 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isTrue
     }
 
     @Test
@@ -112,9 +165,9 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isTrue
     }
 
     @Test
@@ -130,9 +183,9 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isTrue
     }
 
     @Test
@@ -148,9 +201,9 @@ internal class UttakTjenesteSimuleringTest {
             )
         )
 
-        val resultatEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isTrue
     }
 
     private fun oppfylt(): UttaksperiodeInfo {
