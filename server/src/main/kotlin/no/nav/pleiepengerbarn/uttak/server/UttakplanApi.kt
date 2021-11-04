@@ -58,7 +58,7 @@ class UttakplanApi {
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
-        val uttaksplanEndret = UttakTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
         return ResponseEntity.ok(Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret))
     }
 
