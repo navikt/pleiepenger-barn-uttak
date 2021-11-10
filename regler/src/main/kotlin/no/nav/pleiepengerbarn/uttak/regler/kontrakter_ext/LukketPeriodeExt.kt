@@ -1,7 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
+import no.nav.fpsak.tidsserie.LocalDateSegment
+import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
+import java.lang.IllegalArgumentException
 
 internal fun LukketPeriode.overlapperHelt(annen: LukketPeriode) =
         (fom == annen.fom || fom.isBefore(annen.fom)) &&
@@ -14,3 +17,13 @@ internal fun LukketPeriode.overlapperDelvis(annen: LukketPeriode) =
 
 internal fun <T> Map<LukketPeriode, T>.sortertPåFom() = toSortedMap(compareBy { it.fom })
 internal fun Collection<SøktUttak>.sortertPåFom() = sortedBy { it.periode.fom }
+
+fun Collection<LukketPeriode>.sjekkOmOverlapp(): Boolean {
+    val segmenter = map { LocalDateSegment(it.fom, it.tom, true) }
+    try {
+        LocalDateTimeline(segmenter)
+    } catch (e: IllegalArgumentException) {
+        return true
+    }
+    return false
+}

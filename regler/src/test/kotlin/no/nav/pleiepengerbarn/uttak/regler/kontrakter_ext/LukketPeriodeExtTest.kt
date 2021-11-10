@@ -45,4 +45,13 @@ internal class LukketPeriodeExtTest {
         assertThat(LukketPeriode("2021-01-21/2021-01-25").overlapperDelvis(LukketPeriode("2021-01-10/2021-01-20"))).isFalse
     }
 
+    @Test
+    fun `Test av sjekkOmOverlapp`() {
+        assertThat(perioder("2021-01-01/2021-01-10", "2021-01-11/2021-01-20").sjekkOmOverlapp()).isFalse
+        assertThat(perioder("2021-01-01/2021-01-10", "2021-01-05/2021-01-20").sjekkOmOverlapp()).isTrue
+        assertThat(perioder("2021-01-01/2021-01-20", "2021-01-05/2021-01-15").sjekkOmOverlapp()).isTrue
+    }
+
+    private fun perioder(vararg perioderSomStrenger: String) = perioderSomStrenger.map { LukketPeriode(it) }
+
 }
