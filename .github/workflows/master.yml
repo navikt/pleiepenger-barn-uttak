@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - '**.md'
       - '.gitignore'
-      - 'LICENCE'
+      - 'LICENSE'
       - 'CODEOWNERS'
 
 env:
@@ -43,18 +43,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lukk gamle issues
-        uses: actions/github-script@v4
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.listForRepo({
+            github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               labels: ['deployment']
             }).then(response => {
               response.data.forEach(issue => {
-                github.issues.update({
+                github.rest.issues.update({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.number,
@@ -66,29 +66,29 @@ jobs:
       -  name: Opprett deployment issue
          id: createdeployissue
          if: success()
-         uses: actions/github-script@v4
+         uses: actions/github-script@v5
          with:
            github-token: ${{secrets.GITHUB_TOKEN}}
            script: |
-             github.issues.create( {
+             github.rest.issues.create( {
                owner: context.issue.owner,
                repo: context.issue.repo,
                labels: ['deployment'],
-               body: 'Kommenter enten "/promote dev-fss default" eller "/promote prod-fss default"',
+               body: 'Kommenter enten "/promote dev-fss k9saksbehandling" eller "/promote prod-fss k9saksbehandling"',
                title: 'Deploy av ${{ env.TAG }}'})
              .then(response => {
                      core.setOutput('number', response.data.number);
               });
 
       - name: Trigger deploy til dev
-        uses: actions/github-script@v4
+        uses: actions/github-script@v5
         with:
           github-token: ${{secrets.GH_TOKEN}}
           script: |
             const issue = { owner: context.issue.owner,
                             repo: context.issue.repo,
                             issue_number: ${{ steps.createdeployissue.outputs.number }} }
-            github.issues.createComment({...issue,
+            github.rest.issues.createComment({...issue,
                                     title: 'Deploy av ${{ env.TAG }}',
-                                    body: '/promote dev-fss default'})
+                                    body: '/promote dev-fss k9saksbehandling'})
 
