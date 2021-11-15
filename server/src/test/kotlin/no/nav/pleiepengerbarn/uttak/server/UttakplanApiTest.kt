@@ -766,10 +766,29 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
-    private fun Uttaksgrunnlag.opprettUttaksplan(): Uttaksplan {
+    @Test
+    internal fun `Skal slå sammen perioder selv om de har forskjellige knekkpunktTyper`() {
+        var grunnlag = lagGrunnlag(periode = "2021-09-20/2021-09-24")
+        grunnlag = grunnlag.copy(
+            kravprioritetForBehandlinger = mapOf(LukketPeriode("2021-09-22/2021-09-24") to listOf(grunnlag.behandlingUUID))
+        )
+
+        val uttaksplan = grunnlag.opprettUttaksplan(slåSammenPerioder = true)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2021-09-20/2021-09-24"),
+            HUNDRE_PROSENT,
+            mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING,
+            Endringsstatus.NY
+        )
+    }
+
+    private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-        val hentResponse = testClient.hentUttaksplan(this.behandlingUUID)
+        val hentResponse = testClient.hentUttaksplan(this.behandlingUUID, slåSammenPerioder)
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
         return hentResponse.body ?: fail("Mangler uttaksplan")
