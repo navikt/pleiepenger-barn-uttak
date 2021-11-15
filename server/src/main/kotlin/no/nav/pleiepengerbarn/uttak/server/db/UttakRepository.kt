@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sjekkOmOverlapp
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
@@ -58,6 +59,12 @@ internal class UttakRepository {
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         val uttaksresultatId = keyHolder.key as Long
 
+        if (uttaksplan.perioder.keys.sjekkOmOverlapp()) {
+            throw IllegalArgumentException("Lagre uttaksplan: Overlapp mellom perioder i uttak. ${uttaksplan.perioder.keys}")
+        }
+        if (regelGrunnlag.trukketUttak.sjekkOmOverlapp()) {
+            throw IllegalArgumentException("Lagre uttaksplab: Overlapp mellom perioder i trukket uttak. ${regelGrunnlag.trukketUttak}")
+        }
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
         trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, regelGrunnlag.trukketUttak)
     }
@@ -70,6 +77,12 @@ internal class UttakRepository {
                 uttaksplanRowMapper)
             val perioder = uttaksperiodeRepository.hentPerioder(uttaksresultatId!!)
             val trukketUttaksperioder = trukketUttaksperiodeRepository.hentTrukketUttaksperioder(uttaksresultatId)
+            if (perioder.keys.sjekkOmOverlapp()) {
+                throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i uttak. ${perioder.keys}")
+            }
+            if (trukketUttaksperioder.sjekkOmOverlapp()) {
+                throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i trukket uttak. $trukketUttaksperioder")
+            }
             Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder)
         } catch (e: EmptyResultDataAccessException) {
             null
