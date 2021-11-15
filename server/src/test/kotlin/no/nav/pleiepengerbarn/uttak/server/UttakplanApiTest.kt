@@ -373,7 +373,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
-        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2", andrePartersSaksnummer = listOf("2", "1"))
+        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2")
 
         val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
 

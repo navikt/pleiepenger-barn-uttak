@@ -14,8 +14,6 @@ data class Uttaksgrunnlag (
     @JsonProperty("søker") val søker: Søker,
     @JsonProperty("saksnummer") val saksnummer: Saksnummer,
     @JsonProperty("behandlingUUID") val behandlingUUID: BehandlingUUID,
-    @JsonProperty("andrePartersSaksnummer") val andrePartersSaksnummer: List<Saksnummer> = listOf(),
-    @JsonProperty("andrePartersBehandling") val andrePartersBehandling: List<BehandlingUUID> = listOf(),
 
     @JsonProperty("søktUttak") val søktUttak: List<SøktUttak>,
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
@@ -27,7 +25,6 @@ data class Uttaksgrunnlag (
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     @JsonProperty("beredskapsperioder") val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("nattevåksperioder") val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
-    @JsonProperty("kravprioritet") val kravprioritet: Map<LukketPeriode, List<Saksnummer>> = mapOf(),
     @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf()
 
 )

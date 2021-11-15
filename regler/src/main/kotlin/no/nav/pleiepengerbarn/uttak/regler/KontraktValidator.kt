@@ -15,11 +15,6 @@ fun  Uttaksgrunnlag.valider() {
 
 internal fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     val valideringsfeil = mutableSetOf<Valideringsfeil>()
-    // Sjekk andre parters saksnummer
-    andrePartersSaksnummer.apply { if (this.toSet().size != this.size) valideringsfeil.add(Valideringsfeil.ANDRE_PARTERS_SAKSNUMMER_DUPLIKAT) } //TODO fjernes når det er godt over til å bruke behandling istedet for sak
-    // Sjekk andre parters behandling
-    andrePartersBehandling.apply { if (this.toSet().size != this.size) valideringsfeil.add(Valideringsfeil.ANDRE_PARTERS_BEHANDLING_DUPLIKAT)}
-    andrePartersBehandling.forEach { sjekkUUID(it) {valideringsfeil.add(Valideringsfeil.BEHANDLING_UUID_FORMATFEIL_I_ANDRE_PARTER)} }
     // Sjekk kravprioritet
     if (sjekkOmDetFinnesOverlappendePerioder(kravprioritetForBehandlinger.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_KRAVPRIORITETPERIODER)}
     kravprioritetForBehandlinger.values.flatten().forEach { sjekkUUID(it) {valideringsfeil.add(Valideringsfeil.BEHANDLING_UUID_FORMATFEIL_I_KRAVPRIORITET)} }
