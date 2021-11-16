@@ -22,18 +22,6 @@ internal class KontraktValidatorTest {
         assertThat(valideringsfeil).isEmpty()
     }
 
-
-    @Test
-    internal fun `Samme saksnummer for andre søkere`() {
-        val grunnlag = grunnlag()
-            .copy(andrePartersSaksnummer = listOf("987", "987"))
-
-        val valideringsfeil = grunnlag.sjekk()
-
-        assertThat(valideringsfeil).hasSize(1)
-        assertThat(valideringsfeil).contains(Valideringsfeil.ANDRE_PARTERS_SAKSNUMMER_DUPLIKAT)
-    }
-
     @Test
     internal fun `Behandling UUID med ugyldig UUID`() {
         val grunnlag = grunnlag()
@@ -184,14 +172,17 @@ internal class KontraktValidatorTest {
     @Test
     internal fun `Grunnlag med flere valideringsfeil`() {
         val grunnlag = grunnlag().copy(
-            andrePartersSaksnummer = listOf("987", "987"),
+            nattevåksperioder = mapOf(
+                helePerioden to Utfall.OPPFYLT,
+                helePerioden.plusDager(3) to Utfall.OPPFYLT
+            ),
             behandlingUUID= "tullball"
         )
 
         val valideringsfeil = grunnlag.sjekk()
 
         assertThat(valideringsfeil).hasSize(2)
-        assertThat(valideringsfeil).contains(Valideringsfeil.ANDRE_PARTERS_SAKSNUMMER_DUPLIKAT)
+        assertThat(valideringsfeil).contains(Valideringsfeil.OVERLAPP_MELLOM_NATTEVÅKSPERIODER)
         assertThat(valideringsfeil).contains(Valideringsfeil.BEHANDLING_UUID_FORMATFEIL)
     }
 
@@ -225,7 +216,6 @@ internal class KontraktValidatorTest {
             søker = Søker(aktørId = "456"),
             saksnummer = "123456",
             behandlingUUID = UUID.randomUUID().toString(),
-            andrePartersSaksnummer = listOf(),
             søktUttak = listOf(
                 SøktUttak(helePerioden)
             ),
