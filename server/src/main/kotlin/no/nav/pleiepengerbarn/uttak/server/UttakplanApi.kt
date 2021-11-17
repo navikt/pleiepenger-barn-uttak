@@ -109,27 +109,6 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplan)
     }
 
-    /*
-    @GetMapping(FullUttaksplanForTilkjentYtelsePath, produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(
-        description = "Hent forenklet uttaksplan for behandling.",
-        parameters = [
-            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
-        ]
-    )
-    fun hentFullUttaksplanForTilkjentYtelse(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
-        logger.info("Henter forenklet uttaksplan for behanding=$behandlingUUID")
-        val behandlingUUIDParsed = try {
-            UUID.fromString(behandlingUUID)
-        } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().build()
-        }
-        val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.noContent().build()
-        return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
-    }
-    */
-
-
     @DeleteMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         description = "Slett siste uttaksplan for behandling.",

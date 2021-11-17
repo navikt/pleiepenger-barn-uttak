@@ -27,10 +27,6 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
         return restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID&slåSammenLikePerioder=$slåSammenLikePerioder", HttpMethod.GET, HttpEntity<Any>(headers()), Uttaksplan::class.java)
     }
 
-    internal fun hentForenkletUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<ForenkletUttaksplan> {
-        return restTemplate.exchange(UttakplanApi.FullUttaksplanForTilkjentYtelsePath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(headers()), ForenkletUttaksplan::class.java)
-    }
-
     internal fun slettUttaksplan(behandlingUUID: BehandlingUUID) {
         restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.DELETE, HttpEntity<Any>(headers()), Unit::class.java)
     }
