@@ -109,6 +109,7 @@ class UttakplanApi {
         return ResponseEntity.ok(uttaksplan)
     }
 
+    /*
     @GetMapping(FullUttaksplanForTilkjentYtelsePath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         description = "Hent forenklet uttaksplan for behandling.",
@@ -126,6 +127,8 @@ class UttakplanApi {
         val uttaksplan = uttakRepository.hent(behandlingUUIDParsed) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(uttaksplan.tilForenkletUttaksplan())
     }
+    */
+
 
     @DeleteMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
