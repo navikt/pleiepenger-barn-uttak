@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import no.nav.pleiepengerbarn.uttak.testklient.ARBEIDSFORHOLD1
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
@@ -784,6 +785,53 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             Endringsstatus.NY
         )
     }
+
+    @Test
+    internal fun `Avslag på inngangsvilkår og pleiebehov skal føre til at annen part kan overta andelen av pleiebehov fra motpart`() {
+        val periode = "2021-09-20/2021-09-24"
+        val barn = Barn("12345")
+        val grunnlag1søker1 = lagGrunnlag(periode = periode).copy(
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode(periode) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = Duration.ofHours(3))))
+            ),
+            barn = barn
+        )
+        val uttakplan1søker1 = grunnlag1søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.perioder).hasSize(1)
+        assertThat(uttakplan1søker1.perioder[LukketPeriode(periode)]!!.uttaksgrad).isEqualByComparingTo(Prosent(60))
+
+        val grunnlag1søker2 = lagGrunnlag(periode = periode).copy(
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD4, mapOf(LukketPeriode(periode) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            barn = barn,
+            kravprioritetForBehandlinger = mapOf(LukketPeriode(periode) to listOf(grunnlag1søker1.behandlingUUID))
+        )
+        val uttaksplan1søker2 = grunnlag1søker2.opprettUttaksplan()
+        assertThat(uttaksplan1søker2.perioder).hasSize(1)
+        assertThat(uttaksplan1søker2.perioder[LukketPeriode(periode)]!!.uttaksgrad).isEqualByComparingTo(Prosent(40))
+
+
+        val grunnlag2søker1 = grunnlag1søker1.copy(
+            inngangsvilkår = mapOf("K9_VK_1" to listOf(Vilkårsperiode(LukketPeriode(periode), Utfall.IKKE_OPPFYLT))),
+            pleiebehov = mapOf(LukketPeriode(periode) to Pleiebehov.PROSENT_0)
+
+        )
+        val uttaksplan2søker1 = grunnlag2søker1.opprettUttaksplan()
+        assertThat(uttaksplan2søker1.perioder).hasSize(1)
+        assertThat(uttaksplan2søker1.perioder[LukketPeriode(periode)]!!.uttaksgrad).isEqualByComparingTo(NULL_PROSENT)
+
+
+        val grunnlag2søker2 = grunnlag1søker2.copy(
+            kravprioritetForBehandlinger = mapOf(LukketPeriode(periode) to listOf(grunnlag1søker1.behandlingUUID, grunnlag1søker2.behandlingUUID))
+        )
+        val uttaksplan2søker2 = grunnlag2søker2.opprettUttaksplan()
+
+
+        assertThat(uttaksplan2søker2.perioder).hasSize(1)
+        assertThat(uttaksplan2søker2.perioder[LukketPeriode(periode)]!!.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
+    }
+
 
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
