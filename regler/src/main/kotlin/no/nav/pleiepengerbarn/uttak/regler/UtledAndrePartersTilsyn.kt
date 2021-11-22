@@ -51,20 +51,33 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(per
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
         if (annenPartsOverlappendePeriodeInfo != null) {
-            val graderBeregnet = BeregnGrader.beregn(
-                pleiebehov,
-                etablertTilsyn,
-                annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
-                sumAndreSøkeresTilsyn,
-                true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
-                finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
-                annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid()
-            )
-            sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
+            if (annenPartsOverlappendePeriodeInfo.harÅrsakSomIkkeTriggerReberegning()) {
+                sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
+            } else {
+                val graderBeregnet = BeregnGrader.beregn(
+                    pleiebehov,
+                    etablertTilsyn,
+                    annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
+                    sumAndreSøkeresTilsyn,
+                    true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
+                    finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
+                    annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid()
+                )
+                sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
+            }
         }
     }
 
     return sumAndreSøkeresTilsyn
+}
+
+private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
+    for (årsak in listOf(Årsak.BARNETS_DØDSFALL, Årsak.LOVBESTEMT_FERIE, Årsak.UTENOM_PLEIEBEHOV, Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)) {
+        if (this.årsaker.contains(årsak)) {
+            return true
+        }
+    }
+    return false
 }
 
 private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
