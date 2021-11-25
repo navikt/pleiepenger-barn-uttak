@@ -680,26 +680,25 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Simulering ved gjensidige krav`() {
-        var grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(søker = Søker("søker1"),)
+        var grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(søker = Søker("søker1"))
         grunnlagSøker1 = grunnlagSøker1.copy(kravprioritetForBehandlinger = mapOf(
             LukketPeriode("2021-09-20/2021-09-24") to listOf(grunnlagSøker1.behandlingUUID)
         ))
-        val uttaksplan1Søker1 = grunnlagSøker1.opprettUttaksplan()
+        grunnlagSøker1.opprettUttaksplan()
 
 
         var grunnlagSøker2 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(søker = Søker("søker2"))
         grunnlagSøker2 = grunnlagSøker2.copy(kravprioritetForBehandlinger = mapOf(
             LukketPeriode("2021-09-20/2021-09-24") to listOf(grunnlagSøker2.behandlingUUID)
         ))
-        val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
+        grunnlagSøker2.opprettUttaksplan()
 
 
         val grunnlagSøker1MedKravPrio = grunnlagSøker1.copy(kravprioritetForBehandlinger = mapOf(
             LukketPeriode("2021-09-20/2021-09-22") to listOf(grunnlagSøker1.behandlingUUID),
             LukketPeriode("2021-09-23/2021-09-24") to listOf(grunnlagSøker2.behandlingUUID, grunnlagSøker1.behandlingUUID)
         ))
-
-        val uttaksplan2Søker1 = grunnlagSøker1MedKravPrio.opprettUttaksplan()
+        grunnlagSøker1MedKravPrio.opprettUttaksplan()
 
         val grunnlagSøker2MedKravPrio = grunnlagSøker2.copy(kravprioritetForBehandlinger = mapOf(
             LukketPeriode("2021-09-20/2021-09-22") to listOf(grunnlagSøker1.behandlingUUID, grunnlagSøker2.behandlingUUID),
