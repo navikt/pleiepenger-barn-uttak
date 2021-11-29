@@ -663,6 +663,92 @@ internal class UttakTjenesteGraderingTest {
         sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 27), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), Årsak.GRADERT_MOT_TILSYN)
     }
 
+    @Test
+    internal fun `Livets sluttfase, En uttaksperiode med uttak på to andre parter som tilsammen er på 300 prosent skal innvilges`() {
+        val annenPartsBehandlingUUID = nesteBehandlingUUID()
+        val tredjePartsBehandlingUUID = nesteBehandlingUUID()
+
+        val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
+                søker = Søker(
+                        aktørId = aktørIdSøker
+                ),
+                barn = Barn(
+                        aktørId = aktørIdBarn
+                ),
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_6000
+                ),
+                søktUttak = listOf(
+                        helePeriodenSøktUttak
+                ),
+                andrePartersUttaksplanPerBehandling = mapOf(
+                        annenPartsBehandlingUUID to Uttaksplan(
+                                perioder = mapOf(
+                                        helePerioden to UttaksperiodeInfo.oppfylt(
+                                                kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                                                uttaksgrad = Prosent(100),
+                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                                                søkersTapteArbeidstid = Prosent(100),
+                                                oppgittTilsyn = null,
+                                                årsak = Årsak.FULL_DEKNING,
+                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                knekkpunktTyper = setOf(),
+                                                annenPart = AnnenPart.ALENE,
+                                                nattevåk = null,
+                                                beredskap = null
+                                        )
+                                ),
+                                trukketUttak = listOf()
+                        ),
+                        tredjePartsBehandlingUUID to Uttaksplan(
+                                perioder = mapOf(
+                                        helePerioden to UttaksperiodeInfo.oppfylt(
+                                                kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
+                                                uttaksgrad = Prosent(100),
+                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                                                søkersTapteArbeidstid = Prosent(100),
+                                                oppgittTilsyn = null,
+                                                årsak = Årsak.FULL_DEKNING,
+                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                knekkpunktTyper = setOf(),
+                                                annenPart = AnnenPart.ALENE,
+                                                nattevåk = null,
+                                                beredskap = null
+                                        )
+                                ),
+                                trukketUttak = listOf()
+                        )
+                ),
+                tilsynsperioder = emptyMap(),
+                behandlingUUID = nesteBehandlingUUID(),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+                ).somArbeid(),
+                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID, tredjePartsBehandlingUUID))
+
+        )
+
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(5)
+        sjekkOppfylt(
+                uttaksplan,
+                listOf(
+                        LukketPeriode("2020-01-01/2020-01-03"),
+                        LukketPeriode("2020-01-06/2020-01-10"),
+                        LukketPeriode("2020-01-13/2020-01-17"),
+                        LukketPeriode("2020-01-20/2020-01-24"),
+                        LukketPeriode("2020-01-27/2020-01-31")
+                ),
+                Prosent(100),
+                mapOf(arbeidsforhold1 to Prosent(100)),
+                Årsak.FULL_DEKNING
+        )
+    }
+
+
 }
 
 private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)

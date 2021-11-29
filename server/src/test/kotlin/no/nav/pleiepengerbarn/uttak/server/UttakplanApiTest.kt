@@ -18,6 +18,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 import kotlin.test.fail
@@ -831,6 +832,109 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplan2søker2.perioder[LukketPeriode(periode)]!!.uttaksgrad).isEqualByComparingTo(HUNDRE_PROSENT)
     }
 
+    @Test
+    internal fun `Simulering av livets sluttfase med samme grunnlag skal gi at uttaksplanen ikke er endret og at det er brukt 5 dager av kvoten`() {
+        val grunnlag = lagLivetsSluttfaseGrunnlag(periode = "2021-09-20/2021-09-24")
+        grunnlag.opprettUttaksplan()
+
+        val simuleringsresultat = grunnlag.simuleringSluttfase()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+        assertThat(simuleringsresultat.overstigerKvoten).isFalse
+        assertThat(simuleringsresultat.antallBrukteDager).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+    }
+
+    @Test
+    internal fun `Enkelt uttak på grunnlaget til livets sluttfase med et arbeidsforhold`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val grunnlag = lagLivetsSluttfaseGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                )
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+                perioder = listOf(LukketPeriode("2020-01-01/2020-01-03"), LukketPeriode("2020-01-06/2020-01-10")),
+                grad = HUNDRE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.FULL_DEKNING,
+                endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
+    internal fun `En del av uttaksplanen til livets sluttfase blir ikke oppfylt pga ikke oppfylte inngangsvilkår`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val grunnlag = lagLivetsSluttfaseGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                )
+        ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-01/2020-01-03"), endringsstatus = Endringsstatus.NY)
+        uttaksplan.assertIkkeOppfylt(
+                periode = LukketPeriode("2020-01-06/2020-01-08"),
+                ikkeOppfyltÅrsaker = setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT),
+                endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2020-01-09/2020-01-10"), endringsstatus = Endringsstatus.NY)
+    }
+
+    @Test
+    internal fun `Tre paralelle behandlinger på livets sluttfase med 100% krav skal alle bli innvilget med fullstendig dekning`() {
+        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
+        val grunnlag1Søker1 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer())
+
+
+        grunnlag1Søker1.opprettUttaksplan()
+
+        val søker2BehandlingId = nesteBehandlingId()
+        val arbeidSøker2 = Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
+        val grunnlagSøker2 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker2),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker2BehandlingId, grunnlag1Søker1.behandlingUUID)))
+
+        grunnlagSøker2.opprettUttaksplan()
+
+        val søker3BehandlingId = nesteBehandlingId()
+
+        val arbeidSøker3 = Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
+        val grunnlagSøker3 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker3),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker3BehandlingId, grunnlagSøker2.behandlingUUID, grunnlag1Søker1.behandlingUUID)))
+
+
+        val uttakplanSøker3 = grunnlagSøker3.opprettUttaksplan()
+
+        uttakplanSøker3.assertOppfylt(søknadsperiode, Prosent(100), mapOf(ARBEIDSFORHOLD4 to Prosent(100)), Årsak.FULL_DEKNING, Endringsstatus.NY)
+    }
+
 
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
@@ -843,6 +947,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private fun Uttaksgrunnlag.simulering(): Simulering {
         val postResponse = testClient.simulerUttaksplan(this)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
+        return postResponse.body ?: fail("Mangler simulering")
+    }
+
+    private fun Uttaksgrunnlag.simuleringSluttfase(): SimuleringLivetsSluttfase {
+        val postResponse = testClient.simulerUttaksplanLivetsSluttfase(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
         return postResponse.body ?: fail("Mangler simulering")
     }
