@@ -13,6 +13,21 @@ fun  Uttaksgrunnlag.valider() {
     }
 }
 
+fun EndrePerioderGrunnlag.valider() {
+    val valideringsfeil = mutableSetOf<Valideringsfeil>()
+    if (sjekkOmDetFinnesOverlappendePerioder(perioderSomIkkeErInnvilget.keys)) {
+        valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_PERIODER_IKKE_ER_INNVILGET)
+    }
+    perioderSomIkkeErInnvilget.values.toSet().forEach {
+        if (it !in setOf(Årsak.FOR_LAV_INNTEKT)) {
+            valideringsfeil.add(Valideringsfeil.ULOVLIG_ENDRING_AV_ÅRSAK)
+        }
+    }
+    if (valideringsfeil.isNotEmpty()) {
+        throw ValideringException("Valideringsfeil: $valideringsfeil")
+    }
+}
+
 internal fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     val valideringsfeil = mutableSetOf<Valideringsfeil>()
     // Sjekk kravprioritet

@@ -49,29 +49,30 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Uttaksplan kan lagres og hentes opp igjen`() {
-        val behandlingId = UUID.randomUUID()
-
         val uttakJanuar = dummyUttaksplan(heleJanuar)
+        val grunnlag = dummyRegelGrunnlag(heleJanuar)
 
-        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
 
-        val uttaksplan = uttakRepository.hent(behandlingId)
+        val uttaksplan = uttakRepository.hent(grunnlag.behandlingUUID)
         assertThat(uttaksplan).isNotNull
         assertThat(uttaksplan).isEqualTo(uttakJanuar)
     }
 
     @Test
     internal fun `Ny uttaksplan på samme behanding, skal føre til at den opprinnelig uttaksplanen blir slettet`() {
-        val behandlingId = UUID.randomUUID()
+        val behandlingUUID = UUID.randomUUID()
 
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val grunnlagFebruar = dummyRegelGrunnlag(heleFebruar, behandlingUUID)
         val uttakJanuar = dummyUttaksplan(heleJanuar)
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
-        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
-        uttakRepository.lagre("123", behandlingId, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = grunnlagFebruar)
 
 
-        val uttaksplan = uttakRepository.hent(behandlingId)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         assertThat(uttaksplan).isEqualTo(uttakFebruar)
     }
@@ -85,9 +86,9 @@ internal class UttakRepositoryTest {
         val uttakJanuar = dummyUttaksplan(heleJanuar)
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
-        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = UUID.randomUUID()))
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(saksnummer, UUID.randomUUID(), uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = UUID.randomUUID()))
 
 
         val uttaksplan = uttakRepository.hent(saksnummer)
@@ -100,13 +101,13 @@ internal class UttakRepositoryTest {
     @Test
     internal fun `Skal ikke finne forrige behandling når det er en behandling`() {
         val saksnummer = "123456"
-        val behandlingUUID1 = UUID.randomUUID()
+        val behandlingUUID = UUID.randomUUID()
 
         val uttakJanuar = dummyUttaksplan(heleJanuar)
 
-        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID))
 
-        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID1)
+        val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID)
 
         assertThat(forrigeUttaksplan).isNull()
     }
@@ -120,9 +121,9 @@ internal class UttakRepositoryTest {
         val uttakJanuar = dummyUttaksplan(heleJanuar)
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
-        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID1))
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(saksnummer, behandlingUUID2, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID2))
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID2)
 
@@ -141,11 +142,11 @@ internal class UttakRepositoryTest {
         val uttakFebruar = dummyUttaksplan(heleFebruar)
         val uttakMars = dummyUttaksplan(heleMars)
 
-        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID1))
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(saksnummer, behandlingUUID2, uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar))
+        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID2))
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(saksnummer, behandlingUUID3, uttaksplan = uttakMars, regelGrunnlag = dummyRegelGrunnlag(heleMars))
+        uttakRepository.lagre(uttaksplan = uttakMars, regelGrunnlag = dummyRegelGrunnlag(heleMars).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID3))
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID3)
 
@@ -156,11 +157,10 @@ internal class UttakRepositoryTest {
     @Test
     internal fun `Skal finne forrige behandling når det ikke er registrert noen uttaksplan på nåværende behandling`() {
         val saksnummer = "123456"
-        val behandlingUUID1 = UUID.randomUUID()
 
         val uttakJanuar = dummyUttaksplan(heleJanuar)
 
-        uttakRepository.lagre(saksnummer, behandlingUUID1, uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar))
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer))
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, UUID.randomUUID())
 
@@ -177,10 +177,10 @@ internal class UttakRepositoryTest {
         assertThat(forrigeUttaksplan).isNull()
     }
 
-    private fun dummyRegelGrunnlag(periode:LukketPeriode): RegelGrunnlag {
+    private fun dummyRegelGrunnlag(periode:LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
         return RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID(),
+                behandlingUUID = behandlingUUID,
                 søker = Søker(
                     aktørId = aktørIdSøker
                 ),

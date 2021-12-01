@@ -20,6 +20,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     FOR_LAV_ØNSKET_UTTAKSGRAD(false),
     LOVBESTEMT_FERIE(false),
     BARNETS_DØDSFALL(false),
-    INNGANGSVILKÅR_IKKE_OPPFYLT(false)
+    INNGANGSVILKÅR_IKKE_OPPFYLT(false),
+    FOR_LAV_INNTEKT(false)
 
 }
