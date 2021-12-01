@@ -626,7 +626,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `To paralelle behandling og så revurdering av den første med kravprioritet`() {
+    internal fun `To parallelle behandling og så revurdering av den første med kravprioritet`() {
         val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = Duration.ofHours(2))))
@@ -834,7 +834,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Simulering av livets sluttfase med samme grunnlag skal gi at uttaksplanen ikke er endret og at det er brukt 5 dager av kvoten`() {
-        val grunnlag = lagLivetsSluttfaseGrunnlag(periode = "2021-09-20/2021-09-24")
+        val grunnlag = lagGrunnlag(ytelseType = YtelseType.PLS, periode = "2021-09-20/2021-09-24")
         grunnlag.opprettUttaksplan()
 
         val simuleringsresultat = grunnlag.simuleringSluttfase()
@@ -847,12 +847,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     @Test
     internal fun `Enkelt uttak på grunnlaget til livets sluttfase med et arbeidsforhold`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
-        val grunnlag = lagLivetsSluttfaseGrunnlag(
+        val grunnlag = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                ),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000),
                 )
-        )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -875,12 +877,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     @Test
     internal fun `En del av uttaksplanen til livets sluttfase blir ikke oppfylt pga ikke oppfylte inngangsvilkår`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
-        val grunnlag = lagLivetsSluttfaseGrunnlag(
+        val grunnlag = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
-                )
-        ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
+                ),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000)
+                ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
 
         val uttaksplan = grunnlag.opprettUttaksplan()
 
@@ -894,11 +898,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Tre paralelle behandlinger på livets sluttfase med 100% krav skal alle bli innvilget med fullstendig dekning`() {
+    internal fun `Tre parallelle behandlinger på livets sluttfase med 100% krav skal alle bli innvilget med fullstendig dekning`() {
         val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
         val grunnlag1Søker1 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker1),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
@@ -911,6 +916,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val søker2BehandlingId = nesteBehandlingId()
         val arbeidSøker2 = Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
         val grunnlagSøker2 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker2),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
@@ -923,6 +929,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val arbeidSøker3 = Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
         val grunnlagSøker3 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker3),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),

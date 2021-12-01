@@ -293,8 +293,8 @@ internal class UttakTjenesteTest {
     }
 
     @Test
-    fun `Livets sluttfase, En uttaksperiode som delvis overlapper med ferie`() {
-        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+    fun `Livets sluttfase, En enkel uttaksperiode skal få 100 prosent utbetaling`() {
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3))
         val grunnlag = RegelGrunnlag(
                 saksnummer = nesteSaksnummer(),
                 søker = Søker(
@@ -309,9 +309,6 @@ internal class UttakTjenesteTest {
                 søktUttak = listOf(
                         SøktUttak(helePerioden)
                 ),
-                lovbestemtFerie = listOf(
-                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
-                ),
                 arbeid = mapOf(
                         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 ).somArbeid(),
@@ -320,26 +317,14 @@ internal class UttakTjenesteTest {
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
-        assertThat(uttaksplan.perioder).hasSize(6)
+        assertThat(uttaksplan.perioder).hasSize(1)
+
         sjekkOppfylt(
-                uttaksplan,
-                listOf(
-                        LukketPeriode("2020-01-01/2020-01-03"),
-                        LukketPeriode("2020-01-06/2020-01-10"),
-                        LukketPeriode("2020-01-13/2020-01-14")
-                ),
-                HUNDRE_PROSENT,
-                mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
-                Årsak.FULL_DEKNING
-        )
-        sjekkIkkeOppfylt(
-                uttaksplan,
-                listOf(
-                        LukketPeriode("2020-01-15/2020-01-17"),
-                        LukketPeriode("2020-01-20/2020-01-24"),
-                        LukketPeriode("2020-01-27/2020-01-31")
-                ),
-                setOf(Årsak.LOVBESTEMT_FERIE)
+                uttaksplan = uttaksplan,
+                forventetPeriode = LukketPeriode("2020-01-01/2020-01-03"),
+                forventetGrad = HUNDRE_PROSENT,
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
         )
     }
 

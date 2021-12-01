@@ -44,8 +44,8 @@ internal class UttakRepository {
         val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
         val sql = """
             insert into uttaksresultat 
-            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid) 
-            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid)            
+            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, ytelsetype) 
+            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :ytelsetype::ytelsetype)            
         """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -55,6 +55,7 @@ internal class UttakRepository {
             .addValue("regel_grunnlag", tilJSON(regelGrunnlag))
             .addValue("slettet", false)
             .addValue("opprettet_tid", opprettetTidspunkt)
+            .addValue("ytelsetype", regelGrunnlag.ytelseType.toString())
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         val uttaksresultatId = keyHolder.key as Long

@@ -28,6 +28,7 @@ object GrunnlagMapper {
         }
 
         return RegelGrunnlag(
+                ytelseType = uttaksgrunnlag.ytelseType,
                 saksnummer = uttaksgrunnlag.saksnummer,
                 behandlingUUID = UUID.fromString(uttaksgrunnlag.behandlingUUID),
                 barn = uttaksgrunnlag.barn,

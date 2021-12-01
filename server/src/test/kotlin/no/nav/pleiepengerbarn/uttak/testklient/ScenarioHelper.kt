@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.testklient
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksgrunnlagLivetsSluttfase.Companion.tilUttaksgrunnlag
 import java.time.Duration
 import java.util.*
 
@@ -17,9 +16,10 @@ internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "12
 internal val FRILANS1 = Arbeidsforhold(type = "FL")
 internal val ARBEIDSFORHOLD4 = Arbeidsforhold(type="AT", organisasjonsnummer = "987654321")
 
-internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String): Uttaksgrunnlag {
+internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String, ytelseType: YtelseType = YtelseType.PSB): Uttaksgrunnlag {
     val søknadsperiode = LukketPeriode(periode)
     return lagGrunnlag(
+        ytelseType = ytelseType,
         saksnummer = saksnummer,
         søknadsperiode = søknadsperiode,
         arbeid = listOf(
@@ -29,39 +29,8 @@ internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: St
     )
 }
 
-internal fun lagLivetsSluttfaseGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String): Uttaksgrunnlag {
-    val søknadsperiode = LukketPeriode(periode)
-    return lagLivetsSluttfaseGrunnlag(
-            saksnummer = saksnummer,
-            søknadsperiode = søknadsperiode,
-            arbeid = listOf(
-                    Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
-            )
-    )
-}
-
-internal fun lagLivetsSluttfaseGrunnlag(
-        søknadsperiode: LukketPeriode,
-        arbeid: List<Arbeid>,
-        søker: Søker = Søker(
-                aktørId = "123"
-        ),
-        barn: Barn  = Barn(
-                aktørId = "456"
-        ),
-        saksnummer: Saksnummer = nesteSaksnummer(),
-        behandlingUUID: BehandlingUUID = nesteBehandlingId()
-): Uttaksgrunnlag {
-    return UttaksgrunnlagLivetsSluttfase(
-            søker = søker,
-            barn = barn,
-            saksnummer = saksnummer,
-            behandlingUUID = behandlingUUID,
-            søktUttak = listOf(SøktUttak(søknadsperiode)),
-            arbeid = arbeid
-    ).tilUttaksgrunnlag()
-}
 internal fun lagGrunnlag(
+    ytelseType: YtelseType = YtelseType.PSB,
     søknadsperiode: LukketPeriode,
     arbeid: List<Arbeid>,
     pleiebehov: Map<LukketPeriode, Pleiebehov>,
@@ -78,6 +47,7 @@ internal fun lagGrunnlag(
     behandlingUUID: BehandlingUUID = nesteBehandlingId()
 ): Uttaksgrunnlag {
     return Uttaksgrunnlag(
+        ytelseType = ytelseType,
         søker = søker,
         barn = barn,
         saksnummer = saksnummer,
