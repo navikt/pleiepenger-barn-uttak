@@ -35,9 +35,13 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
         restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.DELETE, HttpEntity<Any>(headers()), Unit::class.java)
     }
 
+    internal fun endreUttaksplan(endrePerioderGrunnlag: EndrePerioderGrunnlag): ResponseEntity<Uttaksplan> {
+        return restTemplate.exchange(UttakplanApi.EndringUttaksplanPath, HttpMethod.POST, HttpEntity<Any>(endrePerioderGrunnlag, headers()), Uttaksplan::class.java)
+    }
+
     private fun headers():HttpHeaders {
         val headers = HttpHeaders()
-        headers.put("NAV_PSB_UTTAK_TOKEN", listOf("no_secret"))
+        headers["NAV_PSB_UTTAK_TOKEN"] = listOf("no_secret")
         return headers
     }
 

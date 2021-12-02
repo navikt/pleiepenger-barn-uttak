@@ -1,8 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sjekkOmOverlapp
 import org.postgresql.util.PGobject
@@ -14,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.sql.Types
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -39,23 +39,33 @@ internal class UttakRepository {
         private val uttaksplanRowMapper = RowMapper {resultSet, _ -> resultSet.getLong("id")}
     }
 
-    internal fun lagre(saksnummer:String, behandlingId:UUID, regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
+    internal fun lagre(regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
+        lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG, regelGrunnlag.ytelseType)
+    }
+
+    internal fun lagre(endrePerioderGrunnlag: EndrePerioderGrunnlag, uttaksplan: Uttaksplan) {
+        lagre(endrePerioderGrunnlag.saksnummer, UUID.fromString(endrePerioderGrunnlag.behandlingUUID), tilJSON(endrePerioderGrunnlag), listOf(), uttaksplan, Grunnlagstype.ENDRINGSGRUNNLAG)
+    }
+
+
+    private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype, ytelseType: YtelseType = YtelseType.PSB) {
         slettTidligereUttaksplan(behandlingId)
         val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
         val sql = """
             insert into uttaksresultat 
-            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, ytelsetype) 
-            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :ytelsetype::ytelsetype)            
+            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, grunnlagstype, ytelsetype) 
+            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :grunnlagstype::grunnlagstype, :ytelsetype::ytelsetype)            
         """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
         val params = MapSqlParameterSource()
             .addValue("saksnummer", saksnummer)
             .addValue("behandling_id", behandlingId)
-            .addValue("regel_grunnlag", tilJSON(regelGrunnlag))
+            .addValue("regel_grunnlag", grunnlagJson)
             .addValue("slettet", false)
             .addValue("opprettet_tid", opprettetTidspunkt)
-            .addValue("ytelsetype", regelGrunnlag.ytelseType.toString())
+            .addValue("grunnlagstype", grunnlagstype.name, Types.OTHER)
+            .addValue("ytelsetype", ytelseType.name, Types.OTHER)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         val uttaksresultatId = keyHolder.key as Long
@@ -63,14 +73,14 @@ internal class UttakRepository {
         if (uttaksplan.perioder.keys.sjekkOmOverlapp()) {
             throw IllegalArgumentException("Lagre uttaksplan: Overlapp mellom perioder i uttak. ${uttaksplan.perioder.keys}")
         }
-        if (regelGrunnlag.trukketUttak.sjekkOmOverlapp()) {
-            throw IllegalArgumentException("Lagre uttaksplab: Overlapp mellom perioder i trukket uttak. ${regelGrunnlag.trukketUttak}")
+        if (trukketUttak.sjekkOmOverlapp()) {
+            throw IllegalArgumentException("Lagre uttaksplab: Overlapp mellom perioder i trukket uttak. $trukketUttak")
         }
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
-        trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, regelGrunnlag.trukketUttak)
+        trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, trukketUttak)
     }
 
-    internal fun hent(behandlingId:UUID):Uttaksplan? {
+    internal fun hent(behandlingId:UUID): Uttaksplan? {
         return try {
             val uttaksresultatId = jdbcTemplate.queryForObject(
                 "select id from uttaksresultat where behandling_id = :behandling_id and slettet=false",
@@ -148,4 +158,9 @@ internal class UttakRepository {
         return jsonObject
     }
 
+}
+
+private enum class Grunnlagstype {
+    UTTAKSGRUNNLAG,
+    ENDRINGSGRUNNLAG
 }

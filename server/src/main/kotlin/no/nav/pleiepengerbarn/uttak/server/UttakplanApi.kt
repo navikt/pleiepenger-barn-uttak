@@ -25,7 +25,7 @@ class UttakplanApi {
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
-        const val FullUttaksplanForTilkjentYtelsePath = "/uttaksplan/ty"
+        const val EndringUttaksplanPath = "/uttaksplan/endring"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
         const val BehandlingUUID = "behandlingUUID"
@@ -48,6 +48,18 @@ class UttakplanApi {
         return ResponseEntity
             .created(uri)
             .body(nyUttaksplan)
+    }
+
+    @PostMapping(EndringUttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Endrer en uttaksplan. Kun enkelte endringer er lovlig, hvis endringen er ulovlig så vil endepunktet returnere en 'bad request'.")
+    fun endrePerioder(@RequestBody endrePerioderGrunnlag: EndrePerioderGrunnlag): ResponseEntity<Uttaksplan?> {
+        logger.info("Endrer uttaksplan for behanding=${endrePerioderGrunnlag.behandlingUUID}")
+        endrePerioderGrunnlag.valider()
+        val eksisterendeUttaksplan = uttakRepository.hent(UUID.fromString(endrePerioderGrunnlag.behandlingUUID))
+            ?: return ResponseEntity.badRequest().body(null)
+        val oppdatertUttaksplan = UttakTjeneste.endreUttaksplan(eksisterendeUttaksplan, endrePerioderGrunnlag.perioderSomIkkeErInnvilget)
+        uttakRepository.lagre(endrePerioderGrunnlag, oppdatertUttaksplan)
+        return ResponseEntity.ok(oppdatertUttaksplan)
     }
 
     @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -91,7 +103,7 @@ class UttakplanApi {
         uttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, uttaksplan)
 
         if (lagre) {
-            uttakRepository.lagre(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID), regelGrunnlag, uttaksplan)
+            uttakRepository.lagre(regelGrunnlag, uttaksplan)
         }
 
         return uttaksplan

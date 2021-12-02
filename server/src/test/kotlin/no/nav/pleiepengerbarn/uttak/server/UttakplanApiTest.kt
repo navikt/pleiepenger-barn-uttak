@@ -833,6 +833,51 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Endre utfall og årsak på eksisterende uttaksplan`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = nesteSaksnummer()
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(søknadsperiode),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        testClient.endreUttaksplan(EndrePerioderGrunnlag(grunnlag.saksnummer, grunnlag.behandlingUUID, mapOf(LukketPeriode("2021-01-04/2021-01-05") to Årsak.FOR_LAV_INNTEKT)))
+        val endretUttaksplanResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(endretUttaksplanResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val endretUttaksplan = endretUttaksplanResponse.body!!
+
+        endretUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2021-01-04/2021-01-05"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_INNTEKT),
+            endringsstatus = Endringsstatus.NY
+        )
+        endretUttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2021-01-06/2021-01-08")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
     internal fun `Simulering av livets sluttfase med samme grunnlag skal gi at uttaksplanen ikke er endret og at det er brukt 5 dager av kvoten`() {
         val grunnlag = lagGrunnlag(ytelseType = YtelseType.PLS, periode = "2021-09-20/2021-09-24")
         grunnlag.opprettUttaksplan()
@@ -854,7 +899,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
                 pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000),
-                )
+        )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -884,7 +929,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
                 pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000)
-                ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
+        ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
 
         val uttaksplan = grunnlag.opprettUttaksplan()
 
@@ -941,7 +986,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttakplanSøker3.assertOppfylt(søknadsperiode, Prosent(100), mapOf(ARBEIDSFORHOLD4 to Prosent(100)), Årsak.FULL_DEKNING, Endringsstatus.NY)
     }
-
 
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
