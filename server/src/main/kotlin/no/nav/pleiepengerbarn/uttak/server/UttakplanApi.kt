@@ -27,6 +27,7 @@ class UttakplanApi {
         const val UttaksplanPath = "/uttaksplan"
         const val EndringUttaksplanPath = "/uttaksplan/endring"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
+        const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
         const val BehandlingUUID = "behandlingUUID"
 
         private val logger = LoggerFactory.getLogger(this::class.java)
@@ -66,23 +67,32 @@ class UttakplanApi {
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
+            val simulering = simuler(uttaksgrunnlag)
+        return ResponseEntity.ok(simulering)
+    }
+
+    @PostMapping(UttaksplanSimuleringSluttfasePath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan for livets sluttfase. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
+    fun simulerUttaksplanForLivetsSluttfase(
+            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<SimuleringLivetsSluttfase> {
+        val simulering = simuler(uttaksgrunnlag)
+        val erKvotenBruktOpp = BeregnBruktKvote.erKvotenOversteget(simulering.simulertUttaksplan, hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag))
+        return ResponseEntity.ok(SimuleringLivetsSluttfase(simulering.forrigeUttaksplan, simulering.simulertUttaksplan,
+                simulering.uttakplanEndret, erKvotenBruktOpp.first, erKvotenBruktOpp.second))
+    }
+
+    private fun simuler(uttaksgrunnlag: Uttaksgrunnlag): Simulering {
         logger.info("Simulerer uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
         val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
-        return ResponseEntity.ok(Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret))
+        return Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret)
     }
 
     private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, forrigeUttaksplan: Uttaksplan?, lagre: Boolean): Uttaksplan {
-        val unikeBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten().toSet().map {UUID.fromString(it)}
-        val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
-        unikeBehandlinger .forEach { behandlingUUID ->
-            val uttaksplan = uttakRepository.hent(behandlingUUID)
-            if (uttaksplan != null) {
-                andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
-            }
-        }
+        val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
 
         val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
 
@@ -97,6 +107,18 @@ class UttakplanApi {
         }
 
         return uttaksplan
+    }
+
+    private fun hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {
+        val unikeBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten().toSet().map {UUID.fromString(it)}
+        val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
+        unikeBehandlinger .forEach { behandlingUUID ->
+            val uttaksplan = uttakRepository.hent(behandlingUUID)
+            if (uttaksplan != null) {
+                andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
+            }
+        }
+        return andrePartersUttaksplanerPerBehandling
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])

@@ -19,6 +19,10 @@ internal class PleiepengerBarnUttakTestClient(private val restTemplate: TestRest
         return restTemplate.exchange(UttakplanApi.UttaksplanSimuleringPath, HttpMethod.POST, HttpEntity<Any>(grunnlag, headers()), Simulering::class.java)
     }
 
+    internal fun simulerUttaksplanLivetsSluttfase(grunnlag: Uttaksgrunnlag): ResponseEntity<SimuleringLivetsSluttfase> {
+        return restTemplate.exchange(UttakplanApi.UttaksplanSimuleringSluttfasePath, HttpMethod.POST, HttpEntity<Any>(grunnlag, headers()), SimuleringLivetsSluttfase::class.java)
+    }
+
     internal fun hentUttaksplan(behandlingUUID: BehandlingUUID): ResponseEntity<Uttaksplan> {
         return restTemplate.exchange(UttakplanApi.UttaksplanPath + "?behandlingUUID=$behandlingUUID", HttpMethod.GET, HttpEntity<Any>(headers()), Uttaksplan::class.java)
     }

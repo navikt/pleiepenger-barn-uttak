@@ -1,10 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.pleiepengerbarn.uttak.kontrakter.EndrePerioderGrunnlag
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sjekkOmOverlapp
 import org.postgresql.util.PGobject
@@ -43,7 +40,7 @@ internal class UttakRepository {
     }
 
     internal fun lagre(regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
-        lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG)
+        lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG, regelGrunnlag.ytelseType)
     }
 
     internal fun lagre(endrePerioderGrunnlag: EndrePerioderGrunnlag, uttaksplan: Uttaksplan) {
@@ -51,13 +48,13 @@ internal class UttakRepository {
     }
 
 
-    private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype) {
+    private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype, ytelseType: YtelseType = YtelseType.PSB) {
         slettTidligereUttaksplan(behandlingId)
         val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
         val sql = """
             insert into uttaksresultat 
-            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, grunnlagstype) 
-            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :grunnlagstype::grunnlagstype)            
+            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, grunnlagstype, ytelsetype) 
+            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :grunnlagstype::grunnlagstype, :ytelsetype::ytelsetype)            
         """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -68,6 +65,7 @@ internal class UttakRepository {
             .addValue("slettet", false)
             .addValue("opprettet_tid", opprettetTidspunkt)
             .addValue("grunnlagstype", grunnlagstype.name, Types.OTHER)
+            .addValue("ytelsetype", ytelseType.name, Types.OTHER)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         val uttaksresultatId = keyHolder.key as Long

@@ -6,6 +6,7 @@ import java.time.Duration
 import java.util.*
 
 data class RegelGrunnlag(
+    val ytelseType: YtelseType = YtelseType.PSB,
     val saksnummer: Saksnummer,
     val behandlingUUID: UUID,
     val barn: Barn,

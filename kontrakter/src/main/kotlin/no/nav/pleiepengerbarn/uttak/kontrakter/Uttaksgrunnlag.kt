@@ -10,6 +10,7 @@ import java.time.Duration
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksgrunnlag (
+    @JsonProperty("ytelseType") val ytelseType: YtelseType = YtelseType.PSB,
     @JsonProperty("barn") val barn: Barn,
     @JsonProperty("søker") val søker: Søker,
     @JsonProperty("saksnummer") val saksnummer: Saksnummer,

@@ -10,6 +10,11 @@ enum class Utfall {
     IKKE_OPPFYLT
 }
 
+enum class YtelseType {
+    PSB,
+    PLS
+}
+
 /**
  * Angir om det finnes uttak fra andre parter.
  */

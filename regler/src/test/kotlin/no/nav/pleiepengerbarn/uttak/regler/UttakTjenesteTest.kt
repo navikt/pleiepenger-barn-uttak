@@ -292,6 +292,42 @@ internal class UttakTjenesteTest {
 
     }
 
+    @Test
+    fun `Livets sluttfase, En enkel uttaksperiode skal få 100 prosent utbetaling`() {
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3))
+        val grunnlag = RegelGrunnlag(
+                saksnummer = nesteSaksnummer(),
+                søker = Søker(
+                        aktørId = aktørIdSøker
+                ),
+                barn = Barn(
+                        aktørId = aktørIdBarn
+                ),
+                pleiebehov = mapOf(
+                        helePerioden to Pleiebehov.PROSENT_6000
+                ),
+                søktUttak = listOf(
+                        SøktUttak(helePerioden)
+                ),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+                ).somArbeid(),
+                behandlingUUID = nesteBehandlingId()
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+
+        sjekkOppfylt(
+                uttaksplan = uttaksplan,
+                forventetPeriode = LukketPeriode("2020-01-01/2020-01-03"),
+                forventetGrad = HUNDRE_PROSENT,
+                forventedeUtbetalingsgrader = mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+                forventedeOppfyltÅrsak = Årsak.FULL_DEKNING
+        )
+    }
+
 }
 
 private fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)

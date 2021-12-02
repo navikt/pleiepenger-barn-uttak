@@ -16,9 +16,10 @@ internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "12
 internal val FRILANS1 = Arbeidsforhold(type = "FL")
 internal val ARBEIDSFORHOLD4 = Arbeidsforhold(type="AT", organisasjonsnummer = "987654321")
 
-internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String): Uttaksgrunnlag {
+internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String, ytelseType: YtelseType = YtelseType.PSB): Uttaksgrunnlag {
     val søknadsperiode = LukketPeriode(periode)
     return lagGrunnlag(
+        ytelseType = ytelseType,
         saksnummer = saksnummer,
         søknadsperiode = søknadsperiode,
         arbeid = listOf(
@@ -29,6 +30,7 @@ internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: St
 }
 
 internal fun lagGrunnlag(
+    ytelseType: YtelseType = YtelseType.PSB,
     søknadsperiode: LukketPeriode,
     arbeid: List<Arbeid>,
     pleiebehov: Map<LukketPeriode, Pleiebehov>,
@@ -45,6 +47,7 @@ internal fun lagGrunnlag(
     behandlingUUID: BehandlingUUID = nesteBehandlingId()
 ): Uttaksgrunnlag {
     return Uttaksgrunnlag(
+        ytelseType = ytelseType,
         søker = søker,
         barn = barn,
         saksnummer = saksnummer,
