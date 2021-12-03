@@ -27,6 +27,7 @@ class UttakplanApi {
         const val UttaksplanPath = "/uttaksplan"
         const val EndringUttaksplanPath = "/uttaksplan/endring"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
+        const val UttaksplanSimuleringPathV2 = "/uttaksplan/simulering/v2"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
         const val BehandlingUUID = "behandlingUUID"
 
@@ -62,12 +63,25 @@ class UttakplanApi {
         return ResponseEntity.ok(oppdatertUttaksplan)
     }
 
+    @Deprecated("Bruk den andre simulerUttaksplan istedet")
     @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
-            val simulering = simuler(uttaksgrunnlag)
+        logger.info("Simulerer uttaksplan(PSB) for behanding=${uttaksgrunnlag.behandlingUUID}")
+        val simulering = simuler(uttaksgrunnlag)
+        return ResponseEntity.ok(simulering)
+    }
+
+
+    @PostMapping(UttaksplanSimuleringPathV2, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
+    fun simulerUttaksplan(
+        @RequestBody simuleringsgrunnlag: Simuleringsgrunnlag,
+        uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
+        logger.info("Simulerer(v2) uttaksplan(PSB) for behanding=${simuleringsgrunnlag.uttaksgrunnlag.behandlingUUID}")
+        val simulering = simuler(simuleringsgrunnlag.uttaksgrunnlag)
         return ResponseEntity.ok(simulering)
     }
 
@@ -76,17 +90,20 @@ class UttakplanApi {
     fun simulerUttaksplanForLivetsSluttfase(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<SimuleringLivetsSluttfase> {
+        logger.info("Simulerer uttaksplan(PLS) for behanding=${uttaksgrunnlag.behandlingUUID}")
         val simulering = simuler(uttaksgrunnlag)
         val erKvotenBruktOpp = BeregnBruktKvote.erKvotenOversteget(simulering.simulertUttaksplan, hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag))
         return ResponseEntity.ok(SimuleringLivetsSluttfase(simulering.forrigeUttaksplan, simulering.simulertUttaksplan,
                 simulering.uttakplanEndret, erKvotenBruktOpp.first, erKvotenBruktOpp.second))
     }
 
-    private fun simuler(uttaksgrunnlag: Uttaksgrunnlag): Simulering {
-        logger.info("Simulerer uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
+    private fun simuler(uttaksgrunnlag: Uttaksgrunnlag, perioderSomIkkeErInnvilget: Map<LukketPeriode, Årsak> = mapOf()): Simulering {
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
-        val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
+        var simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
+        if (perioderSomIkkeErInnvilget.isNotEmpty()) {
+            simulertUttaksplan = UttakTjeneste.endreUttaksplan(simulertUttaksplan, perioderSomIkkeErInnvilget)
+        }
         val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
         return Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret)
     }
