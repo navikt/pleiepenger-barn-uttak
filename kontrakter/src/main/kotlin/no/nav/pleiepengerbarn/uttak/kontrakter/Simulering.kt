@@ -3,6 +3,15 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 import com.fasterxml.jackson.annotation.*
 import java.math.BigDecimal
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class Simuleringsgrunnlag @JsonCreator constructor(
+    @JsonProperty("uttaksgrunnlag") val uttaksgrunnlag: Uttaksgrunnlag,
+    @JsonProperty("perioderSomIkkeErInnvilget") val perioderSomIkkeErInnvilget: Map<LukketPeriode, Årsak>
+)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
