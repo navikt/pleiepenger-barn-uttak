@@ -81,7 +81,7 @@ class UttakplanApi {
         @RequestBody simuleringsgrunnlag: Simuleringsgrunnlag,
         uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
         logger.info("Simulerer(v2) uttaksplan(PSB) for behanding=${simuleringsgrunnlag.uttaksgrunnlag.behandlingUUID}")
-        val simulering = simuler(simuleringsgrunnlag.uttaksgrunnlag)
+        val simulering = simuler(simuleringsgrunnlag.uttaksgrunnlag, simuleringsgrunnlag.perioderSomIkkeErInnvilget)
         return ResponseEntity.ok(simulering)
     }
 
