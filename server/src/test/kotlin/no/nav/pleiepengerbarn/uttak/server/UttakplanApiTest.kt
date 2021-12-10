@@ -943,7 +943,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Tre parallelle behandlinger på livets sluttfase med 100% krav skal alle bli innvilget med fullstendig dekning`() {
+    internal fun `Tre parallelle behandlinger på livets sluttfase med 100 prosent krav skal alle bli innvilget med fullstendig dekning`() {
         val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
@@ -987,6 +987,26 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttakplanSøker3.assertOppfylt(søknadsperiode, Prosent(100), mapOf(ARBEIDSFORHOLD4 to Prosent(100)), Årsak.FULL_DEKNING, Endringsstatus.NY)
     }
 
+    @Test
+    internal fun `Perioder med utenlandsopphold skal godkjennes dersom der er under 80 dager per 12 måneder`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-04/2021-01-04"), utenlandsoppholdUtenÅrsak = false)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-05/2021-01-07"), utenlandsoppholdUtenÅrsak = true)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-08/2021-01-08"), utenlandsoppholdUtenÅrsak = false)
+    }
+
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -1012,7 +1032,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         perioder.forEach { assertOppfylt(it, grad, gradPerArbeidsforhold, oppfyltÅrsak, endringsstatus) }
     }
 
-    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING, endringsstatus: Endringsstatus) {
+    private fun Uttaksplan.assertOppfylt(
+        periode: LukketPeriode,
+        grad: Prosent = HUNDRE_PROSENT,
+        gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
+        oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING,
+        endringsstatus: Endringsstatus = Endringsstatus.NY,
+        utenlandsoppholdUtenÅrsak: Boolean = false
+    ) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {
@@ -1023,6 +1050,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
                 }
+                assertThat(periodeInfo.utenlandsoppholdUtenÅrsak).isEqualTo(utenlandsoppholdUtenÅrsak)
             }
             else -> fail("Perioden $periode er ikke oppfylt")
         }

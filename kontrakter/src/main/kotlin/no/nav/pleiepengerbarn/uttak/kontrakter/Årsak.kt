@@ -21,6 +21,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     LOVBESTEMT_FERIE(false),
     BARNETS_DØDSFALL(false),
     INNGANGSVILKÅR_IKKE_OPPFYLT(false),
-    FOR_LAV_INNTEKT(false)
+    FOR_LAV_INNTEKT(false),
+    FOR_MANGE_DAGER_UTENLANDSOPPHOLD(false)
 
 }

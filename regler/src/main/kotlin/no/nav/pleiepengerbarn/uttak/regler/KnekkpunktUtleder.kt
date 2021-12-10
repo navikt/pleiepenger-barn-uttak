@@ -35,12 +35,17 @@ internal object KnekkpunktUtleder {
         finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritetForBehandlinger.keys)
         finnForBarnsDød(knekkpunkMap, regelGrunnlag.barn)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
+        finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
+    }
+
+    private fun finnForUtenlandsopphold(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, utenlandsopphold: Set<LukketPeriode>) {
+        utenlandsopphold.forEach {finnForPeriode(knekkpunkMap, it, KnekkpunktType.UTENLANDSOPPHOLD)}
     }
 
     private fun finnForTrukketUttak(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, trukketUttak: List<LukketPeriode>) {

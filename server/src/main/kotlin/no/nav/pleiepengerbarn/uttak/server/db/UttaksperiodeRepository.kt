@@ -42,7 +42,7 @@ internal class UttaksperiodeRepository {
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
                 uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn,
                 inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
-                nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet, endringsstatus
+                nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet, endringsstatus, utenlandsopphold_uten_aarsak
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -90,7 +90,8 @@ internal class UttaksperiodeRepository {
                     annenPart = AnnenPart.valueOf(rs.getString("annen_part")),
                     nattevåk = tilUtfall(rs.getString("nattevåk")),
                     beredskap = tilUtfall(rs.getString("beredskap")),
-                    endringsstatus = endringsstatus
+                    endringsstatus = endringsstatus,
+                    utenlandsoppholdUtenÅrsak = rs.getBoolean("utenlandsopphold_uten_aarsak")
                 )
             )
         }
@@ -127,11 +128,11 @@ internal class UttaksperiodeRepository {
             insert into 
                 uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, andre_sokeres_tilsyn_reberegnet,
                     tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn, inngangsvilkar, knekkpunkt_typer,
-                    kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap, endringsstatus)
+                    kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap, endringsstatus, utenlandsopphold_uten_aarsak)
                 values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn, :andre_sokeres_tilsyn_reberegnet,
                     :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :oppgitt_tilsyn, :inngangsvilkar, :knekkpunkt_typer,
                     :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
-                    :nattevåk::utfall, :beredskap::utfall, :endringsstatus::endringsstatus)
+                    :nattevåk::utfall, :beredskap::utfall, :endringsstatus::endringsstatus, :utenlandsopphold_uten_aarsak)
        
         """.trimIndent()
         val keyHolder = GeneratedKeyHolder()
@@ -157,6 +158,7 @@ internal class UttaksperiodeRepository {
             .addValue("nattevåk", info.nattevåk?.name, Types.OTHER)
             .addValue("beredskap", info.beredskap?.name, Types.OTHER)
             .addValue("endringsstatus", info.endringsstatus?.name, Types.OTHER)
+            .addValue("utenlandsopphold_uten_aarsak", info.utenlandsoppholdUtenÅrsak)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long

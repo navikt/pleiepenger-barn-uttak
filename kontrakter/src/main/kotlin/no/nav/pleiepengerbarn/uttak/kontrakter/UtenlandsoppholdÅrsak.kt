@@ -1,0 +1,7 @@
+package no.nav.pleiepengerbarn.uttak.kontrakter
+
+enum class UtenlandsoppholdÅrsak {
+    BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING,
+    BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD,
+    INGEN
+}
