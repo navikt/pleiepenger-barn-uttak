@@ -11,6 +11,7 @@
 		<java.version>1.8</java.version>
 		<kotlin.version>1.5.20</kotlin.version>
 		<threeten-extra.version>1.5.0</threeten-extra.version>
+		<log4j2.version>2.15.0</log4j2.version>
 	</properties>
 
     <parent>
