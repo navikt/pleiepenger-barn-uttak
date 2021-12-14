@@ -5,7 +5,7 @@ import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -44,7 +44,7 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
 }
 
 private fun RegelGrunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsak(periode: LukketPeriode): Boolean {
-    return this.utenlandsoppholdperioder.any {periode.overlapperHelt(it.key) && it.value.utenlandsoppholdÅrsak == UtenlandsoppholdÅrsak.INGEN}
+    return this.utenlandsoppholdperioder.any {periode.overlapperDelvis(it.key) && it.value.utenlandsoppholdÅrsak == UtenlandsoppholdÅrsak.INGEN}
 }
 
 private fun UttaksperiodeInfo.settIkkeInnvilgetPgaUtenlandsopphold(): UttaksperiodeInfo {
