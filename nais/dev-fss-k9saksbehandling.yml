@@ -64,4 +64,4 @@ spec:
 
     # Feature toggles
     - name: BEREGN_GRADER_IKKE_YRKESAKTIV_FIX
-      value: true
+      value: "true"
