@@ -8,10 +8,15 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(): Prosent {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(seBortFraIkkeYrkesaktiv: Boolean): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
-    this.values.forEach {
+    val oppdatertArbeid = if (seBortFraIkkeYrkesaktiv) {
+        this.filter { it.key.type != Arbeidstype.IKKE_YRKESAKTIV.kode }
+    } else {
+        this
+    }
+    oppdatertArbeid.values.forEach {
         sumJobberNå += if (it.jobberNå > it.jobberNormalt) {
             it.jobberNormalt //Aldri tell mer enn max per dag
         } else {
