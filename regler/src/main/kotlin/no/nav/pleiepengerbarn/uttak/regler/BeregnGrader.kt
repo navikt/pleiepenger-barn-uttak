@@ -17,11 +17,11 @@ internal object BeregnGrader {
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
-        val seBortFraIkkeYrkesaktiv = arbeid.seBortFraIkkeYrkesaktiv()
+        val seBortFraAndreArbeidsforhold = arbeid.seBortFraAndreArbeidsforhold()
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(seBortFraIkkeYrkesaktiv)
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(seBortFraAndreArbeidsforhold)
         val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid, overseEtablertTilsynÅrsak)
-        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid, seBortFraIkkeYrkesaktiv)
+        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid, seBortFraAndreArbeidsforhold)
 
         return GraderBeregnet(
             pleiebehov = pleiebehov,
@@ -141,13 +141,13 @@ internal object BeregnGrader {
 
 }
 
-private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraIkkeYrkesaktiv(): Boolean {
+private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
     val featureToggleBeregnGrader = System.getenv("BEREGN_GRADER_IKKE_YRKESAKTIV_FIX").toBoolean()
     if (!featureToggleBeregnGrader) {
         return false
     }
-    val harIkkeYrkesaktiv = this.keys.any {it.type == Arbeidstype.IKKE_YRKESAKTIV.kode}
-    val harAndreArbeidsforhold = this.keys.any {it.type != Arbeidstype.IKKE_YRKESAKTIV.kode}
+    val harIkkeYrkesaktiv = this.keys.any {it.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
+    val harAndreArbeidsforhold = this.keys.any {it.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
 
