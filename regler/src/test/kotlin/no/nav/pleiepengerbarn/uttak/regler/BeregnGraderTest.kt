@@ -15,6 +15,8 @@ internal class BeregnGraderTest {
     private val ARBEIDSGIVER1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "987654321")
     private val IKKE_YRKESAKTIV = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV.kode)
+    private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
+    private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
 
 
     @Test
@@ -301,6 +303,31 @@ internal class BeregnGraderTest {
         )
     }
 
+    @Test
+    internal fun `Riktige grader dersom det er flere arbeidsforhold som ikke skal telles med`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                KUN_YTELSE to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(50),
+            IKKE_YRKESAKTIV to NULL_PROSENT,
+            INAKTIV to NULL_PROSENT,
+            KUN_YTELSE to NULL_PROSENT
+        )
+
+    }
 
     private fun GraderBeregnet.assert(årsak: Årsak, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
         assertThat(this.årsak).isEqualTo(årsak)

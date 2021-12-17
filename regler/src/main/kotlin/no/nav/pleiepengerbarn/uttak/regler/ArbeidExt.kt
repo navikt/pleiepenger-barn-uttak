@@ -12,7 +12,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
     val oppdatertArbeid = if (seBortFraIkkeYrkesaktiv) {
-        this.filter { it.key.type != Arbeidstype.IKKE_YRKESAKTIV.kode }
+        this.filter { it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE }
     } else {
         this
     }
