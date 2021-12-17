@@ -14,6 +14,7 @@ internal class BeregnGraderTest {
     private val INGENTING = Duration.ZERO
     private val ARBEIDSGIVER1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "987654321")
+    private val IKKE_YRKESAKTIV = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV.kode)
 
 
     @Test
@@ -238,6 +239,68 @@ internal class BeregnGraderTest {
             ARBEIDSGIVER1 to Prosent(40)
         )
     }
+
+    @Test
+    internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(50),
+            IKKE_YRKESAKTIV to NULL_PROSENT
+        )
+    }
+
+    @Test
+    internal fun `Avslå periode dersom annet arbeidsforhold med IKKE_YRKESAKTIV gjør at uttaksgrad kommer under 20 prosent`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = Duration.ofHours(6).plusMinutes(45)),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.FOR_LAV_TAPT_ARBEIDSTID,
+            NULL_PROSENT,
+            ARBEIDSGIVER1 to NULL_PROSENT,
+            IKKE_YRKESAKTIV to NULL_PROSENT
+        )
+    }
+
+    @Test
+    internal fun `Dersom ikke yrkesaktiv er eneste arbeidsforhold så skal det gi utbetalingsgrad`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(75),
+            IKKE_YRKESAKTIV to Prosent(75)
+        )
+    }
+
 
     private fun GraderBeregnet.assert(årsak: Årsak, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
         assertThat(this.årsak).isEqualTo(årsak)
