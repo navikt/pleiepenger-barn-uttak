@@ -257,9 +257,9 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(50),
+            Prosent(75),
             ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to NULL_PROSENT
+            IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -301,32 +301,6 @@ internal class BeregnGraderTest {
             Prosent(75),
             IKKE_YRKESAKTIV to Prosent(75)
         )
-    }
-
-    @Test
-    internal fun `Riktige grader dersom det er flere arbeidsforhold som ikke skal telles med`() {
-        val grader = BeregnGrader.beregn(
-            pleiebehov = PROSENT_100,
-            etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
-            andreSøkeresTilsyn = NULL_PROSENT,
-            arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                KUN_YTELSE to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
-        )
-
-        grader.assert(
-            Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(50),
-            ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to NULL_PROSENT,
-            INAKTIV to NULL_PROSENT,
-            KUN_YTELSE to NULL_PROSENT
-        )
-
     }
 
     private fun GraderBeregnet.assert(årsak: Årsak, uttaksgrad: Prosent, vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>) {
