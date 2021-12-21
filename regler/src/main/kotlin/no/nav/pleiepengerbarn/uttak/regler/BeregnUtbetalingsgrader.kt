@@ -39,7 +39,7 @@ private val AKTIVITETS_GRUPPER = listOf(
 
 object BeregnUtbetalingsgrader {
 
-    internal fun beregn(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, seBortFraAndreArbeidsforhold: Boolean): Map<Arbeidsforhold, Utbetalingsgrad> {
+    internal fun beregn(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Utbetalingsgrad> {
         arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
 
 
@@ -56,28 +56,24 @@ object BeregnUtbetalingsgrader {
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
-            val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(gjenværendeTimerSomDekkes, arbeidForAktivitetsgruppe, fordeling, seBortFraAndreArbeidsforhold)
+            val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(gjenværendeTimerSomDekkes, arbeidForAktivitetsgruppe, fordeling)
             gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
             alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
         }
         return alleUtbetalingsgrader
     }
 
-    private fun beregnForAktivitetsGruppe(taptArbeidstidSomDekkes: Duration, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>, seBortFraAndreArbeidsforhold: Boolean): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
+    private fun beregnForAktivitetsGruppe(taptArbeidstidSomDekkes: Duration, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         var sumTimerForbrukt = Duration.ZERO
         arbeid.forEach { (arbeidsforhold, info) ->
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             if (info.jobberNormalt > Duration.ZERO) {
-                if (seBortFraAndreArbeidsforhold && arbeidsforhold.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE) {
-                    utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = NULL_PROSENT, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
-                } else {
-                    val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.taptArbeid())
-                    val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
-                    utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
-                    sumTimerForbrukt += timerForbrukt
-                }
+                val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.taptArbeid())
+                val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
+                sumTimerForbrukt += timerForbrukt
             }
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(utbetalingsgrader, taptArbeidstidSomDekkes - sumTimerForbrukt)
