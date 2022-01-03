@@ -61,7 +61,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <environmentVariables>
-                        <BEREGN_GRADER_IKKE_YRKESAKTIV_FIX>true</BEREGN_GRADER_IKKE_YRKESAKTIV_FIX>
                     </environmentVariables>
                 </configuration>
             </plugin>

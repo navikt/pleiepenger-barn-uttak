@@ -150,10 +150,6 @@ internal object BeregnGrader {
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
-    val featureToggleBeregnGrader = System.getenv("BEREGN_GRADER_IKKE_YRKESAKTIV_FIX").toBoolean()
-    if (!featureToggleBeregnGrader) {
-        return false
-    }
     val harIkkeYrkesaktiv = this.keys.any {it.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
     val harAndreArbeidsforhold = this.keys.any {it.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
