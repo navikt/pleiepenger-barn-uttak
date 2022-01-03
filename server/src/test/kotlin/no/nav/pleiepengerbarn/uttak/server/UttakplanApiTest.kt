@@ -943,7 +943,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Tre parallelle behandlinger på livets sluttfase med 100% krav skal alle bli innvilget med fullstendig dekning`() {
+    internal fun `Tre parallelle behandlinger på livets sluttfase med 100 prosent krav skal alle bli innvilget med fullstendig dekning`() {
         val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(8), jobberNå = INGENTING)))
