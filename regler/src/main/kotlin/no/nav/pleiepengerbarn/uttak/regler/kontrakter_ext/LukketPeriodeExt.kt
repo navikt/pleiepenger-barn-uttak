@@ -5,6 +5,7 @@ import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
 import java.lang.IllegalArgumentException
+import java.time.DayOfWeek
 
 internal fun LukketPeriode.overlapperHelt(annen: LukketPeriode) =
         (fom == annen.fom || fom.isBefore(annen.fom)) &&
@@ -26,4 +27,16 @@ fun Collection<LukketPeriode>.sjekkOmOverlapp(): Boolean {
         return true
     }
     return false
+}
+
+internal fun LukketPeriode.virkedager(): Int {
+    var nåværende = fom
+    var antall = 0
+    while (!nåværende.isAfter(tom)) {
+        if (nåværende.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+            antall++
+        }
+        nåværende = nåværende.plusDays(1)
+    }
+    return antall
 }

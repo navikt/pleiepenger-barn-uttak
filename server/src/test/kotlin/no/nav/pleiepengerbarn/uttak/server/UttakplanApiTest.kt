@@ -1050,6 +1050,27 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertIkkeOppfylt(periode = søknadsperiode, ikkeOppfyltÅrsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD), endringsstatus = Endringsstatus.NY)
     }
 
+    @Test
+    internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen men over mer enn 12 måneder skal ikke avslås`() {
+        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+
+        val søknadsperiode = LukketPeriode("2022-03-07/2022-03-11")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertOppfylt(periode = søknadsperiode, utenlandsoppholdUtenÅrsak = true)
+    }
+
     private fun opprettUttakMed8UkerUtenlandsopphold(): Saksnummer {
         val søknadsperiode = LukketPeriode("2021-01-04/2021-02-28")
 

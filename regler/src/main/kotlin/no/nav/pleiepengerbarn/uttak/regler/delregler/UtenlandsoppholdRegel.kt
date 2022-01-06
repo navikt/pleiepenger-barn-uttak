@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -23,13 +24,13 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
         val sortertePerioder = uttaksplan.perioder.keys.toList().sortedBy { it.fom }
         sortertePerioder.forEach { periode ->
             val info = uttaksplan.perioder[periode]
-                ?: throw IllegalStateException("Dette skal ikke kunne skje. Aller perioder skal finnes i map.")
+                ?: throw IllegalStateException("Dette skal ikke kunne skje. Alle perioder skal finnes i map.")
             if (info.utfall == Utfall.OPPFYLT && grunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsak(periode)) {
                 val avklartePerioder = periode.avklarPeriode(utenlandsdagerFraForrigeUttaksplan, brukteDager)
                 avklartePerioder.forEach { (nyPeriode, utenlandsoppholdInnvilget) ->
                     if (utenlandsoppholdInnvilget) {
                         nyePerioder[nyPeriode] = info.copy(utenlandsoppholdUtenÅrsak = true)
-                        brukteDager++
+                        brukteDager += nyPeriode.virkedager()
                     } else {
                         nyePerioder[nyPeriode] = info.settIkkeInnvilgetPgaUtenlandsopphold()
                     }
@@ -74,7 +75,7 @@ private fun LukketPeriode.avklarPeriode(utenlandsdager: Set<LocalDate>, brukteDa
     return nyePerioder.toSegments().associate {LukketPeriode(it.fom, it.tom) to it.value}
 }
 
-private fun Set<LocalDate>.mellom(fom: LocalDate, tom: LocalDate) = this.count {it >= fom || it <= tom}
+private fun Set<LocalDate>.mellom(fom: LocalDate, tom: LocalDate) = this.count { it in fom..tom }
 
 private fun RegelGrunnlag.finnUtenlandsdager(): Set<LocalDate> {
     if (this.forrigeUttaksplan == null) {
