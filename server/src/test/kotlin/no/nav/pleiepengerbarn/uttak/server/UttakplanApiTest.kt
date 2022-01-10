@@ -987,6 +987,109 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttakplanSøker3.assertOppfylt(søknadsperiode, Prosent(100), mapOf(ARBEIDSFORHOLD4 to Prosent(100)), Årsak.FULL_DEKNING, Endringsstatus.NY)
     }
 
+    @Test
+    internal fun `Perioder med utenlandsopphold skal godkjennes dersom der er under 80 dager per 12 måneder`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-04/2021-01-04"), utenlandsoppholdUtenÅrsak = false)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-05/2021-01-07"), utenlandsoppholdUtenÅrsak = true)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-08/2021-01-08"), utenlandsoppholdUtenÅrsak = false)
+    }
+
+    @Test
+    internal fun `Perioder med utenlandsopphold med gyldig grunn skal ikke telles`() {
+        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+
+        val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertOppfylt(søknadsperiode)
+    }
+
+
+    @Test
+    internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen skal avslås`() {
+        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+
+        val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertIkkeOppfylt(periode = søknadsperiode, ikkeOppfyltÅrsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD), endringsstatus = Endringsstatus.NY)
+    }
+
+    @Test
+    internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen men over mer enn 12 måneder skal ikke avslås`() {
+        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+
+        val søknadsperiode = LukketPeriode("2022-03-07/2022-03-11")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertOppfylt(periode = søknadsperiode, utenlandsoppholdUtenÅrsak = true)
+    }
+
+    private fun opprettUttakMed8UkerUtenlandsopphold(): Saksnummer {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-02-28")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        grunnlag.opprettUttaksplan()
+
+        return grunnlag.saksnummer
+    }
+
+
+
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -1012,7 +1115,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         perioder.forEach { assertOppfylt(it, grad, gradPerArbeidsforhold, oppfyltÅrsak, endringsstatus) }
     }
 
-    private fun Uttaksplan.assertOppfylt(periode: LukketPeriode, grad: Prosent = HUNDRE_PROSENT, gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT), oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING, endringsstatus: Endringsstatus) {
+    private fun Uttaksplan.assertOppfylt(
+        periode: LukketPeriode,
+        grad: Prosent = HUNDRE_PROSENT,
+        gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
+        oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING,
+        endringsstatus: Endringsstatus = Endringsstatus.NY,
+        utenlandsoppholdUtenÅrsak: Boolean = false
+    ) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {
@@ -1023,6 +1133,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                     val utbetalingsgrad = periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold } .utbetalingsgrad
                     assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
                 }
+                assertThat(periodeInfo.utenlandsoppholdUtenÅrsak).isEqualTo(utenlandsoppholdUtenÅrsak)
             }
             else -> fail("Perioden $periode er ikke oppfylt")
         }

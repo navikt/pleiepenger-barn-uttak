@@ -26,8 +26,8 @@ data class Uttaksgrunnlag (
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     @JsonProperty("beredskapsperioder") val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("nattevåksperioder") val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
-    @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf()
-
+    @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf(),
+    @JsonProperty("utenlandsoppholdperioder") val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf()
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -44,4 +44,12 @@ data class Vilkårsperiode(
 data class SøktUttak(
     @JsonProperty("periode") val periode: LukketPeriode,
     @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration? = null
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class UtenlandsoppholdInfo(
+    @JsonProperty("utenlandsoppholdÅrsak") val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak,
+    @JsonProperty("landkode") val landkode: String
 )

@@ -3,8 +3,6 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 import com.fasterxml.jackson.annotation.*
 import java.time.Duration
 
-typealias Uttaksperiode = Map.Entry<LukketPeriode, UttaksperiodeInfo>
-
 enum class Utfall {
     OPPFYLT,
     IKKE_OPPFYLT
@@ -74,7 +72,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("annenPart") val annenPart: AnnenPart,
     @JsonProperty("nattevåk") val nattevåk: Utfall?,
     @JsonProperty("beredskap") val beredskap: Utfall?,
-    @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null
+    @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null,
+    @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false
 ) {
 
     companion object {

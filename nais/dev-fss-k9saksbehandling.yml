@@ -61,3 +61,7 @@ spec:
       value: "true"
     - name: APPDYNAMICS_AGENT_ACCOUNT_NAME
       value: NON-PROD
+
+    # Feature toggles
+    - name: UTENLANDSOPPHOLD_REGEL
+      value: "true"

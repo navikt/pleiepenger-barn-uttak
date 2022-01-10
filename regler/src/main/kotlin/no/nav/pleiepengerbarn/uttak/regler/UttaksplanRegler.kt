@@ -21,6 +21,7 @@ internal object UttaksplanRegler {
 
     private val UttaksplanRegler = linkedSetOf(
             InngangsvilkårIkkeOppfyltRegel(),
+            UtenlandsoppholdRegel()
 // NB: erstartet inntil videre med  BarnsDødPeriodeRegel
 // BarnsDødRegel()
     )
