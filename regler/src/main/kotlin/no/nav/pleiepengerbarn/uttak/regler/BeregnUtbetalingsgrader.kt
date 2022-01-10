@@ -16,13 +16,14 @@ enum class Arbeidstype(val kode: String) {
     IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
     KUN_YTELSE("BA"),
     INAKTIV("MIDL_INAKTIV"),
-    SYKEPENGER_AV_DAGPENGER("SP_AV_DP")
+    SYKEPENGER_AV_DAGPENGER("SP_AV_DP"),
+    PSB_AV_DP("PSB_AV_DP")
 }
 
 private val AKTIVITETS_GRUPPER = listOf(
     setOf(Arbeidstype.ARBEIDSTAKER),
     setOf(Arbeidstype.FRILANSER),
-    setOf(Arbeidstype.DAGPENGER, Arbeidstype.SYKEPENGER_AV_DAGPENGER),
+    setOf(Arbeidstype.DAGPENGER, Arbeidstype.SYKEPENGER_AV_DAGPENGER, Arbeidstype.PSB_AV_DP),
     setOf(Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE),
     setOf(
         Arbeidstype.IKKE_YRKESAKTIV,
@@ -30,6 +31,11 @@ private val AKTIVITETS_GRUPPER = listOf(
         Arbeidstype.INAKTIV
     )
 )
+ internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
+     Arbeidstype.IKKE_YRKESAKTIV.kode,
+     Arbeidstype.KUN_YTELSE.kode,
+     Arbeidstype.INAKTIV.kode
+ )
 
 object BeregnUtbetalingsgrader {
 

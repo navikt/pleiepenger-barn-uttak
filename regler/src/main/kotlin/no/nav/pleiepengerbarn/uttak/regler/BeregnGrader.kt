@@ -18,8 +18,8 @@ internal object BeregnGrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid()
-        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, søkersTapteArbeidstid, overseEtablertTilsynÅrsak)
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(false)
+        val uttaksgradResultat = avklarUttaksgrad(pleiebehov, etablertTilsynsprosent, oppgittTilsyn, andreSøkeresTilsyn, arbeid, overseEtablertTilsynÅrsak)
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid)
 
         return GraderBeregnet(
@@ -44,9 +44,10 @@ internal object BeregnGrader {
                                  ønsketUttaksgrad: Duration?,
                                  andreSøkeresTilsyn: Prosent,
                                  arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-                                 søkersTapteArbeidstid: Prosent,
                                  overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
     ): UttaksgradResultat {
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(false)
+
         val restTilSøker = finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
 
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
@@ -55,8 +56,16 @@ internal object BeregnGrader {
             val forLavGradÅrsak = utledForLavGradÅrsak(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
             return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = forLavGradÅrsak, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
         }
-        if (søkersTapteArbeidstid < TJUE_PROSENT) {
-            return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
+        val seBortFraAndreArbeidsforhold = arbeid.seBortFraAndreArbeidsforhold()
+        if (seBortFraAndreArbeidsforhold) {
+            val søkersTapteArbeidstidUtenAndreArbeidsforhold = arbeid.finnSøkersTapteArbeidstid(true)
+            if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
+                return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
+            }
+        } else {
+            if (søkersTapteArbeidstid < TJUE_PROSENT) {
+                return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
+            }
         }
         if (ønsketUttaksgradProsent < TJUE_PROSENT) {
             return UttaksgradResultat(restTilSøker, Prosent.ZERO, ikkeOppfyltÅrsak = Årsak.FOR_LAV_ØNSKET_UTTAKSGRAD, overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak)
@@ -138,6 +147,12 @@ internal object BeregnGrader {
         return BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
     }
 
+}
+
+private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
+    val harIkkeYrkesaktiv = this.keys.any {it.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
+    val harAndreArbeidsforhold = this.keys.any {it.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
+    return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
