@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
 import java.lang.IllegalArgumentException
 import java.time.DayOfWeek
+import java.time.LocalDate
 
 internal fun LukketPeriode.overlapperHelt(annen: LukketPeriode) =
         (fom == annen.fom || fom.isBefore(annen.fom)) &&
@@ -40,3 +41,15 @@ internal fun LukketPeriode.virkedager(): Int {
     }
     return antall
 }
+
+internal fun LukketPeriode.tilVirkedager(): Set<LocalDate> {
+    val datoer = mutableSetOf<LocalDate>()
+    this.stream().forEach {
+        if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+            datoer.add(it)
+        }
+    }
+    return datoer
+}
+
+internal fun LukketPeriode.stream() = fom.datesUntil(tom.plusDays(1))

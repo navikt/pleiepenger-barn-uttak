@@ -965,7 +965,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker2),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
-                behandlingUUID = nesteBehandlingId(),
+                behandlingUUID = søker2BehandlingId,
                 saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker2BehandlingId, grunnlag1Søker1.behandlingUUID)))
 
         grunnlagSøker2.opprettUttaksplan()
@@ -978,7 +978,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker3),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
-                behandlingUUID = nesteBehandlingId(),
+                behandlingUUID = søker3BehandlingId,
                 saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker3BehandlingId, grunnlagSøker2.behandlingUUID, grunnlag1Søker1.behandlingUUID)))
 
 

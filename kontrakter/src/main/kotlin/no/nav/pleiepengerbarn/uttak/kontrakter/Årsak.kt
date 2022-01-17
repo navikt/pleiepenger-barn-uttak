@@ -22,6 +22,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     BARNETS_DØDSFALL(false),
     INNGANGSVILKÅR_IKKE_OPPFYLT(false),
     FOR_LAV_INNTEKT(false),
-    FOR_MANGE_DAGER_UTENLANDSOPPHOLD(false)
+    FOR_MANGE_DAGER_UTENLANDSOPPHOLD(false),
+    MAKS_DAGER_OVERSTEGET(false)
 
 }

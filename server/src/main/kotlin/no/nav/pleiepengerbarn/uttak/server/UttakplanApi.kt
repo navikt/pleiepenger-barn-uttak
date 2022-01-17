@@ -39,7 +39,7 @@ class UttakplanApi {
     fun opprettUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
-        logger.info("Opprett uttaksplan for behanding=${uttaksgrunnlag.behandlingUUID}")
+        logger.info("Opprett uttaksplan for behandling=${uttaksgrunnlag.behandlingUUID}")
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val nyUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, true)
@@ -53,7 +53,7 @@ class UttakplanApi {
     @PostMapping(EndringUttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Endrer en uttaksplan. Kun enkelte endringer er lovlig, hvis endringen er ulovlig så vil endepunktet returnere en 'bad request'.")
     fun endrePerioder(@RequestBody endrePerioderGrunnlag: EndrePerioderGrunnlag): ResponseEntity<Uttaksplan?> {
-        logger.info("Endrer uttaksplan for behanding=${endrePerioderGrunnlag.behandlingUUID}")
+        logger.info("Endrer uttaksplan for behandling=${endrePerioderGrunnlag.behandlingUUID}")
         endrePerioderGrunnlag.valider()
         val eksisterendeUttaksplan = uttakRepository.hent(UUID.fromString(endrePerioderGrunnlag.behandlingUUID))
             ?: return ResponseEntity.badRequest().body(null)
@@ -68,7 +68,7 @@ class UttakplanApi {
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
-        logger.info("Simulerer uttaksplan(PSB) for behanding=${uttaksgrunnlag.behandlingUUID}")
+        logger.info("Simulerer uttaksplan(PSB) for behandling=${uttaksgrunnlag.behandlingUUID}")
         val simulering = simuler(uttaksgrunnlag)
         return ResponseEntity.ok(simulering)
     }
@@ -78,7 +78,7 @@ class UttakplanApi {
     fun simulerUttaksplanForLivetsSluttfase(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<SimuleringLivetsSluttfase> {
-        logger.info("Simulerer uttaksplan(PLS) for behanding=${uttaksgrunnlag.behandlingUUID}")
+        logger.info("Simulerer uttaksplan(PLS) for behandling=${uttaksgrunnlag.behandlingUUID}")
         val simulering = simuler(uttaksgrunnlag)
         val erKvotenBruktOpp = BeregnBruktKvote.erKvotenOversteget(simulering.simulertUttaksplan, hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag))
         return ResponseEntity.ok(SimuleringLivetsSluttfase(simulering.forrigeUttaksplan, simulering.simulertUttaksplan,
@@ -131,7 +131,7 @@ class UttakplanApi {
         ]
     )
     fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID, @RequestParam slåSammenLikePerioder: Boolean = false): ResponseEntity<Uttaksplan> {
-        logger.info("Henter uttaksplan for behanding=$behandlingUUID slåSammenLikePerioder=$slåSammenLikePerioder")
+        logger.info("Henter uttaksplan for behandling=$behandlingUUID slåSammenLikePerioder=$slåSammenLikePerioder")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
         } catch (e: IllegalArgumentException) {
@@ -153,7 +153,7 @@ class UttakplanApi {
         ]
     )
     fun slettUttaksplab(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
-        logger.info("Sletter uttaksplan for behanding=$behandlingUUID")
+        logger.info("Sletter uttaksplan for behandling=$behandlingUUID")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
         } catch (e: IllegalArgumentException) {

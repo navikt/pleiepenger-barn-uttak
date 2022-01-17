@@ -6,6 +6,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.stream
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.tilVirkedager
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -88,18 +90,6 @@ private fun RegelGrunnlag.finnUtenlandsdager(): Set<LocalDate> {
     }
     return this.forrigeUttaksplan.perioder
         .filter {it.value.utenlandsoppholdUtenÅrsak}
-        .flatMap {it.key.tilDatoer()}
+        .flatMap {it.key.tilVirkedager()}
         .toSet()
 }
-
-private fun LukketPeriode.tilDatoer(): Set<LocalDate> {
-    val datoer = mutableSetOf<LocalDate>()
-    this.stream().forEach {
-        if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-            datoer.add(it)
-        }
-    }
-    return datoer
-}
-
-private fun LukketPeriode.stream() = fom.datesUntil(tom.plusDays(1))
