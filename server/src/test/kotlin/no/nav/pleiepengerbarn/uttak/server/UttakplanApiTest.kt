@@ -1071,6 +1071,32 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertOppfylt(periode = søknadsperiode, utenlandsoppholdUtenÅrsak = true)
     }
 
+
+    @Test
+    internal fun `Ikke yrkesaktiv i kombinasjon med arbeidsforhold uten normal arbeidstid skal gi utbetaling for ikke yrkesaktiv`() {
+        val saksnummer = nesteSaksnummer()
+
+        val uttaksplan = lagGrunnlag(saksnummer, "2022-01-01/2022-01-31")
+            .copy(
+                arbeid = listOf(
+                    Arbeid(Arbeidsforhold(type = "AT", organisasjonsnummer = "987654321"), mapOf(LukketPeriode("2022-01-01/2022-01-31") to ArbeidsforholdPeriodeInfo(jobberNormalt = INGENTING, jobberNå = INGENTING))),
+                    Arbeid(Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789"), mapOf(LukketPeriode("2022-01-01/2022-01-10") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
+                    Arbeid(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123456789"), mapOf(LukketPeriode("2022-01-11/2022-01-31") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
+                )
+            )
+            .opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(6)
+        val hundreProsentTilVanligArbeidsforhold = mapOf(Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789") to HUNDRE_PROSENT)
+        val hundreProsentTilIkkeYrkesaktiv = mapOf(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123456789") to HUNDRE_PROSENT)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-03/2022-01-07"), gradPerArbeidsforhold = hundreProsentTilVanligArbeidsforhold)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-10/2022-01-10"), gradPerArbeidsforhold = hundreProsentTilVanligArbeidsforhold)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-11/2022-01-14"), gradPerArbeidsforhold = hundreProsentTilIkkeYrkesaktiv)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-17/2022-01-21"), gradPerArbeidsforhold = hundreProsentTilIkkeYrkesaktiv)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-24/2022-01-28"), gradPerArbeidsforhold = hundreProsentTilIkkeYrkesaktiv)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-31/2022-01-31"), gradPerArbeidsforhold = hundreProsentTilIkkeYrkesaktiv)
+    }
+
     private fun opprettUttakMed8UkerUtenlandsopphold(): Saksnummer {
         val søknadsperiode = LukketPeriode("2021-01-04/2021-02-28")
 
