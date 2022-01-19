@@ -151,9 +151,11 @@ internal object BeregnGrader {
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
     val harIkkeYrkesaktiv = this.keys.any {it.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
-    val harAndreArbeidsforhold = this.keys.any {it.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE}
+    val harAndreArbeidsforhold = this.any {it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE && !it.value.utenArbeidtid()}
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
+
+private fun ArbeidsforholdPeriodeInfo.utenArbeidtid() = this.jobberNormalt == Duration.ZERO && this.jobberNå == Duration.ZERO
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
 private fun ArbeidsforholdPeriodeInfo.fulltFravær() = jobberNå == Duration.ZERO
