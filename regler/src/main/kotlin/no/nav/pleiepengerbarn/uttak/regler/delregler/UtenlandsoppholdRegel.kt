@@ -32,7 +32,7 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
         sortertePerioder.forEach { periode ->
             val info = uttaksplan.perioder[periode]
                 ?: throw IllegalStateException("Dette skal ikke kunne skje. Alle perioder skal finnes i map.")
-            if (info.utfall == Utfall.OPPFYLT && grunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsak(periode)) {
+            if (info.utfall == Utfall.OPPFYLT && grunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsakUtenforEøs(periode)) {
                 val avklartePerioder = periode.avklarPeriode(utenlandsdagerFraForrigeUttaksplan, brukteDager)
                 avklartePerioder.forEach { (nyPeriode, utenlandsoppholdInnvilget) ->
                     if (utenlandsoppholdInnvilget) {
@@ -51,8 +51,16 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
 
 }
 
-private fun RegelGrunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsak(periode: LukketPeriode): Boolean {
-    return this.utenlandsoppholdperioder.any {periode.overlapperDelvis(it.key) && it.value.utenlandsoppholdÅrsak == UtenlandsoppholdÅrsak.INGEN}
+private fun RegelGrunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsakUtenforEøs(periode: LukketPeriode): Boolean {
+    val eøsLand: List<String> = listOf("ALA", "AUT", "BEL", "BGR", "CYP", "CZE",
+        "DEU", "DNK", "ESP", "EST", "FIN", "FRA", "FRO", "GBR", "GRC", "GRL",
+        "HRV", "HUN", "IRL", "ISL", "ITA", "LIE", "LTU", "LUX", "LVA", "MLT",
+        "NLD", "NOR", "POL", "PRT", "ROU", "SVK", "SVN", "SWE")
+    return this.utenlandsoppholdperioder.any {
+        (periode.overlapperDelvis(it.key)
+                && it.value.utenlandsoppholdÅrsak == UtenlandsoppholdÅrsak.INGEN)
+                && !eøsLand.contains(it.value.landkode)
+    }
 }
 
 private fun UttaksperiodeInfo.settIkkeInnvilgetPgaUtenlandsopphold(): UttaksperiodeInfo {
