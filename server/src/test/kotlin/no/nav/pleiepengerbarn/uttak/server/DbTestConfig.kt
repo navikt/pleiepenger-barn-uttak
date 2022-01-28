@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.server
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
@@ -20,6 +21,14 @@ class DbTestConfig {
     @Bean
     fun applicationDataConnection(): JdbcTemplate {
         return JdbcTemplate(testDataSource())
+    }
+
+    @Bean
+    fun registration(filter: AuthFilter): FilterRegistrationBean<AuthFilter> {
+        //Fjerner filter som sjekker secret.
+        val registration = FilterRegistrationBean(filter)
+        registration.isEnabled = false
+        return registration
     }
 
     private fun createLocalDatasource(url: String, username: String, password: String): DataSource {
