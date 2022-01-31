@@ -1091,6 +1091,25 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertOppfylt(periode = søknadsperiode, utenlandsoppholdUtenÅrsak = true)
     }
 
+    @Test
+    internal fun `Simulering skal gi samme resultat med samme grunnlag som forrige uttaksplan`() {
+
+        val søknadsperiode = LukketPeriode("2021-10-01/2021-12-31")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(
+            utenlandsoppholdperioder = mapOf(søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        grunnlag.opprettUttaksplan()
+
+        val resultatSimulering = testClient.simulerUttaksplan(grunnlag).body ?: throw IllegalStateException("Skal ikke være null")
+
+        assertThat(resultatSimulering.uttakplanEndret).isFalse
+    }
 
     @Test
     internal fun `Ikke yrkesaktiv i kombinasjon med arbeidsforhold uten normal arbeidstid skal gi utbetaling for ikke yrkesaktiv`() {
