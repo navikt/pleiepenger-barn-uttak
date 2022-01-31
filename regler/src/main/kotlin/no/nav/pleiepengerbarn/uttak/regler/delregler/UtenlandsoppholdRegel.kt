@@ -8,8 +8,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.stream
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.tilVirkedager
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 private const val MAX_DAGER_PER_ÅR = 8 * 5
@@ -27,17 +25,16 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
         val utenlandsdagerFraForrigeUttaksplan = grunnlag.finnUtenlandsdager()
 
-        var brukteDager = 0
         val sortertePerioder = uttaksplan.perioder.keys.toList().sortedBy { it.fom }
         sortertePerioder.forEach { periode ->
             val info = uttaksplan.perioder[periode]
                 ?: throw IllegalStateException("Dette skal ikke kunne skje. Alle perioder skal finnes i map.")
             if (info.utfall == Utfall.OPPFYLT && grunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsakUtenforEøs(periode)) {
-                val avklartePerioder = periode.avklarPeriode(utenlandsdagerFraForrigeUttaksplan, brukteDager)
+                val avklartePerioder = periode.avklarPeriode(utenlandsdagerFraForrigeUttaksplan)
                 avklartePerioder.forEach { (nyPeriode, utenlandsoppholdInnvilget) ->
                     if (utenlandsoppholdInnvilget) {
                         nyePerioder[nyPeriode] = info.copy(utenlandsoppholdUtenÅrsak = true)
-                        brukteDager += nyPeriode.virkedager()
+                        utenlandsdagerFraForrigeUttaksplan.addAll(nyPeriode.tilVirkedager())
                     } else {
                         nyePerioder[nyPeriode] = info.settIkkeInnvilgetPgaUtenlandsopphold()
                     }
@@ -69,7 +66,7 @@ private fun UttaksperiodeInfo.settIkkeInnvilgetPgaUtenlandsopphold(): Uttaksperi
     return this.copy(utfall = Utfall.IKKE_OPPFYLT, uttaksgrad = NULL_PROSENT, årsaker = årsaker, utbetalingsgrader = oppdaterteUtbetalingsgrader)
 }
 
-private fun LukketPeriode.avklarPeriode(utenlandsdager: Set<LocalDate>, brukteDager: Int): Map<LukketPeriode, Boolean> {
+private fun LukketPeriode.avklarPeriode(utenlandsdager: Set<LocalDate>): Map<LukketPeriode, Boolean> {
 
     val segmenter = mutableListOf<LocalDateSegment<Boolean>>()
 
@@ -77,7 +74,7 @@ private fun LukketPeriode.avklarPeriode(utenlandsdager: Set<LocalDate>, brukteDa
 
     var brukteDagerPåDennePerioden = 0
     this.stream().forEach { dato ->
-        val forbrukteDager = antallFraTidligereUttaksplan + brukteDager + brukteDagerPåDennePerioden
+        val forbrukteDager = antallFraTidligereUttaksplan + brukteDagerPåDennePerioden
         if (forbrukteDager < MAX_DAGER_PER_ÅR) {
             segmenter.add(LocalDateSegment(dato, dato, true))
             brukteDagerPåDennePerioden++
@@ -92,12 +89,12 @@ private fun LukketPeriode.avklarPeriode(utenlandsdager: Set<LocalDate>, brukteDa
 
 private fun Set<LocalDate>.mellom(fom: LocalDate, tom: LocalDate) = this.count { it in fom..tom }
 
-private fun RegelGrunnlag.finnUtenlandsdager(): Set<LocalDate> {
+private fun RegelGrunnlag.finnUtenlandsdager(): MutableSet<LocalDate> {
     if (this.forrigeUttaksplan == null) {
-        return setOf()
+        return mutableSetOf()
     }
     return this.forrigeUttaksplan.perioder
         .filter {it.value.utenlandsoppholdUtenÅrsak}
         .flatMap {it.key.tilVirkedager()}
-        .toSet()
+        .toMutableSet()
 }
