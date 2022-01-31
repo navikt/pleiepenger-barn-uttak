@@ -90,7 +90,9 @@ class UttakplanApi() {
         }
         logger.info(logMelding)
         val simulering = simuler(uttaksgrunnlag)
-        logger.info("Simulering for ${uttaksgrunnlag.behandlingUUID} simulering=$simulering")
+        if (utvidetLogging) {
+            logger.info("Simulering for ${uttaksgrunnlag.behandlingUUID} simulering=$simulering")
+        }
         return ResponseEntity.ok(simulering)
     }
 
