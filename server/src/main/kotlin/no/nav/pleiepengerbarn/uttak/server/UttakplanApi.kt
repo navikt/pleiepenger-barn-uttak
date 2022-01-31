@@ -9,6 +9,7 @@ import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -18,10 +19,12 @@ import java.util.*
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
-class UttakplanApi {
+class UttakplanApi() {
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
+
+    private var utvidetLogging: Boolean = false
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
@@ -34,17 +37,29 @@ class UttakplanApi {
 
     }
 
+    init {
+        utvidetLogging = System.getenv("UTVIDET_LOGGING").toBoolean()
+    }
+
     @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
-        logger.info("Opprett uttaksplan for behandling=${uttaksgrunnlag.behandlingUUID}")
+        val logMelding = if (utvidetLogging) {
+            "Opprett uttaksplan for behandling=${uttaksgrunnlag.behandlingUUID} grunnlag=$uttaksgrunnlag"
+        } else {
+            "Opprett uttaksplan for behandling=${uttaksgrunnlag.behandlingUUID}"
+        }
+        logger.info(logMelding)
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val nyUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, true)
         val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
 
+        if (utvidetLogging) {
+            logger.info("Resultat for behandling=${uttaksgrunnlag.behandlingUUID} uttaksplan=$nyUttaksplan")
+        }
         return ResponseEntity
             .created(uri)
             .body(nyUttaksplan)
@@ -68,8 +83,14 @@ class UttakplanApi {
     fun simulerUttaksplan(
             @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
             uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
-        logger.info("Simulerer uttaksplan(PSB) for behandling=${uttaksgrunnlag.behandlingUUID}")
+        val logMelding = if (utvidetLogging) {
+            "Simulerer uttaksplan(PSB) for behandling=${uttaksgrunnlag.behandlingUUID} grunnlag=$uttaksgrunnlag"
+        } else {
+            "Simulerer uttaksplan(PSB) for behandling=${uttaksgrunnlag.behandlingUUID}"
+        }
+        logger.info(logMelding)
         val simulering = simuler(uttaksgrunnlag)
+        logger.info("Simulering for ${uttaksgrunnlag.behandlingUUID} simulering=$simulering")
         return ResponseEntity.ok(simulering)
     }
 
