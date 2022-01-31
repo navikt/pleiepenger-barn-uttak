@@ -65,3 +65,5 @@ spec:
     # Feature toggles
     - name: UTENLANDSOPPHOLD_REGEL
       value: "true"
+    - name: UTVIDET_LOGGING
+      value: "true"
