@@ -73,7 +73,9 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("nattevåk") val nattevåk: Utfall?,
     @JsonProperty("beredskap") val beredskap: Utfall?,
     @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null,
-    @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false
+    @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false,
+    @JsonProperty("landkode") val landkode: String? = null,
+    @JsonProperty("utenlandsoppholdÅrsak") val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
 ) {
 
     companion object {
