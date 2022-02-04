@@ -37,10 +37,12 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
                         utenlandsdagerFraForrigeUttaksplan.addAll(nyPeriode.tilVirkedager())
                     } else {
                         nyePerioder[nyPeriode] = info.settIkkeInnvilgetPgaUtenlandsopphold()
+                        utenlandsdagerFraForrigeUttaksplan.removeAll(nyPeriode.tilVirkedager())
                     }
                 }
             } else {
                 nyePerioder[periode] = info
+                utenlandsdagerFraForrigeUttaksplan.removeAll(periode.tilVirkedager())
             }
         }
         return uttaksplan.copy(perioder = nyePerioder)
