@@ -1009,7 +1009,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Perioder med utenlandsopphold med gyldig grunn skal ikke telles`() {
-        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
         val grunnlag = lagGrunnlag(
@@ -1030,7 +1030,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Perioder med utenlandsopphold uten årsak innenfor EØS som overstiger 8 ukers grensen skal innfris`() {
-        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
         val grunnlag = lagGrunnlag(
@@ -1051,7 +1051,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen skal avslås`() {
-        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
         val grunnlag = lagGrunnlag(
@@ -1071,8 +1071,60 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen men hvor utenlandsoppholdet endres i ny behandling`() {
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-03-07"))
+
+        val søknadsperiode = LukketPeriode("2021-02-22/2021-03-07")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(
+                LukketPeriode("2021-02-22/2021-02-28") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA"),
+                LukketPeriode("2021-03-01/2021-03-07") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA")
+            )
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-02-22/2021-02-26"), utenlandsoppholdUtenÅrsak = false, endringsstatus = Endringsstatus.ENDRET)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-03-01/2021-03-05"), utenlandsoppholdUtenÅrsak = true, endringsstatus = Endringsstatus.ENDRET)
+    }
+
+    @Test
+    internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen men hvor en del av uttak avslås pga arbeid`() {
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-03-07"))
+
+        val søknadsperiode = LukketPeriode("2021-02-22/2021-03-07")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(
+                    LukketPeriode("2021-02-22/2021-02-28") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG),
+                    LukketPeriode("2021-03-01/2021-03-07") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(
+                søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA")
+            )
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        assertThat(uttaksplan.perioder).hasSize(9)
+        uttaksplan.assertIkkeOppfylt(periode = LukketPeriode("2021-02-22/2021-02-26"), ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),  endringsstatus = Endringsstatus.ENDRET)
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-03-01/2021-03-05"), utenlandsoppholdUtenÅrsak = true, endringsstatus = Endringsstatus.ENDRET)
+    }
+
+    @Test
     internal fun `Perioder med utenlandsopphold uten årsak som overstiger 8 ukers grensen men over mer enn 12 måneder skal ikke avslås`() {
-        val saksnummer = opprettUttakMed8UkerUtenlandsopphold()
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2022-03-07/2022-03-11")
         val grunnlag = lagGrunnlag(
@@ -1136,9 +1188,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertOppfylt(periode = LukketPeriode("2022-01-31/2022-01-31"), gradPerArbeidsforhold = hundreProsentTilIkkeYrkesaktiv)
     }
 
-    private fun opprettUttakMed8UkerUtenlandsopphold(): Saksnummer {
-        val søknadsperiode = LukketPeriode("2021-01-04/2021-02-28")
-
+    private fun opprettUttakUtenlandsopphold(søknadsperiode: LukketPeriode, utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN): Saksnummer {
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -1152,8 +1202,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         return grunnlag.saksnummer
     }
-
-
 
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
         val postResponse = testClient.opprettUttaksplan(this)
