@@ -4,7 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -26,13 +26,13 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlag(helePerioden).copy(ytelseType = YtelseType.PSB)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(1)
-        Assertions.assertThat(resultat.kvoteInfo).isNull()
+        assertThat(resultat.perioder).hasSize(1)
+        assertThat(resultat.kvoteInfo).isNull()
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode).isEqualTo(periode1)
-        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode).isEqualTo(periode1)
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
     }
 
     @Test
@@ -46,16 +46,16 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlag(helePerioden)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(1)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(55))
+        assertThat(resultat.perioder).hasSize(1)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(55))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode).isEqualTo(periode1)
-        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode).isEqualTo(periode1)
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
     }
 
     @Test
@@ -69,21 +69,21 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlag(helePerioden)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(2)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode).isEqualTo(LukketPeriode("2020-01-06/2020-03-27"))
-        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2020-01-06/2020-03-27"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.last()
         val resultatInfo2 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-04-03"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-04-03"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -101,31 +101,31 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlag(helePerioden)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(4)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(resultat.perioder).hasSize(4)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode).isEqualTo(LukketPeriode("2020-01-06/2020-01-31"))
-        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2020-01-06/2020-01-31"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.toList()[1]
         val resultatInfo2 = resultat.perioder.values.toList()[1]
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-02-03/2020-02-07"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-02-03/2020-02-07"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
 
         val resultatPeriode3 = resultat.perioder.keys.toList()[2]
         val resultatInfo3 = resultat.perioder.values.toList()[2]
-        Assertions.assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-02-10/2020-04-03"))
-        Assertions.assertThat(resultatInfo3.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-02-10/2020-04-03"))
+        assertThat(resultatInfo3.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode4 = resultat.perioder.keys.last()
         val resultatInfo4 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode4).isEqualTo(LukketPeriode("2020-04-04/2020-04-10"))
-        Assertions.assertThat(resultatInfo4.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode4).isEqualTo(LukketPeriode("2020-04-04/2020-04-10"))
+        assertThat(resultatInfo4.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -141,16 +141,16 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlagMedAndreParter(helePerioden, annenPartsBehandlingUUID)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(1)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 4, 3))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
+        assertThat(resultat.perioder).hasSize(1)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 4, 3))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode).isEqualTo(periode1)
-        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode).isEqualTo(periode1)
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
     }
 
     @Test
@@ -236,26 +236,26 @@ class MaxAntallDagerRegelTest {
         )
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(3)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(30))
+        assertThat(resultat.perioder).hasSize(3)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(30))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-02-17/2020-02-21")) // resterende 5 dagene på kvoten
-        Assertions.assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-02-17/2020-02-21")) // resterende 5 dagene på kvoten
+        assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.toList()[1]
         val resultatInfo2 = resultat.perioder.values.toList()[1]
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-02-22/2020-03-27")) // innvilget fordi det sammenfaller
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-02-22/2020-03-27")) // innvilget fordi det sammenfaller
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode3 = resultat.perioder.keys.last()
         val resultatInfo3 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-28/2020-04-10")) // avslag fordi max kvote
-        Assertions.assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-28/2020-04-10")) // avslag fordi max kvote
+        assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -274,26 +274,26 @@ class MaxAntallDagerRegelTest {
 
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(3)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(3))
+        assertThat(resultat.perioder).hasSize(3)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(3))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-25/2020-03-27"))
-        Assertions.assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-25/2020-03-27"))
+        assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.toList()[1]
         val resultatInfo2 = resultat.perioder.values.toList()[1]
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-03-30"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-03-30"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
 
         val resultatPeriode3 = resultat.perioder.keys.last()
         val resultatInfo3 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-31/2020-04-03"))
-        Assertions.assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-31/2020-04-03"))
+        assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -310,21 +310,21 @@ class MaxAntallDagerRegelTest {
 
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(2)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(25))
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(25))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-02-24/2020-03-27"))
-        Assertions.assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-02-24/2020-03-27"))
+        assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.last()
         val resultatInfo2 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-04-24"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-04-24"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -340,21 +340,21 @@ class MaxAntallDagerRegelTest {
         val grunnlag = dummyRegelGrunnlagMedAndreParter(helePerioden, annenPartsBehandlingUUID)
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(2)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-16/2020-03-20"))
-        Assertions.assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-16/2020-03-20"))
+        assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.last()
         val resultatInfo2 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-21/2020-03-27"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-21/2020-03-27"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
     @Test
@@ -371,26 +371,26 @@ class MaxAntallDagerRegelTest {
 
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
-        Assertions.assertThat(resultat.perioder).hasSize(3)
-        Assertions.assertThat(resultat.kvoteInfo).isNotNull
-        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
-        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10))
+        assertThat(resultat.perioder).hasSize(3)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
-        Assertions.assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-09/2020-03-13"))
-        Assertions.assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode1).isEqualTo(LukketPeriode("2020-03-09/2020-03-13"))
+        assertThat(resultatInfo1.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode2 = resultat.perioder.keys.toList()[1]
         val resultatInfo2 = resultat.perioder.values.toList()[1]
-        Assertions.assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-14/2020-03-20"))
-        Assertions.assertThat(resultatInfo2.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-14/2020-03-20"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val resultatPeriode3 = resultat.perioder.keys.last()
         val resultatInfo3 = resultat.perioder.values.last()
-        Assertions.assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-21/2020-03-27"))
-        Assertions.assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultatPeriode3).isEqualTo(LukketPeriode("2020-03-21/2020-03-27"))
+        assertThat(resultatInfo3.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
 
 }
