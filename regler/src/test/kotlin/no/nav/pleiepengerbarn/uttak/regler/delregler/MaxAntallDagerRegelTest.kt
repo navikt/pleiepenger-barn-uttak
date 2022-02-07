@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.somArbeid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
@@ -13,6 +14,26 @@ import java.util.*
 
 class MaxAntallDagerRegelTest {
     private val regel: MaxAntallDagerRegel = MaxAntallDagerRegel()
+
+    @Test
+    internal fun `Pleiepenger sykt barn skal få innvilget uavhengig av kvote, og kvoteInfo skal derfor ikke være satt`() {
+        val periode1 = LukketPeriode("2020-01-06/2020-04-03") // 65 dager
+        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+                periode1 to dummyUttaksperiodeInfo()
+        ), trukketUttak = listOf())
+
+        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.MARCH, 20))
+        val grunnlag = dummyRegelGrunnlag(helePerioden).copy(ytelseType = YtelseType.PSB)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        Assertions.assertThat(resultat.perioder).hasSize(1)
+        Assertions.assertThat(resultat.kvoteInfo).isNull()
+
+        val resultatPeriode = resultat.perioder.keys.first()
+        val resultatInfo = resultat.perioder.values.first()
+        Assertions.assertThat(resultatPeriode).isEqualTo(periode1)
+        Assertions.assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+    }
 
     @Test
     internal fun `Søker får fraværet innvilget fordi det er mindre enn max antall dager`() {
@@ -26,6 +47,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(1)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(55))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
@@ -45,6 +70,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(2)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
@@ -73,6 +102,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(4)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.ZERO)
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(60))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
@@ -109,6 +142,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(1)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 4, 3))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
 
         val resultatPeriode = resultat.perioder.keys.first()
         val resultatInfo = resultat.perioder.values.first()
@@ -200,6 +237,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(3)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(30))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
@@ -234,6 +275,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(3)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(3))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
@@ -266,6 +311,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(2)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(60))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(25))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
@@ -292,6 +341,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(2)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
@@ -319,6 +372,10 @@ class MaxAntallDagerRegelTest {
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         Assertions.assertThat(resultat.perioder).hasSize(3)
+        Assertions.assertThat(resultat.kvoteInfo).isNotNull
+        Assertions.assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteAndreParter).isEqualTo(BigDecimal.valueOf(55))
+        Assertions.assertThat(resultat.kvoteInfo!!.kvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10))
 
         val resultatPeriode1 = resultat.perioder.keys.first()
         val resultatInfo1 = resultat.perioder.values.first()
@@ -407,120 +464,6 @@ private fun dummyRegelGrunnlagMedAndreParter(helePerioden: LukketPeriode, annenP
         ).somArbeid(),
         kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
 )
-
-
-private fun dummyRegelGrunnlagMedToAndreParter(helePerioden: LukketPeriode,
-                                               annenPartsBehandlingUUID: UUID = nesteBehandlingUUID(),
-                                               tredjePartsBehandlingUUID: UUID = nesteBehandlingUUID()) = RegelGrunnlag(
-        ytelseType = YtelseType.PLS,
-        saksnummer = nesteSaksnummer(),
-        søker = Søker(
-                aktørId = "123"
-        ),
-        barn = Barn(
-                aktørId = "456"
-        ),
-        pleiebehov = mapOf(
-                helePerioden to Pleiebehov.PROSENT_6000
-        ),
-        søktUttak = listOf(
-                SøktUttak(helePerioden)
-        ),
-        andrePartersUttaksplanPerBehandling = mapOf(
-                annenPartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePerioden to UttaksperiodeInfo.oppfylt(
-                                        kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                                        uttaksgrad = Prosent(100),
-                                        utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                                        søkersTapteArbeidstid = Prosent(100),
-                                        oppgittTilsyn = null,
-                                        årsak = Årsak.FULL_DEKNING,
-                                        pleiebehov = Pleiebehov.PROSENT_6000.prosent,
-                                        knekkpunktTyper = setOf(),
-                                        annenPart = AnnenPart.ALENE,
-                                        nattevåk = null,
-                                        beredskap = null
-                                )
-                        ),
-                        trukketUttak = listOf()
-                ),
-                tredjePartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePerioden to UttaksperiodeInfo.oppfylt(
-                                        kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
-                                        uttaksgrad = Prosent(100),
-                                        utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                                        søkersTapteArbeidstid = Prosent(100),
-                                        oppgittTilsyn = null,
-                                        årsak = Årsak.FULL_DEKNING,
-                                        pleiebehov = Pleiebehov.PROSENT_6000.prosent,
-                                        knekkpunktTyper = setOf(),
-                                        annenPart = AnnenPart.ALENE,
-                                        nattevåk = null,
-                                        beredskap = null
-                                )
-                        ),
-                        trukketUttak = listOf()
-                ),
-        ),
-        tilsynsperioder = emptyMap(),
-        behandlingUUID = nesteBehandlingUUID(),
-        arbeid = mapOf(
-                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-        ).somArbeid(),
-        kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID, tredjePartsBehandlingUUID))
-)
-
-private fun dummyRegelGrunnlagMedAndreParter2(helePerioden: LukketPeriode, andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>): RegelGrunnlag {
-    return RegelGrunnlag(
-            ytelseType = YtelseType.PLS,
-            saksnummer = nesteSaksnummer(),
-            søker = Søker(
-                    aktørId = "123"
-            ),
-            barn = Barn(
-                    aktørId = "456"
-            ),
-            pleiebehov = mapOf(
-                    helePerioden to Pleiebehov.PROSENT_6000
-            ),
-            søktUttak = listOf(
-                    SøktUttak(helePerioden)
-            ),
-            andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
-            tilsynsperioder = emptyMap(),
-            behandlingUUID = nesteBehandlingUUID(),
-            arbeid = mapOf(
-                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-            ).somArbeid(),
-            kravprioritetForBehandlinger = mapOf(helePerioden to andrePartersUttakplanPerBehandling.keys.toList())
-    )
-}
-
-private fun dummyAndrePartersUttaksplanPerBehandling(helePerioden: LukketPeriode, annenPartsBehandlingUUID: UUID = nesteBehandlingUUID()): Uttaksplan {
-    return Uttaksplan(
-        perioder = mapOf(
-                helePerioden to UttaksperiodeInfo.oppfylt(
-                        kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                        uttaksgrad = Prosent(100),
-                        utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                        søkersTapteArbeidstid = Prosent(100),
-                        oppgittTilsyn = null,
-                        årsak = Årsak.FULL_DEKNING,
-                        pleiebehov = Pleiebehov.PROSENT_6000.prosent,
-                        knekkpunktTyper = setOf(),
-                        annenPart = AnnenPart.ALENE,
-                        nattevåk = null,
-                        beredskap = null
-                )
-        ),
-        trukketUttak = listOf()
-    )
-}
-
-
-
 
 private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfall = Utfall.OPPFYLT) = UttaksperiodeInfo(
         utfall = utfall,

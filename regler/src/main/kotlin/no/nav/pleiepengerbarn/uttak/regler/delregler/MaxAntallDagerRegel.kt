@@ -54,8 +54,18 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
+        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, kvoteAndreParter = forBrukteDagerAndreParter, kvoteDenneBehandlingen = finnForbrukteDagerDenneBehandling(nyePerioder))
+        return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
+    }
 
-        return uttaksplan.copy(perioder = nyePerioder)
+    private fun finnForbrukteDagerDenneBehandling(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>): BigDecimal {
+        var antallDager = BigDecimal.ZERO
+        nyePerioder.forEach { (annenPartsPeriode, info) ->
+            if (info.utfall == Utfall.OPPFYLT) {
+                antallDager += (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
+            }
+        }
+        return antallDager
     }
 
     private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoAndreParter: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
