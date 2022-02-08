@@ -52,8 +52,8 @@ data class Uttaksplan @JsonCreator constructor(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class KvoteInfo @JsonCreator constructor(
         @JsonProperty("maxDato") val maxDato: LocalDate?,
-        @JsonProperty("kvoteAndreParter") val kvoteAndreParter: BigDecimal,
-        @JsonProperty("kvoteDenneBehandlingen") val kvoteDenneBehandlingen: BigDecimal,
+        @JsonProperty("forbruktKvoteAndreParter") val forbruktKvoteAndreParter: BigDecimal,
+        @JsonProperty("forbruktKvoteDenneBehandlingen") val forbruktKvoteDenneBehandlingen: BigDecimal,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

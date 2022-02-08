@@ -54,7 +54,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
-        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, kvoteAndreParter = forBrukteDagerAndreParter, kvoteDenneBehandlingen = finnForbrukteDagerDenneBehandling(nyePerioder))
+        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteAndreParter = forBrukteDagerAndreParter, forbruktKvoteDenneBehandlingen = finnForbrukteDagerDenneBehandling(nyePerioder))
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
