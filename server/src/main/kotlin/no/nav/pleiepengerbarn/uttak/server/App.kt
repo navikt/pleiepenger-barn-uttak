@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.familie.log.filter.LogFilter
 import org.springframework.boot.Banner
-import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.builder.SpringApplicationBuilder

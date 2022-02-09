@@ -9,7 +9,6 @@ import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -19,7 +18,7 @@ import java.util.*
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
-class UttakplanApi() {
+class UttakplanApi {
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
