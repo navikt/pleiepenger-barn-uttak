@@ -1,7 +1,9 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
 import com.fasterxml.jackson.annotation.*
+import java.math.BigDecimal
 import java.time.Duration
+import java.time.LocalDate
 
 enum class Utfall {
     OPPFYLT,
@@ -41,7 +43,17 @@ enum class Endringsstatus {
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan @JsonCreator constructor(
     @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
-    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf()
+    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
+    @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class KvoteInfo @JsonCreator constructor(
+        @JsonProperty("maxDato") val maxDato: LocalDate?,
+        @JsonProperty("forbruktKvoteHittil") val forbruktKvoteHittil: BigDecimal,
+        @JsonProperty("forbruktKvoteDenneBehandlingen") val forbruktKvoteDenneBehandlingen: BigDecimal,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

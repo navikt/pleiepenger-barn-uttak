@@ -920,6 +920,67 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Livets sluttfase - Flere behandlinger med uttak etter hverandre hvor kvoteInfo oppdaterer seg tilsvarende`() {
+        val saksnummer = nesteSaksnummer()
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val grunnlag = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                ),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000),
+                saksnummer = saksnummer
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO)
+        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(8))
+
+        val søknadsperiode2 = LukketPeriode("2020-01-11/2020-01-20")
+        val grunnlag2 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode2,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                ),
+                pleiebehov = mapOf(LukketPeriode("2020-01-11/2020-01-20") to Pleiebehov.PROSENT_6000),
+                saksnummer = saksnummer
+        )
+
+        val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan2.kvoteInfo).isNotNull
+        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8).setScale(2))
+        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(6))
+
+        uttaksplan2.assertOppfylt(
+                perioder = listOf(LukketPeriode("2020-01-01/2020-01-03"), LukketPeriode("2020-01-06/2020-01-10")),
+                grad = HUNDRE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.FULL_DEKNING,
+                endringsstatus = Endringsstatus.UENDRET
+        )
+        uttaksplan2.assertOppfylt(
+                perioder = listOf(LukketPeriode("2020-01-13/2020-01-17"), LukketPeriode("2020-01-20/2020-01-20")),
+                grad = HUNDRE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.FULL_DEKNING,
+                endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
     internal fun `En del av uttaksplanen til livets sluttfase blir ikke oppfylt pga ikke oppfylte inngangsvilkår`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
         val grunnlag = lagGrunnlag(
