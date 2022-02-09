@@ -96,7 +96,7 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
 
 private fun RegelGrunnlag.finnForbrukteDagerAndreParter(): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
-    var relevantePerioder = mutableListOf<LukketPeriode>()
+    val relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.kravprioritetForBehandlinger.forEach { (kravprioritetsperiode, behandlingsUUIDer) ->
         for (behandlingUUID in behandlingsUUIDer) {
@@ -115,7 +115,7 @@ private fun RegelGrunnlag.finnForbrukteDagerAndreParter(): Pair<BigDecimal, Loca
             }
         }
     }
-    val maxDatoAndreParter = relevantePerioder.map { it.tom }.maxOrNull()
+    val maxDatoAndreParter = relevantePerioder.maxOfOrNull { it.tom }
 
     return Pair(antallDager, maxDatoAndreParter)
 }

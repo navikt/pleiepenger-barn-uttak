@@ -33,7 +33,7 @@ object BeregnBruktKvote {
     private fun leggSammenUttak(altUttak: List<Uttaksplan>): Duration {
         var totalTid = Duration.ZERO
         altUttak.forEach {
-            it.perioder.forEach { periode, info ->
+            it.perioder.forEach { (periode, info) ->
                 totalTid += if (info.oppgittTilsyn != null) {
                     info.oppgittTilsyn
                 } else {
