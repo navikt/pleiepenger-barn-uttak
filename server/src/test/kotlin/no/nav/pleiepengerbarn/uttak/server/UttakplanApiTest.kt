@@ -120,6 +120,36 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
+
+    @Test
+    internal fun `Uttak på to arbeidsforhold hvor det ene har faktisk arbeid større enn normalt arbeid`() {
+        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-16")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = INGENTING))),
+                Arbeid(ARBEIDSFORHOLD4, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(1).plusMinutes(30), jobberNå = FULL_DAG))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        )
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = søknadsperiode,
+            grad = Prosent(67),
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT,
+                ARBEIDSFORHOLD4 to NULL_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+        val søkersTapteTimer = uttaksplan.perioder[søknadsperiode]!!.getSøkersTapteTimer()
+        assertThat(søkersTapteTimer).isEqualTo(Duration.ofHours(3))
+    }
+
+
     @Test
     internal fun `Avslag pga ferie`() {
         val søknadsperiode = LukketPeriode("2021-06-01/2021-06-04")

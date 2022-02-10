@@ -167,7 +167,15 @@ data class UttaksperiodeInfo @JsonCreator constructor(
         var sumNormalTid = Duration.ZERO
         var sumFaktiskTid = Duration.ZERO
         utbetalingsgrader.forEach { sumNormalTid += it.normalArbeidstid }
-        utbetalingsgrader.forEach { if (it.faktiskArbeidstid != null) sumFaktiskTid += it.faktiskArbeidstid }
+        utbetalingsgrader.forEach {
+            if (it.faktiskArbeidstid != null) {
+                sumFaktiskTid += if (it.faktiskArbeidstid > it.normalArbeidstid) {
+                    it.normalArbeidstid
+                } else {
+                    it.faktiskArbeidstid
+                }
+            }
+        }
         return sumNormalTid - sumFaktiskTid
     }
 
