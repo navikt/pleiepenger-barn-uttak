@@ -18,7 +18,6 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-
 @Repository
 @Transactional
 internal class UttakRepository {
@@ -42,11 +41,6 @@ internal class UttakRepository {
     internal fun lagre(regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
         lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG, regelGrunnlag.ytelseType)
     }
-
-    internal fun lagre(endrePerioderGrunnlag: EndrePerioderGrunnlag, uttaksplan: Uttaksplan) {
-        lagre(endrePerioderGrunnlag.saksnummer, UUID.fromString(endrePerioderGrunnlag.behandlingUUID), tilJSON(endrePerioderGrunnlag), listOf(), uttaksplan, Grunnlagstype.ENDRINGSGRUNNLAG)
-    }
-
 
     private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype, ytelseType: YtelseType = YtelseType.PSB) {
         slettTidligereUttaksplan(behandlingId)
