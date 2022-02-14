@@ -27,7 +27,6 @@ class UttakplanApi {
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
-        const val EndringUttaksplanPath = "/uttaksplan/endring"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
         const val BehandlingUUID = "behandlingUUID"
@@ -62,18 +61,6 @@ class UttakplanApi {
         return ResponseEntity
             .created(uri)
             .body(nyUttaksplan)
-    }
-
-    @PostMapping(EndringUttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Endrer en uttaksplan. Kun enkelte endringer er lovlig, hvis endringen er ulovlig så vil endepunktet returnere en 'bad request'.")
-    fun endrePerioder(@RequestBody endrePerioderGrunnlag: EndrePerioderGrunnlag): ResponseEntity<Uttaksplan?> {
-        logger.info("Endrer uttaksplan for behandling=${endrePerioderGrunnlag.behandlingUUID}")
-        endrePerioderGrunnlag.valider()
-        val eksisterendeUttaksplan = uttakRepository.hent(UUID.fromString(endrePerioderGrunnlag.behandlingUUID))
-            ?: return ResponseEntity.badRequest().body(null)
-        val oppdatertUttaksplan = UttakTjeneste.endreUttaksplan(eksisterendeUttaksplan, endrePerioderGrunnlag.perioderSomIkkeErInnvilget)
-        uttakRepository.lagre(endrePerioderGrunnlag, oppdatertUttaksplan)
-        return ResponseEntity.ok(oppdatertUttaksplan)
     }
 
     @Deprecated("Bruk den andre simulerUttaksplan istedet")
