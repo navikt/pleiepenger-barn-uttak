@@ -883,7 +883,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100),
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
@@ -914,7 +914,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100),
                 saksnummer = saksnummer
         )
 
@@ -933,7 +933,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                pleiebehov = mapOf(LukketPeriode("2020-01-11/2020-01-20") to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(LukketPeriode("2020-01-11/2020-01-20") to Pleiebehov.PROSENT_100),
                 saksnummer = saksnummer
         )
 
@@ -974,7 +974,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 arbeid = listOf(
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
-                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_6000)
+                pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100)
         ).copy(inngangsvilkår = mapOf("MEDLEMSKAPSVILKÅRET" to listOf(Vilkårsperiode(LukketPeriode("2020-01-05/2020-01-08"), Utfall.IKKE_OPPFYLT))))
 
         val uttaksplan = grunnlag.opprettUttaksplan()
@@ -997,7 +997,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker1),
-                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
                 behandlingUUID = nesteBehandlingId(),
                 saksnummer = nesteSaksnummer())
 
@@ -1010,7 +1010,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker2),
-                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
                 behandlingUUID = søker2BehandlingId,
                 saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker2BehandlingId, grunnlag1Søker1.behandlingUUID)))
 
@@ -1023,7 +1023,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker3),
-                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_6000),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
                 behandlingUUID = søker3BehandlingId,
                 saksnummer = nesteSaksnummer()).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(søker3BehandlingId, grunnlagSøker2.behandlingUUID, grunnlag1Søker1.behandlingUUID)))
 

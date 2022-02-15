@@ -664,7 +664,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    internal fun `Livets sluttfase, En uttaksperiode med uttak på to andre parter som tilsammen er på 300 prosent skal innvilges`() {
+    internal fun `Livets sluttfase, En uttaksperiode med uttak på to andre parter som tilsammen er på 300 prosent skal ikke innvilges`() {
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val tredjePartsBehandlingUUID = nesteBehandlingUUID()
 
@@ -677,7 +677,7 @@ internal class UttakTjenesteGraderingTest {
                         aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_6000
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søktUttak = listOf(
                         helePeriodenSøktUttak
@@ -692,7 +692,7 @@ internal class UttakTjenesteGraderingTest {
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 oppgittTilsyn = null,
                                                 årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
@@ -710,7 +710,7 @@ internal class UttakTjenesteGraderingTest {
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 oppgittTilsyn = null,
                                                 årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
@@ -733,7 +733,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(5)
-        sjekkOppfylt(
+        sjekkIkkeOppfylt(
                 uttaksplan,
                 listOf(
                         LukketPeriode("2020-01-01/2020-01-03"),
@@ -742,9 +742,7 @@ internal class UttakTjenesteGraderingTest {
                         LukketPeriode("2020-01-20/2020-01-24"),
                         LukketPeriode("2020-01-27/2020-01-31")
                 ),
-                Prosent(100),
-                mapOf(arbeidsforhold1 to Prosent(100)),
-                Årsak.FULL_DEKNING
+                setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
         )
     }
 
