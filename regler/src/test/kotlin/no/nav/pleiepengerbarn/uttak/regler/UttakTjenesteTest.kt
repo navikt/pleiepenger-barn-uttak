@@ -304,7 +304,7 @@ internal class UttakTjenesteTest {
                         aktørId = aktørIdBarn
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_6000
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søktUttak = listOf(
                         SøktUttak(helePerioden)

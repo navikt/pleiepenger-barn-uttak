@@ -176,7 +176,7 @@ class MaxAntallDagerRegelTest {
                         aktørId = "456"
                 ),
                 pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_6000
+                        helePerioden to Pleiebehov.PROSENT_100
                 ),
                 søktUttak = listOf(
                         SøktUttak(helePerioden)
@@ -191,7 +191,7 @@ class MaxAntallDagerRegelTest {
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 oppgittTilsyn = null,
                                                 årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
@@ -202,7 +202,7 @@ class MaxAntallDagerRegelTest {
                                                 utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 oppgittTilsyn = null,
-                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
@@ -216,7 +216,7 @@ class MaxAntallDagerRegelTest {
                                                 søkersTapteArbeidstid = Prosent(100),
                                                 oppgittTilsyn = null,
                                                 årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
@@ -410,7 +410,7 @@ private fun dummyRegelGrunnlag(helePerioden: LukketPeriode) = RegelGrunnlag(
                 aktørId = "456"
         ),
         pleiebehov = mapOf(
-                helePerioden to Pleiebehov.PROSENT_6000
+                helePerioden to Pleiebehov.PROSENT_100
         ),
         søktUttak = listOf(
                 SøktUttak(helePerioden)
@@ -432,7 +432,7 @@ private fun dummyRegelGrunnlagMedAndreParter(helePerioden: LukketPeriode, annenP
                 aktørId = "456"
         ),
         pleiebehov = mapOf(
-                helePerioden to Pleiebehov.PROSENT_6000
+                helePerioden to Pleiebehov.PROSENT_100
         ),
         søktUttak = listOf(
                 SøktUttak(helePerioden)
@@ -447,7 +447,7 @@ private fun dummyRegelGrunnlagMedAndreParter(helePerioden: LukketPeriode, annenP
                                         søkersTapteArbeidstid = Prosent(100),
                                         oppgittTilsyn = null,
                                         årsak = Årsak.FULL_DEKNING,
-                                        pleiebehov = Pleiebehov.PROSENT_6000.prosent,
+                                        pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                         knekkpunktTyper = setOf(),
                                         annenPart = AnnenPart.ALENE,
                                         nattevåk = null,
