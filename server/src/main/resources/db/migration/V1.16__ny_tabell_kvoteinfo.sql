@@ -7,3 +7,5 @@ create table if not exists kvote_info (
     forbrukt_kvote_hittil decimal(8,2) default '0.00',
     forbrukt_kvote_denne_behandlingen decimal(8,2) default '0.00'
 );
+
+create index IDX_KVOTE_INFO_01 on KVOTE_INFO (uttaksresultat_id);
