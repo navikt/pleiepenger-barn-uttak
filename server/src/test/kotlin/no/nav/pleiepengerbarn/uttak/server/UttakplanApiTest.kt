@@ -963,6 +963,15 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 oppfyltÅrsak = Årsak.FULL_DEKNING,
                 endringsstatus = Endringsstatus.NY
         )
+
+        // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
+        val hentResponse = testClient.hentUttaksplan(grunnlag2.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(hentetUttaksplan.kvoteInfo).isNotNull
+        assertThat(hentetUttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8).setScale(2))
+        assertThat(hentetUttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(6).setScale(2))
     }
 
     @Test

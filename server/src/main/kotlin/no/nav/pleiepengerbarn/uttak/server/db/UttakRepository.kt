@@ -32,6 +32,9 @@ internal class UttakRepository {
     private lateinit var trukketUttaksperiodeRepository: TrukketUttaksperiodeRepository
 
     @Autowired
+    private lateinit var kvoteInfoRepository: KvoteInfoRepository
+
+    @Autowired
     private lateinit var mapper: ObjectMapper
 
     private companion object {
@@ -72,6 +75,7 @@ internal class UttakRepository {
         }
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
         trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, trukketUttak)
+        if (uttaksplan.kvoteInfo != null) kvoteInfoRepository.lagreKvoteInfo(uttaksresultatId, uttaksplan.kvoteInfo!!)
     }
 
     internal fun hent(behandlingId:UUID): Uttaksplan? {
@@ -82,13 +86,14 @@ internal class UttakRepository {
                 uttaksplanRowMapper)
             val perioder = uttaksperiodeRepository.hentPerioder(uttaksresultatId!!)
             val trukketUttaksperioder = trukketUttaksperiodeRepository.hentTrukketUttaksperioder(uttaksresultatId)
+            val kvoteInfo = kvoteInfoRepository.hentKvoteInfo(uttaksresultatId)
             if (perioder.keys.sjekkOmOverlapp()) {
                 throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i uttak. ${perioder.keys}")
             }
             if (trukketUttaksperioder.sjekkOmOverlapp()) {
                 throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i trukket uttak. $trukketUttaksperioder")
             }
-            Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder)
+            Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder, kvoteInfo = kvoteInfo)
         } catch (e: EmptyResultDataAccessException) {
             null
         }
