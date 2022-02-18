@@ -23,9 +23,9 @@ class KvoteInfoRepository {
         """.trimIndent()
         val params = MapSqlParameterSource()
                 .addValue("uttaksresultat_id", uttaksresultatId)
-                .addValue("max_dato", kvoteInfo?.maxDato)
-                .addValue("forbrukt_kvote_hittil", kvoteInfo?.forbruktKvoteHittil)
-                .addValue("forbrukt_kvote_denne_behandlingen", kvoteInfo?.forbruktKvoteDenneBehandlingen)
+                .addValue("max_dato", kvoteInfo.maxDato)
+                .addValue("forbrukt_kvote_hittil", kvoteInfo.forbruktKvoteHittil)
+                .addValue("forbrukt_kvote_denne_behandlingen", kvoteInfo.forbruktKvoteDenneBehandlingen)
         jdbcTemplate.update(sql, params)
     }
 
