@@ -15,7 +15,7 @@ class KvoteInfoRepository {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
-    internal fun lagreKvoteInfo(uttaksresultatId: Long, kvoteInfo: KvoteInfo?) {
+    internal fun lagreKvoteInfo(uttaksresultatId: Long, kvoteInfo: KvoteInfo) {
         val sql = """
             insert into 
                 kvote_info (id, uttaksresultat_id, max_dato, forbrukt_kvote_hittil, forbrukt_kvote_denne_behandlingen)

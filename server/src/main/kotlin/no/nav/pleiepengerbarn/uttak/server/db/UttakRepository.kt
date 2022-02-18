@@ -75,7 +75,7 @@ internal class UttakRepository {
         }
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
         trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, trukketUttak)
-        if (uttaksplan.kvoteInfo != null) kvoteInfoRepository.lagreKvoteInfo(uttaksresultatId, uttaksplan.kvoteInfo)
+        if (uttaksplan.kvoteInfo != null) kvoteInfoRepository.lagreKvoteInfo(uttaksresultatId, uttaksplan.kvoteInfo!!)
     }
 
     internal fun hent(behandlingId:UUID): Uttaksplan? {
