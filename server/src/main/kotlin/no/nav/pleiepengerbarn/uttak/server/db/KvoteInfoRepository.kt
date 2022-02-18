@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.server.db
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.KvoteInfo
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -35,23 +36,21 @@ class KvoteInfoRepository {
             from kvote_info
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
+        try {
+            val kvoteInfoMapper = RowMapper { rs, _ ->
+                val forbruktKvoteHittil = if (rs.getBigDecimal("forbrukt_kvote_hittil") != null) rs.getBigDecimal("forbrukt_kvote_hittil") else BigDecimal.ZERO
+                val forbruktKvoteDenneBehandlingen = if (rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") != null) rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") else BigDecimal.ZERO
 
-        val kvoteInfoMapper = RowMapper { rs, _ ->
-            val forbruktKvoteHittil = if (rs.getBigDecimal("forbrukt_kvote_hittil") != null) rs.getBigDecimal("forbrukt_kvote_hittil") else BigDecimal.ZERO
-            val forbruktKvoteDenneBehandlingen = if (rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") != null) rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") else BigDecimal.ZERO
+                KvoteInfo(
+                        maxDato = rs.getDate("max_dato")?.toLocalDate(),
+                        forbruktKvoteHittil = forbruktKvoteHittil,
+                        forbruktKvoteDenneBehandlingen = forbruktKvoteDenneBehandlingen
+                )
+            }
 
-            KvoteInfo(
-                    maxDato = rs.getDate("max_dato")?.toLocalDate(),
-                    forbruktKvoteHittil = forbruktKvoteHittil,
-                    forbruktKvoteDenneBehandlingen = forbruktKvoteDenneBehandlingen
-            )
-        }
-
-        val kvoteInfo = jdbcTemplate.queryForObject(sql, mapOf("uttaksresultat_id" to uttaksresultatId), kvoteInfoMapper)
-
-        if (kvoteInfo != null && kvoteInfo.maxDato == null && kvoteInfo.forbruktKvoteHittil == BigDecimal.ZERO && kvoteInfo.forbruktKvoteDenneBehandlingen == BigDecimal.ZERO) {
+            return jdbcTemplate.queryForObject(sql, mapOf("uttaksresultat_id" to uttaksresultatId), kvoteInfoMapper)
+        } catch (e: EmptyResultDataAccessException) {
             return null
         }
-        return kvoteInfo
     }
 }
