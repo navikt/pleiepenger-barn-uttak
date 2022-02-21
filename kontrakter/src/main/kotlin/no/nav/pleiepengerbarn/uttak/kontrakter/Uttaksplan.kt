@@ -44,7 +44,8 @@ enum class Endringsstatus {
 data class Uttaksplan @JsonCreator constructor(
     @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
-    @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null
+    @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null,
+    @JsonProperty("commitId") val commitId: String = ""
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

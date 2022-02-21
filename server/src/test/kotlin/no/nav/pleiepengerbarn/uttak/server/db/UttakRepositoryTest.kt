@@ -50,8 +50,8 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Uttaksplan kan lagres og hentes opp igjen`() {
-        val uttakJanuar = dummyUttaksplan(heleJanuar)
-        val grunnlag = dummyRegelGrunnlag(heleJanuar)
+        val uttakJanuar = dummyUttaksplan(heleJanuar).copy(commitId = "12345")
+        val grunnlag = dummyRegelGrunnlag(heleJanuar).copy(commitId = "12345")
 
         uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
 
