@@ -69,7 +69,6 @@ internal class UttaksperiodeRepository {
 
             val endringsstatusString = rs.getString("endringsstatus")
             val endringsstatus = if (endringsstatusString != null) Endringsstatus.valueOf(endringsstatusString) else null
-            val utenlanddebugstring = rs.getString("utenlandsopphold_aarsak")
             PeriodeOgUttaksperiodeInfo(
                 uttaksperiodeId = rs.getLong("id"),
                 periode = LukketPeriode(
