@@ -10,9 +10,6 @@ import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
-import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -27,7 +24,7 @@ class UttakplanApi {
     @Autowired
     private lateinit var uttakRepository: UttakRepository
 
-    @Value("\${git.commit.id:}")
+    @Value("\${git.commit.id.full:}")
     private val commitId: String? = null
 
     private var utvidetLogging: Boolean = false
