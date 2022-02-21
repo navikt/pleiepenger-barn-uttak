@@ -198,7 +198,7 @@
                 </executions>
                 <configuration>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                    <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
                 </configuration>
             </plugin>
         </plugins>
