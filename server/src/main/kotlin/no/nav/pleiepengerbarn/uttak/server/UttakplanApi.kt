@@ -9,12 +9,16 @@ import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.lang.IllegalArgumentException
 import java.util.*
+import javax.annotation.PostConstruct
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
@@ -22,6 +26,9 @@ class UttakplanApi {
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
+
+    @Value("\${git.commit.id:}")
+    private val commitId: String? = null
 
     private var utvidetLogging: Boolean = false
 
@@ -161,7 +168,7 @@ class UttakplanApi {
             Parameter(name ="behandlingUUID", description = "UUID for behandling hvor siste uttaksplan som skal slettes.")
         ]
     )
-    fun slettUttaksplab(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
+    fun slettUttaksplan(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
         logger.info("Sletter uttaksplan for behandling=$behandlingUUID")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
@@ -170,6 +177,11 @@ class UttakplanApi {
         }
         uttakRepository.slett(behandlingUUIDParsed)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostConstruct
+    fun init() {
+        logger.info("GIT commit id: $commitId")
     }
 
 }

@@ -12,7 +12,8 @@ object GrunnlagMapper {
     fun tilRegelGrunnlag(
         uttaksgrunnlag: Uttaksgrunnlag,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
-        forrigeUttaksplan: Uttaksplan?
+        forrigeUttaksplan: Uttaksplan?,
+        commitId: String = ""
     ): RegelGrunnlag {
 
         val søknadsperioderSortert = uttaksgrunnlag.søktUttak.sortertPåFom()
@@ -45,7 +46,8 @@ object GrunnlagMapper {
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
                 kravprioritetForBehandlinger = kravprioritetForBehandlinger,
-                utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder
+                utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
+                commitId = commitId
         )
     }
 

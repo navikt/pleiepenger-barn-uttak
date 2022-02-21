@@ -26,7 +26,7 @@ internal fun Uttaksplan.slåSammenLikePerioder(): Uttaksplan {
         }
     }
 
-    return Uttaksplan(perioder = nyePerioder, trukketUttak = this.trukketUttak)
+    return Uttaksplan(perioder = nyePerioder, trukketUttak = this.trukketUttak, commitId = this.commitId)
 }
 
 private fun List<LukketPeriode>.slåSammen(): List<LukketPeriode> {

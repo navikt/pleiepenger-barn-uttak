@@ -11,7 +11,7 @@ object UttaksplanMerger {
         val timelineForrigeUttaksplanMinusTrukketUttak = fjernTrukketUttak(timelineForrigeUttaksplan, trukketUttak)
         val timelineNyUttaksplan = lagTimeline(nyUttaksplan)
         val uttaksperioder = lagSammenslåttUttaksplan(timelineForrigeUttaksplanMinusTrukketUttak, timelineNyUttaksplan)
-        return Uttaksplan(perioder = uttaksperioder, trukketUttak = trukketUttak, kvoteInfo = nyUttaksplan.kvoteInfo)
+        return Uttaksplan(perioder = uttaksperioder, trukketUttak = trukketUttak, kvoteInfo = nyUttaksplan.kvoteInfo, commitId = nyUttaksplan.commitId)
     }
 
     private fun lagTimeline(uttaksplan:Uttaksplan): LocalDateTimeline<UttaksperiodeInfo> {
