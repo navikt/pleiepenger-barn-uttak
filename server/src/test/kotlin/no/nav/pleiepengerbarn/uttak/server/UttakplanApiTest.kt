@@ -1162,6 +1162,24 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Perioder med utenlandsopphold skal lagres med korrekt landkode i UttaksperiodeInfo`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-05/2021-01-07"), utenlandsoppholdUtenÅrsak = true, landkode = "USA")
+    }
+
+    @Test
     internal fun `Simulering skal gi samme resultat med samme grunnlag som forrige uttaksplan`() {
 
         val søknadsperiode = LukketPeriode("2021-10-01/2021-12-31")
