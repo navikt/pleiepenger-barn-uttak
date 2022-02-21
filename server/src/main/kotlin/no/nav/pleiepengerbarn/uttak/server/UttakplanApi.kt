@@ -24,7 +24,7 @@ class UttakplanApi {
     @Autowired
     private lateinit var uttakRepository: UttakRepository
 
-    @Value("\${git.commit.id.full:}")
+    @Value("\${git.commit.id:}")
     private val commitId: String? = null
 
     private var utvidetLogging: Boolean = false
