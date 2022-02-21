@@ -183,6 +183,7 @@
                     </environmentVariables>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
@@ -201,6 +202,7 @@
                     <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                 </configuration>
             </plugin>
+            -->
         </plugins>
         <resources>
             <resource>
