@@ -1144,6 +1144,24 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Perioder skal opprettes med korrekte default verdier for landkode og utenlandsoppholdÅrsak`() {
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
+
+        val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(søknadsperiode, landkode = null, utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
+    }
+
+    @Test
     internal fun `Simulering skal gi samme resultat med samme grunnlag som forrige uttaksplan`() {
 
         val søknadsperiode = LukketPeriode("2021-10-01/2021-12-31")
@@ -1249,6 +1267,33 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 assertThat(periodeInfo.utenlandsoppholdUtenÅrsak).isEqualTo(utenlandsoppholdUtenÅrsak)
             }
             else -> fail("Perioden $periode er ikke oppfylt")
+        }
+    }
+
+    /*
+     * Lagt til en testmetode som tester informasjon om utenlandsperioder.
+     * Valgte å lage en metode med ekstra parametre så slipper vi å skrive om ekisterende tester.
+     */
+    private fun Uttaksplan.assertOppfylt(
+        periode: LukketPeriode,
+        grad: Prosent = HUNDRE_PROSENT,
+        gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
+        oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING,
+        endringsstatus: Endringsstatus = Endringsstatus.NY,
+        utenlandsoppholdUtenÅrsak: Boolean = false,
+        landkode: String? = null,
+        utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+    ) {
+        assertOppfylt(
+            periode, grad, gradPerArbeidsforhold, oppfyltÅrsak,
+            endringsstatus, utenlandsoppholdUtenÅrsak
+        )
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        when (periodeInfo.utfall) {
+            Utfall.OPPFYLT -> {
+                assertThat(periodeInfo.landkode).isEqualTo(landkode)
+                assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
+            }
         }
     }
 
