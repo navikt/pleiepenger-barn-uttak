@@ -23,7 +23,8 @@ internal class UttaksplanMergerTest {
             kildeBehandlingUUID = behandlingUUID,
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
-            beredskap = null
+            beredskap = null,
+            landkode = null
     )
 
     private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(

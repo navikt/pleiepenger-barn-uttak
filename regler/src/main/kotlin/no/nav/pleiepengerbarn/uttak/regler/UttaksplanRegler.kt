@@ -101,7 +101,8 @@ internal object UttaksplanRegler {
                     kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
-                    beredskap = beredskap
+                    beredskap = beredskap,
+                    landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(

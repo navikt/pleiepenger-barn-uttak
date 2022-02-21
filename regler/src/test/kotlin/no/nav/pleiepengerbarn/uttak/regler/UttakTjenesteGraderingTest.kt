@@ -227,7 +227,8 @@ internal class UttakTjenesteGraderingTest {
                                     pleiebehov = Pleiebehov.PROSENT_100.prosent,
                                     annenPart = AnnenPart.ALENE,
                                     nattevåk = null,
-                                    beredskap = null
+                                    beredskap = null,
+                                    landkode = null
                                 )
                             ),
                             trukketUttak = listOf()
@@ -295,7 +296,8 @@ internal class UttakTjenesteGraderingTest {
                                     søkersTapteArbeidstid = Prosent(40),
                                     oppgittTilsyn = null,
                                     nattevåk = null,
-                                    beredskap = null
+                                    beredskap = null,
+                                    landkode = null
                                 )
                             ),
                             trukketUttak = listOf()
@@ -359,7 +361,8 @@ internal class UttakTjenesteGraderingTest {
                                     knekkpunktTyper = setOf(),
                                     annenPart = AnnenPart.ALENE,
                                     nattevåk = null,
-                                    beredskap = null
+                                    beredskap = null,
+                                    landkode = null
                                 )
                             ),
                             trukketUttak = listOf()
@@ -696,7 +699,8 @@ internal class UttakTjenesteGraderingTest {
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
-                                                beredskap = null
+                                                beredskap = null,
+                                                landkode = null
                                         )
                                 ),
                                 trukketUttak = listOf()
@@ -714,7 +718,8 @@ internal class UttakTjenesteGraderingTest {
                                                 knekkpunktTyper = setOf(),
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
-                                                beredskap = null
+                                                beredskap = null,
+                                                landkode = null
                                         )
                                 ),
                                 trukketUttak = listOf()
