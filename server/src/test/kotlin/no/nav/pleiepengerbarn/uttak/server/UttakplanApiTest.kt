@@ -1144,7 +1144,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Perioder skal opprettes med korrekte default verdier for landkode og utenlandsoppholdÅrsak`() {
+    internal fun `Oppfylte perioder skal lagres med korrekte default verdier for landkode og utenlandsoppholdÅrsak`() {
         val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
@@ -1159,6 +1159,33 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = grunnlag.opprettUttaksplan()
 
         uttaksplan.assertOppfylt(søknadsperiode, landkode = null, utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
+    }
+
+    @Test
+    internal fun `Ikke oppfylte perioder skal lagres med korrekte default verdier for landkode og utenlandsoppholdÅrsak`() {
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-03-07"))
+
+        val søknadsperiode = LukketPeriode("2021-02-22/2021-03-07")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(
+                    LukketPeriode("2021-02-22/2021-02-28") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG)
+                ))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(
+                søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, landkode = null)
+            )
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertIkkeOppfylt(periode = LukketPeriode("2021-02-22/2021-02-26"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),
+            endringsstatus = Endringsstatus.ENDRET, landkode = null,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
     }
 
     @Test
@@ -1356,6 +1383,23 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             else -> fail("Perioden $periode er oppfylt")
         }
     }
+
+    private fun Uttaksplan.assertIkkeOppfylt(periode: LukketPeriode,
+            ikkeOppfyltÅrsaker: Set<Årsak> = setOf(),
+            knekkpunktTyper: Set<KnekkpunktType> = setOf(),
+            endringsstatus: Endringsstatus,
+            landkode: String? = null,
+            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN) {
+        assertIkkeOppfylt(periode, ikkeOppfyltÅrsaker, knekkpunktTyper, endringsstatus)
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        when (periodeInfo.utfall) {
+            Utfall.IKKE_OPPFYLT -> {
+                assertThat(periodeInfo.landkode).isEqualTo(landkode)
+                assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
+            }
+        }
+    }
+
 
     private fun Duration.prosent(prosent: Long):Duration {
         return this.multipliedBy(prosent).dividedBy(100)
