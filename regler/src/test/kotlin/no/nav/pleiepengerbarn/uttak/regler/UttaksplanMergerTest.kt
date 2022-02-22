@@ -38,7 +38,9 @@ internal class UttaksplanMergerTest {
             kildeBehandlingUUID = behandlingUUID,
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
-            beredskap = null
+            beredskap = null,
+            landkode = null,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
     )
 
     @Test

@@ -172,7 +172,9 @@ class MaxAntallDagerRegelTest {
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
                                                 beredskap = null,
-                                                årsaker = setOf(Årsak.FOR_LAV_INNTEKT)
+                                                årsaker = setOf(Årsak.FOR_LAV_INNTEKT),
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                         ),
                                         annenPeriode3 to UttaksperiodeInfo.oppfylt(
                                                 kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),

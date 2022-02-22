@@ -91,7 +91,9 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             kildeBehandlingUUID: BehandlingUUID,
             annenPart: AnnenPart,
             nattevåk: Utfall?,
-            beredskap: Utfall?): UttaksperiodeInfo {
+            beredskap: Utfall?,
+            landkode: String?,
+            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -111,7 +113,9 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 kildeBehandlingUUID = kildeBehandlingUUID,
                 annenPart = annenPart,
                 nattevåk = nattevåk,
-                beredskap = beredskap
+                beredskap = beredskap,
+                landkode = landkode,
+                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
             )
         }
 
