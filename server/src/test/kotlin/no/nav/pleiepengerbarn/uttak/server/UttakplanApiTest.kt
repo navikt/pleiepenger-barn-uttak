@@ -1234,7 +1234,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Perioder med utenlandsopphold skal lagres med korrekt utenlandsoppholdÅrsak i UttaksperiodeInfo`() {
+    internal fun `Oppfylte perioder med utenlandsopphold skal lagres med korrekt utenlandsoppholdÅrsak i UttaksperiodeInfo`() {
         val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
 
         val grunnlag = lagGrunnlag(
@@ -1253,6 +1253,33 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, landkode = "USA")
     }
 
+    @Test
+    internal fun `Ikke oppfylte perioder skal lagres med korrekt utenlandsoppholdÅrsak i UttaksperiodeInfo`() {
+        val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-03-07"))
+
+        val søknadsperiode = LukketPeriode("2021-02-22/2021-03-07")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(
+                    LukketPeriode("2021-02-22/2021-02-28") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG)
+                ))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer
+        ).copy(
+            utenlandsoppholdperioder = mapOf(
+                søknadsperiode to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA")
+            )
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertIkkeOppfylt(periode = LukketPeriode("2021-02-22/2021-02-26"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),
+            endringsstatus = Endringsstatus.ENDRET,
+            landkode = "USA",
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING)
+    }
     @Test
     internal fun `Simulering skal gi samme resultat med samme grunnlag som forrige uttaksplan`() {
 
