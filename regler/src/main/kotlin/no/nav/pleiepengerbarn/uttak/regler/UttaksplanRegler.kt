@@ -72,6 +72,7 @@ internal object UttaksplanRegler {
         var søktPeriodeOverlapperMedUtenlandsperiode = false
         var utenlandsopphold: Map.Entry<LukketPeriode, UtenlandsoppholdInfo>? = null
         val landkode: String?
+        val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak
         for (utenlandsoppholdElement in grunnlag.utenlandsoppholdperioder) {
             if (utenlandsoppholdElement.key.overlapperDelvis(søktUttaksperiode)) {
                 søktPeriodeOverlapperMedUtenlandsperiode = true
@@ -81,8 +82,10 @@ internal object UttaksplanRegler {
         }
         if (søktPeriodeOverlapperMedUtenlandsperiode) {
             landkode = utenlandsopphold?.value?.landkode
+            utenlandsoppholdÅrsak = utenlandsopphold?.value?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
         } else {
             landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode
+            utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
         }
         if (ikkeOppfyltÅrsaker.isNotEmpty()) {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -98,8 +101,7 @@ internal object UttaksplanRegler {
                 nattevåk = nattevåk,
                 beredskap = beredskap,
                 landkode = landkode,
-                utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak
-                        ?: UtenlandsoppholdÅrsak.INGEN
+                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
             )
         } else {
             if (grader.årsak.oppfylt) {
@@ -122,8 +124,7 @@ internal object UttaksplanRegler {
                     nattevåk = nattevåk,
                     beredskap = beredskap,
                     landkode = landkode,
-                    utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak
-                            ?: UtenlandsoppholdÅrsak.INGEN
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -139,8 +140,7 @@ internal object UttaksplanRegler {
                     nattevåk = nattevåk,
                     beredskap = beredskap,
                     landkode = landkode,
-                    utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak
-                        ?: UtenlandsoppholdÅrsak.INGEN
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
                 )
             }
         }
