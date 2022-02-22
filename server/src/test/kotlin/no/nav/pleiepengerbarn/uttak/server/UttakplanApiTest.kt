@@ -1190,7 +1190,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
         ).copy(
-            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07") to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA"))
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07")
+                    to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA"))
         )
         val uttaksplan = grunnlag.opprettUttaksplan()
 

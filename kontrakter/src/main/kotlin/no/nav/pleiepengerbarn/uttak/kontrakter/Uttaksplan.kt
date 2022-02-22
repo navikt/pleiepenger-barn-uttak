@@ -128,7 +128,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             annenPart: AnnenPart,
             nattevåk: Utfall?,
             beredskap: Utfall?,
-            landkode: String?): UttaksperiodeInfo {
+            landkode: String?,
+            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -148,7 +149,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 annenPart = annenPart,
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                landkode = landkode
+                landkode = landkode,
+                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
             )
         }
 

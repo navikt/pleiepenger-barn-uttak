@@ -222,7 +222,8 @@ internal class UttakRepositoryTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            landkode = null)
+                            landkode = null,
+                            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
 
             ),
             trukketUttak = listOf()

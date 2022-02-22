@@ -159,7 +159,8 @@ class MaxAntallDagerRegelTest {
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
                                                 beredskap = null,
-                                                landkode = null
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                         ),
                                         annenPeriode2 to UttaksperiodeInfo.ikkeOppfylt(
                                                 kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
@@ -185,7 +186,8 @@ class MaxAntallDagerRegelTest {
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
                                                 beredskap = null,
-                                                landkode = null
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                         )
 
                                 ),
@@ -397,7 +399,8 @@ private fun dummyRegelGrunnlagMedAndreParter(helePerioden: LukketPeriode, annenP
                                         annenPart = AnnenPart.ALENE,
                                         nattevåk = null,
                                         beredskap = null,
-                                        landkode = null
+                                        landkode = null,
+                                        utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                         ),
                         trukketUttak = listOf()
@@ -444,7 +447,8 @@ private fun dummyRegelGrunnlagMedToAndreParter(helePerioden: LukketPeriode,
                                         annenPart = AnnenPart.ALENE,
                                         nattevåk = null,
                                         beredskap = null,
-                                        landkode = null
+                                        landkode = null,
+                                        utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                         ),
                         trukketUttak = listOf()
@@ -463,7 +467,8 @@ private fun dummyRegelGrunnlagMedToAndreParter(helePerioden: LukketPeriode,
                                         annenPart = AnnenPart.ALENE,
                                         nattevåk = null,
                                         beredskap = null,
-                                        landkode = null
+                                        landkode = null,
+                                        utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                         ),
                         trukketUttak = listOf()
@@ -518,7 +523,8 @@ private fun dummyAndrePartersUttaksplanPerBehandling(helePerioden: LukketPeriode
                         annenPart = AnnenPart.ALENE,
                         nattevåk = null,
                         beredskap = null,
-                        landkode = null
+                        landkode = null,
+                        utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                 )
         ),
         trukketUttak = listOf()

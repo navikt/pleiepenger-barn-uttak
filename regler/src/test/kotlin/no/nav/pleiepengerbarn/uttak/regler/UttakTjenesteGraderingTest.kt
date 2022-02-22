@@ -228,7 +228,8 @@ internal class UttakTjenesteGraderingTest {
                                     annenPart = AnnenPart.ALENE,
                                     nattevåk = null,
                                     beredskap = null,
-                                    landkode = null
+                                    landkode = null,
+                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                             ),
                             trukketUttak = listOf()
@@ -297,7 +298,8 @@ internal class UttakTjenesteGraderingTest {
                                     oppgittTilsyn = null,
                                     nattevåk = null,
                                     beredskap = null,
-                                    landkode = null
+                                    landkode = null,
+                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                             ),
                             trukketUttak = listOf()
@@ -362,7 +364,8 @@ internal class UttakTjenesteGraderingTest {
                                     annenPart = AnnenPart.ALENE,
                                     nattevåk = null,
                                     beredskap = null,
-                                    landkode = null
+                                    landkode = null,
+                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                 )
                             ),
                             trukketUttak = listOf()
@@ -700,13 +703,14 @@ internal class UttakTjenesteGraderingTest {
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
                                                 beredskap = null,
-                                                landkode = null
-                                        )
-                                ),
-                                trukketUttak = listOf()
-                        ),
-                        tredjePartsBehandlingUUID to Uttaksplan(
-                                perioder = mapOf(
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+                                            )
+                                    ),
+                                    trukketUttak = listOf()
+                            ),
+                            tredjePartsBehandlingUUID to Uttaksplan(
+                                    perioder = mapOf(
                                         helePerioden to UttaksperiodeInfo.oppfylt(
                                                 kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
                                                 uttaksgrad = Prosent(100),
@@ -719,7 +723,8 @@ internal class UttakTjenesteGraderingTest {
                                                 annenPart = AnnenPart.ALENE,
                                                 nattevåk = null,
                                                 beredskap = null,
-                                                landkode = null
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
                                         )
                                 ),
                                 trukketUttak = listOf()

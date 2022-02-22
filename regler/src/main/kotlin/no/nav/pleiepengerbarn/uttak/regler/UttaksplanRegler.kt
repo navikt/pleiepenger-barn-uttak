@@ -102,7 +102,9 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode
+                    landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode,
+                    utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak
+                            ?: UtenlandsoppholdÅrsak.INGEN
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(

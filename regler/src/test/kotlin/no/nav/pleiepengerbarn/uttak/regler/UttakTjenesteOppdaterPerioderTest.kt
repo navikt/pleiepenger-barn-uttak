@@ -100,7 +100,8 @@ internal class UttakTjenesteOppdaterPerioderTest {
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
             beredskap = null,
-            landkode = null
+            landkode = null,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
         )
     }
 
