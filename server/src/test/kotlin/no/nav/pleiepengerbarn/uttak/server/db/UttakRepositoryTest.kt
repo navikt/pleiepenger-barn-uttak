@@ -53,8 +53,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan?.perioder?.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan?.perioder?.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
     }
 
     @Test
@@ -69,8 +69,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
     }
 
     @Test
@@ -85,8 +85,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
     }
 
     @Test
@@ -99,8 +99,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.landkode).isNull()}
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
             .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
     }
 
@@ -114,8 +114,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.landkode).isNull()}
-        uttaksplan?.perioder?.values?.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
             .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
     }
 
