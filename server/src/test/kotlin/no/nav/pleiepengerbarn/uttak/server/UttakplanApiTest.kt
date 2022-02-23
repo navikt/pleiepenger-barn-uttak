@@ -1413,6 +1413,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 assertThat(periodeInfo.landkode).isEqualTo(landkode)
                 assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
             }
+            else -> fail("Perioden $periode er ikke oppfylt")
         }
     }
 
@@ -1451,7 +1452,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 assertThat(periodeInfo.landkode).isEqualTo(landkode)
                 assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
             }
+            else -> fail("Perioden $periode er oppfylt")
         }
+
     }
 
 
