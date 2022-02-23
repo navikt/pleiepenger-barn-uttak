@@ -18,7 +18,6 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-
 @Repository
 @Transactional
 internal class UttakRepository {
@@ -33,28 +32,28 @@ internal class UttakRepository {
     private lateinit var trukketUttaksperiodeRepository: TrukketUttaksperiodeRepository
 
     @Autowired
+    private lateinit var kvoteInfoRepository: KvoteInfoRepository
+
+    @Autowired
     private lateinit var mapper: ObjectMapper
 
     private companion object {
-        private val uttaksplanRowMapper = RowMapper {resultSet, _ -> resultSet.getLong("id")}
+        private val uttaksplanRowMapper = RowMapper {resultSet, _ ->
+            Uttaksresultat(resultSet.getLong("id"), resultSet.getString("commit_id"))
+        }
     }
 
     internal fun lagre(regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
-        lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG, regelGrunnlag.ytelseType)
+        lagre(regelGrunnlag.saksnummer, regelGrunnlag.behandlingUUID, tilJSON(regelGrunnlag), regelGrunnlag.trukketUttak, uttaksplan, Grunnlagstype.UTTAKSGRUNNLAG, regelGrunnlag.ytelseType, regelGrunnlag.commitId)
     }
 
-    internal fun lagre(endrePerioderGrunnlag: EndrePerioderGrunnlag, uttaksplan: Uttaksplan) {
-        lagre(endrePerioderGrunnlag.saksnummer, UUID.fromString(endrePerioderGrunnlag.behandlingUUID), tilJSON(endrePerioderGrunnlag), listOf(), uttaksplan, Grunnlagstype.ENDRINGSGRUNNLAG)
-    }
-
-
-    private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype, ytelseType: YtelseType = YtelseType.PSB) {
+    private fun lagre(saksnummer:String, behandlingId:UUID, grunnlagJson: PGobject, trukketUttak: List<LukketPeriode>, uttaksplan: Uttaksplan, grunnlagstype: Grunnlagstype, ytelseType: YtelseType = YtelseType.PSB, commitId: String) {
         slettTidligereUttaksplan(behandlingId)
         val opprettetTidspunkt = OffsetDateTime.now(ZoneOffset.UTC)
         val sql = """
             insert into uttaksresultat 
-            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, grunnlagstype, ytelsetype) 
-            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :grunnlagstype::grunnlagstype, :ytelsetype::ytelsetype)            
+            (id, saksnummer, behandling_id, regel_grunnlag, slettet, opprettet_tid, grunnlagstype, ytelsetype, commit_id) 
+            values(nextval('seq_uttaksresultat'), :saksnummer, :behandling_id, :regel_grunnlag, :slettet, :opprettet_tid, :grunnlagstype::grunnlagstype, :ytelsetype::ytelsetype, :commit_id)            
         """.trimIndent()
 
         val keyHolder = GeneratedKeyHolder()
@@ -66,6 +65,7 @@ internal class UttakRepository {
             .addValue("opprettet_tid", opprettetTidspunkt)
             .addValue("grunnlagstype", grunnlagstype.name, Types.OTHER)
             .addValue("ytelsetype", ytelseType.name, Types.OTHER)
+            .addValue("commit_id", commitId)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         val uttaksresultatId = keyHolder.key as Long
@@ -78,23 +78,26 @@ internal class UttakRepository {
         }
         uttaksperiodeRepository.lagrePerioder(uttaksresultatId, uttaksplan.perioder)
         trukketUttaksperiodeRepository.lagreTrukketUttaksperioder(uttaksresultatId, trukketUttak)
+        if (uttaksplan.kvoteInfo != null) kvoteInfoRepository.lagreKvoteInfo(uttaksresultatId, uttaksplan.kvoteInfo!!)
     }
 
     internal fun hent(behandlingId:UUID): Uttaksplan? {
         return try {
-            val uttaksresultatId = jdbcTemplate.queryForObject(
-                "select id from uttaksresultat where behandling_id = :behandling_id and slettet=false",
+            val uttaksresultat = jdbcTemplate.queryForObject(
+                "select id, commit_id from uttaksresultat where behandling_id = :behandling_id and slettet=false",
                 mapOf("behandling_id" to behandlingId),
                 uttaksplanRowMapper)
-            val perioder = uttaksperiodeRepository.hentPerioder(uttaksresultatId!!)
-            val trukketUttaksperioder = trukketUttaksperiodeRepository.hentTrukketUttaksperioder(uttaksresultatId)
+            //NB: Sikkert å anta at uttaksresultat ikke er null, siden EmptyResultDataAccessException skal være kastet dersom den ikke finnes.
+            val perioder = uttaksperiodeRepository.hentPerioder(uttaksresultat!!.id)
+            val trukketUttaksperioder = trukketUttaksperiodeRepository.hentTrukketUttaksperioder(uttaksresultat.id)
+            val kvoteInfo = kvoteInfoRepository.hentKvoteInfo(uttaksresultat.id)
             if (perioder.keys.sjekkOmOverlapp()) {
                 throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i uttak. ${perioder.keys}")
             }
             if (trukketUttaksperioder.sjekkOmOverlapp()) {
                 throw IllegalArgumentException("Hent uttaksplan: Overlapp mellom perioder i trukket uttak. $trukketUttaksperioder")
             }
-            Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder)
+            Uttaksplan(perioder = perioder, trukketUttak = trukketUttaksperioder, kvoteInfo = kvoteInfo, commitId = uttaksresultat.commitId)
         } catch (e: EmptyResultDataAccessException) {
             null
         }
@@ -159,6 +162,11 @@ internal class UttakRepository {
     }
 
 }
+
+private data class Uttaksresultat(
+    val id: Long,
+    val commitId: String
+)
 
 private enum class Grunnlagstype {
     UTTAKSGRUNNLAG,

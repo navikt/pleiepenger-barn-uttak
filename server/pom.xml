@@ -14,7 +14,7 @@
     <properties>
         <springdoc.version>1.6.6</springdoc.version>
         <logback.logstash.version>7.0.1</logback.logstash.version>
-        <postgres.version>42.3.2</postgres.version>
+        <postgres.version>42.3.3</postgres.version>
     </properties>
 
     <dependencies>
@@ -129,7 +129,7 @@
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
+            <artifactId>kotlin-test-junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -183,7 +183,24 @@
                     </environmentVariables>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>5.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>

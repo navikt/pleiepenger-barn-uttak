@@ -10,25 +10,30 @@ import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.lang.IllegalArgumentException
 import java.util.*
+import javax.annotation.PostConstruct
 
 @RestController
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
-class UttakplanApi() {
+class UttakplanApi {
 
     @Autowired
     private lateinit var uttakRepository: UttakRepository
+
+    @Value("\${git.commit.id:}")
+    private val commitId: String? = null
 
     private var utvidetLogging: Boolean = false
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
-        const val EndringUttaksplanPath = "/uttaksplan/endring"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
         const val BehandlingUUID = "behandlingUUID"
@@ -63,18 +68,6 @@ class UttakplanApi() {
         return ResponseEntity
             .created(uri)
             .body(nyUttaksplan)
-    }
-
-    @PostMapping(EndringUttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    @Operation(description = "Endrer en uttaksplan. Kun enkelte endringer er lovlig, hvis endringen er ulovlig så vil endepunktet returnere en 'bad request'.")
-    fun endrePerioder(@RequestBody endrePerioderGrunnlag: EndrePerioderGrunnlag): ResponseEntity<Uttaksplan?> {
-        logger.info("Endrer uttaksplan for behandling=${endrePerioderGrunnlag.behandlingUUID}")
-        endrePerioderGrunnlag.valider()
-        val eksisterendeUttaksplan = uttakRepository.hent(UUID.fromString(endrePerioderGrunnlag.behandlingUUID))
-            ?: return ResponseEntity.badRequest().body(null)
-        val oppdatertUttaksplan = UttakTjeneste.endreUttaksplan(eksisterendeUttaksplan, endrePerioderGrunnlag.perioderSomIkkeErInnvilget)
-        uttakRepository.lagre(endrePerioderGrunnlag, oppdatertUttaksplan)
-        return ResponseEntity.ok(oppdatertUttaksplan)
     }
 
     @Deprecated("Bruk den andre simulerUttaksplan istedet")
@@ -175,7 +168,7 @@ class UttakplanApi() {
             Parameter(name ="behandlingUUID", description = "UUID for behandling hvor siste uttaksplan som skal slettes.")
         ]
     )
-    fun slettUttaksplab(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
+    fun slettUttaksplan(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
         logger.info("Sletter uttaksplan for behandling=$behandlingUUID")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
@@ -184,6 +177,11 @@ class UttakplanApi() {
         }
         uttakRepository.slett(behandlingUUIDParsed)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostConstruct
+    fun init() {
+        logger.info("GIT commit id: $commitId")
     }
 
 }

@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.tilVirkedager
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -19,12 +18,11 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
     }
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
-
         if (grunnlag.ytelseType != YtelseType.PLS) {
             return uttaksplan
         }
         val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
-        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerAndreParter()
+        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil()
 
         var rest = BigDecimal(maxDager) - forBrukteDagerAndreParter
 
@@ -54,9 +52,11 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
-
-        return uttaksplan.copy(perioder = nyePerioder)
+        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteHittil = forBrukteDagerAndreParter, forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first)
+        return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
+
+
 
     private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoAndreParter: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
         if (maxDatoAndreParter!=null) {
@@ -94,9 +94,9 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
     )
 }
 
-private fun RegelGrunnlag.finnForbrukteDagerAndreParter(): Pair<BigDecimal, LocalDate?> {
+private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
-    var relevantePerioder = mutableListOf<LukketPeriode>()
+    val relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.kravprioritetForBehandlinger.forEach { (kravprioritetsperiode, behandlingsUUIDer) ->
         for (behandlingUUID in behandlingsUUIDer) {
@@ -115,23 +115,26 @@ private fun RegelGrunnlag.finnForbrukteDagerAndreParter(): Pair<BigDecimal, Loca
             }
         }
     }
-    val maxDatoAndreParter = relevantePerioder.map { it.tom }.maxOrNull()
 
-    return Pair(antallDager, maxDatoAndreParter)
+    if (this.forrigeUttaksplan != null) {
+        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = this.forrigeUttaksplan.perioder.finnForbrukteDager()
+        relevantePerioder.addAll(relevantePerioderForrigeBehandling)
+        antallDager += forBrukteDagerForrigeBehandling
+    }
+    val maxDatoHittil = relevantePerioder.maxOfOrNull { it.tom }
+
+    return Pair(antallDager, maxDatoHittil)
 }
 
+private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<BigDecimal, List<LukketPeriode>> {
+    var antallDager = BigDecimal.ZERO
+    var relevantePerioder = mutableListOf<LukketPeriode>()
 
-private fun RegelGrunnlag.finnForbrukteDagerFraForrigeUttaksplan(): Map<LocalDate, BigDecimal> {
-    if (this.forrigeUttaksplan == null) {
-        return mapOf()
-    }
-    val forbrukteDagerPerDato = mutableMapOf<LocalDate, BigDecimal>()
-    this.forrigeUttaksplan.perioder
-        .filter {it.value.utfall == Utfall.OPPFYLT}
-        .forEach {
-            it.key.tilVirkedager().forEach { virkedag ->
-                forbrukteDagerPerDato[virkedag] = it.value.uttaksgrad.divide(HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
-            }
+    this.forEach { (annenPartsPeriode, info) ->
+        if (info.utfall == Utfall.OPPFYLT) {
+            antallDager += (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
+            relevantePerioder.add(annenPartsPeriode)
         }
-    return forbrukteDagerPerDato
+    }
+    return Pair(antallDager, relevantePerioder)
 }

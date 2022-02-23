@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
@@ -127,8 +128,50 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Uttaksplan kan lagres og hentes opp igjen`() {
-        val uttakJanuar = dummyUttaksplan(heleJanuar)
-        val grunnlag = dummyRegelGrunnlag(heleJanuar)
+        val uttakJanuar = dummyUttaksplan(heleJanuar).copy(commitId = "12345")
+        val grunnlag = dummyRegelGrunnlag(heleJanuar).copy(commitId = "12345")
+
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
+
+        val uttaksplan = uttakRepository.hent(grunnlag.behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        assertThat(uttaksplan).isEqualTo(uttakJanuar)
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Uttaksplan kan lagres og hentes opp igjen, med kvoteinfo`() {
+        val kvoteinfo = KvoteInfo(maxDato = LocalDate.of(2020, 1, 2),
+                forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
+                forbruktKvoteDenneBehandlingen = BigDecimal.valueOf(23).setScale(2))
+        val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
+        val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
+
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
+
+        val uttaksplan = uttakRepository.hent(grunnlag.behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        assertThat(uttaksplan).isEqualTo(uttakJanuar)
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Uttaksplan kan lagres og hentes opp igjen, med maxDato null`() {
+        val kvoteinfo = KvoteInfo(maxDato = null,
+                forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
+                forbruktKvoteDenneBehandlingen = BigDecimal.ZERO.setScale(2))
+        val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
+        val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
+
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
+
+        val uttaksplan = uttakRepository.hent(grunnlag.behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        assertThat(uttaksplan).isEqualTo(uttakJanuar)
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Uttaksplan kan lagres og hentes opp igjen, med kvoteinfo null`() {
+        val uttakJanuar = dummyUttaksplanPLS(heleJanuar, null)
+        val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
 
         uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlag)
 
@@ -381,6 +424,59 @@ internal class UttakRepositoryTest {
                     utenlandsoppholdÅrsak = utenlandsoppholdÅrsak)
             ),
             trukketUttak = listOf()
+        )
+    }
+
+    private fun dummyUttaksplanPLS(periode:LukketPeriode, kvoteInfo: KvoteInfo?): Uttaksplan {
+        return Uttaksplan(
+                perioder = mapOf(
+                        periode to UttaksperiodeInfo.oppfylt(
+                                kildeBehandlingUUID = UUID.randomUUID().toString(),
+                                uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                                årsak = Årsak.FULL_DEKNING,
+                                pleiebehov = Pleiebehov.PROSENT_100.prosent.setScale(2, RoundingMode.HALF_UP),
+                                knekkpunktTyper = setOf(),
+                                utbetalingsgrader = listOf(Utbetalingsgrader(
+                                        arbeidsforhold = arbeidsforhold1,
+                                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                                        normalArbeidstid = FULL_DAG,
+                                        faktiskArbeidstid = Duration.ZERO)),
+                                søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                                oppgittTilsyn = null,
+                                annenPart = AnnenPart.ALENE,
+                                nattevåk = null,
+                                beredskap = null)
+
+                ),
+                trukketUttak = listOf(),
+                kvoteInfo = kvoteInfo
+        )
+    }
+
+    private fun dummyRegelGrunnlagPLS(periode:LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
+        return RegelGrunnlag(
+                ytelseType = YtelseType.PLS,
+                saksnummer = nesteSaksnummer(),
+                behandlingUUID = behandlingUUID,
+                søker = Søker(
+                        aktørId = aktørIdSøker
+                ),
+                barn = Barn(
+                        aktørId = aktørIdBarn
+                ),
+                søktUttak = listOf(SøktUttak(periode)),
+                pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+                arbeid = listOf(
+                        Arbeid(
+                                arbeidsforhold = arbeidsforhold1,
+                                perioder = mapOf(
+                                        periode to ArbeidsforholdPeriodeInfo(
+                                                jobberNormalt = Duration.ofHours(7).plusMinutes(30),
+                                                jobberNå = Duration.ofHours(7).plusMinutes(30)
+                                        )
+                                )
+                        )
+                )
         )
     }
 

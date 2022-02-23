@@ -7,8 +7,7 @@ enum class Pleiebehov(
         @get:JsonValue val prosent: Prosent) {
     PROSENT_0(Prosent.ZERO),
     PROSENT_100(Prosent(100)),
-    PROSENT_200(Prosent(200)),
-    PROSENT_6000(Prosent(6000));
+    PROSENT_200(Prosent(200));
 
     fun prosent() = prosent
 
