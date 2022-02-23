@@ -7,6 +7,7 @@ import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
+import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -68,6 +69,24 @@ internal object UttaksplanRegler {
         val nattevåk = grunnlag.finnNattevåk(søktUttaksperiode)
         val beredskap = grunnlag.finnBeredskap(søktUttaksperiode)
         val ikkeOppfyltÅrsaker = årsaker.filter { !it.oppfylt } .toSet()
+        var søktPeriodeOverlapperMedUtenlandsperiode = false
+        var utenlandsopphold: Map.Entry<LukketPeriode, UtenlandsoppholdInfo>? = null
+        val landkode: String?
+        val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak
+        for (utenlandsoppholdElement in grunnlag.utenlandsoppholdperioder) {
+            if (utenlandsoppholdElement.key.overlapperDelvis(søktUttaksperiode)) {
+                søktPeriodeOverlapperMedUtenlandsperiode = true
+                utenlandsopphold = utenlandsoppholdElement
+                break                            
+            }
+        }
+        if (søktPeriodeOverlapperMedUtenlandsperiode) {
+            landkode = utenlandsopphold?.value?.landkode
+            utenlandsoppholdÅrsak = utenlandsopphold?.value?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
+        } else {
+            landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode
+            utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
+        }
         if (ikkeOppfyltÅrsaker.isNotEmpty()) {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
                 utbetalingsgrader = grader.tilUtbetalingsgrader(false),
@@ -80,7 +99,9 @@ internal object UttaksplanRegler {
                 kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                 annenPart = grunnlag.annenPart(søktUttaksperiode),
                 nattevåk = nattevåk,
-                beredskap = beredskap
+                beredskap = beredskap,
+                landkode = landkode,
+                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
             )
         } else {
             if (grader.årsak.oppfylt) {
@@ -101,7 +122,9 @@ internal object UttaksplanRegler {
                     kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
-                    beredskap = beredskap
+                    beredskap = beredskap,
+                    landkode = landkode,
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -115,7 +138,9 @@ internal object UttaksplanRegler {
                     kildeBehandlingUUID = grunnlag.behandlingUUID.toString(),
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
-                    beredskap = beredskap
+                    beredskap = beredskap,
+                    landkode = landkode,
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
                 )
             }
         }

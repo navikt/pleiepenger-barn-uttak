@@ -219,7 +219,9 @@ internal class SimuleringTjenesteTest {
             kildeBehandlingUUID = UUID.randomUUID().toString(),
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
-            beredskap = null
+            beredskap = null,
+            landkode = null,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
         )
     }
 
@@ -235,8 +237,9 @@ internal class SimuleringTjenesteTest {
             kildeBehandlingUUID = UUID.randomUUID().toString(),
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
-            beredskap = null
-
+            beredskap = null,
+            landkode = null,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
         )
 
     }

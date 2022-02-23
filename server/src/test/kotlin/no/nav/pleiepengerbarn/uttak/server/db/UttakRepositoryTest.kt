@@ -43,6 +43,84 @@ internal class UttakRepositoryTest {
     private lateinit var uttakRepository: UttakRepository
 
     @Test
+    internal fun `Ikke oppfylt uttaksplan skal lagre informasjon om utenlandsperioder`() {
+        val behandlingUUID = UUID.randomUUID()
+
+        val landkode = "CAN"
+        val utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val uttakJanuar = dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(heleJanuar, landkode, utenlandsoppholdÅrsak)
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        // Krever at landkodene og utenlandsoppholdårsaken er som før.
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+    }
+
+    @Test
+    internal fun `Ikke oppfylt uttaksplan skal lagre informasjon om utenlandsperioder med gyldig utenlandsoppholdÅrsak`() {
+        val behandlingUUID = UUID.randomUUID()
+
+        val landkode = "CAN"
+        val utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val uttakJanuar = dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(heleJanuar, landkode, utenlandsoppholdÅrsak)
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        // Krever at landkodene og utenlandsoppholdårsaken er som før.
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+    }
+
+    @Test
+    internal fun `Oppfylt uttaksplan skal lagre informasjon om utenlandsperioder`() {
+        val behandlingUUID = UUID.randomUUID()
+
+        val landkode = "CAN"
+        val utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val uttakJanuar = dummyUttaksplanMedUtenlandsopphold(heleJanuar, landkode, utenlandsoppholdÅrsak)
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        // Krever at landkodene og utenlandsoppholdårsaken er som før.
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+    }
+
+    @Test
+    internal fun `Ikke oppfylt uttaksplan uten informasjon om utenlandsperioder skal lagres med standardverdier`() {
+        val behandlingUUID = UUID.randomUUID()
+
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val uttakJanuar = dummyIkkeOppfyltUttaksplan(heleJanuar)
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
+            .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
+    }
+
+    @Test
+    internal fun `Oppfylt uttaksplan uten informasjon om utenlandsperioder skal lagres med standardverdier`() {
+        val behandlingUUID = UUID.randomUUID()
+
+        val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
+        val uttakJanuar = dummyUttaksplan(heleJanuar)
+        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
+        val uttaksplan = uttakRepository.hent(behandlingUUID)
+        assertThat(uttaksplan).isNotNull
+        // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
+        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
+        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
+            .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
+    }
+
+    @Test
     internal fun `Søker etter ikke eksisterende behandling skal føre til exception`() {
         val uttaksplan = uttakRepository.hent(UUID.randomUUID())
         assertThat(uttaksplan).isNull()
@@ -264,8 +342,86 @@ internal class UttakRepositoryTest {
                             oppgittTilsyn = null,
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
-                            beredskap = null)
+                            beredskap = null,
+                            landkode = null,
+                            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
+            )
+        )
+    }
 
+    private fun dummyIkkeOppfyltUttaksplan(periode:LukketPeriode): Uttaksplan {
+        return Uttaksplan(
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.ikkeOppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    årsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD),
+                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(Utbetalingsgrader(
+                        arbeidsforhold = arbeidsforhold1,
+                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                        normalArbeidstid = FULL_DAG,
+                        faktiskArbeidstid = Duration.ZERO)),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    landkode = null,
+                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
+            ),
+            trukketUttak = listOf()
+        )
+    }
+
+    private fun dummyUttaksplanMedUtenlandsopphold(periode:LukketPeriode, landkode: String,
+            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): Uttaksplan {
+        return Uttaksplan(
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.oppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    årsak = Årsak.FULL_DEKNING,
+                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(Utbetalingsgrader(
+                        arbeidsforhold = arbeidsforhold1,
+                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                        normalArbeidstid = FULL_DAG,
+                        faktiskArbeidstid = Duration.ZERO)),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    landkode = landkode,
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak)
+            ),
+            trukketUttak = listOf()
+        )
+    }
+
+    private fun dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(periode:LukketPeriode, landkode: String,
+            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): Uttaksplan {
+        return Uttaksplan(
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.ikkeOppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    årsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD),
+                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(Utbetalingsgrader(
+                        arbeidsforhold = arbeidsforhold1,
+                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                        normalArbeidstid = FULL_DAG,
+                        faktiskArbeidstid = Duration.ZERO)),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    landkode = landkode,
+                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak)
             ),
             trukketUttak = listOf()
         )
@@ -289,7 +445,9 @@ internal class UttakRepositoryTest {
                                 oppgittTilsyn = null,
                                 annenPart = AnnenPart.ALENE,
                                 nattevåk = null,
-                                beredskap = null)
+                                beredskap = null,
+                                landkode = null,
+                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
 
                 ),
                 trukketUttak = listOf(),

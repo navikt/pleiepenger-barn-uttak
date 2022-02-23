@@ -51,5 +51,5 @@ data class SøktUttak(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class UtenlandsoppholdInfo(
     @JsonProperty("utenlandsoppholdÅrsak") val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak,
-    @JsonProperty("landkode") val landkode: String
+    @JsonProperty("landkode") val landkode: String?
 )
