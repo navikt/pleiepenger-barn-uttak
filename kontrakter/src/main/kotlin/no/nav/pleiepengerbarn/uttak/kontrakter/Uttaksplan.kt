@@ -46,7 +46,9 @@ data class Uttaksplan @JsonCreator constructor(
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
     @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null,
     @JsonProperty("commitId") val commitId: String = ""
-)
+) {
+    constructor(perioder: Map<LukketPeriode, UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>) : this(perioder, trukketUttak, null, "")
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
