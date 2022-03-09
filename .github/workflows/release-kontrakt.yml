@@ -21,5 +21,5 @@ jobs:
            mvn deploy -e -B --settings ./.m2/settings.xml -am -pl kontrakter -DtrimStackTrace=false -Dchangelist= -Dsha1= -Drevision=$NEW_VERSION -Dfile.encoding=UTF-8
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
           NEW_VERSION: ${{ github.event.release.tag_name }}
