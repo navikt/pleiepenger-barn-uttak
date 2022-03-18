@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
@@ -756,6 +757,72 @@ internal class UttakTjenesteGraderingTest {
         )
     }
 
+    @Test
+    internal fun `Livets sluttfase hvor første søker tar 60% av en dag og andre søker får 40% og kvoteinfo gjenspeiler det`() {
+        val annenPartsBehandlingUUID = nesteBehandlingUUID()
+
+        val perioden = LukketPeriode("2021-03-15/2021-03-15") // 1 full dag
+        val helePeriodenSøktUttak = SøktUttak(perioden)
+
+        val grunnlag = RegelGrunnlag(
+                ytelseType = YtelseType.PLS,
+                saksnummer = nesteSaksnummer(),
+                søker = Søker(
+                        aktørId = aktørIdSøker
+                ),
+                barn = Barn(
+                        aktørId = aktørIdBarn
+                ),
+                pleiebehov = mapOf(
+                        perioden to Pleiebehov.PROSENT_100
+                ),
+                søktUttak = listOf(
+                        helePeriodenSøktUttak
+                ),
+                andrePartersUttaksplanPerBehandling = mapOf(
+                        annenPartsBehandlingUUID to Uttaksplan(
+                                perioder = mapOf(
+                                        perioden to UttaksperiodeInfo.oppfylt(
+                                                kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                                                uttaksgrad = Prosent(60),
+                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                                                søkersTapteArbeidstid = Prosent(100),
+                                                oppgittTilsyn = null,
+                                                årsak = Årsak.FULL_DEKNING,
+                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                                                knekkpunktTyper = setOf(),
+                                                annenPart = AnnenPart.ALENE,
+                                                nattevåk = null,
+                                                beredskap = null,
+                                                landkode = null,
+                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+                                        )
+                                ),
+                                trukketUttak = listOf()
+                        )
+                ),
+                tilsynsperioder = emptyMap(),
+                behandlingUUID = nesteBehandlingUUID(),
+                arbeid = mapOf(
+                        arbeidsforhold1 to mapOf(perioden to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(7).plusMinutes(30), jobberNå = Duration.ofHours(2)))
+                ).somArbeid(),
+                kravprioritetForBehandlinger = mapOf(perioden to listOf(annenPartsBehandlingUUID))
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+
+        assertThat(uttaksplan.perioder).hasSize(1)
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2021, 3, 15))
+        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.6))
+        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.4))
+
+        sjekkOppfylt(uttaksplan,
+                LukketPeriode(LocalDate.of(2021, Month.MARCH, 15), LocalDate.of(2021, Month.MARCH, 15)),
+                Prosent(40),
+                mapOf(arbeidsforhold1 to Prosent(40)),
+                Årsak.GRADERT_MOT_TILSYN)
+    }
 
 }
 
