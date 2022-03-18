@@ -108,7 +108,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
             annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                 if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
                     if (info.utfall == Utfall.OPPFYLT) {
-                        antallDager += (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)* BigDecimal(annenPartsPeriode.virkedager()))
+                        antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))* BigDecimal(annenPartsPeriode.virkedager()))
                         relevantePerioder.add(annenPartsPeriode)
                     }
                 }
@@ -132,7 +132,7 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<Big
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            antallDager += (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
+            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
             relevantePerioder.add(annenPartsPeriode)
         }
     }
