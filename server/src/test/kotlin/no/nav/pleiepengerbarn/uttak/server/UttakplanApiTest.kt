@@ -942,7 +942,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8).setScale(2))
+        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8))
         assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(6))
 
         uttaksplan2.assertOppfylt(
