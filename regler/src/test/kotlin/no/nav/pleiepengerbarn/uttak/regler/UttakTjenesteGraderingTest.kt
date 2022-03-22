@@ -26,32 +26,33 @@ internal class UttakTjenesteGraderingTest {
     }
 
 
-    private val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+    private val helePerioden =
+        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
     private val helePeriodenSøktUttak = SøktUttak(helePerioden)
 
     @Test
     internal fun `En uttaksperiode med overlappende tilsynsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                tilsynsperioder = mapOf(
-                        helePerioden to Prosent(20)
-                ).somTilsynperioder(),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingUUID()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(20)
+            ).somTilsynperioder(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
 
         )
 
@@ -150,35 +151,74 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(6)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-01/2020-01-03"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-06/2020-01-07"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.BEREDSKAP)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-08/2020-01-10"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-13/2020-01-15"), HUNDRE_PROSENT, mapOf(arbeidsforhold1 to HUNDRE_PROSENT), Årsak.FULL_DEKNING, OverseEtablertTilsynÅrsak.NATTEVÅK)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-16/2020-01-17"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
-        sjekkOppfylt(uttaksplan, LukketPeriode("2020-01-20/2020-01-20"), Prosent(40), mapOf(arbeidsforhold1 to Prosent(40)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-01/2020-01-03"),
+            Prosent(40),
+            mapOf(arbeidsforhold1 to Prosent(40)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-06/2020-01-07"),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING,
+            OverseEtablertTilsynÅrsak.BEREDSKAP
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-08/2020-01-10"),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING,
+            OverseEtablertTilsynÅrsak.NATTEVÅK_OG_BEREDSKAP
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-13/2020-01-15"),
+            HUNDRE_PROSENT,
+            mapOf(arbeidsforhold1 to HUNDRE_PROSENT),
+            Årsak.FULL_DEKNING,
+            OverseEtablertTilsynÅrsak.NATTEVÅK
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-16/2020-01-17"),
+            Prosent(40),
+            mapOf(arbeidsforhold1 to Prosent(40)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode("2020-01-20/2020-01-20"),
+            Prosent(40),
+            mapOf(arbeidsforhold1 to Prosent(40)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
 
     @Test
     internal fun `En uttaksperiode med overlappende arbeidsperiode skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingUUID()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -202,44 +242,43 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med overlappende arbeidsperiode og uttak på annen part skal føre til redusert grad på uttaksperiode`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                andrePartersUttaksplanPerBehandling = mapOf(
-                        nesteBehandlingUUID() to Uttaksplan(
-                            perioder = mapOf(
-                                helePerioden to UttaksperiodeInfo.oppfylt(
-                                    kildeBehandlingUUID = nesteBehandlingUUID().toString(),
-                                    uttaksgrad = Prosent(40),
-                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                                    søkersTapteArbeidstid = Prosent(40),
-                                    oppgittTilsyn = null,
-                                    årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
-                                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                    annenPart = AnnenPart.ALENE,
-                                    nattevåk = null,
-                                    beredskap = null,
-                                    landkode = null,
-                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                )
-                            ),
-                            trukketUttak = listOf()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            andrePartersUttaksplanPerBehandling = mapOf(
+                nesteBehandlingUUID() to Uttaksplan(
+                    perioder = mapOf(
+                        helePerioden to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = nesteBehandlingUUID().toString(),
+                            uttaksgrad = Prosent(40),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                            søkersTapteArbeidstid = Prosent(40),
+                            oppgittTilsyn = null,
+                            årsak = Årsak.AVKORTET_MOT_INNTEKT, knekkpunktTyper = setOf(),
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                         )
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingUUID()
+                    ),
+                    trukketUttak = listOf()
+                )
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(75)))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -263,56 +302,55 @@ internal class UttakTjenesteGraderingTest {
     internal fun `En uttaksperiode med tilsyn og uttak på annen part skal overstyres av søkers etablerte tilsyn`() {
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = nesteBehandlingUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_200
-                ),
-                søktUttak = listOf(
-                        helePeriodenSøktUttak
-                ),
-                andrePartersUttaksplanPerBehandling = mapOf(
-                        annenPartsBehandlingUUID to Uttaksplan(
-                            perioder = mapOf(
-                                helePerioden to UttaksperiodeInfo.oppfylt(
-                                    uttaksgrad = Prosent(60),
-                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                                    årsak = Årsak.GRADERT_MOT_TILSYN,
-                                    knekkpunktTyper = setOf(),
-                                    graderingMotTilsyn = GraderingMotTilsyn(
-                                        etablertTilsyn = Prosent(40),
-                                        overseEtablertTilsynÅrsak = null,
-                                        andreSøkeresTilsyn = NULL_PROSENT,
-                                        andreSøkeresTilsynReberegnet = false,
-                                        tilgjengeligForSøker = Prosent(60)
-                                    ),
-                                    annenPart = AnnenPart.ALENE,
-                                    kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                                    pleiebehov = HUNDRE_PROSENT,
-                                    søkersTapteArbeidstid = Prosent(40),
-                                    oppgittTilsyn = null,
-                                    nattevåk = null,
-                                    beredskap = null,
-                                    landkode = null,
-                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                )
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingUUID(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_200
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            andrePartersUttaksplanPerBehandling = mapOf(
+                annenPartsBehandlingUUID to Uttaksplan(
+                    perioder = mapOf(
+                        helePerioden to UttaksperiodeInfo.oppfylt(
+                            uttaksgrad = Prosent(60),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                            årsak = Årsak.GRADERT_MOT_TILSYN,
+                            knekkpunktTyper = setOf(),
+                            graderingMotTilsyn = GraderingMotTilsyn(
+                                etablertTilsyn = Prosent(40),
+                                overseEtablertTilsynÅrsak = null,
+                                andreSøkeresTilsyn = NULL_PROSENT,
+                                andreSøkeresTilsynReberegnet = false,
+                                tilgjengeligForSøker = Prosent(60)
                             ),
-                            trukketUttak = listOf()
+                            annenPart = AnnenPart.ALENE,
+                            kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                            pleiebehov = HUNDRE_PROSENT,
+                            søkersTapteArbeidstid = Prosent(40),
+                            oppgittTilsyn = null,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                         )
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(30)))
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        helePerioden to Prosent(30)
-                ).somTilsynperioder(),
-                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
+                    ),
+                    trukketUttak = listOf()
+                )
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(30)))
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(30)
+            ).somTilsynperioder(),
+            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -337,47 +375,51 @@ internal class UttakTjenesteGraderingTest {
     internal fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                andrePartersUttaksplanPerBehandling = mapOf(
-                        annenPartsBehandlingUUID to Uttaksplan(
-                            perioder = mapOf(
-                                helePerioden to UttaksperiodeInfo.oppfylt(
-                                    kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                                    uttaksgrad = Prosent(40),
-                                    utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
-                                    søkersTapteArbeidstid = Prosent(40),
-                                    oppgittTilsyn = null,
-                                    årsak = Årsak.AVKORTET_MOT_INNTEKT,
-                                    pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                    knekkpunktTyper = setOf(),
-                                    annenPart = AnnenPart.ALENE,
-                                    nattevåk = null,
-                                    beredskap = null,
-                                    landkode = null,
-                                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                )
-                            ),
-                            trukketUttak = listOf()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            andrePartersUttaksplanPerBehandling = mapOf(
+                annenPartsBehandlingUUID to Uttaksplan(
+                    perioder = mapOf(
+                        helePerioden to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                            uttaksgrad = Prosent(40),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
+                            søkersTapteArbeidstid = Prosent(40),
+                            oppgittTilsyn = null,
+                            årsak = Årsak.AVKORTET_MOT_INNTEKT,
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                            knekkpunktTyper = setOf(),
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                         )
-                ),
-                tilsynsperioder = mapOf(
-                        helePerioden to Prosent(45)
-                ).somTilsynperioder(),
-                behandlingUUID = nesteBehandlingUUID(),
-                arbeid = listOf(Arbeid(Arbeidsforhold(type="FL"), mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING)))),
-                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
+                    ),
+                    trukketUttak = listOf()
+                )
+            ),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(45)
+            ).somTilsynperioder(),
+            behandlingUUID = nesteBehandlingUUID(),
+            arbeid = listOf(
+                Arbeid(
+                    Arbeidsforhold(type = "FL"),
+                    mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+                )
+            ),
+            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
 
         )
 
@@ -400,26 +442,26 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med mer arbeid enn tilsyn, så skal perioden graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = nesteBehandlingUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        helePeriodenSøktUttak
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(65)))
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        helePerioden to Prosent(30)
-                ).somTilsynperioder()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingUUID(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(65)))
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(30)
+            ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -443,26 +485,26 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med mer tilsyn enn arbeid, så skal perioden graderes mot tilsyn`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = nesteBehandlingUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        helePeriodenSøktUttak
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(60)))
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        helePerioden to Prosent(70)
-                ).somTilsynperioder()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingUUID(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(60)))
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                helePerioden to Prosent(70)
+            ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -486,23 +528,28 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med gradering i en deltidsjobb`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG.dividedBy(2), FULL_DAG.prosent(25)))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingUUID()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(
+                    helePerioden to ArbeidsforholdPeriodeInfo(
+                        FULL_DAG.dividedBy(2),
+                        FULL_DAG.prosent(25)
+                    )
+                )
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -525,30 +572,45 @@ internal class UttakTjenesteGraderingTest {
 
     @Test
     internal fun `En uttaksperioder med tre arbeidsforhold som skal vurderes til gradering mot arbeid`() {
-        val enUke = LukketPeriode(LocalDate.of(2020,Month.JANUARY, 1), LocalDate.of(2020,Month.JANUARY, 7))
+        val enUke = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 7))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = nesteBehandlingUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        enUke to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        SøktUttak(enUke)
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(3), Duration.ZERO)), // 0 % arbeid
-                        arbeidsforhold2 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(2), Duration.ofHours(1))), // 50 % arbeid
-                        arbeidsforhold3 to mapOf(enUke to ArbeidsforholdPeriodeInfo(Duration.ofHours(4), Duration.ofHours(3))), // 75 % arbeid
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        enUke to Prosent(40) // 40 % etabelert tilsyn
-                ).somTilsynperioder()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingUUID(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                enUke to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                SøktUttak(enUke)
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(
+                    enUke to ArbeidsforholdPeriodeInfo(
+                        Duration.ofHours(3),
+                        Duration.ZERO
+                    )
+                ), // 0 % arbeid
+                arbeidsforhold2 to mapOf(
+                    enUke to ArbeidsforholdPeriodeInfo(
+                        Duration.ofHours(2),
+                        Duration.ofHours(1)
+                    )
+                ), // 50 % arbeid
+                arbeidsforhold3 to mapOf(
+                    enUke to ArbeidsforholdPeriodeInfo(
+                        Duration.ofHours(4),
+                        Duration.ofHours(3)
+                    )
+                ), // 75 % arbeid
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                enUke to Prosent(40) // 40 % etabelert tilsyn
+            ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -574,27 +636,36 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                    helePeriodenSøktUttak
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(90)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(80)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70))
-                        )
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingUUID()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 1),
+                        LocalDate.of(2020, Month.JANUARY, 9)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(90)),
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 10),
+                        LocalDate.of(2020, Month.JANUARY, 19)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(80)),
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 20),
+                        LocalDate.of(2020, Month.JANUARY, 31)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70))
+                )
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -633,41 +704,88 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En søknadsperioder med forskjellige arbeidsprosenter skal graderes mot arbeid og tilsyn`() {
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID =nesteBehandlingUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        SøktUttak(helePerioden)
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 9)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(10)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 19)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(20)),
-                                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 31)) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(30))
-                        )
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Prosent(35)
-                ).somTilsynperioder()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingUUID(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                SøktUttak(helePerioden)
+            ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 1),
+                        LocalDate.of(2020, Month.JANUARY, 9)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(10)),
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 10),
+                        LocalDate.of(2020, Month.JANUARY, 19)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(20)),
+                    LukketPeriode(
+                        LocalDate.of(2020, Month.JANUARY, 20),
+                        LocalDate.of(2020, Month.JANUARY, 31)
+                    ) to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(30))
+                )
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                LukketPeriode(LocalDate.of(2020, Month.JANUARY, 25), LocalDate.of(2020, Month.JANUARY, 31)) to Prosent(
+                    35
+                )
+            ).somTilsynperioder()
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
         assertThat(uttaksplan.perioder).hasSize(6)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3)), Prosent(90), mapOf(arbeidsforhold1 to Prosent(90)), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 9)), Prosent(90), mapOf(arbeidsforhold1 to Prosent(90)), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 10)), Prosent(80), mapOf(arbeidsforhold1 to Prosent(80)), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 13), LocalDate.of(2020, Month.JANUARY, 17)), Prosent(80), mapOf(arbeidsforhold1 to Prosent(80)), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)), Prosent(70), mapOf(arbeidsforhold1 to Prosent(70)), Årsak.AVKORTET_MOT_INNTEKT)
-        sjekkOppfylt(uttaksplan, LukketPeriode(LocalDate.of(2020, Month.JANUARY, 27), LocalDate.of(2020, Month.JANUARY, 31)), Prosent(65), mapOf(arbeidsforhold1 to Prosent(65)), Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3)),
+            Prosent(90),
+            mapOf(arbeidsforhold1 to Prosent(90)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 9)),
+            Prosent(90),
+            mapOf(arbeidsforhold1 to Prosent(90)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 10), LocalDate.of(2020, Month.JANUARY, 10)),
+            Prosent(80),
+            mapOf(arbeidsforhold1 to Prosent(80)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 13), LocalDate.of(2020, Month.JANUARY, 17)),
+            Prosent(80),
+            mapOf(arbeidsforhold1 to Prosent(80)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 20), LocalDate.of(2020, Month.JANUARY, 24)),
+            Prosent(70),
+            mapOf(arbeidsforhold1 to Prosent(70)),
+            Årsak.AVKORTET_MOT_INNTEKT
+        )
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 27), LocalDate.of(2020, Month.JANUARY, 31)),
+            Prosent(65),
+            mapOf(arbeidsforhold1 to Prosent(65)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
     @Test
@@ -676,67 +794,70 @@ internal class UttakTjenesteGraderingTest {
         val tredjePartsBehandlingUUID = nesteBehandlingUUID()
 
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                        aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        helePeriodenSøktUttak
-                ),
-                andrePartersUttaksplanPerBehandling = mapOf(
-                        annenPartsBehandlingUUID to Uttaksplan(
-                                perioder = mapOf(
-                                        helePerioden to UttaksperiodeInfo.oppfylt(
-                                                kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                                                uttaksgrad = Prosent(100),
-                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                                                søkersTapteArbeidstid = Prosent(100),
-                                                oppgittTilsyn = null,
-                                                årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                                knekkpunktTyper = setOf(),
-                                                annenPart = AnnenPart.ALENE,
-                                                nattevåk = null,
-                                                beredskap = null,
-                                                landkode = null,
-                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                            )
-                                    ),
-                                    trukketUttak = listOf()
-                            ),
-                            tredjePartsBehandlingUUID to Uttaksplan(
-                                    perioder = mapOf(
-                                        helePerioden to UttaksperiodeInfo.oppfylt(
-                                                kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
-                                                uttaksgrad = Prosent(100),
-                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                                                søkersTapteArbeidstid = Prosent(100),
-                                                oppgittTilsyn = null,
-                                                årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                                knekkpunktTyper = setOf(),
-                                                annenPart = AnnenPart.ALENE,
-                                                nattevåk = null,
-                                                beredskap = null,
-                                                landkode = null,
-                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                        )
-                                ),
-                                trukketUttak = listOf()
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            andrePartersUttaksplanPerBehandling = mapOf(
+                annenPartsBehandlingUUID to Uttaksplan(
+                    perioder = mapOf(
+                        helePerioden to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                            uttaksgrad = Prosent(100),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                            søkersTapteArbeidstid = Prosent(100),
+                            oppgittTilsyn = null,
+                            årsak = Årsak.FULL_DEKNING,
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                            knekkpunktTyper = setOf(),
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                         )
+                    ),
+                    trukketUttak = listOf()
                 ),
-                tilsynsperioder = emptyMap(),
-                behandlingUUID = nesteBehandlingUUID(),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID, tredjePartsBehandlingUUID))
+                tredjePartsBehandlingUUID to Uttaksplan(
+                    perioder = mapOf(
+                        helePerioden to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
+                            uttaksgrad = Prosent(100),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                            søkersTapteArbeidstid = Prosent(100),
+                            oppgittTilsyn = null,
+                            årsak = Årsak.FULL_DEKNING,
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                            knekkpunktTyper = setOf(),
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                        )
+                    ),
+                    trukketUttak = listOf()
+                )
+            ),
+            tilsynsperioder = emptyMap(),
+            behandlingUUID = nesteBehandlingUUID(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            kravprioritetForBehandlinger = mapOf(
+                helePerioden to listOf(
+                    annenPartsBehandlingUUID,
+                    tredjePartsBehandlingUUID
+                )
+            )
 
         )
 
@@ -745,15 +866,15 @@ internal class UttakTjenesteGraderingTest {
 
         assertThat(uttaksplan.perioder).hasSize(5)
         sjekkIkkeOppfylt(
-                uttaksplan,
-                listOf(
-                        LukketPeriode("2020-01-01/2020-01-03"),
-                        LukketPeriode("2020-01-06/2020-01-10"),
-                        LukketPeriode("2020-01-13/2020-01-17"),
-                        LukketPeriode("2020-01-20/2020-01-24"),
-                        LukketPeriode("2020-01-27/2020-01-31")
-                ),
-                setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
+            uttaksplan,
+            listOf(
+                LukketPeriode("2020-01-01/2020-01-03"),
+                LukketPeriode("2020-01-06/2020-01-10"),
+                LukketPeriode("2020-01-13/2020-01-17"),
+                LukketPeriode("2020-01-20/2020-01-24"),
+                LukketPeriode("2020-01-27/2020-01-31")
+            ),
+            setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE)
         )
     }
 
@@ -765,48 +886,51 @@ internal class UttakTjenesteGraderingTest {
         val helePeriodenSøktUttak = SøktUttak(perioden)
 
         val grunnlag = RegelGrunnlag(
-                ytelseType = YtelseType.PLS,
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                        aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        perioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        helePeriodenSøktUttak
-                ),
-                andrePartersUttaksplanPerBehandling = mapOf(
-                        annenPartsBehandlingUUID to Uttaksplan(
-                                perioder = mapOf(
-                                        perioden to UttaksperiodeInfo.oppfylt(
-                                                kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
-                                                uttaksgrad = Prosent(60),
-                                                utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
-                                                søkersTapteArbeidstid = Prosent(100),
-                                                oppgittTilsyn = null,
-                                                årsak = Årsak.FULL_DEKNING,
-                                                pleiebehov = Pleiebehov.PROSENT_100.prosent,
-                                                knekkpunktTyper = setOf(),
-                                                annenPart = AnnenPart.ALENE,
-                                                nattevåk = null,
-                                                beredskap = null,
-                                                landkode = null,
-                                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-                                        )
-                                ),
-                                trukketUttak = listOf()
+            ytelseType = YtelseType.PLS,
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            pleiebehov = mapOf(
+                perioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                helePeriodenSøktUttak
+            ),
+            andrePartersUttaksplanPerBehandling = mapOf(
+                annenPartsBehandlingUUID to Uttaksplan(
+                    perioder = mapOf(
+                        perioden to UttaksperiodeInfo.oppfylt(
+                            kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
+                            uttaksgrad = Prosent(60),
+                            utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+                            søkersTapteArbeidstid = Prosent(100),
+                            oppgittTilsyn = null,
+                            årsak = Årsak.FULL_DEKNING,
+                            pleiebehov = Pleiebehov.PROSENT_100.prosent,
+                            knekkpunktTyper = setOf(),
+                            annenPart = AnnenPart.ALENE,
+                            nattevåk = null,
+                            beredskap = null,
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                         )
-                ),
-                tilsynsperioder = emptyMap(),
-                behandlingUUID = nesteBehandlingUUID(),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(perioden to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(7).plusMinutes(30), jobberNå = Duration.ofHours(2)))
-                ).somArbeid(),
-                kravprioritetForBehandlinger = mapOf(perioden to listOf(annenPartsBehandlingUUID))
+                    ),
+                    trukketUttak = listOf()
+                )
+            ),
+            tilsynsperioder = emptyMap(),
+            behandlingUUID = nesteBehandlingUUID(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(
+                    perioden to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(7).plusMinutes(30), jobberNå = Duration.ofHours(2)
+                    )
+                )
+            ).somArbeid(),
+            kravprioritetForBehandlinger = mapOf(perioden to listOf(annenPartsBehandlingUUID))
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -817,11 +941,13 @@ internal class UttakTjenesteGraderingTest {
         assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.6))
         assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.4))
 
-        sjekkOppfylt(uttaksplan,
-                LukketPeriode(LocalDate.of(2021, Month.MARCH, 15), LocalDate.of(2021, Month.MARCH, 15)),
-                Prosent(40),
-                mapOf(arbeidsforhold1 to Prosent(40)),
-                Årsak.GRADERT_MOT_TILSYN)
+        sjekkOppfylt(
+            uttaksplan,
+            LukketPeriode(LocalDate.of(2021, Month.MARCH, 15), LocalDate.of(2021, Month.MARCH, 15)),
+            Prosent(40),
+            mapOf(arbeidsforhold1 to Prosent(40)),
+            Årsak.GRADERT_MOT_TILSYN
+        )
     }
 
 }

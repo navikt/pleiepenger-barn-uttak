@@ -1,7 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.*
+import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -36,24 +36,25 @@ internal class RegelGrunnlagExtKtTest {
     }
 
     private fun uttaksplan(perioderString: String): Uttaksplan {
-        return Uttaksplan(perioder = mapOf(
-            LukketPeriode(perioderString) to UttaksperiodeInfo.oppfylt(
-                // Fyll med dummy data
-                kildeBehandlingUUID = UUID.randomUUID().toString(),
-                uttaksgrad = HUNDRE_PROSENT,
-                årsak = Årsak.FULL_DEKNING,
-                pleiebehov = HUNDRE_PROSENT,
-                knekkpunktTyper = setOf(),
-                utbetalingsgrader = listOf(),
-                søkersTapteArbeidstid = HUNDRE_PROSENT,
-                oppgittTilsyn = null,
-                annenPart = AnnenPart.ALENE,
-                nattevåk = null,
-                beredskap = null,
-                landkode = null,
-                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+        return Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode(perioderString) to UttaksperiodeInfo.oppfylt(
+                    // Fyll med dummy data
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    uttaksgrad = HUNDRE_PROSENT,
+                    årsak = Årsak.FULL_DEKNING,
+                    pleiebehov = HUNDRE_PROSENT,
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(),
+                    søkersTapteArbeidstid = HUNDRE_PROSENT,
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                )
             )
-        ))
+        )
     }
 
     private fun dummyGrunnlag(): RegelGrunnlag {

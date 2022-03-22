@@ -2,8 +2,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
-import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
-import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
@@ -77,7 +75,7 @@ internal object UttaksplanRegler {
             if (utenlandsoppholdElement.key.overlapperDelvis(søktUttaksperiode)) {
                 søktPeriodeOverlapperMedUtenlandsperiode = true
                 utenlandsopphold = utenlandsoppholdElement
-                break                            
+                break
             }
         }
         if (søktPeriodeOverlapperMedUtenlandsperiode) {
@@ -100,8 +98,7 @@ internal object UttaksplanRegler {
                 annenPart = grunnlag.annenPart(søktUttaksperiode),
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                landkode = landkode,
-                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
+                utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
             )
         } else {
             if (grader.årsak.oppfylt) {
@@ -123,8 +120,7 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    landkode = landkode,
-                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -139,8 +135,7 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    landkode = landkode,
-                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
                 )
             }
         }

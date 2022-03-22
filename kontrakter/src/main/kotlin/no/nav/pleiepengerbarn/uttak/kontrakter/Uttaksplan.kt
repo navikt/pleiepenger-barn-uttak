@@ -89,8 +89,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("beredskap") val beredskap: Utfall?,
     @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null,
     @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false,
-    @JsonProperty("landkode") val landkode: String? = null,
-    @JsonProperty("utenlandsoppholdÅrsak") val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+    @JsonProperty("utenlandsopphold") val utenlandsopphold: Utenlandsopphold? = null,
 ) {
 
     companion object {
@@ -107,8 +106,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             annenPart: AnnenPart,
             nattevåk: Utfall?,
             beredskap: Utfall?,
-            landkode: String?,
-            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): UttaksperiodeInfo {
+            utenlandsopphold: Utenlandsopphold?): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -129,8 +127,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 annenPart = annenPart,
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                landkode = landkode,
-                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
+                utenlandsopphold = utenlandsopphold
             )
         }
 
@@ -147,8 +144,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             annenPart: AnnenPart,
             nattevåk: Utfall?,
             beredskap: Utfall?,
-            landkode: String?,
-            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): UttaksperiodeInfo {
+            utenlandsopphold: Utenlandsopphold?): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -168,8 +164,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 annenPart = annenPart,
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                landkode = landkode,
-                utenlandsoppholdÅrsak = utenlandsoppholdÅrsak
+                utenlandsopphold = utenlandsopphold
             )
         }
 
@@ -203,4 +198,12 @@ data class GraderingMotTilsyn @JsonCreator constructor(
     @JsonProperty("andreSøkeresTilsyn") val andreSøkeresTilsyn: Prosent,
     @JsonProperty("andreSøkeresTilsynReberegnet") val andreSøkeresTilsynReberegnet: Boolean,
     @JsonProperty("tilgjengeligForSøker") val tilgjengeligForSøker: Prosent
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class Utenlandsopphold @JsonCreator constructor(
+    @JsonProperty("landkode") val landkode: String? = null,
+    @JsonProperty("årsak") val årsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
 )

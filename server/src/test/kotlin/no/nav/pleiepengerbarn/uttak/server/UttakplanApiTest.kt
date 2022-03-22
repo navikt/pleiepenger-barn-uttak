@@ -4,10 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
-import no.nav.pleiepengerbarn.uttak.testklient.ARBEIDSFORHOLD1
-import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
-import no.nav.pleiepengerbarn.uttak.testklient.INGENTING
-import no.nav.pleiepengerbarn.uttak.testklient.PleiepengerBarnUttakTestClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -1465,8 +1461,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {
-                assertThat(periodeInfo.landkode).isEqualTo(landkode)
-                assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
+                assertThat(periodeInfo.utenlandsopphold?.landkode).isEqualTo(landkode)
+                assertThat(periodeInfo.utenlandsopphold?.årsak).isEqualTo(utenlandsoppholdÅrsak)
             }
             else -> fail("Perioden $periode er ikke oppfylt")
         }
@@ -1504,8 +1500,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.IKKE_OPPFYLT -> {
-                assertThat(periodeInfo.landkode).isEqualTo(landkode)
-                assertThat(periodeInfo.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)
+                assertThat(periodeInfo.utenlandsopphold?.landkode).isEqualTo(landkode)
+                assertThat(periodeInfo.utenlandsopphold?.årsak).isEqualTo(utenlandsoppholdÅrsak)
             }
             else -> fail("Perioden $periode er oppfylt")
         }
