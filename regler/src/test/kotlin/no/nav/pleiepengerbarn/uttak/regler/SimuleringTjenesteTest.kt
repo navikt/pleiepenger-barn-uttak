@@ -220,8 +220,7 @@ internal class SimuleringTjenesteTest {
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
             beredskap = null,
-            landkode = null,
-            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
         )
     }
 
@@ -238,8 +237,7 @@ internal class SimuleringTjenesteTest {
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
             beredskap = null,
-            landkode = null,
-            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
+            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
         )
 
     }

@@ -92,8 +92,7 @@ internal class UttaksperiodeRepository {
                     beredskap = tilUtfall(rs.getString("beredskap")),
                     endringsstatus = endringsstatus,
                     utenlandsoppholdUtenÅrsak = rs.getBoolean("utenlandsopphold_uten_aarsak"),
-                    landkode = rs.getString("landkode"),
-                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.valueOf(rs.getString("utenlandsopphold_aarsak"))
+                    utenlandsopphold = Utenlandsopphold(rs.getString("landkode"), UtenlandsoppholdÅrsak.valueOf(rs.getString("utenlandsopphold_aarsak")))
                 )
             )
         }
@@ -162,8 +161,8 @@ internal class UttaksperiodeRepository {
             .addValue("beredskap", info.beredskap?.name, Types.OTHER)
             .addValue("endringsstatus", info.endringsstatus?.name, Types.OTHER)
             .addValue("utenlandsopphold_uten_aarsak", info.utenlandsoppholdUtenÅrsak)
-            .addValue("landkode", info.landkode)
-            .addValue("utenlandsopphold_aarsak", info.utenlandsoppholdÅrsak.toString())
+            .addValue("landkode", info.utenlandsopphold?.landkode)
+            .addValue("utenlandsopphold_aarsak", info.utenlandsopphold?.årsak.toString())
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long

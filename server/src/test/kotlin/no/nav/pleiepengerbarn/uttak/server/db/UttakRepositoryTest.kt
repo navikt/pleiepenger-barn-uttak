@@ -29,8 +29,10 @@ import java.util.concurrent.TimeUnit
 internal class UttakRepositoryTest {
 
     private companion object {
-        private val heleJanuar = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
-        private val heleFebruar = LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
+        private val heleJanuar =
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
+        private val heleFebruar =
+            LukketPeriode(LocalDate.of(2020, Month.FEBRUARY, 1), LocalDate.of(2020, Month.FEBRUARY, 29))
         private val heleMars = LukketPeriode(LocalDate.of(2020, Month.MARCH, 1), LocalDate.of(2020, Month.MARCH, 31))
 
         private val arbeidsforhold1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
@@ -54,8 +56,8 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isEqualTo(landkode) }
+        uttaksplan.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.årsak).isEqualTo(utenlandsoppholdÅrsak) }
     }
 
     @Test
@@ -63,15 +65,20 @@ internal class UttakRepositoryTest {
         val behandlingUUID = UUID.randomUUID()
 
         val landkode = "CAN"
-        val utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
+        val utenlandsoppholdÅrsak =
+            UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
         val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
         val uttakJanuar = dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(heleJanuar, landkode, utenlandsoppholdÅrsak)
         uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isEqualTo(landkode) }
+        uttaksplan.perioder.values.forEach { it ->
+            assertThat(it.utenlandsopphold?.årsak).isEqualTo(
+                utenlandsoppholdÅrsak
+            )
+        }
     }
 
     @Test
@@ -79,15 +86,20 @@ internal class UttakRepositoryTest {
         val behandlingUUID = UUID.randomUUID()
 
         val landkode = "CAN"
-        val utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
+        val utenlandsoppholdÅrsak =
+            UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_DEKKET_ETTER_AVTALE_MED_ET_ANNET_LAND_OM_TRYGD
         val grunnlagJanuar = dummyRegelGrunnlag(heleJanuar, behandlingUUID)
         val uttakJanuar = dummyUttaksplanMedUtenlandsopphold(heleJanuar, landkode, utenlandsoppholdÅrsak)
         uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = grunnlagJanuar)
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isEqualTo(landkode)}
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak).isEqualTo(utenlandsoppholdÅrsak)}
+        uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isEqualTo(landkode) }
+        uttaksplan!!.perioder.values.forEach { it ->
+            assertThat(it.utenlandsopphold?.årsak).isEqualTo(
+                utenlandsoppholdÅrsak
+            )
+        }
     }
 
     @Test
@@ -100,9 +112,11 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
-        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
-            .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
+        uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isNull() }
+        uttaksplan.perioder.values.forEach { it ->
+            assertThat(it.utenlandsopphold?.årsak)
+                .isEqualTo(UtenlandsoppholdÅrsak.INGEN)
+        }
     }
 
     @Test
@@ -115,9 +129,11 @@ internal class UttakRepositoryTest {
         val uttaksplan = uttakRepository.hent(behandlingUUID)
         assertThat(uttaksplan).isNotNull
         // Krever at landkoden er null og utenlandsoppholdårsaken er INGEN.
-        uttaksplan!!.perioder.values.forEach{ it -> assertThat(it.landkode).isNull()}
-        uttaksplan.perioder.values.forEach{ it -> assertThat(it.utenlandsoppholdÅrsak)
-            .isEqualTo(UtenlandsoppholdÅrsak.INGEN)}
+        uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isNull() }
+        uttaksplan.perioder.values.forEach { it ->
+            assertThat(it.utenlandsopphold?.årsak)
+                .isEqualTo(UtenlandsoppholdÅrsak.INGEN)
+        }
     }
 
     @Test
@@ -140,9 +156,11 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Livets sluttfase - Uttaksplan kan lagres og hentes opp igjen, med kvoteinfo`() {
-        val kvoteinfo = KvoteInfo(maxDato = LocalDate.of(2020, 1, 2),
-                forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
-                forbruktKvoteDenneBehandlingen = BigDecimal.valueOf(23).setScale(2))
+        val kvoteinfo = KvoteInfo(
+            maxDato = LocalDate.of(2020, 1, 2),
+            forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
+            forbruktKvoteDenneBehandlingen = BigDecimal.valueOf(23).setScale(2)
+        )
         val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
         val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
 
@@ -155,9 +173,11 @@ internal class UttakRepositoryTest {
 
     @Test
     internal fun `Livets sluttfase - Uttaksplan kan lagres og hentes opp igjen, med maxDato null`() {
-        val kvoteinfo = KvoteInfo(maxDato = null,
-                forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
-                forbruktKvoteDenneBehandlingen = BigDecimal.ZERO.setScale(2))
+        val kvoteinfo = KvoteInfo(
+            maxDato = null,
+            forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
+            forbruktKvoteDenneBehandlingen = BigDecimal.ZERO.setScale(2)
+        )
         val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
         val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
 
@@ -199,7 +219,6 @@ internal class UttakRepositoryTest {
     }
 
 
-
     @Test
     internal fun `Flere behandlinger på samme saksnummer skal hente ut med nyeste uttaksplan`() {
         val saksnummer = "123456"
@@ -207,9 +226,21 @@ internal class UttakRepositoryTest {
         val uttakJanuar = dummyUttaksplan(heleJanuar)
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
-        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = UUID.randomUUID()))
+        uttakRepository.lagre(
+            uttaksplan = uttakJanuar,
+            regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = UUID.randomUUID()
+            )
+        )
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = UUID.randomUUID()))
+        uttakRepository.lagre(
+            uttaksplan = uttakFebruar,
+            regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = UUID.randomUUID()
+            )
+        )
 
 
         val uttaksplan = uttakRepository.hent(saksnummer)
@@ -226,7 +257,13 @@ internal class UttakRepositoryTest {
 
         val uttakJanuar = dummyUttaksplan(heleJanuar)
 
-        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID))
+        uttakRepository.lagre(
+            uttaksplan = uttakJanuar,
+            regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID
+            )
+        )
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID)
 
@@ -242,9 +279,21 @@ internal class UttakRepositoryTest {
         val uttakJanuar = dummyUttaksplan(heleJanuar)
         val uttakFebruar = dummyUttaksplan(heleFebruar)
 
-        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID1))
+        uttakRepository.lagre(
+            uttaksplan = uttakJanuar,
+            regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID1
+            )
+        )
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID2))
+        uttakRepository.lagre(
+            uttaksplan = uttakFebruar,
+            regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID2
+            )
+        )
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID2)
 
@@ -263,11 +312,26 @@ internal class UttakRepositoryTest {
         val uttakFebruar = dummyUttaksplan(heleFebruar)
         val uttakMars = dummyUttaksplan(heleMars)
 
-        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID1))
+        uttakRepository.lagre(
+            uttaksplan = uttakJanuar,
+            regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID1
+            )
+        )
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(uttaksplan = uttakFebruar, regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID2))
+        uttakRepository.lagre(
+            uttaksplan = uttakFebruar,
+            regelGrunnlag = dummyRegelGrunnlag(heleFebruar).copy(
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID2
+            )
+        )
         TimeUnit.MILLISECONDS.sleep(25L) //vent 25 ms
-        uttakRepository.lagre(uttaksplan = uttakMars, regelGrunnlag = dummyRegelGrunnlag(heleMars).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID3))
+        uttakRepository.lagre(
+            uttaksplan = uttakMars,
+            regelGrunnlag = dummyRegelGrunnlag(heleMars).copy(saksnummer = saksnummer, behandlingUUID = behandlingUUID3)
+        )
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, behandlingUUID3)
 
@@ -281,7 +345,10 @@ internal class UttakRepositoryTest {
 
         val uttakJanuar = dummyUttaksplan(heleJanuar)
 
-        uttakRepository.lagre(uttaksplan = uttakJanuar, regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer))
+        uttakRepository.lagre(
+            uttaksplan = uttakJanuar,
+            regelGrunnlag = dummyRegelGrunnlag(heleJanuar).copy(saksnummer = saksnummer)
+        )
 
         val forrigeUttaksplan = uttakRepository.hentForrige(saksnummer, UUID.randomUUID())
 
@@ -298,84 +365,33 @@ internal class UttakRepositoryTest {
         assertThat(forrigeUttaksplan).isNull()
     }
 
-    private fun dummyRegelGrunnlag(periode:LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
+    private fun dummyRegelGrunnlag(periode: LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
         return RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = behandlingUUID,
-                søker = Søker(
-                    aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                søktUttak = listOf(SøktUttak(periode)),
-                pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
-                arbeid = listOf(
-                        Arbeid(
-                                arbeidsforhold = arbeidsforhold1,
-                                perioder = mapOf(
-                                        periode to ArbeidsforholdPeriodeInfo(
-                                                jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                                jobberNå = Duration.ofHours(7).plusMinutes(30)
-                                        )
-                                )
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = behandlingUUID,
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søktUttak = listOf(SøktUttak(periode)),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+            arbeid = listOf(
+                Arbeid(
+                    arbeidsforhold = arbeidsforhold1,
+                    perioder = mapOf(
+                        periode to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = Duration.ofHours(7).plusMinutes(30),
+                            jobberNå = Duration.ofHours(7).plusMinutes(30)
                         )
+                    )
                 )
-        )
-    }
-
-    private fun dummyUttaksplan(periode:LukketPeriode): Uttaksplan {
-        return Uttaksplan(
-            perioder = mapOf(
-                    periode to UttaksperiodeInfo.oppfylt(
-                            kildeBehandlingUUID = UUID.randomUUID().toString(),
-                            uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                            årsak = Årsak.FULL_DEKNING,
-                            pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
-                            knekkpunktTyper = setOf(),
-                            utbetalingsgrader = listOf(Utbetalingsgrader(
-                                    arbeidsforhold = arbeidsforhold1,
-                                    utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                    normalArbeidstid = FULL_DAG,
-                                    faktiskArbeidstid = Duration.ZERO)),
-                            søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                            oppgittTilsyn = null,
-                            annenPart = AnnenPart.ALENE,
-                            nattevåk = null,
-                            beredskap = null,
-                            landkode = null,
-                            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
             )
         )
     }
 
-    private fun dummyIkkeOppfyltUttaksplan(periode:LukketPeriode): Uttaksplan {
-        return Uttaksplan(
-            perioder = mapOf(
-                periode to UttaksperiodeInfo.ikkeOppfylt(
-                    kildeBehandlingUUID = UUID.randomUUID().toString(),
-                    årsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD),
-                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
-                    knekkpunktTyper = setOf(),
-                    utbetalingsgrader = listOf(Utbetalingsgrader(
-                        arbeidsforhold = arbeidsforhold1,
-                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                        normalArbeidstid = FULL_DAG,
-                        faktiskArbeidstid = Duration.ZERO)),
-                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                    oppgittTilsyn = null,
-                    annenPart = AnnenPart.ALENE,
-                    nattevåk = null,
-                    beredskap = null,
-                    landkode = null,
-                    utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
-            ),
-            trukketUttak = listOf()
-        )
-    }
-
-    private fun dummyUttaksplanMedUtenlandsopphold(periode:LukketPeriode, landkode: String,
-            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): Uttaksplan {
+    private fun dummyUttaksplan(periode: LukketPeriode): Uttaksplan {
         return Uttaksplan(
             perioder = mapOf(
                 periode to UttaksperiodeInfo.oppfylt(
@@ -384,25 +400,26 @@ internal class UttakRepositoryTest {
                     årsak = Årsak.FULL_DEKNING,
                     pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
                     knekkpunktTyper = setOf(),
-                    utbetalingsgrader = listOf(Utbetalingsgrader(
-                        arbeidsforhold = arbeidsforhold1,
-                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                        normalArbeidstid = FULL_DAG,
-                        faktiskArbeidstid = Duration.ZERO)),
+                    utbetalingsgrader = listOf(
+                        Utbetalingsgrader(
+                            arbeidsforhold = arbeidsforhold1,
+                            utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            normalArbeidstid = FULL_DAG,
+                            faktiskArbeidstid = Duration.ZERO
+                        )
+                    ),
                     søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                     oppgittTilsyn = null,
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    landkode = landkode,
-                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak)
-            ),
-            trukketUttak = listOf()
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                )
+            )
         )
     }
 
-    private fun dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(periode:LukketPeriode, landkode: String,
-            utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak): Uttaksplan {
+    private fun dummyIkkeOppfyltUttaksplan(periode: LukketPeriode): Uttaksplan {
         return Uttaksplan(
             perioder = mapOf(
                 periode to UttaksperiodeInfo.ikkeOppfylt(
@@ -410,75 +427,144 @@ internal class UttakRepositoryTest {
                     årsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD),
                     pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
                     knekkpunktTyper = setOf(),
-                    utbetalingsgrader = listOf(Utbetalingsgrader(
-                        arbeidsforhold = arbeidsforhold1,
-                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                        normalArbeidstid = FULL_DAG,
-                        faktiskArbeidstid = Duration.ZERO)),
+                    utbetalingsgrader = listOf(
+                        Utbetalingsgrader(
+                            arbeidsforhold = arbeidsforhold1,
+                            utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            normalArbeidstid = FULL_DAG,
+                            faktiskArbeidstid = Duration.ZERO
+                        )
+                    ),
                     søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                     oppgittTilsyn = null,
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    landkode = landkode,
-                    utenlandsoppholdÅrsak = utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                )
             ),
             trukketUttak = listOf()
         )
     }
 
-    private fun dummyUttaksplanPLS(periode:LukketPeriode, kvoteInfo: KvoteInfo?): Uttaksplan {
+    private fun dummyUttaksplanMedUtenlandsopphold(
+        periode: LukketPeriode, landkode: String,
+        utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak
+    ): Uttaksplan {
         return Uttaksplan(
-                perioder = mapOf(
-                        periode to UttaksperiodeInfo.oppfylt(
-                                kildeBehandlingUUID = UUID.randomUUID().toString(),
-                                uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                årsak = Årsak.FULL_DEKNING,
-                                pleiebehov = Pleiebehov.PROSENT_100.prosent.setScale(2, RoundingMode.HALF_UP),
-                                knekkpunktTyper = setOf(),
-                                utbetalingsgrader = listOf(Utbetalingsgrader(
-                                        arbeidsforhold = arbeidsforhold1,
-                                        utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                        normalArbeidstid = FULL_DAG,
-                                        faktiskArbeidstid = Duration.ZERO)),
-                                søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
-                                oppgittTilsyn = null,
-                                annenPart = AnnenPart.ALENE,
-                                nattevåk = null,
-                                beredskap = null,
-                                landkode = null,
-                                utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN)
-
-                ),
-                trukketUttak = listOf(),
-                kvoteInfo = kvoteInfo
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.oppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    årsak = Årsak.FULL_DEKNING,
+                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(
+                        Utbetalingsgrader(
+                            arbeidsforhold = arbeidsforhold1,
+                            utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            normalArbeidstid = FULL_DAG,
+                            faktiskArbeidstid = Duration.ZERO
+                        )
+                    ),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                )
+            ),
+            trukketUttak = listOf()
         )
     }
 
-    private fun dummyRegelGrunnlagPLS(periode:LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
-        return RegelGrunnlag(
-                ytelseType = YtelseType.PLS,
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = behandlingUUID,
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                        aktørId = aktørIdBarn
-                ),
-                søktUttak = listOf(SøktUttak(periode)),
-                pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
-                arbeid = listOf(
-                        Arbeid(
-                                arbeidsforhold = arbeidsforhold1,
-                                perioder = mapOf(
-                                        periode to ArbeidsforholdPeriodeInfo(
-                                                jobberNormalt = Duration.ofHours(7).plusMinutes(30),
-                                                jobberNå = Duration.ofHours(7).plusMinutes(30)
-                                        )
-                                )
+    private fun dummyIkkeOppfyltUttaksplanMedUtenlandsopphold(
+        periode: LukketPeriode, landkode: String,
+        utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak
+    ): Uttaksplan {
+        return Uttaksplan(
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.ikkeOppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    årsaker = setOf(Årsak.FOR_MANGE_DAGER_UTENLANDSOPPHOLD),
+                    pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(
+                        Utbetalingsgrader(
+                            arbeidsforhold = arbeidsforhold1,
+                            utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            normalArbeidstid = FULL_DAG,
+                            faktiskArbeidstid = Duration.ZERO
                         )
+                    ),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
                 )
+            ),
+            trukketUttak = listOf()
+        )
+    }
+
+    private fun dummyUttaksplanPLS(periode: LukketPeriode, kvoteInfo: KvoteInfo?): Uttaksplan {
+        return Uttaksplan(
+            perioder = mapOf(
+                periode to UttaksperiodeInfo.oppfylt(
+                    kildeBehandlingUUID = UUID.randomUUID().toString(),
+                    uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    årsak = Årsak.FULL_DEKNING,
+                    pleiebehov = Pleiebehov.PROSENT_100.prosent.setScale(2, RoundingMode.HALF_UP),
+                    knekkpunktTyper = setOf(),
+                    utbetalingsgrader = listOf(
+                        Utbetalingsgrader(
+                            arbeidsforhold = arbeidsforhold1,
+                            utbetalingsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                            normalArbeidstid = FULL_DAG,
+                            faktiskArbeidstid = Duration.ZERO
+                        )
+                    ),
+                    søkersTapteArbeidstid = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    oppgittTilsyn = null,
+                    annenPart = AnnenPart.ALENE,
+                    nattevåk = null,
+                    beredskap = null,
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                )
+
+            ),
+            trukketUttak = listOf(),
+            kvoteInfo = kvoteInfo
+        )
+    }
+
+    private fun dummyRegelGrunnlagPLS(periode: LukketPeriode, behandlingUUID: UUID = UUID.randomUUID()): RegelGrunnlag {
+        return RegelGrunnlag(
+            ytelseType = YtelseType.PLS,
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = behandlingUUID,
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søktUttak = listOf(SøktUttak(periode)),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+            arbeid = listOf(
+                Arbeid(
+                    arbeidsforhold = arbeidsforhold1,
+                    perioder = mapOf(
+                        periode to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = Duration.ofHours(7).plusMinutes(30),
+                            jobberNå = Duration.ofHours(7).plusMinutes(30)
+                        )
+                    )
+                )
+            )
         )
     }
 
