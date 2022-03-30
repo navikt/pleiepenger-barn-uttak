@@ -694,6 +694,91 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttakplan2søker1.assertOppfylt(søknadsperiode, Prosent(75), mapOf(ARBEIDSFORHOLD1 to Prosent(75)), Årsak.AVKORTET_MOT_INNTEKT, Endringsstatus.UENDRET)
     }
 
+    @Test
+    internal fun `Livets sluttfase - første behandling blir innvilget, deretter lik periode avslått på inngangsvilkår, kvoteInfo skal gjenspeile det`() {
+        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
+        val grunnlag1Søker1 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer()
+        ).copy(
+                ytelseType = YtelseType.PLS
+        )
+
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+
+        val grunnlag2Søker1BehandlingId = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                behandlingUUID = grunnlag2Søker1BehandlingId,
+                saksnummer = grunnlag1Søker1.saksnummer
+        ).copy(
+                ytelseType = YtelseType.PLS,
+                inngangsvilkår = mapOf("K9_VK_1" to listOf(Vilkårsperiode(søknadsperiode, Utfall.IKKE_OPPFYLT)))
+                )
+
+        val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        uttakplan2søker1.assertIkkeOppfylt(søknadsperiode, setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT), setOf(), Endringsstatus.ENDRET)
+
+        assertThat(uttakplan2søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+    }
+
+    @Test
+    internal fun `Livets sluttfase - første behandling blir innvilget, deretter overlappende periode avslått på pleiebehov, kvoteInfo skal gjenspeile det`() {
+        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
+        val grunnlag1Søker1 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer()
+        ).copy(
+                ytelseType = YtelseType.PLS
+        )
+
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+
+        val nySøknadsperiode = LukketPeriode("2021-09-22/2021-09-24")
+
+        val grunnlag2Søker1BehandlingId = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+                søknadsperiode = nySøknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(nySøknadsperiode to Pleiebehov.PROSENT_0),
+                behandlingUUID = grunnlag2Søker1BehandlingId,
+                saksnummer = grunnlag1Søker1.saksnummer
+        ).copy(
+                ytelseType = YtelseType.PLS,
+        )
+
+        val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        uttakplan2søker1.assertIkkeOppfylt(nySøknadsperiode, setOf(Årsak.UTENOM_PLEIEBEHOV), setOf(), Endringsstatus.ENDRET)
+
+        assertThat(uttakplan2søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(2).setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+    }
+
 
     @Test
     internal fun `Simulering av samme grunnlag skal gi at uttaksplanen ikke er endret`() {

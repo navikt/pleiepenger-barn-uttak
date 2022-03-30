@@ -1,7 +1,9 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.EndringsstatusOppdaterer
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
@@ -22,7 +24,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             return uttaksplan
         }
         val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
-        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil()
+        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil(uttaksplan)
 
         var rest = BigDecimal(maxDager) - forBrukteDagerAndreParter
 
@@ -52,7 +54,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
-        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteHittil = forBrukteDagerAndreParter, forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first)
+        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteHittil = forBrukteDagerAndreParter,
+                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
@@ -94,7 +97,7 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
     )
 }
 
-private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate?> {
+private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
     val relevantePerioder = mutableListOf<LukketPeriode>()
 
@@ -117,7 +120,10 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
     }
 
     if (this.forrigeUttaksplan != null) {
-        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = this.forrigeUttaksplan.perioder.finnForbrukteDager()
+        var fullstendigUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(this.forrigeUttaksplan, uttaksplan, this.trukketUttak)
+        fullstendigUttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, fullstendigUttaksplan)
+
+        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = fullstendigUttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
         relevantePerioder.addAll(relevantePerioderForrigeBehandling)
         antallDager += forBrukteDagerForrigeBehandling
     }
@@ -126,15 +132,25 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
     return Pair(antallDager, maxDatoHittil)
 }
 
-private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<BigDecimal, List<LukketPeriode>> {
+private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan: Boolean): Pair<BigDecimal, List<LukketPeriode>> {
     var antallDager = BigDecimal.ZERO
     var relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
-            relevantePerioder.add(annenPartsPeriode)
+            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan)) {
+                antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
+                relevantePerioder.add(annenPartsPeriode)
+            }
+
         }
     }
     return Pair(antallDager, relevantePerioder)
+}
+
+private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
+    if (brukKunPerioderFraForrigeUttaksplan) {
+        return (this.endringsstatus != null && this.endringsstatus == Endringsstatus.UENDRET)
+    }
+    return true
 }
