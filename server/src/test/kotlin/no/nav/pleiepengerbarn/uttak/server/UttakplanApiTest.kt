@@ -1280,7 +1280,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Oppfylte perioder skal lagres med korrekte default verdier for landkode og utenlandsoppholdÅrsak`() {
+    internal fun `Oppfylte perioder skal lagres med korrekte default verdier for erEøsLand, landkode og utenlandsoppholdÅrsak`() {
         val saksnummer = opprettUttakUtenlandsopphold(LukketPeriode("2021-01-04/2021-02-28"))
 
         val søknadsperiode = LukketPeriode("2021-12-13/2021-12-17")
@@ -1367,6 +1367,46 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),
             endringsstatus = Endringsstatus.ENDRET,
             landkode = "USA")
+    }
+
+    @Test
+    internal fun `Oppfylte perioder med utenlandsopphold skal lagres med korrekt verdi for erEøsLand i UttaksperiodeInfo`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07")
+                    to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.INGEN, "SWE"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-05/2021-01-07"), utenlandsoppholdUtenÅrsak = false,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN, landkode = "SWE")
+    }
+
+    @Test
+    internal fun `Ikke oppfylte perioder med utenlandsopphold skal lagres med korrekt verdi for erEøsLand i UttaksperiodeInfo`() {
+        val søknadsperiode = LukketPeriode("2021-01-04/2021-01-08")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+        ).copy(
+            utenlandsoppholdperioder = mapOf(LukketPeriode("2021-01-05/2021-01-07")
+                    to UtenlandsoppholdInfo(UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, "USA"))
+        )
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(periode = LukketPeriode("2021-01-05/2021-01-07"), utenlandsoppholdUtenÅrsak = false,
+            utenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.BARNET_INNLAGT_I_HELSEINSTITUSJON_FOR_NORSK_OFFENTLIG_REGNING, landkode = "USA")
     }
 
     @Test
@@ -1546,6 +1586,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.OPPFYLT -> {
+                assertThat(periodeInfo.utenlandsopphold?.erEøsLand).isEqualTo(RegionUtil().erIEØS(landkode))
                 assertThat(periodeInfo.utenlandsopphold?.landkode).isEqualTo(landkode)
                 assertThat(periodeInfo.utenlandsopphold?.årsak).isEqualTo(utenlandsoppholdÅrsak)
             }
@@ -1585,6 +1626,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         when (periodeInfo.utfall) {
             Utfall.IKKE_OPPFYLT -> {
+                assertThat(periodeInfo.utenlandsopphold?.erEøsLand).isEqualTo(RegionUtil().erIEØS(landkode))
                 assertThat(periodeInfo.utenlandsopphold?.landkode).isEqualTo(landkode)
                 assertThat(periodeInfo.utenlandsopphold?.årsak).isEqualTo(utenlandsoppholdÅrsak)
             }
