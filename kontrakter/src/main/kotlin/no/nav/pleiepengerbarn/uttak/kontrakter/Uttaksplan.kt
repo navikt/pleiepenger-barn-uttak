@@ -204,6 +204,13 @@ data class GraderingMotTilsyn @JsonCreator constructor(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utenlandsopphold @JsonCreator constructor(
+    @JsonProperty("erEøsLand") val erEøsLand: Boolean?,
     @JsonProperty("landkode") val landkode: String? = null,
     @JsonProperty("årsak") val årsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
-)
+) {
+    constructor(landkode: String?, utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak) : this(
+            RegionUtil().erIEØS(landkode),
+            landkode,
+            utenlandsoppholdÅrsak
+    )
+}

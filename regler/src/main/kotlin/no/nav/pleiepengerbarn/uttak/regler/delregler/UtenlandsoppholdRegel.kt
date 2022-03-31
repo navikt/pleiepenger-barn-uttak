@@ -14,7 +14,6 @@ private const val MAX_DAGER_PER_ÅR = 8 * 5
 
 internal class UtenlandsoppholdRegel : UttaksplanRegel {
 
-
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
 
         val featureToggleUtenlandsoppholdRgel = System.getenv("UTENLANDSOPPHOLD_REGEL").toBoolean()
@@ -47,18 +46,13 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
         }
         return uttaksplan.copy(perioder = nyePerioder)
     }
-
 }
 
 private fun RegelGrunnlag.overlapperMedUtenlandsoppholdUtenGyldigÅrsakUtenforEøs(periode: LukketPeriode): Boolean {
-    val eøsLand: List<String> = listOf("ALA", "AUT", "BEL", "BGR", "CYP", "CZE",
-        "DEU", "DNK", "ESP", "EST", "FIN", "FRA", "FRO", "GBR", "GRC", "GRL",
-        "HRV", "HUN", "IRL", "ISL", "ITA", "LIE", "LTU", "LUX", "LVA", "MLT",
-        "NLD", "NOR", "POL", "PRT", "ROU", "SVK", "SVN", "SWE")
     return this.utenlandsoppholdperioder.any {
         (periode.overlapperDelvis(it.key)
                 && it.value.utenlandsoppholdÅrsak == UtenlandsoppholdÅrsak.INGEN)
-                && !eøsLand.contains(it.value.landkode)
+                && !RegionUtil().erIEØS(it.value.landkode)
     }
 }
 
