@@ -779,6 +779,48 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
     }
 
+    @Test
+    internal fun `Livets sluttfase - første behandling blir innvilget, deretter trekkes tre dager, kvoteInfo skal gjenspeile det`() {
+        val søknadsperiode = LukketPeriode("2022-02-07/2022-02-18")
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
+        val grunnlag1Søker1 = lagGrunnlag(
+                søknadsperiode = søknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                behandlingUUID = nesteBehandlingId(),
+                saksnummer = nesteSaksnummer()
+        ).copy(
+                ytelseType = YtelseType.PLS
+        )
+
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10).setScale(2))
+
+        val nySøknadsperiode = LukketPeriode("2022-02-10/2022-02-18")
+
+        val grunnlag2Søker1BehandlingId = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+                søknadsperiode = nySøknadsperiode,
+                arbeid =  listOf(arbeidSøker1),
+                pleiebehov = mapOf(nySøknadsperiode to Pleiebehov.PROSENT_100),
+                behandlingUUID = grunnlag2Søker1BehandlingId,
+                saksnummer = grunnlag1Søker1.saksnummer
+        ).copy(
+                ytelseType = YtelseType.PLS,
+                trukketUttak = listOf(LukketPeriode("2022-02-07/2022-02-09"))
+        )
+
+        val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        assertThat(uttakplan2søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(7).setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+    }
+
 
     @Test
     internal fun `Simulering av samme grunnlag skal gi at uttaksplanen ikke er endret`() {

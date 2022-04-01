@@ -24,14 +24,17 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             return uttaksplan
         }
         val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
-        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil(uttaksplan)
+
+        val fullstendigUttaksplan = utledFullstendigUttaksplan(uttaksplan, grunnlag)
+
+        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil(fullstendigUttaksplan)
 
         var rest = BigDecimal(maxDager) - forBrukteDagerAndreParter
 
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
-        uttaksplan.perioder.forEach { (periode, info) ->
-            if (info.utfall == Utfall.OPPFYLT) {
+        fullstendigUttaksplan.perioder.forEach { (periode, info) ->
+            if (info.utfall == Utfall.OPPFYLT && (info.endringsstatus == null || info.endringsstatus == Endringsstatus.NY)) {
                 val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
@@ -57,6 +60,15 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteHittil = forBrukteDagerAndreParter,
                 forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
+    }
+
+    private fun utledFullstendigUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
+        return if (grunnlag.forrigeUttaksplan != null) {
+            val fullstendigUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(grunnlag.forrigeUttaksplan, uttaksplan, grunnlag.trukketUttak)
+            EndringsstatusOppdaterer.oppdater(grunnlag.forrigeUttaksplan, fullstendigUttaksplan)
+        } else {
+            uttaksplan
+        }
     }
 
 
@@ -120,10 +132,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
     }
 
     if (this.forrigeUttaksplan != null) {
-        var fullstendigUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(this.forrigeUttaksplan, uttaksplan, this.trukketUttak)
-        fullstendigUttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, fullstendigUttaksplan)
-
-        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = fullstendigUttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
+        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = uttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
         relevantePerioder.addAll(relevantePerioderForrigeBehandling)
         antallDager += forBrukteDagerForrigeBehandling
     }
@@ -138,7 +147,7 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPeri
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan)) {
+            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan) || info.erPeriodenNy(brukKunPerioderFraForrigeUttaksplan)) {
                 antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
                 relevantePerioder.add(annenPartsPeriode)
             }
@@ -152,5 +161,12 @@ private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraF
     if (brukKunPerioderFraForrigeUttaksplan) {
         return (this.endringsstatus != null && this.endringsstatus == Endringsstatus.UENDRET)
     }
-    return true
+    return false
+}
+
+private fun UttaksperiodeInfo.erPeriodenNy(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
+    if (!brukKunPerioderFraForrigeUttaksplan) {
+        return ((this.endringsstatus == null) || (this.endringsstatus != null && this.endringsstatus == Endringsstatus.NY))
+    }
+    return false
 }
