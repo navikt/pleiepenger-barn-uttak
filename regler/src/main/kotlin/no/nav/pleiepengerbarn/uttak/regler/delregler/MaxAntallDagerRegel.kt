@@ -115,16 +115,16 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
 
     this.kravprioritetForBehandlinger.forEach { (kravprioritetsperiode, behandlingsUUIDer) ->
         for (behandlingUUID in behandlingsUUIDer) {
-            if (behandlingUUID == this.behandlingUUID) {
-                //Avslutt loop dersom nåværende behandling
-                break
-            }
-            val annenPartsUttaksplan = this.andrePartersUttaksplanPerBehandling[behandlingUUID] ?: throw IllegalStateException("Skal ikke kunne skje at behandling ikke finnes")
-            annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
-                if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
-                    if (info.utfall == Utfall.OPPFYLT) {
-                        antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))* BigDecimal(annenPartsPeriode.virkedager()))
-                        relevantePerioder.add(annenPartsPeriode)
+            if (behandlingUUID != this.behandlingUUID) {
+                //Skal ikke telle med nåværende behandling
+                val annenPartsUttaksplan = this.andrePartersUttaksplanPerBehandling[behandlingUUID]
+                        ?: throw IllegalStateException("Skal ikke kunne skje at behandling ikke finnes")
+                annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
+                    if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
+                        if (info.utfall == Utfall.OPPFYLT) {
+                            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
+                            relevantePerioder.add(annenPartsPeriode)
+                        }
                     }
                 }
             }
@@ -147,7 +147,7 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPeri
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan) || info.erPeriodenNy(brukKunPerioderFraForrigeUttaksplan)) {
+            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan) || info.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan)) {
                 antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
                 relevantePerioder.add(annenPartsPeriode)
             }
@@ -164,9 +164,9 @@ private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraF
     return false
 }
 
-private fun UttaksperiodeInfo.erPeriodenNy(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
+private fun UttaksperiodeInfo.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
     if (!brukKunPerioderFraForrigeUttaksplan) {
-        return ((this.endringsstatus == null) || (this.endringsstatus != null && this.endringsstatus == Endringsstatus.NY))
+        return ((this.endringsstatus == null) || (this.endringsstatus != null && (this.endringsstatus == Endringsstatus.NY || this.endringsstatus == Endringsstatus.ENDRET)))
     }
     return false
 }
