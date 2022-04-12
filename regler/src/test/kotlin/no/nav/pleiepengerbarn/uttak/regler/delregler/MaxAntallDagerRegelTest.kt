@@ -252,7 +252,7 @@ class MaxAntallDagerRegelTest {
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         assertThat(resultat.perioder).hasSize(3)
         assertThat(resultat.kvoteInfo).isNotNull
-        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 27))
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
         assertThat(resultat.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(55))
         assertThat(resultat.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(30))
 
@@ -365,7 +365,7 @@ class MaxAntallDagerRegelTest {
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         assertThat(resultat.perioder).hasSize(2)
         assertThat(resultat.kvoteInfo).isNotNull
-        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
         assertThat(resultat.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(55))
         assertThat(resultat.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5))
 
@@ -400,7 +400,7 @@ class MaxAntallDagerRegelTest {
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
         assertThat(resultat.perioder).hasSize(3)
         assertThat(resultat.kvoteInfo).isNotNull
-        assertThat(resultat.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2020, 3, 20))
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
         assertThat(resultat.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(55))
         assertThat(resultat.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10))
 
