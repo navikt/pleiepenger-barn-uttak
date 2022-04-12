@@ -27,9 +27,9 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         val fullstendigUttaksplan = utledFullstendigUttaksplan(uttaksplan, grunnlag)
 
-        val (forBrukteDagerAndreParter, maxDatoAndreParter) = grunnlag.finnForbrukteDagerHittil(fullstendigUttaksplan)
+        val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil(fullstendigUttaksplan)
 
-        var rest = BigDecimal(maxDager) - forBrukteDagerAndreParter
+        var rest = BigDecimal(maxDager) - forBrukteDagerHittil
 
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
@@ -39,7 +39,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoAndreParter)
+                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
                 } else if (forbrukteDagerDennePerioen <= rest) {
                     // Hvis det er nok dager igjen, så settes hele periode til oppfylt
                     nyePerioder[periode] = info
@@ -49,7 +49,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     val restHeleDager = rest.setScale(0, RoundingMode.UP).toLong()
                     val restHeleDagerMedEventuellHelg = if (restHeleDager>5) ((restHeleDager/5L)*2L)+restHeleDager-2L else restHeleDager
                     nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays(restHeleDagerMedEventuellHelg - 1L))] = info
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg), periode.tom), info, maxDatoAndreParter)
+                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg), periode.tom), info, maxDatoHittil)
                     rest = BigDecimal.ZERO
                 }
             } else {
@@ -57,9 +57,20 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
-        val kvoteInfo = KvoteInfo(maxDato = maxDatoAndreParter, forbruktKvoteHittil = forBrukteDagerAndreParter,
+        val kvoteInfo = KvoteInfo(
+                maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil, maxDatoHittil, BigDecimal(maxDager)),
+                forbruktKvoteHittil = forBrukteDagerHittil,
                 forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
+    }
+
+    private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil: BigDecimal, maxDatoHittil: LocalDate?, maxDager: BigDecimal): LocalDate? {
+        if (maxDatoHittil == null) {
+            return null
+        } else if (forBrukteDagerHittil == maxDager || forBrukteDagerHittil > maxDager ) {
+            return maxDatoHittil
+        }
+        return null
     }
 
     private fun utledFullstendigUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
@@ -71,15 +82,13 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         }
     }
 
-
-
-    private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoAndreParter: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
-        if (maxDatoAndreParter!=null) {
-            if (sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode, maxDatoAndreParter)) {
+    private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoHittil: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
+        if (maxDatoHittil!=null) {
+            if (sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
                 nyePerioder[periode] = info
-            } else if (sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode, maxDatoAndreParter)) {
-                nyePerioder[LukketPeriode(periode.fom, maxDatoAndreParter)] = info
-                nyePerioder[LukketPeriode(maxDatoAndreParter.plusDays(1), periode.tom)] = info.settIkkeoppfylt()
+            } else if (sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
+                nyePerioder[LukketPeriode(periode.fom, maxDatoHittil)] = info
+                nyePerioder[LukketPeriode(maxDatoHittil.plusDays(1), periode.tom)] = info.settIkkeoppfylt()
             } else {
                 nyePerioder[periode] = info.settIkkeoppfylt()
             }
@@ -89,12 +98,12 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         return nyePerioder
     }
 
-    private fun sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoAndreParter: LocalDate): Boolean {
-        return (periode.fom == maxDatoAndreParter || periode.fom.isBefore(maxDatoAndreParter))
+    private fun sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoHittil: LocalDate): Boolean {
+        return (periode.fom == maxDatoHittil || periode.fom.isBefore(maxDatoHittil))
     }
 
-    private fun sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoAndreParter: LocalDate): Boolean {
-        return (periode.tom == maxDatoAndreParter || periode.tom.isBefore(maxDatoAndreParter))
+    private fun sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoHittil: LocalDate): Boolean {
+        return (periode.tom == maxDatoHittil || periode.tom.isBefore(maxDatoHittil))
     }
 
 }

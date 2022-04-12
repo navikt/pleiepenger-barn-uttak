@@ -937,7 +937,7 @@ internal class UttakTjenesteGraderingTest {
 
         assertThat(uttaksplan.perioder).hasSize(1)
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.maxDato).isEqualTo(LocalDate.of(2021, 3, 15))
+        assertThat(uttaksplan.kvoteInfo!!.maxDato).isNull()
         assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.6))
         assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.4))
 
