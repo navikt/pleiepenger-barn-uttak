@@ -1,8 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -244,6 +247,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold`() {
+        System.setProperty("IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID", "true")
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -257,10 +261,11 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(75),
+            Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to Prosent(100)
+            IKKE_YRKESAKTIV to Prosent(50)
         )
+        System.clearProperty("IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID")
     }
 
     @Test
