@@ -18,7 +18,8 @@ internal object BeregnGrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(false)
+        val skalSeBortIfraIkkeYrkesaktiv = skalSeBortIfraIkkeYrkesaktiv(arbeid)
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraIkkeYrkesaktiv)
         val uttaksgradResultat = avklarUttaksgrad(
             pleiebehov,
             etablertTilsynsprosent,
