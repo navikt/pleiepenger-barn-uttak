@@ -139,7 +139,7 @@ internal object BeregnGrader {
         if (!featureToggle) {
             return false
         }
-        return arbeid.keys.filter { it.type != Arbeidstype.IKKE_YRKESAKTIV.kode }.isNotEmpty() && arbeid.keys.any { it.type == Arbeidstype.IKKE_YRKESAKTIV.kode }
+        return arbeid.entries.filter { (key, entry) -> key.type != Arbeidstype.IKKE_YRKESAKTIV.kode && !entry.utenArbeidtid() }.isNotEmpty() && arbeid.keys.any { it.type == Arbeidstype.IKKE_YRKESAKTIV.kode }
     }
 
     private fun featureToggle(key: String): Boolean {
