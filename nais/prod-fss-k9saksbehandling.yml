@@ -62,8 +62,4 @@ spec:
       value: PROD
 
     # Feature toggles
-    - name: UTENLANDSOPPHOLD_REGEL
-      value: "true"
-    - name: IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID
-      value: "true"
-      
+

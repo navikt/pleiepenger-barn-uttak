@@ -440,16 +440,6 @@ internal class BeregnGraderTest {
         )
     }
 
-    @BeforeEach
-    internal fun setUp() {
-        System.setProperty("IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID", "true")
-    }
-
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID")
-    }
-
     @Test
     internal fun `Avslå periode dersom annet arbeidsforhold med IKKE_YRKESAKTIV gjør at uttaksgrad kommer under 20 prosent`() {
         val grader = BeregnGrader.beregn(

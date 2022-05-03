@@ -136,10 +136,6 @@ internal object BeregnGrader {
     }
 
     private fun skalSeBortIfraIkkeYrkesaktiv(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Boolean {
-        val featureToggle = featureToggle("IKKE_YRKESAKTIV_SE_BORT_IFRA_VED_BEREGNING_SOKERSTAPTE_ARBEID")
-        if (!featureToggle) {
-            return false
-        }
         return arbeid.entries.filter { (key, entry) -> key.type != Arbeidstype.IKKE_YRKESAKTIV.kode && !entry.utenArbeidtid() }.isNotEmpty() && arbeid.keys.any { it.type == Arbeidstype.IKKE_YRKESAKTIV.kode }
     }
 

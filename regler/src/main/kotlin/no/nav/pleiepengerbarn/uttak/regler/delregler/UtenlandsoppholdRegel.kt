@@ -16,11 +16,6 @@ internal class UtenlandsoppholdRegel : UttaksplanRegel {
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
 
-        val featureToggleUtenlandsoppholdRgel = System.getenv("UTENLANDSOPPHOLD_REGEL").toBoolean()
-        if (!featureToggleUtenlandsoppholdRgel) {
-            return uttaksplan
-        }
-
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
         val utenlandsdagerFraForrigeUttaksplan = grunnlag.finnUtenlandsdager()
 
