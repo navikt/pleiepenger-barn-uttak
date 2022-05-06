@@ -28,7 +28,7 @@ internal object BeregnGrader {
             arbeid,
             overseEtablertTilsynÅrsak
         )
-        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid)
+        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid, uttaksgradResultat.oppfyltÅrsak)
 
         return GraderBeregnet(
             pleiebehov = pleiebehov,
@@ -137,13 +137,6 @@ internal object BeregnGrader {
 
     private fun skalSeBortIfraIkkeYrkesaktiv(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Boolean {
         return arbeid.entries.filter { (key, entry) -> key.type != Arbeidstype.IKKE_YRKESAKTIV.kode && !entry.utenArbeidtid() }.isNotEmpty() && arbeid.keys.any { it.type == Arbeidstype.IKKE_YRKESAKTIV.kode }
-    }
-
-    private fun featureToggle(key: String): Boolean {
-        if (System.getProperties().containsKey(key)) {
-            return System.getProperty(key).toBoolean()
-        }
-        return System.getenv(key).toBoolean()
     }
 
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {

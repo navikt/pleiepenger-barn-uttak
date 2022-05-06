@@ -24,6 +24,15 @@ internal class BeregnGraderTest {
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
 
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("TILSYN_GRADERING_ENDRINGER", "true")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("TILSYN_GRADERING_ENDRINGER")
+    }
 
     @Test
     internal fun `100 prosent vanlig uttak`() {
@@ -393,6 +402,48 @@ internal class BeregnGraderTest {
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
             IKKE_YRKESAKTIV to Prosent(50)
+        )
+    }
+
+    @Test
+    internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold med tilsyn`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = FULL_DAG.prosent(47),
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            Prosent(53),
+            ARBEIDSGIVER1 to Prosent(53),
+            IKKE_YRKESAKTIV to Prosent(53)
+        )
+    }
+
+    @Test
+    internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold med tilsyn fra annen søker`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = INGENTING,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = Prosent(47),
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            Prosent(53),
+            ARBEIDSGIVER1 to Prosent(53),
+            IKKE_YRKESAKTIV to Prosent(53)
         )
     }
 
