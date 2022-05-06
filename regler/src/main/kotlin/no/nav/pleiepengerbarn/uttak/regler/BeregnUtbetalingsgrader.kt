@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -31,15 +32,19 @@ private val AKTIVITETS_GRUPPER = listOf(
         Arbeidstype.INAKTIV
     )
 )
- internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
-     Arbeidstype.IKKE_YRKESAKTIV.kode,
-     Arbeidstype.KUN_YTELSE.kode,
-     Arbeidstype.INAKTIV.kode
- )
+internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
+    Arbeidstype.IKKE_YRKESAKTIV.kode,
+    Arbeidstype.KUN_YTELSE.kode,
+    Arbeidstype.INAKTIV.kode
+)
 
 object BeregnUtbetalingsgrader {
 
-    internal fun beregn(uttaksgrad: Prosent, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Utbetalingsgrad> {
+    internal fun beregn(
+        uttaksgrad: Prosent,
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+        oppfyltÅrsak: Årsak?
+    ): Map<Arbeidsforhold, Utbetalingsgrad> {
         arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
 
 
@@ -56,30 +61,67 @@ object BeregnUtbetalingsgrader {
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
-            val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(gjenværendeTimerSomDekkes, arbeidForAktivitetsgruppe, fordeling)
+            val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(
+                gjenværendeTimerSomDekkes,
+                arbeidForAktivitetsgruppe,
+                fordeling,
+                uttaksgrad,
+                oppfyltÅrsak
+            )
             gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
             alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
         }
         return alleUtbetalingsgrader
     }
 
-    private fun beregnForAktivitetsGruppe(taptArbeidstidSomDekkes: Duration, arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, fordeling: Map<Arbeidsforhold, Prosent>): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
+    private fun beregnForAktivitetsGruppe(
+        taptArbeidstidSomDekkes: Duration,
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+        fordeling: Map<Arbeidsforhold, Prosent>,
+        uttaksgrad: Prosent,
+        oppfyltÅrsak: Årsak?
+    ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         var sumTimerForbrukt = Duration.ZERO
         arbeid.forEach { (arbeidsforhold, info) ->
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
             if (info.jobberNormalt > Duration.ZERO) {
-                val timerForbrukt = min(taptArbeidstidSomDekkes.prosent(fordelingsprosent), info.taptArbeid())
-                val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
-                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(utbetalingsgrad = utbetalingsgrad, normalArbeidstid = info.jobberNormalt, faktiskArbeidstid = info.jobberNå)
+                val timerForbrukt = min(
+                    taptArbeidstidSomDekkes.prosent(fordelingsprosent),
+                    utledTaptArbeid(info, uttaksgrad, oppfyltÅrsak)
+                )
+                val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                ) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
+                    utbetalingsgrad = utbetalingsgrad,
+                    normalArbeidstid = info.jobberNormalt,
+                    faktiskArbeidstid = info.jobberNå
+                )
                 sumTimerForbrukt += timerForbrukt
             }
         }
-        return UtbetalingsgraderOgGjenværendeTimerSomDekkes(utbetalingsgrader, taptArbeidstidSomDekkes - sumTimerForbrukt)
+        return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
+            utbetalingsgrader,
+            taptArbeidstidSomDekkes - sumTimerForbrukt
+        )
     }
 
-    private fun min(duration1: Duration, duration2: Duration) = if (duration1 <duration2) duration1 else duration2
+    private fun utledTaptArbeid(
+        info: ArbeidsforholdPeriodeInfo,
+        uttaksgrad: Prosent,
+        oppfyltÅrsak: Årsak?
+    ): Duration {
+        return if (FeatureToggle.isActive("TILSYN_GRADERING_ENDRINGER") && oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN) {
+            min(info.taptArbeid(), info.jobberNormalt.prosent(uttaksgrad))
+        } else {
+            info.taptArbeid()
+        }
+    }
+
+    private fun min(duration1: Duration, duration2: Duration) = if (duration1 < duration2) duration1 else duration2
 
     private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
@@ -91,7 +133,10 @@ object BeregnUtbetalingsgrader {
         arbeid.forEach {
             if (sumTapt != Duration.ZERO) {
                 val tapt = it.value.taptArbeid()
-                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8, RoundingMode.HALF_UP)/BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
+                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(
+                    8,
+                    RoundingMode.HALF_UP
+                ) / BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
                 fordeling[it.key] = Prosent.ZERO
             }
@@ -99,8 +144,6 @@ object BeregnUtbetalingsgrader {
 
         return fordeling
     }
-
-
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.forAktivitetsgruppe(aktivitetsgruppe: Set<Arbeidstype>): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
@@ -115,7 +158,7 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.forAktivitetsgruppe(a
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper() {
-    val lovligeArbeidstyper = AKTIVITETS_GRUPPER.flatten().map { it.kode} .toSet()
+    val lovligeArbeidstyper = AKTIVITETS_GRUPPER.flatten().map { it.kode }.toSet()
     this.keys.forEach {
         if (!lovligeArbeidstyper.contains(it.type)) {
             throw IllegalArgumentException("Ulovlig arbeidstype ${it.type}")

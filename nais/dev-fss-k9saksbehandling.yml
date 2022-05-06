@@ -65,3 +65,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
+    - name: TILSYN_GRADERING_ENDRINGER
+      value: "true"
