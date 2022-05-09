@@ -466,7 +466,7 @@ internal class BeregnGraderTest {
             Prosent(63),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(75),
-            IKKE_YRKESAKTIV to Prosent(62)
+            IKKE_YRKESAKTIV to Prosent(62.5)
         )
     }
 

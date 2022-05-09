@@ -3,7 +3,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -21,16 +20,21 @@ enum class Arbeidstype(val kode: String) {
     PSB_AV_DP("PSB_AV_DP")
 }
 
+val gruppeSomSkalSpesialhåndteres = setOf(
+    Arbeidstype.DAGPENGER,
+    Arbeidstype.SYKEPENGER_AV_DAGPENGER,
+    Arbeidstype.PSB_AV_DP,
+    Arbeidstype.IKKE_YRKESAKTIV,
+    Arbeidstype.KUN_YTELSE,
+    Arbeidstype.INAKTIV
+)
 private val AKTIVITETS_GRUPPER = listOf(
-    setOf(Arbeidstype.ARBEIDSTAKER),
-    setOf(Arbeidstype.FRILANSER),
-    setOf(Arbeidstype.DAGPENGER, Arbeidstype.SYKEPENGER_AV_DAGPENGER, Arbeidstype.PSB_AV_DP),
-    setOf(Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE),
     setOf(
-        Arbeidstype.IKKE_YRKESAKTIV,
-        Arbeidstype.KUN_YTELSE,
-        Arbeidstype.INAKTIV
-    )
+        Arbeidstype.ARBEIDSTAKER,
+        Arbeidstype.FRILANSER,
+        Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
+    ),
+    gruppeSomSkalSpesialhåndteres
 )
 internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
     Arbeidstype.IKKE_YRKESAKTIV.kode,
@@ -42,15 +46,14 @@ object BeregnUtbetalingsgrader {
 
     internal fun beregn(
         uttaksgrad: Prosent,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        oppfyltÅrsak: Årsak?
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
         arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
 
 
         var sumJobberNormalt = Duration.ZERO
-        arbeid.values.forEach {
-            sumJobberNormalt += it.jobberNormalt
+        arbeid.entries.filter { !ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE.contains(it.key.type) }.forEach {
+            sumJobberNormalt += it.value.jobberNormalt
         }
 
         val timerSomDekkes = sumJobberNormalt.prosent(uttaksgrad)
@@ -60,26 +63,46 @@ object BeregnUtbetalingsgrader {
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
-            val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
-            val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(
-                gjenværendeTimerSomDekkes,
-                arbeidForAktivitetsgruppe,
-                fordeling,
-                uttaksgrad,
-                oppfyltÅrsak
-            )
-            gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
-            alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
+            if(aktivitetsgruppe == gruppeSomSkalSpesialhåndteres) {
+                val utbetalingsgraderForSpesialhåndtering = beregnForSpesialhåndtertGruppe(arbeidForAktivitetsgruppe, gjenværendeTimerSomDekkes, uttaksgrad)
+                alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
+            } else {
+                val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
+                val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(
+                    gjenværendeTimerSomDekkes,
+                    arbeidForAktivitetsgruppe,
+                    fordeling
+                )
+                gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
+                alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
+            }
         }
         return alleUtbetalingsgrader
+    }
+
+    private fun beregnForSpesialhåndtertGruppe(
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+        gjenværendeTimerSomDekkes: Duration,
+        uttaksgrad: Prosent
+    ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
+        val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
+        arbeid.forEach { (arbeidsforhold, info) ->
+                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
+                    utbetalingsgrad = uttaksgrad,
+                    normalArbeidstid = info.jobberNormalt,
+                    faktiskArbeidstid = info.jobberNå
+                )
+        }
+        return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
+            utbetalingsgrader,
+            gjenværendeTimerSomDekkes
+        )
     }
 
     private fun beregnForAktivitetsGruppe(
         taptArbeidstidSomDekkes: Duration,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        fordeling: Map<Arbeidsforhold, Prosent>,
-        uttaksgrad: Prosent,
-        oppfyltÅrsak: Årsak?
+        fordeling: Map<Arbeidsforhold, Prosent>
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         var sumTimerForbrukt = Duration.ZERO
@@ -89,7 +112,7 @@ object BeregnUtbetalingsgrader {
             if (info.jobberNormalt > Duration.ZERO) {
                 val timerForbrukt = min(
                     taptArbeidstidSomDekkes.prosent(fordelingsprosent),
-                    utledTaptArbeid(info, uttaksgrad, oppfyltÅrsak)
+                    info.taptArbeid()
                 )
                 val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(
                     2,
@@ -107,18 +130,6 @@ object BeregnUtbetalingsgrader {
             utbetalingsgrader,
             taptArbeidstidSomDekkes - sumTimerForbrukt
         )
-    }
-
-    private fun utledTaptArbeid(
-        info: ArbeidsforholdPeriodeInfo,
-        uttaksgrad: Prosent,
-        oppfyltÅrsak: Årsak?
-    ): Duration {
-        return if (FeatureToggle.isActive("TILSYN_GRADERING_ENDRINGER") && oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN) {
-            min(info.taptArbeid(), info.jobberNormalt.prosent(uttaksgrad))
-        } else {
-            info.taptArbeid()
-        }
     }
 
     private fun min(duration1: Duration, duration2: Duration) = if (duration1 < duration2) duration1 else duration2
