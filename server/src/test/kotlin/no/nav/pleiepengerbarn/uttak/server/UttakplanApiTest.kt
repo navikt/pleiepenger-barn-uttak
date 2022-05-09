@@ -506,8 +506,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             perioder = listOf(søknadsperiode),
             grad = Prosent(50),
             gradPerArbeidsforhold = mapOf(
-                SELVSTENDIG1 to Prosent.ZERO,
-                ARBEIDSFORHOLD1 to Prosent(51)
+                SELVSTENDIG1 to Prosent(50),
+                ARBEIDSFORHOLD1 to Prosent(50)
             ),
             oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
             endringsstatus = Endringsstatus.NY
