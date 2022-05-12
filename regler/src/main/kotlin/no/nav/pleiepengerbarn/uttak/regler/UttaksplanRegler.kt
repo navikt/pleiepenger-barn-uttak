@@ -14,19 +14,23 @@ import java.time.Duration
 internal object UttaksplanRegler {
 
     private val PeriodeRegler = linkedSetOf(
-            FerieRegel(),
-            BarnsDødPeriodeRegel()
+        FerieRegel(),
+        SøkersDødRegel(),
+        BarnsDødPeriodeRegel()
     )
 
     private val UttaksplanRegler = linkedSetOf(
-            InngangsvilkårIkkeOppfyltRegel(),
-            UtenlandsoppholdRegel(),
-            MaxAntallDagerRegel()
+        InngangsvilkårIkkeOppfyltRegel(),
+        UtenlandsoppholdRegel(),
+        MaxAntallDagerRegel()
 // NB: erstartet inntil videre med  BarnsDødPeriodeRegel
 // BarnsDødRegel()
     )
 
-    internal fun fastsettUttaksplan(grunnlag: RegelGrunnlag, knektePerioder: Map<SøktUttak,Set<KnekkpunktType>>) : Uttaksplan {
+    internal fun fastsettUttaksplan(
+        grunnlag: RegelGrunnlag,
+        knektePerioder: Map<SøktUttak, Set<KnekkpunktType>>
+    ): Uttaksplan {
         // Fastsett periode
         val perioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
         knektePerioder.forEach { (søktUttaksperiode, knekkpunktTyper) ->
@@ -61,12 +65,12 @@ internal object UttaksplanRegler {
         søktUttaksperiode: LukketPeriode,
         grunnlag: RegelGrunnlag,
         knekkpunktTyper: Set<KnekkpunktType>,
-        årsaker: Set<Årsak>)
-    {
+        årsaker: Set<Årsak>
+    ) {
         val grader = finnGrader(søktUttaksperiode, grunnlag)
         val nattevåk = grunnlag.finnNattevåk(søktUttaksperiode)
         val beredskap = grunnlag.finnBeredskap(søktUttaksperiode)
-        val ikkeOppfyltÅrsaker = årsaker.filter { !it.oppfylt } .toSet()
+        val ikkeOppfyltÅrsaker = årsaker.filter { !it.oppfylt }.toSet()
         var søktPeriodeOverlapperMedUtenlandsperiode = false
         var utenlandsopphold: Map.Entry<LukketPeriode, UtenlandsoppholdInfo>? = null
         val landkode: String?
@@ -83,7 +87,8 @@ internal object UttaksplanRegler {
             utenlandsoppholdÅrsak = utenlandsopphold?.value?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
         } else {
             landkode = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.landkode
-            utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak ?: UtenlandsoppholdÅrsak.INGEN
+            utenlandsoppholdÅrsak = grunnlag.utenlandsoppholdperioder[søktUttaksperiode]?.utenlandsoppholdÅrsak
+                ?: UtenlandsoppholdÅrsak.INGEN
         }
         if (ikkeOppfyltÅrsaker.isNotEmpty()) {
             perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -141,9 +146,12 @@ internal object UttaksplanRegler {
         }
     }
 
-    private fun fastsettUttaksplanRegler(perioder: Map<LukketPeriode, UttaksperiodeInfo>, grunnlag: RegelGrunnlag): Uttaksplan {
+    private fun fastsettUttaksplanRegler(
+        perioder: Map<LukketPeriode, UttaksperiodeInfo>,
+        grunnlag: RegelGrunnlag
+    ): Uttaksplan {
         var uttaksplan = Uttaksplan(perioder, grunnlag.trukketUttak, null, grunnlag.commitId)
-        UttaksplanRegler.forEach {uttaksplanRegler ->
+        UttaksplanRegler.forEach { uttaksplanRegler ->
             uttaksplan = uttaksplanRegler.kjør(
                 uttaksplan = uttaksplan,
                 grunnlag = grunnlag
@@ -155,7 +163,7 @@ internal object UttaksplanRegler {
 
     private fun GraderBeregnet.tilUtbetalingsgrader(oppfylt: Boolean): List<Utbetalingsgrader> {
         return this.utbetalingsgrader.map {
-            val utbetalingsgrad  = if (oppfylt) it.value.utbetalingsgrad else BigDecimal.ZERO
+            val utbetalingsgrad = if (oppfylt) it.value.utbetalingsgrad else BigDecimal.ZERO
             Utbetalingsgrader(
                 arbeidsforhold = it.key,
                 utbetalingsgrad = utbetalingsgrad,
@@ -184,8 +192,14 @@ internal object UttaksplanRegler {
         )
     }
 
-    private fun RegelGrunnlag.avklarOverseEtablertTilsynÅrsak(periode: LukketPeriode, etablertTilsyn: Duration): OverseEtablertTilsynÅrsak? {
-        val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+    private fun RegelGrunnlag.avklarOverseEtablertTilsynÅrsak(
+        periode: LukketPeriode,
+        etablertTilsyn: Duration
+    ): OverseEtablertTilsynÅrsak? {
+        val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(
+            2,
+            RoundingMode.HALF_UP
+        ) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
         if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
             return OverseEtablertTilsynÅrsak.FOR_LAVT
         }
@@ -195,12 +209,12 @@ internal object UttaksplanRegler {
     }
 
     private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
-        val søktUttak = this.søktUttak.firstOrNull {it.periode.overlapperHelt(periode)}
+        val søktUttak = this.søktUttak.firstOrNull { it.periode.overlapperHelt(periode) }
         return søktUttak?.oppgittTilsyn
     }
 
     private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
-        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapperHelt(periode)}
+        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull { it.overlapperHelt(periode) }
         return if (etablertTilsynPeriode != null) {
             this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
         } else {
