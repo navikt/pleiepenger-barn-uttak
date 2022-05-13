@@ -206,6 +206,24 @@ internal class SimuleringTjenesteTest {
         Assertions.assertThat(resultatEndret).isTrue
     }
 
+    @Test
+    fun `Forskjellige utfall skal gi endring for PLS`() {
+        val forrigeUttaksplan = Uttaksplan(
+                perioder = mapOf(
+                        LukketPeriode("2020-02-01/2020-04-26") to oppfylt()
+                )
+        )
+        val simulertUttaksplan = Uttaksplan(
+                perioder = mapOf(
+                        LukketPeriode("2020-02-01/2020-04-25") to oppfylt(),
+                        LukketPeriode("2020-04-26/2020-04-26") to ikkeOppfylt(Årsak.MAKS_DAGER_OVERSTEGET)                )
+        )
+
+        val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+
+        Assertions.assertThat(resultatEndret).isTrue
+    }
+
     private fun oppfylt(): UttaksperiodeInfo {
         return UttaksperiodeInfo.oppfylt(
             uttaksgrad = HUNDRE_PROSENT,

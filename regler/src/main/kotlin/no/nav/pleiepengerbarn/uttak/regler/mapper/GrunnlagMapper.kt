@@ -10,6 +10,7 @@ import java.util.*
 object GrunnlagMapper {
 
     fun tilRegelGrunnlag(
+        erSimulering: Boolean,
         uttaksgrunnlag: Uttaksgrunnlag,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
         forrigeUttaksplan: Uttaksplan?,
@@ -47,7 +48,8 @@ object GrunnlagMapper {
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
                 kravprioritetForBehandlinger = kravprioritetForBehandlinger,
                 utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
-                commitId = commitId
+                commitId = commitId,
+                erSimulering = erSimulering
         )
     }
 

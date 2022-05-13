@@ -61,7 +61,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val kvoteInfo = KvoteInfo(
                 maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil, maxDatoHittil, BigDecimal(maxDager)),
                 forbruktKvoteHittil = forBrukteDagerHittil,
-                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
+                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDagerDenneBehandling().first)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
@@ -145,8 +145,8 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
         }
     }
 
-    if ((this.forrigeUttaksplan != null) && (!erSammeBehandling())) {
-        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = uttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
+    if (this.forrigeUttaksplan != null && !this.erSimulering) {
+        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = uttaksplan.perioder.finnForbrukteDagerForForrigeBehandling()
         relevantePerioder.addAll(relevantePerioderForrigeBehandling)
         antallDager += forBrukteDagerForrigeBehandling
     }
@@ -155,20 +155,13 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
     return Pair(antallDager, maxDatoHittil)
 }
 
-private fun RegelGrunnlag.erSammeBehandling(): Boolean {
-    if (this.forrigeUttaksplan!!.perioder.isNotEmpty()) {
-        return this.forrigeUttaksplan.perioder.values.first().kildeBehandlingUUID == this.behandlingUUID.toString()
-    }
-    return false
-}
-
-private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan: Boolean): Pair<BigDecimal, List<LukketPeriode>> {
+private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDagerDenneBehandling(): Pair<BigDecimal, List<LukketPeriode>> {
     var antallDager = BigDecimal.ZERO
     var relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan) || info.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan)) {
+            if (info.erPeriodenNyEllerEndret()) {
                 antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
                 relevantePerioder.add(annenPartsPeriode)
             }
@@ -178,16 +171,26 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPeri
     return Pair(antallDager, relevantePerioder)
 }
 
-private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
-    if (brukKunPerioderFraForrigeUttaksplan) {
-        return (this.endringsstatus != null && this.endringsstatus == Endringsstatus.UENDRET)
+private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDagerForForrigeBehandling(): Pair<BigDecimal, List<LukketPeriode>> {
+    var antallDager = BigDecimal.ZERO
+    var relevantePerioder = mutableListOf<LukketPeriode>()
+
+    this.forEach { (annenPartsPeriode, info) ->
+        if (info.utfall == Utfall.OPPFYLT) {
+            if (info.erPeriodenFraForrigeUttaksplan()) {
+                antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
+                relevantePerioder.add(annenPartsPeriode)
+            }
+
+        }
     }
-    return false
+    return Pair(antallDager, relevantePerioder)
 }
 
-private fun UttaksperiodeInfo.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
-    if (!brukKunPerioderFraForrigeUttaksplan) {
+private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(): Boolean {
+        return (this.endringsstatus != null && this.endringsstatus == Endringsstatus.UENDRET)
+}
+
+private fun UttaksperiodeInfo.erPeriodenNyEllerEndret(): Boolean {
         return ((this.endringsstatus == null) || (this.endringsstatus != null && (this.endringsstatus == Endringsstatus.NY || this.endringsstatus == Endringsstatus.ENDRET)))
-    }
-    return false
 }

@@ -24,6 +24,7 @@ internal class GrunnlagMapperTest {
 
         assertThrows<IllegalStateException>("Arbeidsforholdene i grunnlaget må være unike.") {
             GrunnlagMapper.tilRegelGrunnlag(
+                    erSimulering = false,
                     uttaksgrunnlag = lagUttaksgrunnag(
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
@@ -40,6 +41,7 @@ internal class GrunnlagMapperTest {
 
         assertThrows<IllegalStateException>("Arbeidsforholdene i grunnlaget må være unike.") {
             GrunnlagMapper.tilRegelGrunnlag(
+                    erSimulering = false,
                     uttaksgrunnlag = lagUttaksgrunnag(
                             arbeidsforholdReferanse1 = arbeidsforholdReferanse,
                             arbeidsforholdReferanse2 = arbeidsforholdReferanse
@@ -53,7 +55,8 @@ internal class GrunnlagMapperTest {
     @Test
     internal fun `Om det er to forskjellige arbeidsforholdreferanser og en kun har nullverdier er det ok`() {
         GrunnlagMapper.tilRegelGrunnlag(
-                    uttaksgrunnlag = lagUttaksgrunnag(
+                erSimulering = false,
+                uttaksgrunnlag = lagUttaksgrunnag(
                             arbeidsforholdReferanse1 = Arbeidsforhold(
                                     type = "SN"
                             ),

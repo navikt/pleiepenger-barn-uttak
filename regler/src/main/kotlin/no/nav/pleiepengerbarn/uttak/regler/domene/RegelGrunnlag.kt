@@ -24,7 +24,8 @@ data class RegelGrunnlag(
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val kravprioritetForBehandlinger: Map<LukketPeriode, List<UUID>> = mapOf(),
     val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf(),
-    val commitId: String = ""
+    val commitId: String = "",
+    val erSimulering: Boolean = false
 ) {
 
     internal fun finnArbeidPerArbeidsforhold(periode: LukketPeriode): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {

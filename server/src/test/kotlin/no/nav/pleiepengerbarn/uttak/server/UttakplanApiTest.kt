@@ -843,6 +843,26 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Simulering skal gi at uttaksplanen er endret når annen parts uttak er vedtatt for PLS`() {
+        val grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(ytelseType = YtelseType.PLS)
+        grunnlagSøker1.opprettUttaksplan()
+
+        val grunnlagSøker2 = lagGrunnlag(periode = "2021-09-20/2021-09-21").copy(
+                arbeid = listOf(Arbeid(ARBEIDSFORHOLD4, mapOf(LukketPeriode("2021-09-20/2021-09-21") to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))),
+                søker = Søker("124"),
+                ytelseType = YtelseType.PLS
+        )
+        grunnlagSøker2.opprettUttaksplan()
+
+        val simuleringsresultat = grunnlagSøker1.copy(
+                kravprioritetForBehandlinger = mapOf(
+                        LukketPeriode("2021-09-20/2021-09-21") to listOf(grunnlagSøker2.behandlingUUID, grunnlagSøker1.behandlingUUID)
+                )
+        ).simulering()
+        assertThat(simuleringsresultat.uttakplanEndret).isTrue
+    }
+
+    @Test
     internal fun `Simulering ved gjensidige krav`() {
         var grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(søker = Søker("søker1"))
         grunnlagSøker1 = grunnlagSøker1.copy(kravprioritetForBehandlinger = mapOf(
