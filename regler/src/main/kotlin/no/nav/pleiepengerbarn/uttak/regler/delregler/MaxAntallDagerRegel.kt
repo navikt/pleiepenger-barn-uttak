@@ -10,6 +10,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.util.*
 
 internal class MaxAntallDagerRegel : UttaksplanRegel {
 
@@ -34,7 +35,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
         fullstendigUttaksplan.perioder.forEach { (periode, info) ->
-            if (info.utfall == Utfall.OPPFYLT && (info.endringsstatus == null || info.endringsstatus == Endringsstatus.NY)) {
+            if (info.utfall == Utfall.OPPFYLT && (info.endringsstatus == null || info.endringsstatus == Endringsstatus.NY || erSammeBehandling(info, grunnlag.behandlingUUID))) {
                 val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
@@ -62,6 +63,10 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 forbruktKvoteHittil = forBrukteDagerHittil,
                 forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
+    }
+
+    private fun erSammeBehandling(periodeInfo: UttaksperiodeInfo, behandlingUUID: UUID): Boolean {
+        return  periodeInfo.kildeBehandlingUUID == behandlingUUID.toString()
     }
 
     private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil: BigDecimal, maxDatoHittil: LocalDate?, maxDager: BigDecimal): LocalDate? {
@@ -140,7 +145,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
         }
     }
 
-    if (this.forrigeUttaksplan != null) {
+    if ((this.forrigeUttaksplan != null) && (!erSammeBehandling())) {
         val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = uttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
         relevantePerioder.addAll(relevantePerioderForrigeBehandling)
         antallDager += forBrukteDagerForrigeBehandling
@@ -148,6 +153,13 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
     val maxDatoHittil = relevantePerioder.maxOfOrNull { it.tom }
 
     return Pair(antallDager, maxDatoHittil)
+}
+
+private fun RegelGrunnlag.erSammeBehandling(): Boolean {
+    if (this.forrigeUttaksplan!!.perioder.isNotEmpty()) {
+        return this.forrigeUttaksplan.perioder.values.first().kildeBehandlingUUID == this.behandlingUUID.toString()
+    }
+    return false
 }
 
 private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan: Boolean): Pair<BigDecimal, List<LukketPeriode>> {

@@ -833,6 +833,16 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Simulering av samme grunnlag for livets sluttfae skal gi at uttaksplanen ikke er endret`() {
+        val grunnlag = lagGrunnlag(periode = "2021-01-02/2021-04-26").copy(ytelseType = YtelseType.PLS)
+        grunnlag.opprettUttaksplan()
+
+        val simuleringsresultat = grunnlag.simulering()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+    }
+
+    @Test
     internal fun `Simulering ved gjensidige krav`() {
         var grunnlagSøker1 = lagGrunnlag(periode = "2021-09-20/2021-09-24").copy(søker = Søker("søker1"))
         grunnlagSøker1 = grunnlagSøker1.copy(kravprioritetForBehandlinger = mapOf(
