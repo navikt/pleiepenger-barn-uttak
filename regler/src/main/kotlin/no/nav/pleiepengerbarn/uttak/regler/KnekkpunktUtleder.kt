@@ -34,6 +34,7 @@ internal object KnekkpunktUtleder {
         finnForNattevåk(knekkpunkMap, regelGrunnlag.nattevåksperioder.keys)
         finnForKravprioritet(knekkpunkMap, regelGrunnlag.kravprioritetForBehandlinger.keys)
         finnForBarnsDød(knekkpunkMap, regelGrunnlag.barn)
+        finnForSøkersDød(knekkpunkMap, regelGrunnlag.søker)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
 
@@ -63,6 +64,12 @@ internal object KnekkpunktUtleder {
             oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1), KnekkpunktType.BARNETS_DØDSFALL)
             val antallUker = barn.rettVedDød?.uker ?: 0
             oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1).plusWeeks(antallUker), KnekkpunktType.BARNETS_DØDSFALL)
+        }
+    }
+
+    private fun finnForSøkersDød(knekkpunktMap: KnekkpunktMap, barn: Søker) {
+        if (barn.dødsdato != null) {
+            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1), KnekkpunktType.SØKERS_DØDSFALL)
         }
     }
 
