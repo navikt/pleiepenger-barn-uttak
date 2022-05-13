@@ -9,8 +9,7 @@ internal class SøkersDødRegel : PeriodeRegel {
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
         val dødsdato = grunnlag.søker.dødsdato
         if (dødsdato != null) {
-            val sisteDagMedRettEtterBarnetsDød = dødsdato
-            if (periode.fom.isAfter(sisteDagMedRettEtterBarnetsDød)) {
+            if (periode.fom.isAfter(dødsdato)) {
                 return IkkeOppfylt(årsaker = setOf(Årsak.SØKERS_DØDSFALL))
             }
         }
