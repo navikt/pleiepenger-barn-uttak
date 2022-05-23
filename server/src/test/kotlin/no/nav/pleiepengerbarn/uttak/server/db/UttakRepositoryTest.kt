@@ -159,7 +159,8 @@ internal class UttakRepositoryTest {
         val kvoteinfo = KvoteInfo(
             maxDato = LocalDate.of(2020, 1, 2),
             forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
-            forbruktKvoteDenneBehandlingen = BigDecimal.valueOf(23).setScale(2)
+            forbruktKvoteDenneBehandlingen = BigDecimal.valueOf(23).setScale(2),
+            totaltForbruktKvote = BigDecimal.valueOf(23).setScale(2)
         )
         val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
         val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)
@@ -176,7 +177,8 @@ internal class UttakRepositoryTest {
         val kvoteinfo = KvoteInfo(
             maxDato = null,
             forbruktKvoteHittil = BigDecimal.ZERO.setScale(2),
-            forbruktKvoteDenneBehandlingen = BigDecimal.ZERO.setScale(2)
+            forbruktKvoteDenneBehandlingen = BigDecimal.ZERO.setScale(2),
+            totaltForbruktKvote = BigDecimal.ZERO.setScale(2)
         )
         val uttakJanuar = dummyUttaksplanPLS(heleJanuar, kvoteinfo)
         val grunnlag = dummyRegelGrunnlagPLS(heleJanuar)

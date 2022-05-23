@@ -60,7 +60,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val kvoteInfo = KvoteInfo(
                 maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil, maxDatoHittil, BigDecimal(maxDager)),
                 forbruktKvoteHittil = forBrukteDagerHittil,
-                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first)
+                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first,
+                totaltForbruktKvote = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first) // TODO HN oppdatere denne
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
