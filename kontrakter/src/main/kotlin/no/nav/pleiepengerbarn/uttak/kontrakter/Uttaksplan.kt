@@ -55,8 +55,11 @@ data class Uttaksplan @JsonCreator constructor(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class KvoteInfo @JsonCreator constructor(
         @JsonProperty("maxDato") val maxDato: LocalDate?,
+        @Deprecated("Denne utgår, bruk totaltForbruktKvote i stedet.")
         @JsonProperty("forbruktKvoteHittil") val forbruktKvoteHittil: BigDecimal,
+        @Deprecated("Denne utgår, bruk totaltForbruktKvote i stedet.")
         @JsonProperty("forbruktKvoteDenneBehandlingen") val forbruktKvoteDenneBehandlingen: BigDecimal,
+        @JsonProperty("totaltForbruktKvote") val totaltForbruktKvote: BigDecimal
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
