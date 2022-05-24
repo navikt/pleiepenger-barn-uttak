@@ -25,16 +25,14 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         }
         val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
 
-        val fullstendigUttaksplan = utledFullstendigUttaksplan(uttaksplan, grunnlag)
-
-        val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil(fullstendigUttaksplan)
+        val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil()
 
         var rest = BigDecimal(maxDager) - forBrukteDagerHittil
 
         val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
 
-        fullstendigUttaksplan.perioder.forEach { (periode, info) ->
-            if (info.utfall == Utfall.OPPFYLT && (info.endringsstatus == null || info.endringsstatus == Endringsstatus.NY)) {
+        uttaksplan.perioder.forEach { (periode, info) ->
+            if (info.utfall == Utfall.OPPFYLT) {
                 val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
@@ -60,8 +58,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val kvoteInfo = KvoteInfo(
                 maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil, maxDatoHittil, BigDecimal(maxDager)),
                 forbruktKvoteHittil = forBrukteDagerHittil,
-                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first,
-                totaltForbruktKvote = nyePerioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = false).first) // TODO HN oppdatere denne
+                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first,
+                totaltForbruktKvote = nyePerioder.finnForbrukteDager().first+forBrukteDagerHittil)
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
@@ -72,15 +70,6 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             return maxDatoHittil
         }
         return null
-    }
-
-    private fun utledFullstendigUttaksplan(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
-        return if (grunnlag.forrigeUttaksplan != null) {
-            val fullstendigUttaksplan = UttaksplanMerger.slåSammenUttaksplaner(grunnlag.forrigeUttaksplan, uttaksplan, grunnlag.trukketUttak)
-            EndringsstatusOppdaterer.oppdater(grunnlag.forrigeUttaksplan, fullstendigUttaksplan)
-        } else {
-            uttaksplan
-        }
     }
 
     private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoHittil: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
@@ -119,7 +108,7 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
     )
 }
 
-private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair<BigDecimal, LocalDate?> {
+private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
     val relevantePerioder = mutableListOf<LukketPeriode>()
 
@@ -141,42 +130,20 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(uttaksplan: Uttaksplan): Pair
         }
     }
 
-    if (this.forrigeUttaksplan != null) {
-        val (forBrukteDagerForrigeBehandling, relevantePerioderForrigeBehandling) = uttaksplan.perioder.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan = true)
-        relevantePerioder.addAll(relevantePerioderForrigeBehandling)
-        antallDager += forBrukteDagerForrigeBehandling
-    }
     val maxDatoHittil = relevantePerioder.maxOfOrNull { it.tom }
 
     return Pair(antallDager, maxDatoHittil)
 }
 
-private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(brukKunPerioderFraForrigeUttaksplan: Boolean): Pair<BigDecimal, List<LukketPeriode>> {
+private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<BigDecimal, List<LukketPeriode>> {
     var antallDager = BigDecimal.ZERO
     var relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            if (info.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan) || info.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan)) {
                 antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
                 relevantePerioder.add(annenPartsPeriode)
-            }
-
         }
     }
     return Pair(antallDager, relevantePerioder)
-}
-
-private fun UttaksperiodeInfo.erPeriodenFraForrigeUttaksplan(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
-    if (brukKunPerioderFraForrigeUttaksplan) {
-        return (this.endringsstatus != null && this.endringsstatus == Endringsstatus.UENDRET)
-    }
-    return false
-}
-
-private fun UttaksperiodeInfo.erPeriodenNyEllerEndret(brukKunPerioderFraForrigeUttaksplan: Boolean): Boolean {
-    if (!brukKunPerioderFraForrigeUttaksplan) {
-        return ((this.endringsstatus == null) || (this.endringsstatus != null && (this.endringsstatus == Endringsstatus.NY || this.endringsstatus == Endringsstatus.ENDRET)))
-    }
-    return false
 }
