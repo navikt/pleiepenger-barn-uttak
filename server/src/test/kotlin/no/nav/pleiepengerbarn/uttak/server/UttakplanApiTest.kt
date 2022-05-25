@@ -3,6 +3,8 @@ package no.nav.pleiepengerbarn.uttak.server
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
@@ -709,11 +711,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ytelseType = YtelseType.PLS
         )
 
-
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(5).setScale(2))
 
         val grunnlag2Søker1BehandlingId = nesteBehandlingId()
         val grunnlag2Søker1 = lagGrunnlag(
@@ -732,73 +732,78 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttakplan2søker1.assertIkkeOppfylt(søknadsperiode, setOf(Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT), setOf(), Endringsstatus.ENDRET)
 
         assertThat(uttakplan2søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.ZERO.setScale(2))
     }
 
     @Test
     internal fun `Livets sluttfase - første behandling blir innvilget, deretter overlappende periode avslått på pleiebehov, kvoteInfo skal gjenspeile det`() {
-        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
-
-        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
+        val søknadsperiode = LukketPeriode("2021-09-20/2021-09-22")
+        val behandlingUUID1 = nesteBehandlingId()
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2021-09-20/2021-09-24") to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
         val grunnlag1Søker1 = lagGrunnlag(
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker1),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
-                behandlingUUID = nesteBehandlingId(),
+                behandlingUUID = behandlingUUID1,
                 saksnummer = nesteSaksnummer()
         ).copy(
-                ytelseType = YtelseType.PLS
+                ytelseType = YtelseType.PLS,
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID1))
         )
-
 
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(3).setScale(2))
 
-        val nySøknadsperiode = LukketPeriode("2021-09-22/2021-09-24")
-
+        val nySøknadsperiode = LukketPeriode("2021-09-20/2021-09-24")
+        val nySøknadsperiodeSomIkkeOverlapperFørsteSøknadsperiode = LukketPeriode("2021-09-23/2021-09-24")
+        val innvilgetPleiebehov = LukketPeriode("2021-09-20/2021-09-21")
+        val avslåttPleiebehov = LukketPeriode("2021-09-22/2021-09-24")
         val grunnlag2Søker1BehandlingId = nesteBehandlingId()
         val grunnlag2Søker1 = lagGrunnlag(
                 søknadsperiode = nySøknadsperiode,
                 arbeid =  listOf(arbeidSøker1),
-                pleiebehov = mapOf(nySøknadsperiode to Pleiebehov.PROSENT_0),
+                pleiebehov = mapOf(innvilgetPleiebehov to Pleiebehov.PROSENT_100,
+                        avslåttPleiebehov to Pleiebehov.PROSENT_0),
                 behandlingUUID = grunnlag2Søker1BehandlingId,
                 saksnummer = grunnlag1Søker1.saksnummer
         ).copy(
                 ytelseType = YtelseType.PLS,
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(grunnlag2Søker1BehandlingId),
+                        nySøknadsperiodeSomIkkeOverlapperFørsteSøknadsperiode to listOf(grunnlag2Søker1BehandlingId))
         )
 
         val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
 
-        uttakplan2søker1.assertIkkeOppfylt(nySøknadsperiode, setOf(Årsak.UTENOM_PLEIEBEHOV), setOf(), Endringsstatus.ENDRET)
+        uttakplan2søker1.assertOppfylt(innvilgetPleiebehov, endringsstatus = Endringsstatus.UENDRET)
+        uttakplan2søker1.assertIkkeOppfylt(LukketPeriode("2021-09-22/2021-09-22"), setOf(Årsak.UTENOM_PLEIEBEHOV), setOf(KnekkpunktType.PLEIEBEHOV), Endringsstatus.ENDRET) // dagen som ble innvilget i første behandling, men så avslått i andre
+        uttakplan2søker1.assertIkkeOppfylt(nySøknadsperiodeSomIkkeOverlapperFørsteSøknadsperiode, setOf(Årsak.UTENOM_PLEIEBEHOV), setOf(KnekkpunktType.KRAVPRIORITETSPERIODE, KnekkpunktType.FORRIGE_UTTAKPLAN), Endringsstatus.NY)
 
         assertThat(uttakplan2søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(2).setScale(2))
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(2).setScale(2))
     }
 
     @Test
     internal fun `Livets sluttfase - første behandling blir innvilget, deretter trekkes tre dager, kvoteInfo skal gjenspeile det`() {
         val søknadsperiode = LukketPeriode("2022-02-07/2022-02-18")
+        val behandlingUUID1 = nesteBehandlingId()
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)))
         val grunnlag1Søker1 = lagGrunnlag(
                 søknadsperiode = søknadsperiode,
                 arbeid =  listOf(arbeidSøker1),
                 pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
-                behandlingUUID = nesteBehandlingId(),
+                behandlingUUID = behandlingUUID1,
                 saksnummer = nesteSaksnummer()
         ).copy(
-                ytelseType = YtelseType.PLS
+                ytelseType = YtelseType.PLS,
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID1))
         )
 
 
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO.setScale(2))
-        assertThat(uttakplan1søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(10).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(10).setScale(2))
 
         val nySøknadsperiode = LukketPeriode("2022-02-10/2022-02-18")
 
@@ -811,20 +816,29 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 saksnummer = grunnlag1Søker1.saksnummer
         ).copy(
                 ytelseType = YtelseType.PLS,
-                trukketUttak = listOf(LukketPeriode("2022-02-07/2022-02-09"))
+                trukketUttak = listOf(LukketPeriode("2022-02-07/2022-02-09")),
+                kravprioritetForBehandlinger = mapOf(nySøknadsperiode to listOf(grunnlag2Søker1BehandlingId))
         )
 
         val uttakplan2søker1 = grunnlag2Søker1.opprettUttaksplan()
 
         assertThat(uttakplan2søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(7).setScale(2))
-        assertThat(uttakplan2søker1.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.ZERO.setScale(2))
+        assertThat(uttakplan2søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(7).setScale(2))
     }
-
 
     @Test
     internal fun `Simulering av samme grunnlag skal gi at uttaksplanen ikke er endret`() {
         val grunnlag = lagGrunnlag(periode = "2021-09-20/2021-09-24")
+        grunnlag.opprettUttaksplan()
+
+        val simuleringsresultat = grunnlag.simulering()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Simulering av samme grunnlag skal gi at uttaksplanen ikke er endret`() {
+        val grunnlag = lagGrunnlag(periode = "2021-01-02/2021-04-26").copy(ytelseType = YtelseType.PLS)
         grunnlag.opprettUttaksplan()
 
         val simuleringsresultat = grunnlag.simulering()
@@ -1031,6 +1045,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     internal fun `Livets sluttfase - Flere behandlinger med uttak etter hverandre hvor kvoteInfo oppdaterer seg tilsvarende`() {
         val saksnummer = nesteSaksnummer()
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val behandlingUUID1 = nesteBehandlingId()
+
         val grunnlag = lagGrunnlag(
                 ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode,
@@ -1038,7 +1054,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
                 pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-10") to Pleiebehov.PROSENT_100),
-                saksnummer = saksnummer
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID1
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID1))
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
@@ -1046,10 +1065,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO)
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(8))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(8))
 
         val søknadsperiode2 = LukketPeriode("2020-01-11/2020-01-20")
+        val behandlingUUID2 = nesteBehandlingId()
+
         val grunnlag2 = lagGrunnlag(
                 ytelseType = YtelseType.PLS,
                 søknadsperiode = søknadsperiode2,
@@ -1057,7 +1077,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                         Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
                 ),
                 pleiebehov = mapOf(LukketPeriode("2020-01-11/2020-01-20") to Pleiebehov.PROSENT_100),
-                saksnummer = saksnummer
+                saksnummer = saksnummer,
+                behandlingUUID = behandlingUUID2
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID1),
+                søknadsperiode2 to listOf(behandlingUUID2))
         )
 
         val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
@@ -1065,8 +1089,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8))
-        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(6))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14))
 
         uttaksplan2.assertOppfylt(
                 perioder = listOf(LukketPeriode("2020-01-01/2020-01-03"), LukketPeriode("2020-01-06/2020-01-10")),
@@ -1093,8 +1116,181 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(hentetUttaksplan.kvoteInfo).isNotNull
-        assertThat(hentetUttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(8).setScale(2))
-        assertThat(hentetUttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(6).setScale(2))
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14).setScale(2))
+    }
+
+    @Test
+    internal fun `Livets sluttfase - første søker tar 80% av en dag og andre søker får 20% og kvoteinfo gjenspeiler det`() {
+        val saksnummer = nesteSaksnummer()
+        val søknadsperiode = LukketPeriode("2021-03-15/2021-03-15")
+        val annenPartsBehandlingUUID = nesteBehandlingId()
+
+        val grunnlag = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(
+                                jobberNormalt = Duration.ofHours(7).plusMinutes(30), jobberNå = Duration.ofHours(1).plusMinutes(30)
+                        )))
+                ),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                saksnummer = saksnummer,
+                behandlingUUID = annenPartsBehandlingUUID
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandlingUUID))
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.8))
+
+        uttaksplan.assertOppfylt(
+                perioder = listOf(søknadsperiode),
+                grad = ÅTTI_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to ÅTTI_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+                endringsstatus = Endringsstatus.NY
+        )
+
+        val søkersBehandlingUUID = nesteBehandlingId()
+
+        val grunnlag2 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(
+                                jobberNormalt = Duration.ofHours(7).plusMinutes(30), jobberNå = Duration.ofHours(2)
+                        )))),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                saksnummer = nesteSaksnummer(),
+                behandlingUUID = søkersBehandlingUUID
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandlingUUID, søkersBehandlingUUID))
+        )
+
+        val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan2.kvoteInfo).isNotNull
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
+
+        uttaksplan2.assertOppfylt(
+                perioder = listOf(søknadsperiode),
+                grad = TJUE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to TJUE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
+                endringsstatus = Endringsstatus.NY
+        )
+
+        // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
+        val hentResponse = testClient.hentUttaksplan(grunnlag2.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(hentetUttaksplan.kvoteInfo).isNotNull
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(2))
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Andre parter har brukt opp alle dagene, men søker får fraværet innvilget fordi det er før datoen dagene ble brukt opp`() {
+        val saksnummer = nesteSaksnummer()
+        val søknadsperiode = LukketPeriode("2022-02-01/2022-05-13")
+        val annenPartsBehandlingUUID = nesteBehandlingId()
+
+        val jobberFulltPeriode = LukketPeriode("2022-02-01/2022-02-28")
+        val jobberIngentingPeriode = LukketPeriode("2022-03-01/2022-03-20")
+        val jobberFulltPeriode2 = LukketPeriode("2022-03-21/2022-05-13")
+
+        val grunnlag = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(jobberFulltPeriode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                                jobberIngentingPeriode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG),
+                                jobberFulltPeriode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+                ),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                saksnummer = saksnummer,
+                behandlingUUID = annenPartsBehandlingUUID
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(jobberFulltPeriode to listOf(annenPartsBehandlingUUID),
+                        jobberIngentingPeriode to listOf(annenPartsBehandlingUUID),
+                        jobberFulltPeriode2 to listOf(annenPartsBehandlingUUID))
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60))
+
+        uttaksplan.assertOppfylt(
+                perioder = listOf(LukketPeriode("2022-02-01/2022-02-04"), LukketPeriode("2022-02-07/2022-02-11"),
+                        LukketPeriode("2022-02-14/2022-02-18"), LukketPeriode("2022-02-21/2022-02-25"),
+                        LukketPeriode("2022-02-28/2022-02-28"), LukketPeriode("2022-03-21/2022-03-25"),
+                        LukketPeriode("2022-03-28/2022-04-01"), LukketPeriode("2022-04-04/2022-04-08"),
+                        LukketPeriode("2022-04-11/2022-04-15"), LukketPeriode("2022-04-18/2022-04-22"),
+                        LukketPeriode("2022-04-25/2022-04-29"), LukketPeriode("2022-05-02/2022-05-06"),
+                        LukketPeriode("2022-05-09/2022-05-13")),
+                grad = HUNDRE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.FULL_DEKNING,
+                endringsstatus = Endringsstatus.NY
+        )
+
+        val søkersBehandlingUUID = nesteBehandlingId()
+        val søknadsperiode2 = LukketPeriode("2022-03-07/2022-03-11")
+
+        val grunnlag2 = lagGrunnlag(
+                ytelseType = YtelseType.PLS,
+                søknadsperiode = søknadsperiode2,
+                arbeid = listOf(
+                        Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))),
+                pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+                saksnummer = nesteSaksnummer(),
+                behandlingUUID = søkersBehandlingUUID
+        ).copy(
+                kravprioritetForBehandlinger = mapOf(LukketPeriode("2022-02-01/2022-03-06") to listOf(annenPartsBehandlingUUID),
+                        søknadsperiode2 to listOf(annenPartsBehandlingUUID, søkersBehandlingUUID),
+                        LukketPeriode("2022-03-12/2022-05-13") to listOf(annenPartsBehandlingUUID)
+                )
+        )
+
+        val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan2.kvoteInfo).isNotNull
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65))
+
+        uttaksplan2.assertOppfylt(
+                perioder = listOf(LukketPeriode("2022-03-07/2022-03-11")),
+                grad = HUNDRE_PROSENT,
+                gradPerArbeidsforhold = mapOf(
+                        ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+                ),
+                oppfyltÅrsak = Årsak.FULL_DEKNING,
+                endringsstatus = Endringsstatus.NY
+        )
+
+        // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
+        val hentResponse = testClient.hentUttaksplan(grunnlag2.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(hentetUttaksplan.kvoteInfo).isNotNull
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65).setScale(2))
     }
 
     @Test
@@ -1117,8 +1313,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.ZERO)
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.2))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.2))
 
         // søker 2 tar resten av dagen
         val søker2BehandlingId = nesteBehandlingId()
@@ -1142,8 +1337,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.2))
-        assertThat(uttaksplan2.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.8))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
 
         // søker 1 endrer til å søke om 4 timer
         // får de 4 timene til tross for at søker 2 tok hele dagen
@@ -1168,8 +1362,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan3 = postResponse3.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan3.kvoteInfo).isNotNull
-        assertThat(uttaksplan3.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.8))
-        assertThat(uttaksplan3.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.53))
+        assertThat(uttaksplan3.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1.33))
     }
 
     @Test

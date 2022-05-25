@@ -880,6 +880,7 @@ internal class UttakTjenesteGraderingTest {
 
     @Test
     internal fun `Livets sluttfase hvor første søker tar 60% av en dag og andre søker får 40% og kvoteinfo gjenspeiler det`() {
+        val søkersBehandlingUUID = nesteBehandlingUUID()
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
 
         val perioden = LukketPeriode("2021-03-15/2021-03-15") // 1 full dag
@@ -922,7 +923,7 @@ internal class UttakTjenesteGraderingTest {
                 )
             ),
             tilsynsperioder = emptyMap(),
-            behandlingUUID = nesteBehandlingUUID(),
+            behandlingUUID = søkersBehandlingUUID,
             arbeid = mapOf(
                 arbeidsforhold1 to mapOf(
                     perioden to ArbeidsforholdPeriodeInfo(
@@ -930,7 +931,7 @@ internal class UttakTjenesteGraderingTest {
                     )
                 )
             ).somArbeid(),
-            kravprioritetForBehandlinger = mapOf(perioden to listOf(annenPartsBehandlingUUID))
+            kravprioritetForBehandlinger = mapOf(perioden to listOf(annenPartsBehandlingUUID, søkersBehandlingUUID))
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -938,8 +939,7 @@ internal class UttakTjenesteGraderingTest {
         assertThat(uttaksplan.perioder).hasSize(1)
         assertThat(uttaksplan.kvoteInfo).isNotNull
         assertThat(uttaksplan.kvoteInfo!!.maxDato).isNull()
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteHittil).isEqualTo(BigDecimal.valueOf(0.6))
-        assertThat(uttaksplan.kvoteInfo!!.forbruktKvoteDenneBehandlingen).isEqualTo(BigDecimal.valueOf(0.4))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
 
         sjekkOppfylt(
             uttaksplan,
