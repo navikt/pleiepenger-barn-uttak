@@ -8,10 +8,10 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(seBortFraIkkeYrkesaktiv: Boolean): Prosent {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
-    val oppdatertArbeid = if (seBortFraIkkeYrkesaktiv) {
+    val oppdatertArbeid = if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
         this.filter { it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE }
     } else {
         this

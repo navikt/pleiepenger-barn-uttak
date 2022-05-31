@@ -1,9 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.EndringsstatusOppdaterer
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
-import no.nav.pleiepengerbarn.uttak.regler.UttaksplanMerger
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
@@ -23,7 +21,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         if (grunnlag.ytelseType != YtelseType.PLS) {
             return uttaksplan
         }
-        val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
+        val maxDager =
+            KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
 
         val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil()
 
@@ -33,11 +32,20 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
-                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP))
+                val forbrukteDagerDennePerioen =
+                    BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(
+                        2,
+                        RoundingMode.HALF_UP
+                    ))
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
+                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
+                        nyePerioder,
+                        periode,
+                        info,
+                        maxDatoHittil
+                    )
                 } else if (forbrukteDagerDennePerioen <= rest) {
                     // Hvis det er nok dager igjen, så settes hele periode til oppfylt
                     nyePerioder[periode] = info
@@ -45,9 +53,16 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 } else {
                     // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
                     val restHeleDager = rest.setScale(0, RoundingMode.UP).toLong()
-                    val restHeleDagerMedEventuellHelg = if (restHeleDager>5) ((restHeleDager/5L)*2L)+restHeleDager-2L else restHeleDager
-                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays(restHeleDagerMedEventuellHelg - 1L))] = info
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg), periode.tom), info, maxDatoHittil)
+                    val restHeleDagerMedEventuellHelg =
+                        if (restHeleDager > 5) ((restHeleDager / 5L) * 2L) + restHeleDager - 2L else restHeleDager
+                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays(restHeleDagerMedEventuellHelg - 1L))] =
+                        info
+                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
+                        nyePerioder,
+                        LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg), periode.tom),
+                        info,
+                        maxDatoHittil
+                    )
                     rest = BigDecimal.ZERO
                 }
             } else {
@@ -56,24 +71,38 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             }
         }
         val kvoteInfo = KvoteInfo(
-                maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil, maxDatoHittil, BigDecimal(maxDager)),
-                forbruktKvoteHittil = forBrukteDagerHittil,
-                forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first,
-                totaltForbruktKvote = nyePerioder.finnForbrukteDager().first+forBrukteDagerHittil)
+            maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(
+                forBrukteDagerHittil,
+                maxDatoHittil,
+                BigDecimal(maxDager)
+            ),
+            forbruktKvoteHittil = forBrukteDagerHittil,
+            forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first,
+            totaltForbruktKvote = nyePerioder.finnForbrukteDager().first + forBrukteDagerHittil
+        )
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
-    private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(forBrukteDagerHittil: BigDecimal, maxDatoHittil: LocalDate?, maxDager: BigDecimal): LocalDate? {
+    private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(
+        forBrukteDagerHittil: BigDecimal,
+        maxDatoHittil: LocalDate?,
+        maxDager: BigDecimal
+    ): LocalDate? {
         if (maxDatoHittil == null) {
             return null
-        } else if (forBrukteDagerHittil == maxDager || forBrukteDagerHittil > maxDager ) {
+        } else if (forBrukteDagerHittil == maxDager || forBrukteDagerHittil > maxDager) {
             return maxDatoHittil
         }
         return null
     }
 
-    private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>, periode: LukketPeriode, info: UttaksperiodeInfo, maxDatoHittil: LocalDate?): Map<LukketPeriode, UttaksperiodeInfo> {
-        if (maxDatoHittil!=null) {
+    private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
+        nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>,
+        periode: LukketPeriode,
+        info: UttaksperiodeInfo,
+        maxDatoHittil: LocalDate?
+    ): Map<LukketPeriode, UttaksperiodeInfo> {
+        if (maxDatoHittil != null) {
             if (sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
                 nyePerioder[periode] = info
             } else if (sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
@@ -88,11 +117,17 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         return nyePerioder
     }
 
-    private fun sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoHittil: LocalDate): Boolean {
+    private fun sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(
+        periode: LukketPeriode,
+        maxDatoHittil: LocalDate
+    ): Boolean {
         return (periode.fom == maxDatoHittil || periode.fom.isBefore(maxDatoHittil))
     }
 
-    private fun sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode: LukketPeriode, maxDatoHittil: LocalDate): Boolean {
+    private fun sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(
+        periode: LukketPeriode,
+        maxDatoHittil: LocalDate
+    ): Boolean {
         return (periode.tom == maxDatoHittil || periode.tom.isBefore(maxDatoHittil))
     }
 
@@ -104,7 +139,14 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
         utfall = Utfall.IKKE_OPPFYLT,
         inngangsvilkår = inngangsvilkår,
         uttaksgrad = Prosent(0).setScale(2, RoundingMode.HALF_UP),
-        utbetalingsgrader = this.utbetalingsgrader.map {it.copy(utbetalingsgrad = Prosent(0).setScale(2, RoundingMode.HALF_UP))}
+        utbetalingsgrader = this.utbetalingsgrader.map {
+            it.copy(
+                utbetalingsgrad = Prosent(0).setScale(
+                    2,
+                    RoundingMode.HALF_UP
+                )
+            )
+        }
     )
 }
 
@@ -117,11 +159,16 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
             if (behandlingUUID != this.behandlingUUID) {
                 //Skal ikke telle med nåværende behandling
                 val annenPartsUttaksplan = this.andrePartersUttaksplanPerBehandling[behandlingUUID]
-                        ?: throw IllegalStateException("Skal ikke kunne skje at behandling ikke finnes")
+                    ?: throw IllegalStateException("Skal ikke kunne skje at behandling ikke finnes")
                 annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                     if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
                         if (info.utfall == Utfall.OPPFYLT) {
-                            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
+                            antallDager += (info.uttaksgrad.divide(
+                                HUNDRE_PROSENT.setScale(
+                                    2,
+                                    RoundingMode.HALF_UP
+                                )
+                            ) * BigDecimal(annenPartsPeriode.virkedager()))
                             relevantePerioder.add(annenPartsPeriode)
                         }
                     }
@@ -141,8 +188,10 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<Big
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-                antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(annenPartsPeriode.virkedager()))
-                relevantePerioder.add(annenPartsPeriode)
+            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(
+                annenPartsPeriode.virkedager()
+            ))
+            relevantePerioder.add(annenPartsPeriode)
         }
     }
     return Pair(antallDager, relevantePerioder)

@@ -103,7 +103,4 @@ data class RegelGrunnlag(
         }
         return Utfall.OPPFYLT
     }
-
-
-
 }
