@@ -5,6 +5,7 @@ import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
+import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -15,6 +16,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         val KVOTER = mapOf(
             YtelseType.PLS to 60
         )
+        private val logger = LoggerFactory.getLogger(this::class.java)
     }
 
     override fun kjør(uttaksplan: Uttaksplan, grunnlag: RegelGrunnlag): Uttaksplan {
@@ -70,6 +72,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
+        val totaltForbruktKvote = nyePerioder.finnForbrukteDager().first + forBrukteDagerHittil
         val kvoteInfo = KvoteInfo(
             maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(
                 forBrukteDagerHittil,
@@ -78,8 +81,13 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             ),
             forbruktKvoteHittil = forBrukteDagerHittil,
             forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first,
-            totaltForbruktKvote = nyePerioder.finnForbrukteDager().first + forBrukteDagerHittil
+            totaltForbruktKvote = totaltForbruktKvote
         )
+
+        if (totaltForbruktKvote > BigDecimal.valueOf(60)) {
+            logger.warn("Totalt forbrukt kvote er mer enn 60 dager.")
+        }
+
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
