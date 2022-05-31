@@ -7,6 +7,7 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
+import java.util.stream.Collectors
 
 enum class Arbeidstype(val kode: String) {
     ARBEIDSTAKER("AT"),
@@ -20,7 +21,7 @@ enum class Arbeidstype(val kode: String) {
     PSB_AV_DP("PSB_AV_DP")
 }
 
-val gruppeSomSkalSpesialhåndteres = setOf(
+val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
     Arbeidstype.DAGPENGER,
     Arbeidstype.SYKEPENGER_AV_DAGPENGER,
     Arbeidstype.PSB_AV_DP,
@@ -34,13 +35,12 @@ private val AKTIVITETS_GRUPPER = listOf(
         Arbeidstype.FRILANSER,
         Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
     ),
-    gruppeSomSkalSpesialhåndteres
+    GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
 )
-internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
-    Arbeidstype.IKKE_YRKESAKTIV.kode,
-    Arbeidstype.KUN_YTELSE.kode,
-    Arbeidstype.INAKTIV.kode
-)
+internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.stream()
+    .map { it.kode }
+    .collect(
+    Collectors.toSet())
 
 object BeregnUtbetalingsgrader {
 
@@ -63,7 +63,7 @@ object BeregnUtbetalingsgrader {
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
-            if(aktivitetsgruppe == gruppeSomSkalSpesialhåndteres) {
+            if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES) {
                 val utbetalingsgraderForSpesialhåndtering = beregnForSpesialhåndtertGruppe(arbeidForAktivitetsgruppe, gjenværendeTimerSomDekkes, uttaksgrad)
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {

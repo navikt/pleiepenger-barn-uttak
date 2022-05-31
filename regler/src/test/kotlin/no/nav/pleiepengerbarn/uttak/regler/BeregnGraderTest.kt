@@ -492,6 +492,54 @@ internal class BeregnGraderTest {
     }
 
     @Test
+    internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(60),
+            ARBEIDSGIVER1 to Prosent(60),
+            DAGPENGER to Prosent(60),
+            IKKE_YRKESAKTIV to Prosent(60)
+        )
+    }
+
+    @Test
+    internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes flere andre aktiviteter`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(60)),
+                DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(60),
+            ARBEIDSGIVER2 to Prosent(40),
+            DAGPENGER to Prosent(50),
+            IKKE_YRKESAKTIV to Prosent(50)
+        )
+    }
+
+    @Test
     internal fun `Avslå periode dersom annet arbeidsforhold med IKKE_YRKESAKTIV gjør at uttaksgrad kommer under 20 prosent`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,

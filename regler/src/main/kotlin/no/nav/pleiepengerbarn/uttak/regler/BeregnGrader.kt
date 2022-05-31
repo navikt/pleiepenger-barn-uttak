@@ -18,8 +18,8 @@ internal object BeregnGrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val skalSeBortIfraIkkeYrkesaktiv = skalSeBortIfraIkkeYrkesaktiv(arbeid)
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraIkkeYrkesaktiv)
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
         val uttaksgradResultat = avklarUttaksgrad(
             pleiebehov,
             etablertTilsynsprosent,
@@ -55,8 +55,8 @@ internal object BeregnGrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
     ): UttaksgradResultat {
-        val skalSeBortIfraIkkeYrkesaktiv = skalSeBortIfraIkkeYrkesaktiv(arbeid)
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraIkkeYrkesaktiv)
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
 
         val restTilSøker =
             finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
@@ -133,10 +133,6 @@ internal object BeregnGrader {
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
         )
-    }
-
-    private fun skalSeBortIfraIkkeYrkesaktiv(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Boolean {
-        return arbeid.entries.filter { (key, entry) -> key.type != Arbeidstype.IKKE_YRKESAKTIV.kode && !entry.utenArbeidtid() }.isNotEmpty() && arbeid.keys.any { it.type == Arbeidstype.IKKE_YRKESAKTIV.kode }
     }
 
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
@@ -223,9 +219,9 @@ internal object BeregnGrader {
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
-    val harIkkeYrkesaktiv = this.keys.any { it.type in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE }
-    val harAndreArbeidsforhold =
-        this.any { it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE && !it.value.utenArbeidtid() }
+    val harIkkeYrkesaktiv = this.keys.any { GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type }) }
+    val harAndreArbeidsforhold = this.any { it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE && !it.value.utenArbeidtid() }
+
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
 
