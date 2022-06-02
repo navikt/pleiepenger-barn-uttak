@@ -70,6 +70,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 nyePerioder[periode] = info
             }
         }
+        val forbrukteDager = nyePerioder.finnForbrukteDager().first
         val kvoteInfo = KvoteInfo(
             maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(
                 forBrukteDagerHittil,
@@ -77,9 +78,14 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 BigDecimal(maxDager)
             ),
             forbruktKvoteHittil = forBrukteDagerHittil,
-            forbruktKvoteDenneBehandlingen = nyePerioder.finnForbrukteDager().first,
-            totaltForbruktKvote = nyePerioder.finnForbrukteDager().first + forBrukteDagerHittil
+            forbruktKvoteDenneBehandlingen = forbrukteDager,
+            totaltForbruktKvote = forbrukteDager + forBrukteDagerHittil
         )
+
+        if (forbrukteDager > BigDecimal.valueOf(60)) {
+            throw java.lang.IllegalStateException("Totalt forbrukt kvote er mer enn 60 dager.")
+        }
+
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
