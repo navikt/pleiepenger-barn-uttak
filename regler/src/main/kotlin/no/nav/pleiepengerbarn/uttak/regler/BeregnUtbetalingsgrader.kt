@@ -22,7 +22,6 @@ enum class Arbeidstype(val kode: String) {
 }
 
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
-    Arbeidstype.DAGPENGER,
     Arbeidstype.SYKEPENGER_AV_DAGPENGER,
     Arbeidstype.PSB_AV_DP,
     Arbeidstype.IKKE_YRKESAKTIV,
@@ -35,12 +34,23 @@ private val AKTIVITETS_GRUPPER = listOf(
         Arbeidstype.FRILANSER,
         Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
     ),
+    setOf(Arbeidstype.DAGPENGER),
     GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
 )
-internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.stream()
+
+internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
+    Arbeidstype.DAGPENGER,
+    Arbeidstype.SYKEPENGER_AV_DAGPENGER,
+    Arbeidstype.PSB_AV_DP,
+    Arbeidstype.IKKE_YRKESAKTIV,
+    Arbeidstype.KUN_YTELSE,
+    Arbeidstype.INAKTIV
+)
+    .stream()
     .map { it.kode }
     .collect(
-    Collectors.toSet())
+        Collectors.toSet()
+    )
 
 object BeregnUtbetalingsgrader {
 
@@ -50,9 +60,8 @@ object BeregnUtbetalingsgrader {
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
         arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
 
-
         var sumJobberNormalt = Duration.ZERO
-        arbeid.entries.filter { !ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE.contains(it.key.type) }.forEach {
+        arbeid.entries.filter { !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type }) }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
 
@@ -64,7 +73,8 @@ object BeregnUtbetalingsgrader {
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES) {
-                val utbetalingsgraderForSpesialhåndtering = beregnForSpesialhåndtertGruppe(arbeidForAktivitetsgruppe, gjenværendeTimerSomDekkes, uttaksgrad)
+                val utbetalingsgraderForSpesialhåndtering =
+                    beregnForSpesialhåndtertGruppe(arbeidForAktivitetsgruppe, gjenværendeTimerSomDekkes, uttaksgrad)
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {
                 val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
@@ -87,11 +97,11 @@ object BeregnUtbetalingsgrader {
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
-                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                    utbetalingsgrad = uttaksgrad,
-                    normalArbeidstid = info.jobberNormalt,
-                    faktiskArbeidstid = info.jobberNå
-                )
+            utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
+                utbetalingsgrad = uttaksgrad,
+                normalArbeidstid = info.jobberNormalt,
+                faktiskArbeidstid = info.jobberNå
+            )
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
             utbetalingsgrader,

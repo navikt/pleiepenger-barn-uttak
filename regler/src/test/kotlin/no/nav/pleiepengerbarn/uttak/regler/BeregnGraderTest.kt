@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.math.RoundingMode
 import java.time.Duration
 
 internal class BeregnGraderTest {
@@ -507,10 +508,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(60),
+            Prosent(80),
             ARBEIDSGIVER1 to Prosent(60),
-            DAGPENGER to Prosent(60),
-            IKKE_YRKESAKTIV to Prosent(60)
+            DAGPENGER to Prosent(100),
+            IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 
@@ -531,11 +532,11 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(50),
+            Prosent(67),
             ARBEIDSGIVER1 to Prosent(60),
             ARBEIDSGIVER2 to Prosent(40),
-            DAGPENGER to Prosent(50),
-            IKKE_YRKESAKTIV to Prosent(50)
+            DAGPENGER to Prosent(100),
+            IKKE_YRKESAKTIV to Prosent(66.67).setScale(2, RoundingMode.HALF_UP)
         )
     }
 

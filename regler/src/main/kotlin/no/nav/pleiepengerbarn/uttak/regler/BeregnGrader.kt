@@ -220,7 +220,7 @@ internal object BeregnGrader {
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
     val harIkkeYrkesaktiv = this.keys.any { GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type }) }
-    val harAndreArbeidsforhold = this.any { it.key.type !in ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE && !it.value.utenArbeidtid() }
+    val harAndreArbeidsforhold = this.any { Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid() }
 
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
