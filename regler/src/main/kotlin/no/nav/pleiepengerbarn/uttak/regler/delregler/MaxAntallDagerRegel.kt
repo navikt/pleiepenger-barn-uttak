@@ -80,9 +80,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 maxDatoHittil,
                 BigDecimal(maxDager)
             ),
-            forbruktKvoteHittil = forBrukteDagerHittil,
-            forbruktKvoteDenneBehandlingen = forbrukteDager,
-            totaltForbruktKvote = totaltForbruktKvote
+                totaltForbruktKvote = totaltForbruktKvote
         )
 
         if (forbrukteDager > BigDecimal.valueOf(60)) {

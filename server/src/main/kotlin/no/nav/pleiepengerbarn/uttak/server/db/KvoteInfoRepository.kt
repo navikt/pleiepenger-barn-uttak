@@ -18,14 +18,12 @@ class KvoteInfoRepository {
     internal fun lagreKvoteInfo(uttaksresultatId: Long, kvoteInfo: KvoteInfo) {
         val sql = """
             insert into 
-                kvote_info (id, uttaksresultat_id, max_dato, forbrukt_kvote_hittil, forbrukt_kvote_denne_behandlingen, totalt_forbrukt_kvote)
-                values(nextval('seq_kvote_info'), :uttaksresultat_id, :max_dato, :forbrukt_kvote_hittil, :forbrukt_kvote_denne_behandlingen, :totalt_forbrukt_kvote)
+                kvote_info (id, uttaksresultat_id, max_dato, totalt_forbrukt_kvote)
+                values(nextval('seq_kvote_info'), :uttaksresultat_id, :max_dato, :totalt_forbrukt_kvote)
         """.trimIndent()
         val params = MapSqlParameterSource()
                 .addValue("uttaksresultat_id", uttaksresultatId)
                 .addValue("max_dato", kvoteInfo.maxDato)
-                .addValue("forbrukt_kvote_hittil", kvoteInfo.forbruktKvoteHittil)
-                .addValue("forbrukt_kvote_denne_behandlingen", kvoteInfo.forbruktKvoteDenneBehandlingen)
                 .addValue("totalt_forbrukt_kvote", kvoteInfo.totaltForbruktKvote)
         jdbcTemplate.update(sql, params)
     }
@@ -33,20 +31,16 @@ class KvoteInfoRepository {
     internal fun hentKvoteInfo(uttaksresultatId: Long): KvoteInfo? {
         val sql = """
             select 
-                id, max_dato, forbrukt_kvote_hittil, forbrukt_kvote_denne_behandlingen, totalt_forbrukt_kvote
+                id, max_dato, totalt_forbrukt_kvote
             from kvote_info
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
         try {
             val kvoteInfoMapper = RowMapper { rs, _ ->
-                val forbruktKvoteHittil = if (rs.getBigDecimal("forbrukt_kvote_hittil") != null) rs.getBigDecimal("forbrukt_kvote_hittil") else BigDecimal.ZERO
-                val forbruktKvoteDenneBehandlingen = if (rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") != null) rs.getBigDecimal("forbrukt_kvote_denne_behandlingen") else BigDecimal.ZERO
                 val totaltForbruktKvote = if (rs.getBigDecimal("totalt_forbrukt_kvote") != null) rs.getBigDecimal("totalt_forbrukt_kvote") else BigDecimal.ZERO
 
                 KvoteInfo(
                         maxDato = rs.getDate("max_dato")?.toLocalDate(),
-                        forbruktKvoteHittil = forbruktKvoteHittil,
-                        forbruktKvoteDenneBehandlingen = forbruktKvoteDenneBehandlingen,
                         totaltForbruktKvote = totaltForbruktKvote
                 )
             }
