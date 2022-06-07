@@ -7,7 +7,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
-import java.util.stream.Collectors
 
 enum class Arbeidstype(val kode: String) {
     ARBEIDSTAKER("AT"),
@@ -37,20 +36,6 @@ private val AKTIVITETS_GRUPPER = listOf(
     setOf(Arbeidstype.DAGPENGER),
     GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
 )
-
-internal val ARBEIDSTYPER_SOM_BARE_SKAL_TELLES_ALENE = setOf(
-    Arbeidstype.DAGPENGER,
-    Arbeidstype.SYKEPENGER_AV_DAGPENGER,
-    Arbeidstype.PSB_AV_DP,
-    Arbeidstype.IKKE_YRKESAKTIV,
-    Arbeidstype.KUN_YTELSE,
-    Arbeidstype.INAKTIV
-)
-    .stream()
-    .map { it.kode }
-    .collect(
-        Collectors.toSet()
-    )
 
 object BeregnUtbetalingsgrader {
 
