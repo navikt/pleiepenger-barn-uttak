@@ -516,6 +516,29 @@ internal class BeregnGraderTest {
     }
 
     @Test
+    internal fun `Se bort fra INAKTIVT arbeidsforhold og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
+        val grader = BeregnGrader.beregn(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsynReberegnet = false,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                arbeid = mapOf(
+                        ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                        INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                        IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                )
+        )
+
+        grader.assert(
+                Årsak.AVKORTET_MOT_INNTEKT,
+                Prosent(80),
+                ARBEIDSGIVER1 to Prosent(60),
+                INAKTIV to Prosent(100),
+                IKKE_YRKESAKTIV to Prosent(80)
+        )
+    }
+
+    @Test
     internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes flere andre aktiviteter`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
