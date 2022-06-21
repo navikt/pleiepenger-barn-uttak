@@ -65,5 +65,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
-    - name: TILSYN_GRADERING_ENDRINGER
+    - name: SPESIALHANDTERING_GRUPPE_PLUSS_FL
       value: "true"

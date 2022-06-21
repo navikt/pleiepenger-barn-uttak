@@ -62,5 +62,5 @@ spec:
       value: PROD
 
     # Feature toggles
-    - name: TILSYN_GRADERING_ENDRINGER
+    - name: SPESIALHANDTERING_GRUPPE_PLUSS_FL
       value: "false"

@@ -8,8 +8,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.RoundingMode
 import java.time.Duration
@@ -24,16 +22,7 @@ internal class BeregnGraderTest {
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
-
-    @BeforeEach
-    internal fun setUp() {
-        System.setProperty("TILSYN_GRADERING_ENDRINGER", "true")
-    }
-
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("TILSYN_GRADERING_ENDRINGER")
-    }
+    private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
 
     @Test
     internal fun `100 prosent vanlig uttak`() {
@@ -141,17 +130,96 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(10),
-                    jobberNå = Duration.ofHours(5)
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
                 )
             )
         )
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(50),
-            ARBEIDSGIVER1 to Prosent(50)
+            Prosent(80),
+            ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
         )
+
+        val grader2 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(8),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            )
+        )
+
+        grader2.assert(
+            Årsak.FOR_LAV_TAPT_ARBEIDSTID,
+            Prosent(0),
+            IKKE_YRKESAKTIV to Prosent(0),
+            FRILANS to Prosent(0)
+        )
+
+        System.setProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL", "true")
+        val grader3 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            )
+        )
+
+        grader3.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(80),
+            ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+
+        val grader4 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(8),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            )
+        )
+
+        grader4.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(89),
+            IKKE_YRKESAKTIV to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+        System.clearProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL")
     }
 
     @Test

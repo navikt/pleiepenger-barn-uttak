@@ -220,7 +220,8 @@ internal object BeregnGrader {
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
     val harIkkeYrkesaktiv = this.keys.any { GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type }) }
-    val harAndreArbeidsforhold = this.any { Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid() }
+    val harAndreArbeidsforhold = this.any { Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid()
+            && !(FeatureToggle.isActive("SPESIALHANDTERING_GRUPPE_PLUSS_FL") && Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær()) }
 
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
@@ -230,3 +231,4 @@ private fun ArbeidsforholdPeriodeInfo.utenArbeidtid() =
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.fulltFravær() = this.values.all { it.fulltFravær() }
 private fun ArbeidsforholdPeriodeInfo.fulltFravær() = jobberNå == Duration.ZERO
+private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå

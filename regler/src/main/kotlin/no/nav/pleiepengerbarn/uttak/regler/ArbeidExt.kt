@@ -3,16 +3,20 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean): Prosent {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(
+    skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean
+): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
     val oppdatertArbeid = if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
-        this.filter { Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES }
+        this.filter {
+            Arbeidstype.values()
+                .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+        }
     } else {
         this
     }
@@ -33,13 +37,28 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
         return Prosent.ZERO
     }
 
-    val søkersTapteArbeidstid = HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8, RoundingMode.HALF_UP) / BigDecimal(sumJobberNormalt.toMillis()) * HUNDRE_PROSENT)
+    val søkersTapteArbeidstid =
+        HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8, RoundingMode.HALF_UP) / BigDecimal(
+            sumJobberNormalt.toMillis()
+        ) * HUNDRE_PROSENT)
 
-    if ( søkersTapteArbeidstid > HUNDRE_PROSENT) {
+    if (søkersTapteArbeidstid > HUNDRE_PROSENT) {
         throw IllegalStateException("Faktisk arbeid > normalt arbeid")
     }
     if (søkersTapteArbeidstid < Prosent.ZERO) {
         return Prosent.ZERO
     }
     return søkersTapteArbeidstid
+}
+
+private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
+
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(): Boolean {
+    val harSpesialhåndteringAktivitetstyper = any {
+        Arbeidstype.values()
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+    }
+    val harFrilansUtenFravær = any { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
+
+    return harSpesialhåndteringAktivitetstyper && harFrilansUtenFravær
 }
