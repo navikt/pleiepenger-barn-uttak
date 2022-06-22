@@ -35,7 +35,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
                 val forbrukteDagerDennePerioen =
-                    BigDecimal(periode.virkedager()) * (info.uttaksgrad / HUNDRE_PROSENT.setScale(
+                    BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT).setScale(
                         2,
                         RoundingMode.HALF_UP
                     ))
