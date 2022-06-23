@@ -196,10 +196,8 @@ internal object UttaksplanRegler {
         periode: LukketPeriode,
         etablertTilsyn: Duration
     ): OverseEtablertTilsynÅrsak? {
-        val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(
-            2,
-            RoundingMode.HALF_UP
-        ) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+        val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP)
+                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
         if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
             return OverseEtablertTilsynÅrsak.FOR_LAVT
         }

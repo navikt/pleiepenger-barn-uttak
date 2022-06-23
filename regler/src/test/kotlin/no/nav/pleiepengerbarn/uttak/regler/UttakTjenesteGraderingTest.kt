@@ -939,7 +939,7 @@ internal class UttakTjenesteGraderingTest {
         assertThat(uttaksplan.perioder).hasSize(1)
         assertThat(uttaksplan.kvoteInfo).isNotNull
         assertThat(uttaksplan.kvoteInfo!!.maxDato).isNull()
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(2))
 
         sjekkOppfylt(
             uttaksplan,

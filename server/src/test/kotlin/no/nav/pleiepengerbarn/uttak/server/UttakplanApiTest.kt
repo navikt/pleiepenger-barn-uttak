@@ -1065,7 +1065,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(8))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(8).setScale(2))
 
         val søknadsperiode2 = LukketPeriode("2020-01-11/2020-01-20")
         val behandlingUUID2 = nesteBehandlingId()
@@ -1089,7 +1089,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14).setScale(2))
 
         uttaksplan2.assertOppfylt(
                 perioder = listOf(LukketPeriode("2020-01-01/2020-01-03"), LukketPeriode("2020-01-06/2020-01-10")),
@@ -1143,7 +1143,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(30).setScale(1))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(30).setScale(2))
 
         // NY BEHANDLING
         val søknadsperiode2 = LukketPeriode("2021-08-09/2021-10-15")
@@ -1168,7 +1168,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(1))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
         // REVURDERING
         val grunnlag3 = lagGrunnlag(
@@ -1191,7 +1191,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan3 = postResponse3.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan3.kvoteInfo).isNotNull
-        assertThat(uttaksplan3.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(1))
+        assertThat(uttaksplan3.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
 
         uttaksplan3.assertOppfylt(
@@ -1239,7 +1239,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.8))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.8).setScale(2))
 
         uttaksplan.assertOppfylt(
                 perioder = listOf(søknadsperiode),
@@ -1272,7 +1272,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(2))
 
         uttaksplan2.assertOppfylt(
                 perioder = listOf(søknadsperiode),
@@ -1325,7 +1325,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
         uttaksplan.assertOppfylt(
                 perioder = listOf(LukketPeriode("2022-02-01/2022-02-04"), LukketPeriode("2022-02-07/2022-02-11"),
@@ -1366,7 +1366,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65).setScale(2))
 
         uttaksplan2.assertOppfylt(
                 perioder = listOf(LukketPeriode("2022-03-07/2022-03-11")),
@@ -1407,7 +1407,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan.kvoteInfo).isNotNull
-        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.2))
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(0.2).setScale(2))
 
         // søker 2 tar resten av dagen
         val søker2BehandlingId = nesteBehandlingId()
@@ -1431,7 +1431,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(1))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(1).setScale(2))
 
         // søker 1 endrer til å søke om 4 timer
         // får de 4 timene til tross for at søker 2 tok hele dagen

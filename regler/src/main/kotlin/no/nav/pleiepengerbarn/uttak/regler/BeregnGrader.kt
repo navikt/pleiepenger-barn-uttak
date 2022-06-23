@@ -145,10 +145,8 @@ internal object BeregnGrader {
         if (ønsketUttaksgrad < Duration.ZERO) {
             return Prosent.ZERO
         }
-        return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(
-            2,
-            RoundingMode.HALF_UP
-        ) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+        return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(2, RoundingMode.HALF_UP)
+                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
     }
 
     private fun finnRestTilSøker(
@@ -166,7 +164,7 @@ internal object BeregnGrader {
         }
         val gradertMotTilsyn = HUNDRE_PROSENT - etablertTilsynsprosent
         val restTilSøker =
-            pleiebehovprosent - (etablertTilsynsprosent * (pleiebehovprosent / HUNDRE_PROSENT)) - andreSøkeresTilsyn
+            pleiebehovprosent - (etablertTilsynsprosent * (pleiebehovprosent.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP))) - andreSøkeresTilsyn
         val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, restTilSøker)
         if (minsteAvRestTilSøkerOgGraderingMotTilsyn < Prosent.ZERO) {
             return Prosent.ZERO
@@ -210,10 +208,8 @@ internal object BeregnGrader {
         if (etablertTilsyn < Duration.ZERO) {
             return Prosent.ZERO
         }
-        return BigDecimal(etablertTilsyn.toMillis()).setScale(
-            2,
-            RoundingMode.HALF_UP
-        ) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+        return BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP)
+                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
     }
 
 }
