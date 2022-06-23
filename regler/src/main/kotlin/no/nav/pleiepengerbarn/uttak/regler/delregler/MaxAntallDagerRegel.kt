@@ -35,10 +35,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
                 val forbrukteDagerDennePerioen =
-                    BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT).setScale(
-                        2,
-                        RoundingMode.HALF_UP
-                    ))
+                    BigDecimal(periode.virkedager()) * (info.uttaksgrad
+                            .divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
@@ -54,14 +52,16 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     rest -= forbrukteDagerDennePerioen
                 } else {
                     // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
-                    val restHeleDager = rest.setScale(0, RoundingMode.UP).toLong()
+                    val restHeleDager = rest.setScale(0, RoundingMode.UP)
                     val restHeleDagerMedEventuellHelg =
-                        if (restHeleDager > 5) ((restHeleDager / 5L) * 2L) + restHeleDager - 2L else restHeleDager
-                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays(restHeleDagerMedEventuellHelg - 1L))] =
+                        if (restHeleDager > BigDecimal(5))
+                                ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2)
+                        else restHeleDager
+                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] =
                         info
                     kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
                         nyePerioder,
-                        LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg), periode.tom),
+                        LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom),
                         info,
                         maxDatoHittil
                     )
@@ -78,7 +78,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             maxDato = skalKunSetteMaxDatoHvisKvotenErbruktOpp(
                 forBrukteDagerHittil,
                 maxDatoHittil,
-                BigDecimal(maxDager)
+                BigDecimal(maxDager).setScale(2)
             ),
                 totaltForbruktKvote = totaltForbruktKvote
         )
@@ -174,12 +174,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
                 annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                     if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
                         if (info.utfall == Utfall.OPPFYLT) {
-                            antallDager += (info.uttaksgrad.divide(
-                                HUNDRE_PROSENT.setScale(
-                                    2,
-                                    RoundingMode.HALF_UP
-                                )
-                            ) * BigDecimal(annenPartsPeriode.virkedager()))
+                            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
                             relevantePerioder.add(annenPartsPeriode)
                         }
                     }
@@ -199,7 +194,7 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<Big
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT.setScale(2, RoundingMode.HALF_UP)) * BigDecimal(
+            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(
                 annenPartsPeriode.virkedager()
             ))
             relevantePerioder.add(annenPartsPeriode)

@@ -98,7 +98,7 @@ private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
 }
 
 private fun Duration.prosentAvFullDag(): Prosent {
-    return BigDecimal(this.toMillis()).setScale(2, RoundingMode.HALF_UP) / BigDecimal(FULL_DAG.toMillis()) * HUNDRE_PROSENT
+    return BigDecimal(this.toMillis()).setScale(2, RoundingMode.HALF_UP).divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
 }
 
 private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: LukketPeriode): BigDecimal {

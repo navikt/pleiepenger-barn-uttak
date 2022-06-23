@@ -38,8 +38,8 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
     }
 
     val søkersTapteArbeidstid =
-        HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8, RoundingMode.HALF_UP) / BigDecimal(
-            sumJobberNormalt.toMillis()
+        HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8, RoundingMode.HALF_UP).divide(BigDecimal(
+            sumJobberNormalt.toMillis()), 8, RoundingMode.HALF_UP
         ) * HUNDRE_PROSENT)
 
     if (søkersTapteArbeidstid > HUNDRE_PROSENT) {

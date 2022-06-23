@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.*
 import java.util.*
 
@@ -22,7 +23,7 @@ object BeregnBruktKvote {
 
     private fun regnUtAntallDagerBrukt(altUttak: List<Uttaksplan>): BigDecimal {
         val totaltBruktKvote = leggSammenUttak(altUttak)
-        return BigDecimal.valueOf(totaltBruktKvote.toMillis()).setScale(2)/BigDecimal.valueOf(FULL_DAG.toMillis())
+        return BigDecimal.valueOf(totaltBruktKvote.toMillis()).setScale(2).divide(BigDecimal.valueOf(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP)
     }
 
     private fun erKvotenOversteget(antallDagerBrukt: BigDecimal): Boolean {

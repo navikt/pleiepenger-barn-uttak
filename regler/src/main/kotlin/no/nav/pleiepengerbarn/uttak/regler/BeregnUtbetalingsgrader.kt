@@ -127,10 +127,8 @@ object BeregnUtbetalingsgrader {
                     taptArbeidstidSomDekkes.prosent(fordelingsprosent),
                     info.taptArbeid()
                 )
-                val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                ) / BigDecimal(info.jobberNormalt.toMillis()) * HUNDRE_PROSENT
+                val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP)
+                        .divide(BigDecimal(info.jobberNormalt.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
                     utbetalingsgrad = utbetalingsgrad,
                     normalArbeidstid = info.jobberNormalt,
@@ -157,10 +155,8 @@ object BeregnUtbetalingsgrader {
         arbeid.forEach {
             if (sumTapt != Duration.ZERO) {
                 val tapt = it.value.taptArbeid()
-                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(
-                    8,
-                    RoundingMode.HALF_UP
-                ) / BigDecimal(sumTapt.toMillis())) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
+                fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8, RoundingMode.HALF_UP)
+                        .divide(BigDecimal(sumTapt.toMillis()), 8, RoundingMode.HALF_UP)) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
                 fordeling[it.key] = Prosent.ZERO
             }
