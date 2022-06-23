@@ -223,6 +223,69 @@ internal class BeregnGraderTest {
     }
 
     @Test
+    internal fun `AT + AVSLUTTA ARBEIDSFORHOLD og omsorgsstønad (frilans)`() {
+        System.setProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL", "true")
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(3),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(88),
+            ARBEIDSGIVER1 to Prosent(100),
+            ARBEIDSGIVER2 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+
+        val grader4 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(8),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            )
+        )
+
+        grader4.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(80),
+            IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
+            ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+        System.clearProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL")
+    }
+
+    @Test
     internal fun `100 prosent fravær hos 2 arbeidsgivere`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
@@ -586,23 +649,23 @@ internal class BeregnGraderTest {
     @Test
     internal fun `Se bort fra INAKTIVT arbeidsforhold og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
         val grader = BeregnGrader.beregn(
-                pleiebehov = PROSENT_100,
-                etablertTilsyn = IKKE_ETABLERT_TILSYN,
-                andreSøkeresTilsynReberegnet = false,
-                andreSøkeresTilsyn = NULL_PROSENT,
-                arbeid = mapOf(
-                        ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
-                        INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                        IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-                )
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsynReberegnet = false,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
+                INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
+                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            )
         )
 
         grader.assert(
-                Årsak.AVKORTET_MOT_INNTEKT,
-                Prosent(80),
-                ARBEIDSGIVER1 to Prosent(60),
-                INAKTIV to Prosent(100),
-                IKKE_YRKESAKTIV to Prosent(80)
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(80),
+            ARBEIDSGIVER1 to Prosent(60),
+            INAKTIV to Prosent(100),
+            IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 

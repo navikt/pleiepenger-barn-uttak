@@ -54,11 +54,8 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(): Boolean {
-    val harSpesialhåndteringAktivitetstyper = any {
+    return all {
         Arbeidstype.values()
-            .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES || Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær()
     }
-    val harFrilansUtenFravær = any { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
-
-    return harSpesialhåndteringAktivitetstyper && harFrilansUtenFravær
 }
