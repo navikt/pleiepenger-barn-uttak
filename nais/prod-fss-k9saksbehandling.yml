@@ -62,5 +62,3 @@ spec:
       value: PROD
 
     # Feature toggles
-    - name: SPESIALHANDTERING_GRUPPE_PLUSS_FL
-      value: "true"

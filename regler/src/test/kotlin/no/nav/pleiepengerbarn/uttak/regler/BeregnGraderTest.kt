@@ -123,56 +123,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent arbeid av en stilling på 10 timer, skal gi 50 prosent uttaksgrad og utbetalingsgrad`() {
-        val grader = BeregnGrader.beregn(
-            pleiebehov = PROSENT_100,
-            etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsyn = NULL_PROSENT,
-            andreSøkeresTilsynReberegnet = false,
-            arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(4),
-                    jobberNå = Duration.ofHours(0)
-                ),
-                FRILANS to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(1),
-                    jobberNå = Duration.ofHours(1)
-                )
-            )
-        )
-
-        grader.assert(
-            Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(80),
-            ARBEIDSGIVER1 to Prosent(100),
-            FRILANS to Prosent(0)
-        )
-
-        val grader2 = BeregnGrader.beregn(
-            pleiebehov = PROSENT_100,
-            etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsyn = NULL_PROSENT,
-            andreSøkeresTilsynReberegnet = false,
-            arbeid = mapOf(
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(8),
-                    jobberNå = Duration.ofHours(0)
-                ),
-                FRILANS to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(1),
-                    jobberNå = Duration.ofHours(1)
-                )
-            )
-        )
-
-        grader2.assert(
-            Årsak.FOR_LAV_TAPT_ARBEIDSTID,
-            Prosent(0),
-            IKKE_YRKESAKTIV to Prosent(0),
-            FRILANS to Prosent(0)
-        )
-
-        System.setProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL", "true")
-        val grader3 = BeregnGrader.beregn(
+    val grader3 = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
             andreSøkeresTilsyn = NULL_PROSENT,
@@ -219,12 +170,10 @@ internal class BeregnGraderTest {
             IKKE_YRKESAKTIV to Prosent(100),
             FRILANS to Prosent(0)
         )
-        System.clearProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL")
     }
 
     @Test
     internal fun `AT + AVSLUTTA ARBEIDSFORHOLD og omsorgsstønad (frilans)`() {
-        System.setProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL", "true")
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -282,7 +231,6 @@ internal class BeregnGraderTest {
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
-        System.clearProperty("SPESIALHANDTERING_GRUPPE_PLUSS_FL")
     }
 
     @Test
