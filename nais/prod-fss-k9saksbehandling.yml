@@ -63,4 +63,4 @@ spec:
 
     # Feature toggles
     - name: SPESIALHANDTERING_GRUPPE_PLUSS_FL
-      value: "false"
+      value: "true"
