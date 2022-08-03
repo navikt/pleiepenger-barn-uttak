@@ -40,6 +40,7 @@ object BeregnUtbetalingsgrader {
 
     internal fun beregn(
         uttaksgrad: Prosent,
+        gradertMotTilsyn: Boolean,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
         arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
@@ -67,6 +68,7 @@ object BeregnUtbetalingsgrader {
                         arbeidForAktivitetsgruppe,
                         gjenværendeTimerSomDekkes,
                         uttaksgrad,
+                        gradertMotTilsyn,
                         spesialhåndteringsgruppeSkalSpesialhåndteres
                     )
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
@@ -88,12 +90,13 @@ object BeregnUtbetalingsgrader {
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
         gjenværendeTimerSomDekkes: Duration,
         uttaksgrad: Prosent,
+        gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
             utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                utbetalingsgrad = utledGrad(uttaksgrad, spesialhåndteringsgruppeSkalSpesialhåndteres),
+                utbetalingsgrad = utledGrad(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres),
                 normalArbeidstid = info.jobberNormalt,
                 faktiskArbeidstid = info.jobberNå
             )
@@ -104,8 +107,10 @@ object BeregnUtbetalingsgrader {
         )
     }
 
-    private fun utledGrad(uttaksgrad: Prosent, spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean): Prosent {
-        return if (spesialhåndteringsgruppeSkalSpesialhåndteres && uttaksgrad > Prosent.ZERO) {
+    private fun utledGrad(uttaksgrad: Prosent,
+                          gradertMotTilsyn: Boolean,
+                          spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean): Prosent {
+        return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad

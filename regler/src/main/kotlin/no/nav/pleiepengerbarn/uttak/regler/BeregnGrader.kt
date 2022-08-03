@@ -28,7 +28,7 @@ internal object BeregnGrader {
             arbeid,
             overseEtablertTilsynÅrsak
         )
-        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, arbeid)
+        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN, arbeid)
 
         return GraderBeregnet(
             pleiebehov = pleiebehov,
