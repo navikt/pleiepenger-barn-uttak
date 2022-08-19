@@ -12,7 +12,8 @@ enum class Utfall {
 
 enum class YtelseType {
     PSB,
-    PLS
+    PLS,
+    OLP
 }
 
 /**
