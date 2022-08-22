@@ -69,7 +69,7 @@ internal object BeregnGrader {
         if (restTilSøker < TJUE_PROSENT) {
             val forLavGradÅrsak =
                 utledForLavGradÅrsak(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
-            if(!(ytelseType == YtelseType.PLS && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
+            if(!(ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
