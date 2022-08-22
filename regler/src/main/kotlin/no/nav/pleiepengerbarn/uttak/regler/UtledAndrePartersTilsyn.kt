@@ -61,7 +61,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(per
                     sumAndreSøkeresTilsyn,
                     true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
                     finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
-                    annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid()
+                    annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
+                    ytelseType
                 )
                 sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
             }

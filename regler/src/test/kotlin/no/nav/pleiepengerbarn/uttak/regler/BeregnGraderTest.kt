@@ -1,11 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -33,13 +30,35 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
             Årsak.FULL_DEKNING,
             HUNDRE_PROSENT,
             ARBEIDSGIVER1 to HUNDRE_PROSENT
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+    @Test
+    internal fun `50 prosent vanlig uttak med 81% tatt av andre søkere`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = Prosent(81),
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            ),
+            ytelseType = YtelseType.PLS
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            Prosent(19),
+            ARBEIDSGIVER1 to Prosent(19)
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
     }
@@ -53,7 +72,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -72,7 +92,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -91,7 +112,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -110,7 +132,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -124,21 +147,22 @@ internal class BeregnGraderTest {
     @Test
     internal fun `50 prosent arbeid av en stilling på 10 timer, skal gi 50 prosent uttaksgrad og utbetalingsgrad`() {
     val grader3 = BeregnGrader.beregn(
-            pleiebehov = PROSENT_100,
-            etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsyn = NULL_PROSENT,
-            andreSøkeresTilsynReberegnet = false,
-            arbeid = mapOf(
-                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(4),
-                    jobberNå = Duration.ofHours(0)
-                ),
-                FRILANS to ArbeidsforholdPeriodeInfo(
-                    jobberNormalt = Duration.ofHours(1),
-                    jobberNå = Duration.ofHours(1)
-                )
+        pleiebehov = PROSENT_100,
+        etablertTilsyn = IKKE_ETABLERT_TILSYN,
+        andreSøkeresTilsyn = NULL_PROSENT,
+        andreSøkeresTilsynReberegnet = false,
+        arbeid = mapOf(
+            ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                jobberNormalt = Duration.ofHours(4),
+                jobberNå = Duration.ofHours(0)
+            ),
+            FRILANS to ArbeidsforholdPeriodeInfo(
+                jobberNormalt = Duration.ofHours(1),
+                jobberNå = Duration.ofHours(1)
             )
-        )
+        ),
+        ytelseType = YtelseType.PSB
+    )
 
         grader3.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
@@ -161,7 +185,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(1),
                     jobberNå = Duration.ofHours(1)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader4.assert(
@@ -192,7 +217,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(1),
                     jobberNå = Duration.ofHours(1)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -221,7 +247,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(1),
                     jobberNå = Duration.ofHours(1)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader4.assert(
@@ -246,7 +273,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(4).plusMinutes(30),
                     jobberNå = INGENTING
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -274,7 +302,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(4).plusMinutes(30),
                     jobberNå = Duration.ofHours(1).plusMinutes(30)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -301,7 +330,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(3),
                     jobberNå = Duration.ofHours(2).plusMinutes(15)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -328,7 +358,8 @@ internal class BeregnGraderTest {
                     jobberNormalt = Duration.ofHours(4),
                     jobberNå = Duration.ofHours(2)
                 )
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -352,7 +383,8 @@ internal class BeregnGraderTest {
                     jobberNå = INGENTING
                 ),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -376,7 +408,8 @@ internal class BeregnGraderTest {
                     jobberNå = INGENTING
                 ),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -396,7 +429,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -415,7 +449,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70)),
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -434,7 +469,8 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -450,11 +486,12 @@ internal class BeregnGraderTest {
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
             oppgittTilsyn = FULL_DAG.prosent(40),
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -469,12 +506,13 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -490,12 +528,13 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = FULL_DAG.prosent(47),
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -511,12 +550,13 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = INGENTING,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = Prosent(47),
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -532,13 +572,14 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25)),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -555,12 +596,13 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -576,13 +618,14 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -599,13 +642,14 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -622,14 +666,15 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(60)),
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -647,15 +692,16 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
                     jobberNormalt = FULL_DAG,
                     jobberNå = Duration.ofHours(6).plusMinutes(45)
                 ),
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(
@@ -671,11 +717,12 @@ internal class BeregnGraderTest {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
-            andreSøkeresTilsynReberegnet = false,
             andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))
-            )
+            ),
+            ytelseType = YtelseType.PSB
         )
 
         grader.assert(

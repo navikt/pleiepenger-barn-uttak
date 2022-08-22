@@ -188,7 +188,8 @@ internal object UttaksplanRegler {
             andreSøkeresTilsyn = andrePartersTilsyn,
             andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
             arbeid = arbeidPerArbeidsforhold,
-            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
+            ytelseType = grunnlag.ytelseType
         )
     }
 
