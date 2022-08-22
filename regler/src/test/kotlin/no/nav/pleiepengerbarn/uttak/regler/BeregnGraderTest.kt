@@ -43,6 +43,27 @@ internal class BeregnGraderTest {
     }
 
     @Test
+    internal fun `50 prosent vanlig uttak med 81% tatt av andre søkere`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = Prosent(81),
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+            ),
+            ytelseType = YtelseType.PLS
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            Prosent(19),
+            ARBEIDSGIVER1 to Prosent(19)
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+    @Test
     internal fun `50 prosent vanlig uttak`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
