@@ -15,18 +15,20 @@ internal object BeregnGrader {
         andreSøkeresTilsyn: Prosent,
         andreSøkeresTilsynReberegnet: Boolean,
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+        ytelseType: YtelseType
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
         val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
         val uttaksgradResultat = avklarUttaksgrad(
+            ytelseType,
             pleiebehov,
             etablertTilsynsprosent,
             oppgittTilsyn,
             andreSøkeresTilsyn,
             arbeid,
-            overseEtablertTilsynÅrsak
+            overseEtablertTilsynÅrsak,
         )
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN, arbeid)
 
@@ -48,6 +50,7 @@ internal object BeregnGrader {
     }
 
     private fun avklarUttaksgrad(
+        ytelseType: YtelseType,
         pleiebehov: Pleiebehov,
         etablertTilsynprosent: Prosent,
         ønsketUttaksgrad: Duration?,
@@ -66,12 +69,14 @@ internal object BeregnGrader {
         if (restTilSøker < TJUE_PROSENT) {
             val forLavGradÅrsak =
                 utledForLavGradÅrsak(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
-            return UttaksgradResultat(
-                restTilSøker,
-                Prosent.ZERO,
-                ikkeOppfyltÅrsak = forLavGradÅrsak,
-                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
-            )
+            if(!(ytelseType == YtelseType.PLS && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
+                return UttaksgradResultat(
+                    restTilSøker,
+                    Prosent.ZERO,
+                    ikkeOppfyltÅrsak = forLavGradÅrsak,
+                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                )
+            }
         }
         val seBortFraAndreArbeidsforhold = arbeid.seBortFraAndreArbeidsforhold()
         if (seBortFraAndreArbeidsforhold) {
