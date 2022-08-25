@@ -1,8 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.kontrakter
 
-enum class RettVedDød(val uker:Long) {
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
-    RETT_6_UKER(6),
-    RETT_12_UKER(12)
+enum class RettVedDød(val lengde:Long, val enhet: TemporalUnit) {
+
+    RETT_6_UKER(6, ChronoUnit.WEEKS),
+    RETT_12_UKER(3, ChronoUnit.MONTHS)
 
 }

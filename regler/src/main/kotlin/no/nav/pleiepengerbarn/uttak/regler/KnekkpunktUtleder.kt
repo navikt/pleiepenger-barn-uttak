@@ -5,6 +5,7 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Knekkpunkt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import java.time.Duration
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 internal typealias KnekkpunktMap = MutableMap<LocalDate, MutableSet<KnekkpunktType>>
@@ -62,8 +63,9 @@ internal object KnekkpunktUtleder {
     private fun finnForBarnsDød(knekkpunktMap: KnekkpunktMap, barn: Barn) {
         if (barn.dødsdato != null) {
             oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1), KnekkpunktType.BARNETS_DØDSFALL)
-            val antallUker = barn.rettVedDød?.uker ?: 0
-            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1).plusWeeks(antallUker), KnekkpunktType.BARNETS_DØDSFALL)
+            val antall = barn.rettVedDød?.lengde ?: 0
+            val enhet = barn.rettVedDød?.enhet ?: ChronoUnit.DAYS
+            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1).plus(antall, enhet), KnekkpunktType.BARNETS_DØDSFALL)
         }
     }
 

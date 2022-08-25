@@ -4,13 +4,14 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.RettVedDød
 import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import java.time.temporal.ChronoUnit
 
 internal class BarnsDødPeriodeRegel : PeriodeRegel {
 
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
         val dødsdato = grunnlag.barn.dødsdato
         if (dødsdato != null) {
-            val sisteDagMedRettEtterBarnetsDød = dødsdato.plusWeeks(grunnlag.barn.rettVedDød?.uker ?: 0)
+            val sisteDagMedRettEtterBarnetsDød = dødsdato.plus(grunnlag.barn.rettVedDød?.lengde ?: 0, grunnlag.barn.rettVedDød?.enhet ?: ChronoUnit.DAYS)
             if (periode.fom.isAfter(sisteDagMedRettEtterBarnetsDød)) {
                 return IkkeOppfylt(årsaker = setOf(Årsak.BARNETS_DØDSFALL))
             }
