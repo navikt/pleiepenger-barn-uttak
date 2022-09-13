@@ -1,0 +1,1 @@
+ALTER TYPE ytelsetype ADD VALUE IF NOT EXISTS 'OLP';
