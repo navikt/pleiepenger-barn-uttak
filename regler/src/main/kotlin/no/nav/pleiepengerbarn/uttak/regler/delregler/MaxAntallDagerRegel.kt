@@ -169,8 +169,10 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
         for (behandlingUUID in behandlingsUUIDer) {
             if (behandlingUUID != this.behandlingUUID) {
                 //Skal ikke telle med nåværende behandling
+
                 val annenPartsUttaksplan = this.andrePartersUttaksplanPerBehandling[behandlingUUID]
-                    ?: throw IllegalStateException("Skal ikke kunne skje at behandling ikke finnes")
+                    ?: continue // Uttaksplan kan mangle ved simulering.
+
                 annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                     if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
                         if (info.utfall == Utfall.OPPFYLT) {
