@@ -69,9 +69,9 @@ internal object KnekkpunktUtleder {
         }
     }
 
-    private fun finnForSøkersDød(knekkpunktMap: KnekkpunktMap, barn: Søker) {
-        if (barn.dødsdato != null) {
-            oppdaterKnekkpunktMap(knekkpunktMap, barn.dødsdato!!.plusDays(1), KnekkpunktType.SØKERS_DØDSFALL)
+    private fun finnForSøkersDød(knekkpunktMap: KnekkpunktMap, søker: Søker) {
+        if (søker.dødsdato != null) {
+            oppdaterKnekkpunktMap(knekkpunktMap, søker.dødsdato!!.plusDays(1), KnekkpunktType.SØKERS_DØDSFALL)
         }
     }
 
