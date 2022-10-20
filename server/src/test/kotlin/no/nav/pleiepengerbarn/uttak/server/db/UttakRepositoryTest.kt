@@ -95,7 +95,7 @@ internal class UttakRepositoryTest {
         assertThat(uttaksplan).isNotNull
         // Krever at landkodene og utenlandsoppholdårsaken er som før.
         uttaksplan!!.perioder.values.forEach { it -> assertThat(it.utenlandsopphold?.landkode).isEqualTo(landkode) }
-        uttaksplan!!.perioder.values.forEach { it ->
+        uttaksplan.perioder.values.forEach { it ->
             assertThat(it.utenlandsopphold?.årsak).isEqualTo(
                 utenlandsoppholdÅrsak
             )
@@ -395,6 +395,7 @@ internal class UttakRepositoryTest {
                 periode to UttaksperiodeInfo.oppfylt(
                     kildeBehandlingUUID = UUID.randomUUID().toString(),
                     uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    brukersTilsynsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                     årsak = Årsak.FULL_DEKNING,
                     pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
                     knekkpunktTyper = setOf(),
@@ -454,6 +455,7 @@ internal class UttakRepositoryTest {
                 periode to UttaksperiodeInfo.oppfylt(
                     kildeBehandlingUUID = UUID.randomUUID().toString(),
                     uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    brukersTilsynsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                     årsak = Årsak.FULL_DEKNING,
                     pleiebehov = Pleiebehov.PROSENT_200.prosent.setScale(2, RoundingMode.HALF_UP),
                     knekkpunktTyper = setOf(),
@@ -514,6 +516,7 @@ internal class UttakRepositoryTest {
                 periode to UttaksperiodeInfo.oppfylt(
                     kildeBehandlingUUID = UUID.randomUUID().toString(),
                     uttaksgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
+                    brukersTilsynsgrad = Prosent(100).setScale(2, RoundingMode.HALF_UP),
                     årsak = Årsak.FULL_DEKNING,
                     pleiebehov = Pleiebehov.PROSENT_100.prosent.setScale(2, RoundingMode.HALF_UP),
                     knekkpunktTyper = setOf(),

@@ -114,6 +114,7 @@ internal object UttaksplanRegler {
                 }
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
                     uttaksgrad = grader.uttaksgrad,
+                    brukersTilsynsgrad = grader.brukersTilsynsGrad,
                     utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     oppgittTilsyn = grader.oppgittTilsyn,

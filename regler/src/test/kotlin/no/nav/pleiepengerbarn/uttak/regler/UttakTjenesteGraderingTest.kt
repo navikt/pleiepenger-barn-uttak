@@ -5,6 +5,8 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -25,6 +27,15 @@ internal class UttakTjenesteGraderingTest {
         private const val aktørIdBarn = "456"
     }
 
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN", "true")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN")
+    }
 
     private val helePerioden =
         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
@@ -261,6 +272,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = nesteBehandlingUUID().toString(),
                             uttaksgrad = Prosent(40),
+                            brukersTilsynsgrad = Prosent(40),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(40),
                             oppgittTilsyn = null,
@@ -321,6 +333,7 @@ internal class UttakTjenesteGraderingTest {
                     perioder = mapOf(
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             uttaksgrad = Prosent(60),
+                            brukersTilsynsgrad = Prosent(60),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             årsak = Årsak.GRADERT_MOT_TILSYN,
                             knekkpunktTyper = setOf(),
@@ -394,6 +407,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(40),
+                            brukersTilsynsgrad = Prosent(40),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(40),
                             oppgittTilsyn = null,
@@ -622,13 +636,13 @@ internal class UttakTjenesteGraderingTest {
                 LukketPeriode("2020-01-01/2020-01-03"),
                 LukketPeriode("2020-01-06/2020-01-07")
             ),
-            Prosent(56),
+            Prosent(60),
             mapOf(
                 arbeidsforhold1 to HUNDRE_PROSENT,
                 arbeidsforhold2 to Prosent(50),
                 arbeidsforhold3 to Prosent(25),
             ),
-            Årsak.AVKORTET_MOT_INNTEKT
+            Årsak.GRADERT_MOT_TILSYN
         )
 
     }
@@ -813,6 +827,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            brukersTilsynsgrad = Prosent(100),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -832,6 +847,7 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            brukersTilsynsgrad = Prosent(100),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -879,7 +895,7 @@ internal class UttakTjenesteGraderingTest {
     }
 
     @Test
-    internal fun `Livets sluttfase hvor første søker tar 60% av en dag og andre søker får 40% og kvoteinfo gjenspeiler det`() {
+    internal fun `Livets sluttfase hvor første søker tar 60 prosent av en dag og andre søker får 40 prosent og kvoteinfo gjenspeiler det`() {
         val søkersBehandlingUUID = nesteBehandlingUUID()
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
 
@@ -907,6 +923,7 @@ internal class UttakTjenesteGraderingTest {
                         perioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(60),
+                            brukersTilsynsgrad = Prosent(60),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,

@@ -5,6 +5,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.RoundingMode
 import java.time.Duration
@@ -20,7 +22,15 @@ internal class BeregnGraderTest {
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN", "true")
+    }
 
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN")
+    }
     @Test
     internal fun `100 prosent vanlig uttak`() {
         val grader = BeregnGrader.beregn(
@@ -37,13 +47,14 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.FULL_DEKNING,
             HUNDRE_PROSENT,
+            HUNDRE_PROSENT,
             ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
     }
 
     @Test
-    internal fun `50 prosent vanlig uttak med 81% tatt av andre søkere`() {
+    internal fun `50 prosent vanlig uttak med 81 prosent tatt av andre søkere`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -58,13 +69,14 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(19),
+            Prosent(19),
             ARBEIDSGIVER1 to Prosent(19)
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
     }
 
     @Test
-    internal fun `50 prosent vanlig uttak med 100% tatt av andre søkere`() {
+    internal fun `50 prosent vanlig uttak med 100 prosent tatt av andre søkere`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -79,7 +91,30 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE,
             Prosent.ZERO,
+            Prosent.ZERO,
             ARBEIDSGIVER1 to Prosent.ZERO
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+    @Test
+    internal fun `100 prosent vanlig uttak i 50 prosent stilling med 50 prosent tatt av andre søkere`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = Prosent(50),
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3).plusMinutes(45), jobberNå = INGENTING)
+            ),
+            ytelseType = YtelseType.PSB
+        )
+
+        grader.assert(
+            Årsak.FULL_DEKNING,
+            Prosent(100),
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(100)
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
     }
@@ -99,6 +134,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50)
         )
@@ -120,6 +156,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT, //Dersom andre tilsyn og arbeid er likt, så skal årsaken være AVKORTET_MOT_INNTEKT
             Prosent(50),
+            Prosent(50),
             ARBEIDSGIVER1 to Prosent(50)
         )
     }
@@ -140,6 +177,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.FULL_DEKNING,
             HUNDRE_PROSENT,
+            HUNDRE_PROSENT,
             ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
     }
@@ -159,6 +197,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
+            Prosent(50),
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50)
         )
@@ -188,6 +227,7 @@ internal class BeregnGraderTest {
         grader3.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
+            Prosent(53.33333360).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
@@ -213,6 +253,7 @@ internal class BeregnGraderTest {
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(89),
+            Prosent(100),
             IKKE_YRKESAKTIV to Prosent(100),
             FRILANS to Prosent(0)
         )
@@ -245,6 +286,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(88),
+            Prosent(93.33333363).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             ARBEIDSGIVER2 to Prosent(100),
             FRILANS to Prosent(0)
@@ -275,6 +317,7 @@ internal class BeregnGraderTest {
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
+            Prosent(53.33333360).setScale(2, RoundingMode.HALF_UP),
             IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
@@ -300,6 +343,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.FULL_DEKNING,
+            HUNDRE_PROSENT,
             HUNDRE_PROSENT,
             ARBEIDSGIVER1 to HUNDRE_PROSENT,
             ARBEIDSGIVER2 to HUNDRE_PROSENT
@@ -330,6 +374,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(60),
+            Prosent(60),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(67)
         )
@@ -358,6 +403,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(38),
+            Prosent(30.0000000000000000).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(25)
         )
@@ -386,6 +432,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(47),
+            Prosent(53.33333371).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(44),
             ARBEIDSGIVER2 to Prosent(50)
         )
@@ -410,6 +457,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
+            Prosent(50),
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(50)
@@ -436,6 +484,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.FULL_DEKNING,
             HUNDRE_PROSENT,
+            HUNDRE_PROSENT,
             ARBEIDSGIVER1 to HUNDRE_PROSENT,
             ARBEIDSGIVER2 to HUNDRE_PROSENT
         )
@@ -457,6 +506,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(40),
+            Prosent(40),
             ARBEIDSGIVER1 to Prosent(40)
         )
     }
@@ -477,6 +527,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(30),
+            Prosent(30),
             ARBEIDSGIVER1 to Prosent(30)
         )
     }
@@ -496,6 +547,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
+            Prosent(40),
             Prosent(40),
             ARBEIDSGIVER1 to Prosent(40)
         )
@@ -518,6 +570,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_SØKERS_ØNSKE,
             Prosent(40),
+            Prosent(40),
             ARBEIDSGIVER1 to Prosent(40)
         )
     }
@@ -538,6 +591,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
             IKKE_YRKESAKTIV to Prosent(50)
@@ -561,6 +615,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
+            Prosent(53),
             ARBEIDSGIVER1 to Prosent(53),
             IKKE_YRKESAKTIV to Prosent(53)
         )
@@ -582,6 +637,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
+            Prosent(53),
             Prosent(53),
             ARBEIDSGIVER1 to Prosent(53),
             IKKE_YRKESAKTIV to Prosent(53)
@@ -606,6 +662,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(63),
+            Prosent(100),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(75),
             IKKE_YRKESAKTIV to Prosent(62.5)
@@ -628,6 +685,7 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.FULL_DEKNING,
+            Prosent(100),
             Prosent(100),
             DAGPENGER to Prosent(100),
             IKKE_YRKESAKTIV to Prosent(100)
@@ -652,6 +710,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
+            Prosent(100),
             ARBEIDSGIVER1 to Prosent(60),
             DAGPENGER to Prosent(100),
             IKKE_YRKESAKTIV to Prosent(80)
@@ -676,6 +735,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
+            Prosent(100),
             ARBEIDSGIVER1 to Prosent(60),
             INAKTIV to Prosent(100),
             IKKE_YRKESAKTIV to Prosent(80)
@@ -701,6 +761,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(67),
+            Prosent(100),
             ARBEIDSGIVER1 to Prosent(60),
             ARBEIDSGIVER2 to Prosent(40),
             DAGPENGER to Prosent(100),
@@ -728,6 +789,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.FOR_LAV_TAPT_ARBEIDSTID,
             NULL_PROSENT,
+            NULL_PROSENT,
             ARBEIDSGIVER1 to NULL_PROSENT,
             IKKE_YRKESAKTIV to NULL_PROSENT
         )
@@ -749,6 +811,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(75),
+            Prosent(75),
             IKKE_YRKESAKTIV to Prosent(75)
         )
     }
@@ -756,10 +819,12 @@ internal class BeregnGraderTest {
     private fun GraderBeregnet.assert(
         årsak: Årsak,
         uttaksgrad: Prosent,
+        brukersTilsynsGrad: Prosent,
         vararg utbetalingsgrader: Pair<Arbeidsforhold, Prosent>
     ) {
         assertThat(this.årsak).isEqualTo(årsak)
         assertThat(this.uttaksgrad).isEqualByComparingTo(uttaksgrad)
+        assertThat(this.brukersTilsynsGrad).isEqualByComparingTo(brukersTilsynsGrad)
         assertThat(this.utbetalingsgrader.size).isEqualTo(utbetalingsgrader.size)
         utbetalingsgrader.forEach {
             assertThat(this.utbetalingsgrader[it.first]!!.utbetalingsgrad).isEqualByComparingTo(it.second)
