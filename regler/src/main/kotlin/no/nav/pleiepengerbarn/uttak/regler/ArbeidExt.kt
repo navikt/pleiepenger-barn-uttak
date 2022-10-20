@@ -2,14 +2,12 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import java.math.BigDecimal
-import java.math.RoundingMode
+import no.nav.pleiepengerbarn.uttak.regler.domene.TaptArbeidstid
 import java.time.Duration
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(
     skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean
-): Prosent {
+): TaptArbeidstid {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
     val oppdatertArbeid = if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
@@ -33,22 +31,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
         sumJobberNå = sumJobberNormalt
     }
 
-    if (sumJobberNormalt == Duration.ZERO) {
-        return Prosent.ZERO
-    }
-
-    val søkersTapteArbeidstid =
-        HUNDRE_PROSENT - (BigDecimal(sumJobberNå.toMillis()).setScale(8, RoundingMode.HALF_UP).divide(BigDecimal(
-            sumJobberNormalt.toMillis()), 8, RoundingMode.HALF_UP
-        ) * HUNDRE_PROSENT)
-
-    if (søkersTapteArbeidstid > HUNDRE_PROSENT) {
-        throw IllegalStateException("Faktisk arbeid > normalt arbeid")
-    }
-    if (søkersTapteArbeidstid < Prosent.ZERO) {
-        return Prosent.ZERO
-    }
-    return søkersTapteArbeidstid
+    return TaptArbeidstid(sumJobberNå, sumJobberNormalt)
 }
 
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå

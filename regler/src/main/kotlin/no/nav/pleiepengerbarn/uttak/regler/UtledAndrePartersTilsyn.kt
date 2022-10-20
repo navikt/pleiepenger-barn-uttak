@@ -52,7 +52,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(per
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
         if (annenPartsOverlappendePeriodeInfo != null) {
             if (annenPartsOverlappendePeriodeInfo.harÅrsakSomIkkeTriggerReberegning()) {
-                sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
+                sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.brukersTilsynsgrad
             } else {
                 val graderBeregnet = BeregnGrader.beregn(
                     pleiebehov,
@@ -64,7 +64,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(per
                     annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType
                 )
-                sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
+                sumAndreSøkeresTilsyn += graderBeregnet.brukersTilsynsGrad
             }
         }
     }
@@ -124,6 +124,7 @@ private fun RegelGrunnlag.andreSøkeresUttaksplaner(periode: LukketPeriode): Lis
 
     val uttaksplanerMedKrav = mutableListOf<Uttaksplan>()
     for (behandlingMedKrav in kravprioritetListe) {
+        this.saksnummer
         if (behandlingMedKrav == this.behandlingUUID) {
             break
         }

@@ -41,11 +41,12 @@ internal object BeregnGrader {
                 tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
                 overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),
-            søkersTapteArbeidstid = søkersTapteArbeidstid,
+            søkersTapteArbeidstid = søkersTapteArbeidstid.beregnTaptArbeidIProsent(),
             oppgittTilsyn = oppgittTilsyn,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
-            årsak = uttaksgradResultat.årsak()
+            årsak = uttaksgradResultat.årsak(),
+            brukersTilsynsGrad = uttaksgradResultat.brukersTilsynsgrad
         )
     }
 
@@ -60,6 +61,7 @@ internal object BeregnGrader {
     ): UttaksgradResultat {
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
         val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val søkersTapteArbeidstidIProsent = søkersTapteArbeidstid.beregnTaptArbeidIProsent()
 
         val restTilSøker =
             finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
@@ -81,7 +83,7 @@ internal object BeregnGrader {
         val seBortFraAndreArbeidsforhold = arbeid.seBortFraAndreArbeidsforhold()
         if (seBortFraAndreArbeidsforhold) {
             val søkersTapteArbeidstidUtenAndreArbeidsforhold = arbeid.finnSøkersTapteArbeidstid(true)
-            if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
+            if (søkersTapteArbeidstidUtenAndreArbeidsforhold.beregnTaptArbeidIProsent() < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
@@ -90,7 +92,7 @@ internal object BeregnGrader {
                 )
             }
         } else {
-            if (søkersTapteArbeidstid < TJUE_PROSENT) {
+            if (søkersTapteArbeidstidIProsent < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
@@ -108,18 +110,21 @@ internal object BeregnGrader {
             )
         }
 
-        if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < søkersTapteArbeidstid) {
+        val taptArbeidIProsentJustertMotNormalArbeidstid = søkersTapteArbeidstid.beregnTaptArbeidIProsentJustertMotNormalArbeidstid()
+        if (ønsketUttaksgradProsent < restTilSøker && ønsketUttaksgradProsent < taptArbeidIProsentJustertMotNormalArbeidstid) {
             return UttaksgradResultat(
                 restTilSøker,
                 ønsketUttaksgradProsent,
+                brukersTilsynsgrad = ønsketUttaksgradProsent,
                 oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
             )
         }
-        if (restTilSøker < søkersTapteArbeidstid) {
+        if (restTilSøker < taptArbeidIProsentJustertMotNormalArbeidstid) {
             return UttaksgradResultat(
                 restTilSøker,
                 restTilSøker,
+                brukersTilsynsgrad = restTilSøker,
                 oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
             )
@@ -127,14 +132,16 @@ internal object BeregnGrader {
         if (arbeid.fulltFravær()) {
             return UttaksgradResultat(
                 restTilSøker,
-                søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
+                søkersTapteArbeidstidIProsent.setScale(2, RoundingMode.HALF_UP),
+                brukersTilsynsgrad = taptArbeidIProsentJustertMotNormalArbeidstid.setScale(2, RoundingMode.HALF_UP),
                 oppfyltÅrsak = Årsak.FULL_DEKNING,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
             )
         }
         return UttaksgradResultat(
             restTilSøker,
-            søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
+            søkersTapteArbeidstidIProsent.setScale(2, RoundingMode.HALF_UP),
+            brukersTilsynsgrad = taptArbeidIProsentJustertMotNormalArbeidstid.setScale(2, RoundingMode.HALF_UP),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
         )

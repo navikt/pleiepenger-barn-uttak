@@ -72,6 +72,7 @@ internal class UttaksplanExtTest {
         pleiebehov = Pleiebehov.PROSENT_100.prosent,
         søkersTapteArbeidstid = null,
         uttaksgrad = HUNDRE_PROSENT,
+        brukersTilsynsgrad = HUNDRE_PROSENT,
         årsaker = setOf()
     )
 

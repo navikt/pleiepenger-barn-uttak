@@ -42,6 +42,7 @@ internal class RegelGrunnlagExtKtTest {
                     // Fyll med dummy data
                     kildeBehandlingUUID = UUID.randomUUID().toString(),
                     uttaksgrad = HUNDRE_PROSENT,
+                    brukersTilsynsgrad = HUNDRE_PROSENT,
                     årsak = Årsak.FULL_DEKNING,
                     pleiebehov = HUNDRE_PROSENT,
                     knekkpunktTyper = setOf(),

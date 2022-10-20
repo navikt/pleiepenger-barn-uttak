@@ -194,6 +194,7 @@ class MaxAntallDagerRegelTest {
                         annenPeriode1 to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            brukersTilsynsgrad = Prosent(100),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -221,6 +222,7 @@ class MaxAntallDagerRegelTest {
                         annenPeriode3 to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            brukersTilsynsgrad = Prosent(100),
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -464,6 +466,7 @@ private fun dummyRegelGrunnlagMedAndreParter(
                 helePerioden to UttaksperiodeInfo.oppfylt(
                     kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                     uttaksgrad = Prosent(100),
+                    brukersTilsynsgrad = Prosent(100),
                     utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                     søkersTapteArbeidstid = Prosent(100),
                     oppgittTilsyn = null,
@@ -507,5 +510,6 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfa
         pleiebehov = Pleiebehov.PROSENT_100.prosent,
         søkersTapteArbeidstid = null,
         uttaksgrad = HUNDRE_PROSENT,
+        brukersTilsynsgrad = HUNDRE_PROSENT,
         årsaker = setOf()
     )

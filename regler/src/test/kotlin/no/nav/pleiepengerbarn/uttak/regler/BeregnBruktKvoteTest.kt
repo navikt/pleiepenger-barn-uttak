@@ -13,21 +13,24 @@ internal class BeregnBruktKvoteTest {
 
     @Test
     internal fun `Kvoten er ikke oversteget og skal bli 46 når søker og annen part tar ut 23 dager hver`() {
-        val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)) // 23 dager
+        val helePerioden =
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31)) // 23 dager
 
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val andrePartsUttak = mapOf(
-                annenPartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePerioden to dummyUttaksperiodeInfo()
-                        ),
-                        trukketUttak = listOf()
-                )
+            annenPartsBehandlingUUID to Uttaksplan(
+                perioder = mapOf(
+                    helePerioden to dummyUttaksperiodeInfo()
+                ),
+                trukketUttak = listOf()
+            )
         )
 
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 helePerioden to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, andrePartsUttak)
 
@@ -37,28 +40,31 @@ internal class BeregnBruktKvoteTest {
 
     @Test
     internal fun `Brukt kvote skal bli 40 når søker og annen part har brukt opp 20 dager hver`() {
-        val helePeriodenAnnenPart = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 31))
+        val helePeriodenAnnenPart =
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 31))
 
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val andrePartsUttak = mapOf(
-                annenPartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePeriodenAnnenPart to dummyUttaksperiodeInfo()
-                        ),
-                        trukketUttak = listOf()
-                )
+            annenPartsBehandlingUUID to Uttaksplan(
+                perioder = mapOf(
+                    helePeriodenAnnenPart to dummyUttaksperiodeInfo()
+                ),
+                trukketUttak = listOf()
+            )
         )
 
         val periode1 = LukketPeriode("2020-01-06/2020-01-10")
         val periode2 = LukketPeriode("2020-01-13/2020-01-17")
         val periode3 = LukketPeriode("2020-01-20/2020-01-24")
         val periode4 = LukketPeriode("2020-01-27/2020-01-31")
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
                 periode4 to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, andrePartsUttak)
 
@@ -72,17 +78,19 @@ internal class BeregnBruktKvoteTest {
 
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val andrePartsUttak = mapOf(
-                annenPartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePerioden to dummyUttaksperiodeInfo()
-                        ),
-                        trukketUttak = listOf()
-                )
+            annenPartsBehandlingUUID to Uttaksplan(
+                perioder = mapOf(
+                    helePerioden to dummyUttaksperiodeInfo()
+                ),
+                trukketUttak = listOf()
+            )
         )
 
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 helePerioden to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, andrePartsUttak)
 
@@ -92,16 +100,17 @@ internal class BeregnBruktKvoteTest {
 
     @Test
     internal fun `Kvoten er oversteget, og skal bli 80 når søker bruker 60 og annen part har brukt 20`() {
-        val helePeriodenAnnenPart = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 31)) //20 dager
+        val helePeriodenAnnenPart =
+            LukketPeriode(LocalDate.of(2020, Month.JANUARY, 6), LocalDate.of(2020, Month.JANUARY, 31)) //20 dager
 
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
         val andrePartsUttak = mapOf(
-                annenPartsBehandlingUUID to Uttaksplan(
-                        perioder = mapOf(
-                                helePeriodenAnnenPart to dummyUttaksperiodeInfo()
-                        ),
-                        trukketUttak = listOf()
-                )
+            annenPartsBehandlingUUID to Uttaksplan(
+                perioder = mapOf(
+                    helePeriodenAnnenPart to dummyUttaksperiodeInfo()
+                ),
+                trukketUttak = listOf()
+            )
         )
 
         val periode1 = LukketPeriode("2020-01-06/2020-01-10") // 5
@@ -116,7 +125,8 @@ internal class BeregnBruktKvoteTest {
         val periode10 = LukketPeriode("2020-03-09/2020-03-13") // 50
         val periode11 = LukketPeriode("2020-03-16/2020-03-20") // 55
         val periode12 = LukketPeriode("2020-03-23/2020-03-27") // 60
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
@@ -129,7 +139,8 @@ internal class BeregnBruktKvoteTest {
                 periode10 to dummyUttaksperiodeInfo(),
                 periode11 to dummyUttaksperiodeInfo(),
                 periode12 to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, andrePartsUttak)
 
@@ -152,7 +163,8 @@ internal class BeregnBruktKvoteTest {
         val periode10 = LukketPeriode("2020-03-09/2020-03-13") // 50
         val periode11 = LukketPeriode("2020-03-16/2020-03-20") // 55
         val periode12 = LukketPeriode("2020-03-23/2020-03-26") // 59
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
@@ -165,7 +177,8 @@ internal class BeregnBruktKvoteTest {
                 periode10 to dummyUttaksperiodeInfo(),
                 periode11 to dummyUttaksperiodeInfo(),
                 periode12 to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, emptyMap())
 
@@ -188,7 +201,8 @@ internal class BeregnBruktKvoteTest {
         val periode10 = LukketPeriode("2020-03-09/2020-03-13") // 50
         val periode11 = LukketPeriode("2020-03-16/2020-03-20") // 55
         val periode12 = LukketPeriode("2020-03-23/2020-03-27") // 60
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
@@ -201,7 +215,8 @@ internal class BeregnBruktKvoteTest {
                 periode10 to dummyUttaksperiodeInfo(),
                 periode11 to dummyUttaksperiodeInfo(),
                 periode12 to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, emptyMap())
 
@@ -225,7 +240,8 @@ internal class BeregnBruktKvoteTest {
         val periode11 = LukketPeriode("2020-03-16/2020-03-20") // 55
         val periode12 = LukketPeriode("2020-03-23/2020-03-27") // 60
         val periode13 = LukketPeriode("2020-03-30/2020-03-30") // 61
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
@@ -239,7 +255,8 @@ internal class BeregnBruktKvoteTest {
                 periode11 to dummyUttaksperiodeInfo(),
                 periode12 to dummyUttaksperiodeInfo(),
                 periode13 to dummyUttaksperiodeInfo()
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, emptyMap())
 
@@ -263,7 +280,8 @@ internal class BeregnBruktKvoteTest {
         val periode11 = LukketPeriode("2020-03-16/2020-03-20") // 55
         val periode12 = LukketPeriode("2020-03-23/2020-03-27") // 60
         val periode13 = LukketPeriode("2020-03-30/2020-03-30") // 60 og en halvtime
-        val søkersUttaksplan = Uttaksplan(perioder = mapOf(
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
                 periode1 to dummyUttaksperiodeInfo(),
                 periode2 to dummyUttaksperiodeInfo(),
                 periode3 to dummyUttaksperiodeInfo(),
@@ -277,7 +295,8 @@ internal class BeregnBruktKvoteTest {
                 periode11 to dummyUttaksperiodeInfo(),
                 periode12 to dummyUttaksperiodeInfo(),
                 periode13 to dummyUttaksperiodeInfo(Duration.ofMinutes(30))
-        ), trukketUttak = listOf())
+            ), trukketUttak = listOf()
+        )
 
         val erKvotenOversteget = BeregnBruktKvote.erKvotenOversteget(søkersUttaksplan, emptyMap())
 
@@ -290,22 +309,23 @@ internal class BeregnBruktKvoteTest {
 private fun nesteBehandlingUUID() = UUID.randomUUID()
 
 private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null) = UttaksperiodeInfo(
-        utfall = Utfall.OPPFYLT,
-        utbetalingsgrader = listOf(),
-        annenPart = AnnenPart.ALENE,
-        beredskap = null,
-        nattevåk = null,
-        graderingMotTilsyn = GraderingMotTilsyn(
-                etablertTilsyn = NULL_PROSENT,
-                overseEtablertTilsynÅrsak = null,
-                andreSøkeresTilsyn = NULL_PROSENT,
-                tilgjengeligForSøker = NULL_PROSENT,
-                andreSøkeresTilsynReberegnet = false
-        ),
-        kildeBehandlingUUID = "123",
-        oppgittTilsyn = oppgittTilsyn,
-        pleiebehov = Pleiebehov.PROSENT_100.prosent,
-        søkersTapteArbeidstid = null,
-        uttaksgrad = HUNDRE_PROSENT,
-        årsaker = setOf()
+    utfall = Utfall.OPPFYLT,
+    utbetalingsgrader = listOf(),
+    annenPart = AnnenPart.ALENE,
+    beredskap = null,
+    nattevåk = null,
+    graderingMotTilsyn = GraderingMotTilsyn(
+        etablertTilsyn = NULL_PROSENT,
+        overseEtablertTilsynÅrsak = null,
+        andreSøkeresTilsyn = NULL_PROSENT,
+        tilgjengeligForSøker = NULL_PROSENT,
+        andreSøkeresTilsynReberegnet = false
+    ),
+    kildeBehandlingUUID = "123",
+    oppgittTilsyn = oppgittTilsyn,
+    pleiebehov = Pleiebehov.PROSENT_100.prosent,
+    søkersTapteArbeidstid = null,
+    uttaksgrad = HUNDRE_PROSENT,
+    brukersTilsynsgrad = HUNDRE_PROSENT,
+    årsaker = setOf()
 )

@@ -1,10 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 
 data class UttaksgradResultat(
     val restTilSøker: Prosent,
     val uttaksgrad: Prosent,
+    val brukersTilsynsgrad: Prosent = uttaksgrad,
     val oppfyltÅrsak: Årsak? = null,
     val ikkeOppfyltÅrsak: Årsak? = null,
     val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?

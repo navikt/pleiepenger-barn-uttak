@@ -7,6 +7,8 @@ import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -28,6 +30,16 @@ import kotlin.test.fail
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
+
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN", "true")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("JUSTER_NORMALTID_ANDRE_PARTERS_TILSYN")
+    }
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
@@ -185,7 +197,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     internal fun `Flere behandlinger med uttak med overlapp`() {
         val saksnummer = nesteSaksnummer()
 
-        lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
+        val orginalUttaksplan = lagGrunnlag(saksnummer, "2020-01-01/2020-01-12").opprettUttaksplan()
         val uttaksplan = lagGrunnlag(saksnummer, "2020-01-07/2020-01-20").opprettUttaksplan()
 
         assertThat(uttaksplan.perioder).hasSize(5)
@@ -1214,7 +1226,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Livets sluttfase - første søker tar 80% av en dag og andre søker får 20% og kvoteinfo gjenspeiler det`() {
+    internal fun `Livets sluttfase - første søker tar 80 prosent av en dag og andre søker får 20 prosent og kvoteinfo gjenspeiler det`() {
         val saksnummer = nesteSaksnummer()
         val søknadsperiode = LukketPeriode("2021-03-15/2021-03-15")
         val annenPartsBehandlingUUID = nesteBehandlingId()
