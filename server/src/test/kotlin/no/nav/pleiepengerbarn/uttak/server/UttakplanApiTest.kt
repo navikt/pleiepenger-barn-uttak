@@ -1120,7 +1120,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14).setScale(2))
     }
 
-    @Disabled
     @Test
     internal fun `Livets sluttfase - Flere behandlinger på samme søker med uttak etter hverandre hvor kvoteInfo oppdaterer seg tilsvarende`() {
         val saksnummer = nesteSaksnummer()
