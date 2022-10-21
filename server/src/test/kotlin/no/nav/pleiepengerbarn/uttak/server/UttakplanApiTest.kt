@@ -7,6 +7,7 @@ import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -1117,6 +1118,85 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         assertThat(hentetUttaksplan.kvoteInfo).isNotNull
         assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(14).setScale(2))
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Flere behandlinger på samme søker med uttak etter hverandre hvor kvoteInfo oppdaterer seg tilsvarende`() {
+        val saksnummer = nesteSaksnummer()
+        val søknadsperiode = LukketPeriode("2022-09-05/2022-09-07")
+        val behandlingUUID1 = nesteBehandlingId()
+
+        val grunnlag = lagGrunnlag(
+            ytelseType = YtelseType.PLS,
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer,
+            behandlingUUID = behandlingUUID1
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID1))
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(3).setScale(2))
+
+        // NY BEHANDLING
+        val søknadsperiode2 = LukketPeriode("2022-10-04/2022-10-05")
+        val behandlingUUID2 = nesteBehandlingId()
+
+        val grunnlag2 = lagGrunnlag(
+            ytelseType = YtelseType.PLS,
+            søknadsperiode = søknadsperiode2,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiode2 to Pleiebehov.PROSENT_100),
+            saksnummer = saksnummer,
+            behandlingUUID = behandlingUUID2
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUID2),
+                søknadsperiode2 to listOf(behandlingUUID2))
+        )
+
+        val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan2.kvoteInfo).isNotNull
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(5).setScale(2))
+
+        uttaksplan2.assertOppfylt(
+            perioder = listOf(LukketPeriode("2022-09-05/2022-09-07")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        uttaksplan2.assertOppfylt(
+            perioder = listOf(LukketPeriode("2022-10-04/2022-10-05")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
+        val hentResponse = testClient.hentUttaksplan(grunnlag2.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(hentetUttaksplan.kvoteInfo).isNotNull
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(5).setScale(2))
     }
 
     @Test

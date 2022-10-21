@@ -181,6 +181,16 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
                         }
                     }
                 }
+            } else {
+                val forrigePlan = forrigeUttaksplan ?: continue
+
+                if (this.søktUttak.any { søktUttak -> søktUttak.periode.overlapperDelvis(kravprioritetsperiode) }) {
+                    continue
+                }
+
+                antallDager += forrigePlan.perioder.filter {
+                    it.key.overlapperDelvis(kravprioritetsperiode)
+                }.finnForbrukteDager().first
             }
         }
     }
