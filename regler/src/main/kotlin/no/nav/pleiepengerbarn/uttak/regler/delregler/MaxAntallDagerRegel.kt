@@ -202,7 +202,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
 
 private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<BigDecimal, List<LukketPeriode>> {
     var antallDager = BigDecimal.ZERO
-    var relevantePerioder = mutableListOf<LukketPeriode>()
+    val relevantePerioder = mutableListOf<LukketPeriode>()
 
     this.forEach { (annenPartsPeriode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
