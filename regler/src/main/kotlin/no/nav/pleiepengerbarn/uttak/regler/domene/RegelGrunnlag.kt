@@ -19,6 +19,7 @@ data class RegelGrunnlag(
     val lovbestemtFerie: List<LukketPeriode> = listOf(),
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     val andrePartersUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
+    val sisteVedtatteUttaksplanForBehandling: Map<UUID, UUID> = mapOf(),
     val forrigeUttaksplan: Uttaksplan? = null,
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),

@@ -10,9 +10,6 @@ import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
-import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -46,11 +43,16 @@ class UttakplanApi {
         utvidetLogging = System.getenv("UTVIDET_LOGGING").toBoolean()
     }
 
-    @PostMapping(UttaksplanPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        UttaksplanPath,
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
-            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
-            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Uttaksplan> {
+        @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+        uriComponentsBuilder: UriComponentsBuilder
+    ): ResponseEntity<Uttaksplan> {
         val logMelding = if (utvidetLogging) {
             "Opprett uttaksplan for behandling=${uttaksgrunnlag.behandlingUUID} grunnlag=$uttaksgrunnlag"
         } else {
@@ -58,9 +60,12 @@ class UttakplanApi {
         }
         logger.info(logMelding)
         uttaksgrunnlag.valider()
-        val forrigeUttaksplan = uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        val forrigeUttaksplan =
+            uttakRepository.hentForrige(uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val nyUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, true)
-        val uri = uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build().toUri()
+        val uri =
+            uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build()
+                .toUri()
 
         if (utvidetLogging) {
             logger.info("Resultat for behandling=${uttaksgrunnlag.behandlingUUID} uttaksplan=$nyUttaksplan")
@@ -71,11 +76,16 @@ class UttakplanApi {
     }
 
     @Deprecated("Bruk den andre simulerUttaksplan istedet")
-    @PostMapping(UttaksplanSimuleringPath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        UttaksplanSimuleringPath,
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplan(
-            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
-            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<Simulering> {
+        @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+        uriComponentsBuilder: UriComponentsBuilder
+    ): ResponseEntity<Simulering> {
         val logMelding = if (utvidetLogging) {
             "Simulerer uttaksplan(PSB) for behandling=${uttaksgrunnlag.behandlingUUID} grunnlag=$uttaksgrunnlag"
         } else {
@@ -89,16 +99,28 @@ class UttakplanApi {
         return ResponseEntity.ok(simulering)
     }
 
-    @PostMapping(UttaksplanSimuleringSluttfasePath, consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        UttaksplanSimuleringSluttfasePath,
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     @Operation(description = "Simuler opprettelse av en ny uttaksplan for livets sluttfase. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplanForLivetsSluttfase(
-            @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
-            uriComponentsBuilder: UriComponentsBuilder): ResponseEntity<SimuleringLivetsSluttfase> {
+        @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+        uriComponentsBuilder: UriComponentsBuilder
+    ): ResponseEntity<SimuleringLivetsSluttfase> {
         logger.info("Simulerer uttaksplan(PLS) for behandling=${uttaksgrunnlag.behandlingUUID}")
         val simulering = simuler(uttaksgrunnlag)
-        val erKvotenBruktOpp = BeregnBruktKvote.erKvotenOversteget(simulering.simulertUttaksplan, hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag))
-        return ResponseEntity.ok(SimuleringLivetsSluttfase(simulering.forrigeUttaksplan, simulering.simulertUttaksplan,
-                simulering.uttakplanEndret, erKvotenBruktOpp.first, erKvotenBruktOpp.second))
+        val erKvotenBruktOpp = BeregnBruktKvote.erKvotenOversteget(
+            simulering.simulertUttaksplan,
+            hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
+        )
+        return ResponseEntity.ok(
+            SimuleringLivetsSluttfase(
+                simulering.forrigeUttaksplan, simulering.simulertUttaksplan,
+                simulering.uttakplanEndret, erKvotenBruktOpp.first, erKvotenBruktOpp.second
+            )
+        )
     }
 
     private fun simuler(uttaksgrunnlag: Uttaksgrunnlag): Simulering {
@@ -109,14 +131,20 @@ class UttakplanApi {
         return Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret)
     }
 
-    private fun lagUttaksplan(uttaksgrunnlag: Uttaksgrunnlag, forrigeUttaksplan: Uttaksplan?, lagre: Boolean): Uttaksplan {
+    private fun lagUttaksplan(
+        uttaksgrunnlag: Uttaksgrunnlag,
+        forrigeUttaksplan: Uttaksplan?,
+        lagre: Boolean
+    ): Uttaksplan {
         val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
 
-        val regelGrunnlag = GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
+        val regelGrunnlag =
+            GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {
-            uttaksplan = UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan, regelGrunnlag.trukketUttak)
+            uttaksplan =
+                UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, uttaksplan, regelGrunnlag.trukketUttak)
         }
         uttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, uttaksplan)
 
@@ -128,12 +156,27 @@ class UttakplanApi {
     }
 
     private fun hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {
-        val unikeBehandlinger = uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten().toSet().map {UUID.fromString(it)}
+        val unikeBehandlinger =
+            uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten()
+                .toSet()
+                .map { UUID.fromString(it) }
+        val vedtatteBehandlinger = uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
+            .values.toSet()
+            .map { UUID.fromString(it) }
         val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
-        unikeBehandlinger .forEach { behandlingUUID ->
+
+        unikeBehandlinger.forEach { behandlingUUID ->
             val uttaksplan = uttakRepository.hent(behandlingUUID)
             if (uttaksplan != null) {
                 andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
+            }
+        }
+        vedtatteBehandlinger.forEach { behandlingUUID ->
+            if (!andrePartersUttaksplanerPerBehandling.containsKey(behandlingUUID)) {
+                val uttaksplan = uttakRepository.hent(behandlingUUID)
+                if (uttaksplan != null) {
+                    andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
+                }
             }
         }
         return andrePartersUttaksplanerPerBehandling
@@ -146,7 +189,10 @@ class UttakplanApi {
             Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
         ]
     )
-    fun hentUttaksplanForBehandling(@RequestParam behandlingUUID: BehandlingUUID, @RequestParam slåSammenLikePerioder: Boolean = false): ResponseEntity<Uttaksplan> {
+    fun hentUttaksplanForBehandling(
+        @RequestParam behandlingUUID: BehandlingUUID,
+        @RequestParam slåSammenLikePerioder: Boolean = false
+    ): ResponseEntity<Uttaksplan> {
         logger.info("Henter uttaksplan for behandling=$behandlingUUID slåSammenLikePerioder=$slåSammenLikePerioder")
         val behandlingUUIDParsed = try {
             UUID.fromString(behandlingUUID)
@@ -165,7 +211,10 @@ class UttakplanApi {
     @Operation(
         description = "Slett siste uttaksplan for behandling.",
         parameters = [
-            Parameter(name ="behandlingUUID", description = "UUID for behandling hvor siste uttaksplan som skal slettes.")
+            Parameter(
+                name = "behandlingUUID",
+                description = "UUID for behandling hvor siste uttaksplan som skal slettes."
+            )
         ]
     )
     fun slettUttaksplan(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {

@@ -15,23 +15,38 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
     val søkersPleiebehov = finnPleiebehov(periode)
 
     val etablertTilsynEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
-        søkersEtablertTilsyn.prosentAvFullDag().compareTo(uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn ?: Prosent.ZERO) != 0
+        søkersEtablertTilsyn.prosentAvFullDag()
+            .compareTo(uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn ?: Prosent.ZERO) != 0
     }
-    val nattevåkEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
-    val beredskapEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
-    val pleiebehovEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.pleiebehov.compareTo(søkersPleiebehov.prosent) != 0 }
+    val nattevåkEndret =
+        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
+    val beredskapEndret =
+        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
+    val pleiebehovEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
+        uttaksperiodeInfo.pleiebehov.compareTo(søkersPleiebehov.prosent) != 0
+    }
 
-    val måReberegneAndrePartersTilsyn = true in listOf(etablertTilsynEndret, nattevåkEndret, beredskapEndret, pleiebehovEndret)
+    val måReberegneAndrePartersTilsyn =
+        true in listOf(etablertTilsynEndret, nattevåkEndret, beredskapEndret, pleiebehovEndret)
 
     val andrePartersTilsyn = if (måReberegneAndrePartersTilsyn) {
-        reberegnAndreSøkeresTilsynKravprioritetBehandling(periode, søkersPleiebehov, søkersEtablertTilsyn, søkersNattevåk, søkersBeredskap)
+        reberegnAndreSøkeresTilsynKravprioritetBehandling(
+            periode,
+            søkersPleiebehov,
+            søkersEtablertTilsyn,
+            søkersNattevåk,
+            søkersBeredskap
+        )
     } else {
         finnAndreSøkeresTilsynFraUttaksperioder(periode)
     }
     return Pair(måReberegneAndrePartersTilsyn, andrePartersTilsyn)
 }
 
-private fun Map<UUID, Uttaksplan>.endret(periode: LukketPeriode, sjekkSøkersVerdi: (UttaksperiodeInfo) -> Boolean): Boolean {
+private fun Map<UUID, Uttaksplan>.endret(
+    periode: LukketPeriode,
+    sjekkSøkersVerdi: (UttaksperiodeInfo) -> Boolean
+): Boolean {
     return this.any { (_, uttaksplan) ->
         val periodeInfo = uttaksplan.finnOverlappendeUttaksperiode(periode)
         periodeInfo != null && sjekkSøkersVerdi(periodeInfo)
@@ -43,10 +58,29 @@ private fun Uttaksplan.finnOverlappendeUttaksperiode(periode: LukketPeriode): Ut
     return perioder[uttaksperiode]
 }
 
-private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(periode: LukketPeriode, pleiebehov: Pleiebehov, etablertTilsyn: Duration, nattevåkUtfall: Utfall?, beredskapUtfall: Utfall?): Prosent {
+private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
+    periode: LukketPeriode,
+    pleiebehov: Pleiebehov,
+    etablertTilsyn: Duration,
+    nattevåkUtfall: Utfall?,
+    beredskapUtfall: Utfall?
+): Prosent {
     val uttaksplanerMedKrav = this.andreSøkeresUttaksplaner(periode)
+    val andreSøkeresUttaksplanerMedTidligereVedtak = this.andreSøkeresUttaksplanerMedTidligereVedtak(periode)
+    val andreVedtak = andreSøkeresUttaksplanerMedTidligereVedtak
+        .filter { uttaksplan ->
+            uttaksplan.perioder.any { (_, periodeinfo) ->
+                uttaksplanerMedKrav.none { plan ->
+                    plan.perioder.any { (_, info) ->
+                        info.kildeBehandlingUUID == periodeinfo.kildeBehandlingUUID
+                    }
+                }
+            }
+        }
 
-    var sumAndreSøkeresTilsyn = Prosent.ZERO
+
+
+    var sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(periode = periode, uttaksplaner = andreVedtak)
 
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
@@ -73,7 +107,12 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(per
 }
 
 private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
-    for (årsak in listOf(Årsak.BARNETS_DØDSFALL, Årsak.LOVBESTEMT_FERIE, Årsak.UTENOM_PLEIEBEHOV, Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT)) {
+    for (årsak in listOf(
+        Årsak.BARNETS_DØDSFALL,
+        Årsak.LOVBESTEMT_FERIE,
+        Årsak.UTENOM_PLEIEBEHOV,
+        Årsak.INNGANGSVILKÅR_IKKE_OPPFYLT
+    )) {
         if (this.årsaker.contains(årsak)) {
             return true
         }
@@ -84,13 +123,16 @@ private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
 private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo> {
     val arbeid = mutableMapOf<Arbeidsforhold, ArbeidsforholdPeriodeInfo>()
     forEach { utbetalingsgrader ->
-        arbeid[utbetalingsgrader.arbeidsforhold] = ArbeidsforholdPeriodeInfo(utbetalingsgrader.normalArbeidstid, utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO)
+        arbeid[utbetalingsgrader.arbeidsforhold] = ArbeidsforholdPeriodeInfo(
+            utbetalingsgrader.normalArbeidstid,
+            utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO
+        )
     }
     return arbeid
 }
 
 private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
-    val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull {it.overlapperHelt(periode)}
+    val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull { it.overlapperHelt(periode) }
     return if (etablertTilsynPeriode != null) {
         this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
     } else {
@@ -99,16 +141,21 @@ private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
 }
 
 private fun Duration.prosentAvFullDag(): Prosent {
-    return BigDecimal(this.toMillis()).setScale(2, RoundingMode.HALF_UP).divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
+    return BigDecimal(this.toMillis()).setScale(2, RoundingMode.HALF_UP)
+        .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
 }
 
 private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: LukketPeriode): BigDecimal {
+    return finnTilsynForUttaksPeriodeFraUttaksplaner(periode, andreSøkeresUttaksplanerMedTidligereVedtak(periode))
+}
+
+private fun RegelGrunnlag.finnTilsynForUttaksPeriodeFraUttaksplaner(periode: LukketPeriode, uttaksplaner: List<Uttaksplan>): BigDecimal {
     var andreSøkeresTilsynsgrad = BigDecimal.ZERO
-    this.andreSøkeresUttaksplaner(periode).forEach { uttaksplan ->
-        val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull {it.overlapperHelt(periode)}
+    uttaksplaner.forEach { uttaksplan ->
+        val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull { it.overlapperHelt(periode) }
         if (overlappendePeriode != null) {
             val uttaksperiode = uttaksplan.perioder[overlappendePeriode]
-            if (uttaksperiode != null && uttaksperiode.utfall  == Utfall.OPPFYLT) {
+            if (uttaksperiode != null && uttaksperiode.utfall == Utfall.OPPFYLT) {
                 andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
             }
         }
@@ -130,6 +177,34 @@ private fun RegelGrunnlag.andreSøkeresUttaksplaner(periode: LukketPeriode): Lis
         val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
         if (uttaksplanMedKrav != null) {
             uttaksplanerMedKrav.add(uttaksplanMedKrav)
+        }
+    }
+    return uttaksplanerMedKrav
+}
+
+private fun RegelGrunnlag.andreSøkeresUttaksplanerMedTidligereVedtak(periode: LukketPeriode): List<Uttaksplan> {
+    val kravprioritetPeriode = kravprioritetForBehandlinger.keys.firstOrNull { it.overlapperHelt(periode) }
+        ?: return listOf()
+
+    val kravprioritetListe = kravprioritetForBehandlinger[kravprioritetPeriode] ?: return listOf()
+
+    val uttaksplanerMedKrav = mutableListOf<Uttaksplan>()
+    var bakEgenBehandling = false;
+    for (behandlingMedKrav in kravprioritetListe) {
+        if (behandlingMedKrav == this.behandlingUUID) {
+            bakEgenBehandling = true
+        }
+        if (!bakEgenBehandling) {
+            val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
+            if (uttaksplanMedKrav != null) {
+                uttaksplanerMedKrav.add(uttaksplanMedKrav)
+            }
+        } else if (behandlingMedKrav != this.behandlingUUID) {
+            val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
+            val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
+            if (uttaksplan != null && uttaksplan.perioder.any { (periode, _) -> periode.overlapperHelt(periode) }) {
+                uttaksplanerMedKrav.add(uttaksplan)
+            }
         }
     }
     return uttaksplanerMedKrav

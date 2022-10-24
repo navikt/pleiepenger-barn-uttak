@@ -27,6 +27,7 @@ data class Uttaksgrunnlag (
     @JsonProperty("beredskapsperioder") val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("nattevåksperioder") val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf(),
+    @JsonProperty("sisteVedtatteUttaksplanForBehandling") val sisteVedtatteUttaksplanForBehandling: Map<BehandlingUUID, BehandlingUUID?> = mapOf(),
     @JsonProperty("utenlandsoppholdperioder") val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf()
 )
 
