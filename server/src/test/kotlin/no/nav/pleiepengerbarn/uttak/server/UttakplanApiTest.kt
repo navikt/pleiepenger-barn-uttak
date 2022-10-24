@@ -7,7 +7,6 @@ import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -404,7 +403,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 Arbeid(ARBEIDSFORHOLD1, mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
             ),
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_200)
-        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)), saksnummer = "2")
+        ).copy(tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(grunnlagSøker1.behandlingUUID to grunnlagSøker1.behandlingUUID),
+            saksnummer = "2")
 
         val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
 
@@ -426,7 +427,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
         ).copy(tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(4)), saksnummer = saksnummerSøker1)
-        grunnlag1Søker1.opprettUttaksplan()
+        val søker1Uttaksplan = grunnlag1Søker1.opprettUttaksplan()
 
         // Opprett Uttaksplan 1 for søker 2
         val saksnummerSøker2 = nesteSaksnummer()
@@ -441,13 +442,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             tilsynsperioder = mapOf(søknadsperiode to Duration.ofHours(2)),
             saksnummer = saksnummerSøker2,
             behandlingUUID = behandlingUUIDSøker2,
-            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, grunnlag1Søker1.behandlingUUID))
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, grunnlag1Søker1.behandlingUUID)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(grunnlag1Søker1.behandlingUUID to grunnlag1Søker1.behandlingUUID)
         )
         val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
 
         assertThat(uttaksplan1Søker2.perioder.keys).hasSize(1)
         assertThat(uttaksplan1Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
-        assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(73))
+        assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(26))
         assertThat(uttaksplan1Søker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue
     }
 

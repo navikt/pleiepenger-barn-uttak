@@ -27,6 +27,10 @@ object GrunnlagMapper {
         uttaksgrunnlag.kravprioritetForBehandlinger.forEach { (periode, kravprio) ->
             kravprioritetForBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
         }
+        val sisteVedtatteUttaksplanForBehandling = mutableMapOf<UUID, UUID>()
+        uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }.forEach { (behandling, originalBehandling) ->
+            sisteVedtatteUttaksplanForBehandling[UUID.fromString(behandling)] = UUID.fromString(originalBehandling)
+        }
 
         return RegelGrunnlag(
                 ytelseType = uttaksgrunnlag.ytelseType,
@@ -42,6 +46,7 @@ object GrunnlagMapper {
                 lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
                 inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
                 andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
+                sisteVedtatteUttaksplanForBehandling = sisteVedtatteUttaksplanForBehandling,
                 forrigeUttaksplan = forrigeUttaksplan,
                 beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
                 nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
