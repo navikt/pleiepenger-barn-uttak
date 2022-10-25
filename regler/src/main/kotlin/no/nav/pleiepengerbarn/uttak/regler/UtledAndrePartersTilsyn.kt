@@ -220,12 +220,7 @@ private fun RegelGrunnlag.andreSøkeresUttaksplanerMedTidligereVedtak(periode: L
         if (behandlingMedKrav == this.behandlingUUID) {
             bakEgenBehandling = true
         }
-        if (!bakEgenBehandling) {
-            val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
-            if (uttaksplanMedKrav != null) {
-                uttaksplanerMedKrav.add(uttaksplanMedKrav)
-            }
-        } else if (behandlingMedKrav != this.behandlingUUID) {
+        if (bakEgenBehandling && behandlingMedKrav != this.behandlingUUID) {
             val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
             val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
             if (uttaksplan != null && uttaksplan.perioder.any { (periode, _) -> periode.overlapperHelt(periode) }) {
