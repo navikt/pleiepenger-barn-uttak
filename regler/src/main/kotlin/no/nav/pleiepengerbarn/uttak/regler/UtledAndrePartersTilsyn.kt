@@ -79,8 +79,10 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
         }
 
 
-
-    var sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(periode = periode, uttaksplaner = andreVedtak)
+    var sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(
+        periode = periode,
+        uttaksplaner = andreVedtak
+    )
 
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
@@ -146,11 +148,35 @@ private fun Duration.prosentAvFullDag(): Prosent {
 }
 
 private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: LukketPeriode): BigDecimal {
-    return finnTilsynForUttaksPeriodeFraUttaksplaner(periode, andreSøkeresUttaksplanerMedTidligereVedtak(periode))
+    val uttaksplanerMedKrav = this.andreSøkeresUttaksplaner(periode)
+    val andreSøkeresUttaksplanerMedTidligereVedtak = this.andreSøkeresUttaksplanerMedTidligereVedtak(periode)
+    val andreVedtak = andreSøkeresUttaksplanerMedTidligereVedtak
+        .filter { uttaksplan ->
+            uttaksplan.perioder.filter { (pp, _) -> pp.overlapperHelt(periode) }.any { (_, periodeinfo) ->
+                uttaksplanerMedKrav.none { plan ->
+                    plan.perioder.filter { (pp, _) -> pp.overlapperHelt(periode) }.any { (_, info) ->
+                        info.kildeBehandlingUUID == periodeinfo.kildeBehandlingUUID
+                    }
+                }
+            }
+        }
+
+    val sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(
+        periode = periode,
+        uttaksplaner = andreVedtak
+    )
+
+    return finnTilsynForUttaksPeriodeFraUttaksplaner(
+        periode = periode,
+        uttaksplaner = uttaksplanerMedKrav,
+        sumAndreSøkeresTilsyn
+    )
 }
 
-private fun RegelGrunnlag.finnTilsynForUttaksPeriodeFraUttaksplaner(periode: LukketPeriode, uttaksplaner: List<Uttaksplan>): BigDecimal {
-    var andreSøkeresTilsynsgrad = BigDecimal.ZERO
+private fun RegelGrunnlag.finnTilsynForUttaksPeriodeFraUttaksplaner(
+    periode: LukketPeriode, uttaksplaner: List<Uttaksplan>, alleredeForbrukt: BigDecimal = Prosent.ZERO
+): BigDecimal {
+    var andreSøkeresTilsynsgrad = alleredeForbrukt
     uttaksplaner.forEach { uttaksplan ->
         val overlappendePeriode = uttaksplan.perioder.keys.firstOrNull { it.overlapperHelt(periode) }
         if (overlappendePeriode != null) {
