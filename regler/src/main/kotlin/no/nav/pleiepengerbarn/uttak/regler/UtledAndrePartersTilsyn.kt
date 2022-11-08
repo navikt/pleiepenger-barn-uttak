@@ -65,24 +65,18 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     nattevåkUtfall: Utfall?,
     beredskapUtfall: Utfall?
 ): Prosent {
-    val uttaksplanerMedKrav = this.andreSøkeresUttaksplaner(periode)
-    val andreSøkeresUttaksplanerMedTidligereVedtak = this.andreSøkeresUttaksplanerMedTidligereVedtak(periode)
-    val andreVedtak = andreSøkeresUttaksplanerMedTidligereVedtak
-        .filter { uttaksplan ->
-            uttaksplan.perioder.any { (_, periodeinfo) ->
-                uttaksplanerMedKrav.none { plan ->
-                    plan.perioder.any { (_, info) ->
-                        info.kildeBehandlingUUID == periodeinfo.kildeBehandlingUUID
-                    }
-                }
-            }
-        }
+    val uttaksplanerMedKrav = if(this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+        this.alleSøkeresUttaksplaner(periode)
+    } else {
+        this.andreSøkeresUttaksplaner(periode)
+    }
 
-
-    var sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(
-        periode = periode,
-        uttaksplaner = andreVedtak
-    )
+    var sumAndreSøkeresTilsyn = Prosent.ZERO
+    val forrigeVedtaksUttaksgrad = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+        this.forrigeUttaksplan?.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.ZERO
+    } else {
+        Prosent.ZERO
+    }
 
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
@@ -90,7 +84,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
             if (annenPartsOverlappendePeriodeInfo.harÅrsakSomIkkeTriggerReberegning()) {
                 sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
             } else {
-                val graderBeregnet = BeregnGrader.beregn(
+                val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     pleiebehov,
                     etablertTilsyn,
                     annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
@@ -98,14 +92,15 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
                     finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
                     annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
-                    ytelseType
+                    ytelseType,
+                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
                 )
                 sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
             }
         }
     }
 
-    return sumAndreSøkeresTilsyn
+    return sumAndreSøkeresTilsyn - forrigeVedtaksUttaksgrad
 }
 
 private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
@@ -203,6 +198,28 @@ private fun RegelGrunnlag.andreSøkeresUttaksplaner(periode: LukketPeriode): Lis
         val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
         if (uttaksplanMedKrav != null) {
             uttaksplanerMedKrav.add(uttaksplanMedKrav)
+        }
+    }
+    return uttaksplanerMedKrav
+}
+
+private fun RegelGrunnlag.alleSøkeresUttaksplaner(periode: LukketPeriode): List<Uttaksplan> {
+    val kravprioritetPeriode = kravprioritetForBehandlinger.keys.firstOrNull { it.overlapperHelt(periode) }
+        ?: return listOf()
+
+    val kravprioritetListe = kravprioritetForBehandlinger[kravprioritetPeriode] ?: return listOf()
+
+    val uttaksplanerMedKrav = mutableListOf<Uttaksplan>()
+    for (behandlingMedKrav in kravprioritetListe) {
+        if (behandlingMedKrav == this.behandlingUUID) {
+            if (this.forrigeUttaksplan != null) {
+                uttaksplanerMedKrav.add(this.forrigeUttaksplan)
+            }
+        } else {
+            val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
+            if (uttaksplanMedKrav != null) {
+                uttaksplanerMedKrav.add(uttaksplanMedKrav)
+            }
         }
     }
     return uttaksplanerMedKrav

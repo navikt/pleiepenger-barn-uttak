@@ -415,6 +415,84 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `flere søkere, masse endringer og tilsyn fortsatt ikke stjele`() {
+        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
+
+        // Opprett uttaksplan 1 for søker 1
+        val saksnummerSøker1 = nesteSaksnummer()
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(saksnummer = saksnummerSøker1)
+        val søker1Uttaksplan = grunnlag1Søker1.opprettUttaksplan()
+
+        // Opprett Uttaksplan 1 for søker 2
+        val saksnummerSøker2 = nesteSaksnummer()
+        val behandlingUUIDSøker2 = nesteBehandlingId()
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50))))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker2,
+            behandlingUUID = behandlingUUIDSøker2,
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, grunnlag1Søker1.behandlingUUID)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(grunnlag1Søker1.behandlingUUID to grunnlag1Søker1.behandlingUUID)
+        )
+        val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
+
+        assertThat(uttaksplan1Søker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplan1Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
+        assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(50))
+
+        // Opprett Uttaksplan 2 for søker 1
+        val behandling2UUIDSøker1 = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker1,
+            behandlingUUID = behandling2UUIDSøker1,
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, behandling2UUIDSøker1)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag1Søker1.behandlingUUID, behandlingUUIDSøker2 to behandlingUUIDSøker2)
+        )
+        val uttaksplan2Søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        assertThat(uttaksplan2Søker1.perioder.keys).hasSize(1)
+        assertThat(uttaksplan2Søker1.perioder.keys.first()).isEqualTo(søknadsperiode)
+        assertThat(uttaksplan2Søker1.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(50))
+
+        // Opprett Uttaksplan 2 for søker 1
+        val behandling2UUIDSøker2 = nesteBehandlingId()
+        val grunnlag2Søker2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)))
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker1,
+            behandlingUUID = behandling2UUIDSøker1,
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(40)),
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandling2UUIDSøker2, behandling2UUIDSøker1)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag1Søker1.behandlingUUID, behandling2UUIDSøker2 to grunnlagSøker2.behandlingUUID)
+        )
+        val uttaksplan2Søker2 = grunnlag2Søker2.opprettUttaksplan()
+
+        assertThat(uttaksplan2Søker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplan2Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
+        assertThat(uttaksplan2Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(60))
+    }
+
+    @Test
     internal fun `2 søkere med forskjellig etablert tilsyn`() {
         val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
 

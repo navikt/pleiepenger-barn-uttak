@@ -20,17 +20,22 @@ internal object BeregnGrader {
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val søkersTapteArbeidstid =
+            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
         val uttaksgradResultat = avklarUttaksgrad(
             ytelseType,
             pleiebehov,
             etablertTilsynsprosent,
-            oppgittTilsyn,
             andreSøkeresTilsyn,
             arbeid,
-            overseEtablertTilsynÅrsak
+            overseEtablertTilsynÅrsak,
+            finnØnsketUttaksgradProsent(oppgittTilsyn)
         )
-        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(uttaksgradResultat.uttaksgrad, uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN, arbeid)
+        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
+            uttaksgradResultat.uttaksgrad,
+            uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
+            arbeid
+        )
 
         return GraderBeregnet(
             pleiebehov = pleiebehov,
@@ -49,27 +54,82 @@ internal object BeregnGrader {
         )
     }
 
+    internal fun beregnMedMaksGrad(
+        pleiebehov: Pleiebehov,
+        etablertTilsyn: Duration,
+        oppgittTilsyn: Duration? = null,
+        andreSøkeresTilsyn: Prosent,
+        andreSøkeresTilsynReberegnet: Boolean,
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
+        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
+        ytelseType: YtelseType,
+        maksGradIProsent: Prosent
+    ): GraderBeregnet {
+        val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+        val søkersTapteArbeidstid =
+            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(oppgittTilsyn);
+        val ønsketUttaksgrad = finnMaksGrad(ønsketUttaksgradProsent, maksGradIProsent)
+        val uttaksgradResultat = avklarUttaksgrad(
+            ytelseType,
+            pleiebehov,
+            etablertTilsynsprosent,
+            andreSøkeresTilsyn,
+            arbeid,
+            overseEtablertTilsynÅrsak,
+            ønsketUttaksgrad
+        )
+        val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
+            uttaksgradResultat.uttaksgrad,
+            uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
+            arbeid
+        )
+
+        return GraderBeregnet(
+            pleiebehov = pleiebehov,
+            graderingMotTilsyn = GraderingMotTilsyn(
+                etablertTilsyn = etablertTilsynsprosent,
+                andreSøkeresTilsyn = andreSøkeresTilsyn,
+                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
+                overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
+            ),
+            søkersTapteArbeidstid = søkersTapteArbeidstid,
+            oppgittTilsyn = oppgittTilsyn,
+            uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
+            utbetalingsgrader = utbetalingsgrader,
+            årsak = uttaksgradResultat.årsak()
+        )
+    }
+
+    private fun finnMaksGrad(ønsketUttaksgradProsent: Prosent, maksGradIProsent: Prosent): Prosent {
+        if (maksGradIProsent < ønsketUttaksgradProsent) {
+            return maksGradIProsent;
+        }
+        return ønsketUttaksgradProsent;
+    }
+
     private fun avklarUttaksgrad(
         ytelseType: YtelseType,
         pleiebehov: Pleiebehov,
         etablertTilsynprosent: Prosent,
-        ønsketUttaksgrad: Duration?,
         andreSøkeresTilsyn: Prosent,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
+        ønsketUttaksgradProsent: Prosent
     ): UttaksgradResultat {
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
-        val søkersTapteArbeidstid = arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val søkersTapteArbeidstid =
+            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
 
         val restTilSøker =
             finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
 
-        val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(ønsketUttaksgrad)
-
         if (restTilSøker < TJUE_PROSENT) {
             val forLavGradÅrsak =
                 utledForLavGradÅrsak(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
-            if(!(ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
+            if (!(ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
@@ -151,7 +211,7 @@ internal object BeregnGrader {
             return Prosent.ZERO
         }
         return BigDecimal(ønsketUttaksgrad.toMillis()).setScale(2, RoundingMode.HALF_UP)
-                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
+            .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
     }
 
     private fun finnRestTilSøker(
@@ -169,7 +229,11 @@ internal object BeregnGrader {
         }
         val gradertMotTilsyn = HUNDRE_PROSENT - etablertTilsynsprosent
         val restTilSøker =
-            pleiebehovprosent - (etablertTilsynsprosent * (pleiebehovprosent.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP))) - andreSøkeresTilsyn
+            pleiebehovprosent - (etablertTilsynsprosent * (pleiebehovprosent.divide(
+                HUNDRE_PROSENT,
+                2,
+                RoundingMode.HALF_UP
+            ))) - andreSøkeresTilsyn
         val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, restTilSøker)
         if (minsteAvRestTilSøkerOgGraderingMotTilsyn < Prosent.ZERO) {
             return Prosent.ZERO
@@ -195,9 +259,11 @@ internal object BeregnGrader {
                 andreSøkeresTilsyn > ÅTTI_PROSENT -> {
                     return Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE
                 }
+
                 etablertTilsynsprosent > ÅTTI_PROSENT -> {
                     return Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN
                 }
+
                 andreSøkeresTilsyn + etablertTilsynsprosent > ÅTTI_PROSENT -> {
                     return Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE
                 }
@@ -214,15 +280,21 @@ internal object BeregnGrader {
             return Prosent.ZERO
         }
         return BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP)
-                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
+            .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
     }
 
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
-    val harIkkeYrkesaktiv = this.keys.any { GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type }) }
-    val harAndreArbeidsforhold = this.any { Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid()
-            && !(Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær()) }
+    val harIkkeYrkesaktiv = this.keys.any {
+        GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
+            Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type })
+    }
+    val harAndreArbeidsforhold = this.any {
+        Arbeidstype.values()
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid()
+                && !(Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær())
+    }
 
     return harIkkeYrkesaktiv && harAndreArbeidsforhold
 }
