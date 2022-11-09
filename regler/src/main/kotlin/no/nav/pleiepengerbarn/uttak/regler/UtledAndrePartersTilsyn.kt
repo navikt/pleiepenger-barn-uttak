@@ -73,7 +73,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
 
     var sumAndreSøkeresTilsyn = Prosent.ZERO
 
-    var oppdatertGrad = Prosent.ZERO;
+    var oppdatertGrad = Prosent.ZERO
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
         if (annenPartsOverlappendePeriodeInfo != null) {
@@ -104,11 +104,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
         }
     }
 
-    val andreSøkersTilsyn = sumAndreSøkeresTilsyn - if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
-        oppdatertGrad
-    } else {
-        Prosent.ZERO
-    }
+    val andreSøkersTilsyn = sumAndreSøkeresTilsyn - oppdatertGrad
+
     if (andreSøkersTilsyn < BigDecimal.ZERO) {
         return Prosent.ZERO
     }
