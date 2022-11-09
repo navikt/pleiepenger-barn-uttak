@@ -84,6 +84,11 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
             if (annenPartsOverlappendePeriodeInfo.harÅrsakSomIkkeTriggerReberegning()) {
                 sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
             } else {
+                val forrigeUttaksgrad = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
+                } else {
+                    Prosent.valueOf(100)
+                }
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     pleiebehov,
                     etablertTilsyn,
@@ -93,7 +98,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
                     annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType,
-                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
+                    forrigeUttaksgrad
                 )
                 sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
             }
