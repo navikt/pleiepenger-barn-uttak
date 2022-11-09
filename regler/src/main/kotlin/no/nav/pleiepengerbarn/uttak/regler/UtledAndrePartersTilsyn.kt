@@ -65,8 +65,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     nattevåkUtfall: Utfall?,
     beredskapUtfall: Utfall?
 ): Prosent {
-    val uttaksplanerMedKrav = if(this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
-        this.alleSøkeresUttaksplaner(periode)
+    val uttaksplanerMedKrav = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+        this.alleSøkeresVedtatteUttaksplaner(periode)
     } else {
         this.andreSøkeresUttaksplaner(periode)
     }
@@ -208,7 +208,7 @@ private fun RegelGrunnlag.andreSøkeresUttaksplaner(periode: LukketPeriode): Lis
     return uttaksplanerMedKrav
 }
 
-private fun RegelGrunnlag.alleSøkeresUttaksplaner(periode: LukketPeriode): List<Uttaksplan> {
+private fun RegelGrunnlag.alleSøkeresVedtatteUttaksplaner(periode: LukketPeriode): List<Uttaksplan> {
     val kravprioritetPeriode = kravprioritetForBehandlinger.keys.firstOrNull { it.overlapperHelt(periode) }
         ?: return listOf()
 
@@ -216,16 +216,10 @@ private fun RegelGrunnlag.alleSøkeresUttaksplaner(periode: LukketPeriode): List
 
     val uttaksplanerMedKrav = mutableListOf<Uttaksplan>()
     for (behandlingMedKrav in kravprioritetListe) {
-        if (behandlingMedKrav == this.behandlingUUID) {
-            if (this.forrigeUttaksplan != null) {
-                uttaksplanerMedKrav.add(this.forrigeUttaksplan)
-            }
-        } else {
-            val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
-            val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
-            if (uttaksplan != null) {
-                uttaksplanerMedKrav.add(uttaksplan)
-            }
+        val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
+        val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
+        if (uttaksplan != null) {
+            uttaksplanerMedKrav.add(uttaksplan)
         }
     }
     return uttaksplanerMedKrav
