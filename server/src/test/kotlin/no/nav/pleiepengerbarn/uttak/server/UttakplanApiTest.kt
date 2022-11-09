@@ -489,7 +489,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         assertThat(uttaksplan2Søker2.perioder.keys).hasSize(1)
         assertThat(uttaksplan2Søker2.perioder.keys.first()).isEqualTo(søknadsperiode)
-        assertThat(uttaksplan2Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(60))
+        assertThat(uttaksplan2Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent.ZERO)
     }
 
     @Test

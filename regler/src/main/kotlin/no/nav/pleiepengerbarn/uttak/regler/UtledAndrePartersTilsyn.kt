@@ -72,12 +72,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     }
 
     var sumAndreSøkeresTilsyn = Prosent.ZERO
-    val forrigeVedtaksUttaksgrad = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
-        this.forrigeUttaksplan?.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.ZERO
-    } else {
-        Prosent.ZERO
-    }
 
+    var oppdatertGrad = Prosent.ZERO;
     for (uttaksplanMedKrav in uttaksplanerMedKrav) {
         val annenPartsOverlappendePeriodeInfo = uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)
         if (annenPartsOverlappendePeriodeInfo != null) {
@@ -100,16 +96,27 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     ytelseType,
                     forrigeUttaksgrad
                 )
+                if (gjelderDenneBehandlingen(annenPartsOverlappendePeriodeInfo.kildeBehandlingUUID)) {
+                    oppdatertGrad = graderBeregnet.uttaksgrad
+                }
                 sumAndreSøkeresTilsyn += graderBeregnet.uttaksgrad
             }
         }
     }
 
-    val andreSøkersTilsyn = sumAndreSøkeresTilsyn - forrigeVedtaksUttaksgrad
+    val andreSøkersTilsyn = sumAndreSøkeresTilsyn - if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+        oppdatertGrad
+    } else {
+        Prosent.ZERO
+    }
     if (andreSøkersTilsyn < BigDecimal.ZERO) {
         return Prosent.ZERO
     }
     return andreSøkersTilsyn
+}
+
+private fun RegelGrunnlag.gjelderDenneBehandlingen(kildeBehandling: BehandlingUUID): Boolean {
+    return  sisteVedtatteUttaksplanForBehandling[this.behandlingUUID] == UUID.fromString(kildeBehandling)
 }
 
 private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
