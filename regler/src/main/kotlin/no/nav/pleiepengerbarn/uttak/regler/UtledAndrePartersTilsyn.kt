@@ -105,7 +105,11 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
         }
     }
 
-    return sumAndreSøkeresTilsyn - forrigeVedtaksUttaksgrad
+    val andreSøkersTilsyn = sumAndreSøkeresTilsyn - forrigeVedtaksUttaksgrad
+    if (andreSøkersTilsyn < BigDecimal.ZERO) {
+        return Prosent.ZERO
+    }
+    return andreSøkersTilsyn
 }
 
 private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
