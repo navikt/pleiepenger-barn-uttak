@@ -216,9 +216,10 @@ private fun RegelGrunnlag.alleSøkeresUttaksplaner(periode: LukketPeriode): List
                 uttaksplanerMedKrav.add(this.forrigeUttaksplan)
             }
         } else {
-            val uttaksplanMedKrav = andrePartersUttaksplanPerBehandling[behandlingMedKrav]
-            if (uttaksplanMedKrav != null) {
-                uttaksplanerMedKrav.add(uttaksplanMedKrav)
+            val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
+            val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
+            if (uttaksplan != null) {
+                uttaksplanerMedKrav.add(uttaksplan)
             }
         }
     }
