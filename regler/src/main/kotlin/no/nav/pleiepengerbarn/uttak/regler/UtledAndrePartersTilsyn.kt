@@ -65,6 +65,10 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     nattevåkUtfall: Utfall?,
     beredskapUtfall: Utfall?
 ): Prosent {
+    if (this.barn.dødsdato != null && this.barn.dødsdato!! <= periode.fom) {
+        return Prosent.ZERO
+    }
+
     val uttaksplanerMedKrav = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
         this.alleSøkeresVedtatteUttaksplaner(periode)
     } else {
@@ -113,7 +117,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
 }
 
 private fun RegelGrunnlag.gjelderDenneBehandlingen(kildeBehandling: BehandlingUUID): Boolean {
-    return  sisteVedtatteUttaksplanForBehandling[this.behandlingUUID] == UUID.fromString(kildeBehandling)
+    return sisteVedtatteUttaksplanForBehandling[this.behandlingUUID] == UUID.fromString(kildeBehandling)
 }
 
 private fun UttaksperiodeInfo.harÅrsakSomIkkeTriggerReberegning(): Boolean {
@@ -156,6 +160,10 @@ private fun Duration.prosentAvFullDag(): Prosent {
 }
 
 private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: LukketPeriode): BigDecimal {
+    if (this.barn.dødsdato != null && this.barn.dødsdato!! <= periode.fom) {
+        return Prosent.ZERO
+    }
+
     val uttaksplanerMedKrav = this.andreSøkeresUttaksplaner(periode)
     val andreSøkeresUttaksplanerMedTidligereVedtak = this.andreSøkeresUttaksplanerMedTidligereVedtak(periode)
     val andreVedtak = andreSøkeresUttaksplanerMedTidligereVedtak
