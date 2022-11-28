@@ -61,6 +61,38 @@ internal fun lagGrunnlag(
     )
 }
 
+internal fun lagGrunnlag(
+    ytelseType: YtelseType = YtelseType.PSB,
+    arbeid: List<Arbeid>,
+    pleiebehov: Map<LukketPeriode, Pleiebehov>,
+    tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
+    søker: Søker = Søker(
+        aktørId = "123"
+    ),
+    barn: Barn = Barn(
+        aktørId = "456"
+    ),
+    nattevåk: Map<LukketPeriode, Utfall> = mapOf(),
+    bereskap: Map<LukketPeriode, Utfall> = mapOf(),
+    saksnummer: Saksnummer = nesteSaksnummer(),
+    behandlingUUID: BehandlingUUID = nesteBehandlingId(),
+    søktUttak: List<SøktUttak>
+): Uttaksgrunnlag {
+    return Uttaksgrunnlag(
+        ytelseType = ytelseType,
+        søker = søker,
+        barn = barn,
+        saksnummer = saksnummer,
+        behandlingUUID = behandlingUUID,
+        søktUttak = søktUttak,
+        arbeid = arbeid,
+        pleiebehov = pleiebehov,
+        tilsynsperioder = tilsynsperioder,
+        nattevåksperioder = nattevåk,
+        beredskapsperioder = bereskap
+    )
+}
+
 
 internal fun nesteSaksnummer(): Saksnummer = UUID.randomUUID().toString().takeLast(19)
 internal fun nesteBehandlingId(): BehandlingUUID = UUID.randomUUID().toString()

@@ -492,6 +492,98 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplan2Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent.ZERO)
     }
 
+
+    @Test
+    internal fun `flere søkere flere perioder, masse endringer og tilsyn fortsatt ikke stjele`() {
+        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
+        val søknadsperiodeTo = LukketPeriode("2020-10-19/2020-10-25")
+
+        // Opprett uttaksplan 1 for søker 1
+        val saksnummerSøker1 = nesteSaksnummer()
+        val grunnlag1Søker1 = lagGrunnlag(
+            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
+        ).copy(saksnummer = saksnummerSøker1)
+        val søker1Uttaksplan = grunnlag1Søker1.opprettUttaksplan()
+
+        // Opprett Uttaksplan 1 for søker 2
+        val saksnummerSøker2 = nesteSaksnummer()
+        val behandlingUUIDSøker2 = nesteBehandlingId()
+        val grunnlagSøker2 = lagGrunnlag(
+            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker2,
+            behandlingUUID = behandlingUUIDSøker2,
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, grunnlag1Søker1.behandlingUUID), søknadsperiodeTo to listOf(grunnlag1Søker1.behandlingUUID, behandlingUUIDSøker2)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(grunnlag1Søker1.behandlingUUID to grunnlag1Søker1.behandlingUUID)
+        )
+        val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
+
+        assertThat(uttaksplan1Søker2.perioder.keys).hasSize(2)
+
+        // Opprett Uttaksplan 2 for søker 1
+        val behandling2UUIDSøker1 = nesteBehandlingId()
+        val grunnlag2Søker1 = lagGrunnlag(
+            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker1,
+            behandlingUUID = behandling2UUIDSøker1,
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, behandling2UUIDSøker1), søknadsperiodeTo to listOf(behandling2UUIDSøker1, behandlingUUIDSøker2)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag1Søker1.behandlingUUID, behandlingUUIDSøker2 to behandlingUUIDSøker2)
+        )
+        val uttaksplan2Søker1 = grunnlag2Søker1.opprettUttaksplan()
+
+        assertThat(uttaksplan2Søker1.perioder.keys).hasSize(2)
+
+        // Opprett Uttaksplan 2 for søker 1
+        val behandling2UUIDSøker2 = nesteBehandlingId()
+        val grunnlag2Søker2 = lagGrunnlag(
+            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker1,
+            behandlingUUID = behandling2UUIDSøker2,
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(40), søknadsperiodeTo to FULL_DAG.prosent(40)),
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandling2UUIDSøker2, behandling2UUIDSøker1), søknadsperiodeTo to listOf(behandling2UUIDSøker1, behandling2UUIDSøker2)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag2Søker1.behandlingUUID, behandling2UUIDSøker2 to grunnlagSøker2.behandlingUUID)
+        )
+        val uttaksplan2Søker2 = grunnlag2Søker2.opprettUttaksplan()
+
+        assertThat(uttaksplan2Søker2.perioder.keys).hasSize(2)
+
+        // Opprett Uttaksplan 2 for søker 1
+        val behandling3UUIDSøker1 = nesteBehandlingId()
+        val grunnlag3Søker1 = lagGrunnlag(
+            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            arbeid = listOf(
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = saksnummerSøker1,
+            behandlingUUID = behandling3UUIDSøker1,
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(40), søknadsperiodeTo to FULL_DAG.prosent(40)),
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandling2UUIDSøker2, behandling3UUIDSøker1), søknadsperiodeTo to listOf(behandling3UUIDSøker1, behandling2UUIDSøker2)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandling3UUIDSøker1 to grunnlag2Søker1.behandlingUUID, behandling2UUIDSøker2 to behandling2UUIDSøker2)
+        )
+        val uttaksplan3Søker1 = grunnlag3Søker1.opprettUttaksplan()
+        assertThat(uttaksplan3Søker1.perioder.keys).hasSize(2)
+    }
+
     @Test
     internal fun `2 søkere med forskjellig etablert tilsyn`() {
         val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
