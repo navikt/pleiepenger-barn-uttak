@@ -14,15 +14,17 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
     val søkersBeredskap = finnBeredskap(periode)
     val søkersPleiebehov = finnPleiebehov(periode)
 
-    val etablertTilsynEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
+    val relevanteUttaksplaner = andrePartersUttaksplanPerBehandling.filter { (behandling, _) -> sisteVedtatteUttaksplanForBehandling.entries.filter { (k,v) -> k != v }.none { (_, v) -> behandling == v } }
+
+    val etablertTilsynEndret = relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo ->
         søkersEtablertTilsyn.prosentAvFullDag()
             .compareTo(uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn ?: Prosent.ZERO) != 0
     }
     val nattevåkEndret =
-        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
+        relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
     val beredskapEndret =
-        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
-    val pleiebehovEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
+        relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
+    val pleiebehovEndret = relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo ->
         uttaksperiodeInfo.pleiebehov.compareTo(søkersPleiebehov.prosent) != 0
     }
 
