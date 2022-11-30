@@ -11,7 +11,7 @@ internal class BarnsDødPeriodeRegel : PeriodeRegel {
     override fun kjør(periode: LukketPeriode, grunnlag: RegelGrunnlag): Regelutfall {
         val dødsdato = grunnlag.barn.dødsdato
         if (dødsdato != null) {
-            val sisteDagMedRettEtterBarnetsDød = dødsdato.plusDays(1).plus(grunnlag.barn.rettVedDød?.lengde ?: 0, grunnlag.barn.rettVedDød?.enhet ?: ChronoUnit.DAYS)
+            val sisteDagMedRettEtterBarnetsDød = dødsdato.plus(grunnlag.barn.rettVedDød?.lengde ?: 0, grunnlag.barn.rettVedDød?.enhet ?: ChronoUnit.DAYS)
             if (periode.fom.isAfter(sisteDagMedRettEtterBarnetsDød)) {
                 return IkkeOppfylt(årsaker = setOf(Årsak.BARNETS_DØDSFALL))
             }
