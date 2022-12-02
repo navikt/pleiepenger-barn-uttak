@@ -14,17 +14,16 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
     val søkersBeredskap = finnBeredskap(periode)
     val søkersPleiebehov = finnPleiebehov(periode)
 
-    val relevanteUttaksplaner = andrePartersUttaksplanPerBehandling.filter { (behandling, _) -> sisteVedtatteUttaksplanForBehandling.entries.filter { (k,v) -> k != v }.none { (_, v) -> behandling == v } }
 
-    val etablertTilsynEndret = relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo ->
+    val etablertTilsynEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
         søkersEtablertTilsyn.prosentAvFullDag()
             .compareTo(uttaksperiodeInfo.graderingMotTilsyn?.etablertTilsyn ?: Prosent.ZERO) != 0
     }
     val nattevåkEndret =
-        relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
+        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.nattevåk != søkersNattevåk }
     val beredskapEndret =
-        relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
-    val pleiebehovEndret = relevanteUttaksplaner.endret(periode) { uttaksperiodeInfo ->
+        andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo -> uttaksperiodeInfo.beredskap != søkersBeredskap }
+    val pleiebehovEndret = andrePartersUttaksplanPerBehandling.endret(periode) { uttaksperiodeInfo ->
         uttaksperiodeInfo.pleiebehov.compareTo(søkersPleiebehov.prosent) != 0
     }
 
@@ -191,7 +190,7 @@ private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: Lukk
     )
 }
 
-private fun RegelGrunnlag.finnTilsynForUttaksPeriodeFraUttaksplaner(
+private fun finnTilsynForUttaksPeriodeFraUttaksplaner(
     periode: LukketPeriode, uttaksplaner: List<Uttaksplan>, alleredeForbrukt: BigDecimal = Prosent.ZERO
 ): BigDecimal {
     var andreSøkeresTilsynsgrad = alleredeForbrukt
@@ -235,7 +234,7 @@ private fun RegelGrunnlag.alleSøkeresVedtatteUttaksplaner(periode: LukketPeriod
     val uttaksplanerMedKrav = mutableListOf<Uttaksplan>()
     for (behandlingMedKrav in kravprioritetListe) {
         val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
-        val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
+        val uttaksplan = vedtatteUttaksplanPerBehandling[forrigeUttaksplan]
         if (uttaksplan != null) {
             uttaksplanerMedKrav.add(uttaksplan)
         }
@@ -257,7 +256,7 @@ private fun RegelGrunnlag.andreSøkeresUttaksplanerMedTidligereVedtak(periode: L
         }
         if (bakEgenBehandling && behandlingMedKrav != this.behandlingUUID) {
             val forrigeUttaksplan = sisteVedtatteUttaksplanForBehandling[behandlingMedKrav] ?: continue
-            val uttaksplan = andrePartersUttaksplanPerBehandling[forrigeUttaksplan]
+            val uttaksplan = vedtatteUttaksplanPerBehandling[forrigeUttaksplan]
             if (uttaksplan != null && uttaksplan.perioder.any { (periode, _) -> periode.overlapperHelt(periode) }) {
                 uttaksplanerMedKrav.add(uttaksplan)
             }

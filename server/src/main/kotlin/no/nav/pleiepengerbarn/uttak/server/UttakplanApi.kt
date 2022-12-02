@@ -137,9 +137,10 @@ class UttakplanApi {
         lagre: Boolean
     ): Uttaksplan {
         val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
+        val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
 
         val regelGrunnlag =
-            GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, forrigeUttaksplan)
+            GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, vedtatteUttaksplanerPerBehandling, forrigeUttaksplan)
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {
@@ -160,9 +161,6 @@ class UttakplanApi {
             uttaksgrunnlag.kravprioritetForBehandlinger.values.flatten()
                 .toSet()
                 .map { UUID.fromString(it) }
-        val vedtatteBehandlinger = uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
-            .values.toSet()
-            .map { UUID.fromString(it) }
         val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
 
         unikeBehandlinger.forEach { behandlingUUID ->
@@ -171,6 +169,15 @@ class UttakplanApi {
                 andrePartersUttaksplanerPerBehandling[behandlingUUID] = uttaksplan
             }
         }
+        return andrePartersUttaksplanerPerBehandling
+    }
+
+    private fun hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {
+        val vedtatteBehandlinger = uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
+            .values.toSet()
+            .map { UUID.fromString(it) }
+        val andrePartersUttaksplanerPerBehandling = mutableMapOf<UUID, Uttaksplan>()
+
         vedtatteBehandlinger.forEach { behandlingUUID ->
             if (!andrePartersUttaksplanerPerBehandling.containsKey(behandlingUUID)) {
                 val uttaksplan = uttakRepository.hent(behandlingUUID)

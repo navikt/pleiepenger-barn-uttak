@@ -12,6 +12,7 @@ object GrunnlagMapper {
     fun tilRegelGrunnlag(
         uttaksgrunnlag: Uttaksgrunnlag,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
+        vedtatteUttaksplanerPerBehandling: Map<UUID, Uttaksplan>,
         forrigeUttaksplan: Uttaksplan?,
         commitId: String = ""
     ): RegelGrunnlag {
@@ -28,31 +29,33 @@ object GrunnlagMapper {
             kravprioritetForBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
         }
         val sisteVedtatteUttaksplanForBehandling = mutableMapOf<UUID, UUID>()
-        uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }.forEach { (behandling, originalBehandling) ->
-            sisteVedtatteUttaksplanForBehandling[UUID.fromString(behandling)] = UUID.fromString(originalBehandling)
-        }
+        uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
+            .forEach { (behandling, originalBehandling) ->
+                sisteVedtatteUttaksplanForBehandling[UUID.fromString(behandling)] = UUID.fromString(originalBehandling)
+            }
 
         return RegelGrunnlag(
-                ytelseType = uttaksgrunnlag.ytelseType,
-                saksnummer = uttaksgrunnlag.saksnummer,
-                behandlingUUID = UUID.fromString(uttaksgrunnlag.behandlingUUID),
-                barn = uttaksgrunnlag.barn,
-                søker = uttaksgrunnlag.søker,
-                pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
-                søktUttak = søknadsperioderSortert,
-                trukketUttak = uttaksgrunnlag.trukketUttak,
-                arbeid = uttaksgrunnlag.arbeid,
-                tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
-                lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
-                inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
-                andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
-                sisteVedtatteUttaksplanForBehandling = sisteVedtatteUttaksplanForBehandling,
-                forrigeUttaksplan = forrigeUttaksplan,
-                beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
-                nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
-                kravprioritetForBehandlinger = kravprioritetForBehandlinger,
-                utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
-                commitId = commitId
+            ytelseType = uttaksgrunnlag.ytelseType,
+            saksnummer = uttaksgrunnlag.saksnummer,
+            behandlingUUID = UUID.fromString(uttaksgrunnlag.behandlingUUID),
+            barn = uttaksgrunnlag.barn,
+            søker = uttaksgrunnlag.søker,
+            pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
+            søktUttak = søknadsperioderSortert,
+            trukketUttak = uttaksgrunnlag.trukketUttak,
+            arbeid = uttaksgrunnlag.arbeid,
+            tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
+            lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
+            inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
+            andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
+            vedtatteUttaksplanPerBehandling = vedtatteUttaksplanerPerBehandling,
+            sisteVedtatteUttaksplanForBehandling = sisteVedtatteUttaksplanForBehandling,
+            forrigeUttaksplan = forrigeUttaksplan,
+            beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
+            nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
+            kravprioritetForBehandlinger = kravprioritetForBehandlinger,
+            utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
+            commitId = commitId
         )
     }
 

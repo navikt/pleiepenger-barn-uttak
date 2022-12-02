@@ -527,6 +527,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan1Søker2 = grunnlagSøker2.opprettUttaksplan()
 
         assertThat(uttaksplan1Søker2.perioder.keys).hasSize(2)
+        assertThat(uttaksplan1Søker2.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(2)
 
         // Opprett Uttaksplan 2 for søker 1
         val behandling2UUIDSøker1 = nesteBehandlingId()
@@ -545,6 +546,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2Søker1 = grunnlag2Søker1.opprettUttaksplan()
 
         assertThat(uttaksplan2Søker1.perioder.keys).hasSize(2)
+        assertThat(uttaksplan2Søker1.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(2)
 
         // Opprett Uttaksplan 2 for søker 1
         val behandling2UUIDSøker2 = nesteBehandlingId()
@@ -564,6 +566,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2Søker2 = grunnlag2Søker2.opprettUttaksplan()
 
         assertThat(uttaksplan2Søker2.perioder.keys).hasSize(2)
+        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(1)
+        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(1)
 
         // Opprett Uttaksplan 2 for søker 1
         val behandling3UUIDSøker1 = nesteBehandlingId()
@@ -582,6 +586,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
         val uttaksplan3Søker1 = grunnlag3Søker1.opprettUttaksplan()
         assertThat(uttaksplan3Søker1.perioder.keys).hasSize(2)
+        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(1)
+        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(1)
     }
 
     @Test

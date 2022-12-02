@@ -26,6 +26,7 @@ internal object KnekkpunktUtleder {
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForPleiebehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplanPerBehandling)
+        finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.vedtatteUttaksplanPerBehandling)
         if (regelGrunnlag.forrigeUttaksplan != null) {
             finnForForrigeUttaksplan(knekkpunkMap, regelGrunnlag.forrigeUttaksplan)
         }
