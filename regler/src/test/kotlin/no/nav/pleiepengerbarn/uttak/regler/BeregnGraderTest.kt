@@ -15,6 +15,7 @@ internal class BeregnGraderTest {
     private val INGENTING = Duration.ZERO
     private val ARBEIDSGIVER1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "987654321")
+    private val ERSTATTET_IKKE_YRKESAKTIV = Arbeidsforhold(type = Arbeidstype.ERSTATTET_IKKE_YRKESAKTIV.kode)
     private val IKKE_YRKESAKTIV = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV.kode)
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
@@ -198,7 +199,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsyn = NULL_PROSENT,
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
                     jobberNormalt = Duration.ofHours(8),
                     jobberNå = Duration.ofHours(0)
                 ),
@@ -213,13 +214,76 @@ internal class BeregnGraderTest {
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(89),
-            IKKE_YRKESAKTIV to Prosent(100),
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(100),
             FRILANS to Prosent(0)
         )
     }
 
     @Test
     internal fun `AT + AVSLUTTA ARBEIDSFORHOLD og omsorgsstønad (frilans)`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(3),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            ),
+            ytelseType = YtelseType.PSB
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(88),
+            ARBEIDSGIVER1 to Prosent(100),
+            ARBEIDSGIVER2 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+
+        val grader4 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(8),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            ),
+            ytelseType = YtelseType.PSB
+        )
+
+        grader4.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(80),
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
+            ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+    }
+
+    @Test
+    internal fun `AT + AVSLUTTA ARBEIDSFORHOLD ikke erstattet og omsorgsstønad (frilans)`() {
         val grader = BeregnGrader.beregn(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -275,7 +339,7 @@ internal class BeregnGraderTest {
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
-            IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
+            IKKE_YRKESAKTIV to Prosent(100),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
@@ -531,7 +595,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -540,7 +604,7 @@ internal class BeregnGraderTest {
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to Prosent(50)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(50)
         )
     }
 
@@ -553,7 +617,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -562,7 +626,7 @@ internal class BeregnGraderTest {
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
             ARBEIDSGIVER1 to Prosent(53),
-            IKKE_YRKESAKTIV to Prosent(53)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(53)
         )
     }
 
@@ -575,7 +639,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -584,7 +648,7 @@ internal class BeregnGraderTest {
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
             ARBEIDSGIVER1 to Prosent(53),
-            IKKE_YRKESAKTIV to Prosent(53)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(53)
         )
     }
 
@@ -598,7 +662,7 @@ internal class BeregnGraderTest {
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25)),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -608,7 +672,7 @@ internal class BeregnGraderTest {
             Prosent(63),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(75),
-            IKKE_YRKESAKTIV to Prosent(62.5)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(62.5)
         )
     }
 
@@ -621,7 +685,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -630,7 +694,7 @@ internal class BeregnGraderTest {
             Årsak.FULL_DEKNING,
             Prosent(100),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(100)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -644,7 +708,7 @@ internal class BeregnGraderTest {
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -654,7 +718,7 @@ internal class BeregnGraderTest {
             Prosent(80),
             ARBEIDSGIVER1 to Prosent(60),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(80)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 
@@ -668,7 +732,7 @@ internal class BeregnGraderTest {
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -678,7 +742,7 @@ internal class BeregnGraderTest {
             Prosent(80),
             ARBEIDSGIVER1 to Prosent(60),
             INAKTIV to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(80)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 
@@ -693,7 +757,7 @@ internal class BeregnGraderTest {
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(60)),
                 DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -704,7 +768,7 @@ internal class BeregnGraderTest {
             ARBEIDSGIVER1 to Prosent(60),
             ARBEIDSGIVER2 to Prosent(40),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(66.67).setScale(2, RoundingMode.HALF_UP)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(66.67).setScale(2, RoundingMode.HALF_UP)
         )
     }
 
@@ -720,7 +784,7 @@ internal class BeregnGraderTest {
                     jobberNormalt = FULL_DAG,
                     jobberNå = Duration.ofHours(6).plusMinutes(45)
                 ),
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
             ),
             ytelseType = YtelseType.PSB
         )
@@ -729,7 +793,7 @@ internal class BeregnGraderTest {
             Årsak.FOR_LAV_TAPT_ARBEIDSTID,
             NULL_PROSENT,
             ARBEIDSGIVER1 to NULL_PROSENT,
-            IKKE_YRKESAKTIV to NULL_PROSENT
+            ERSTATTET_IKKE_YRKESAKTIV to NULL_PROSENT
         )
     }
 
@@ -741,7 +805,7 @@ internal class BeregnGraderTest {
             andreSøkeresTilsyn = NULL_PROSENT,
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
-                IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))
+                ERSTATTET_IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))
             ),
             ytelseType = YtelseType.PSB
         )
@@ -749,7 +813,7 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(75),
-            IKKE_YRKESAKTIV to Prosent(75)
+            ERSTATTET_IKKE_YRKESAKTIV to Prosent(75)
         )
     }
 
