@@ -14,7 +14,7 @@ enum class Arbeidstype(val kode: String) {
     DAGPENGER("DP"),
     SELVSTENDIG_NÆRINGSDRIVENDE("SN"),
     IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
-    ERSTATTET_IKKE_YRKESAKTIV("ERSTATTET_IKKE_YRKESAKTIV"),
+    IKKE_YRKESAKTIV_UTEN_ERSTATNING("IKKE_YRKESAKTIV_UTEN_ERSTATNING"),
     KUN_YTELSE("BA"),
     INAKTIV("MIDL_INAKTIV"),
     SYKEPENGER_AV_DAGPENGER("SP_AV_DP"),
@@ -23,7 +23,7 @@ enum class Arbeidstype(val kode: String) {
 
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
     Arbeidstype.IKKE_YRKESAKTIV,
-    Arbeidstype.ERSTATTET_IKKE_YRKESAKTIV,
+    Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
     Arbeidstype.KUN_YTELSE
 )
 private val AKTIVITETS_GRUPPER = listOf(
@@ -120,7 +120,7 @@ object BeregnUtbetalingsgrader {
     ): Prosent {
         return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
-        } else if(type == Arbeidstype.IKKE_YRKESAKTIV.kode) {
+        } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad
