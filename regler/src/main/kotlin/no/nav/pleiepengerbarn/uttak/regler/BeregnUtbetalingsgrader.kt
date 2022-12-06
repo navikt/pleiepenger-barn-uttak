@@ -14,6 +14,7 @@ enum class Arbeidstype(val kode: String) {
     DAGPENGER("DP"),
     SELVSTENDIG_NÆRINGSDRIVENDE("SN"),
     IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
+    IKKE_YRKESAKTIV_UTEN_ERSTATNING("IKKE_YRKESAKTIV_UTEN_ERSTATNING"),
     KUN_YTELSE("BA"),
     INAKTIV("MIDL_INAKTIV"),
     SYKEPENGER_AV_DAGPENGER("SP_AV_DP"),
@@ -22,6 +23,7 @@ enum class Arbeidstype(val kode: String) {
 
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
     Arbeidstype.IKKE_YRKESAKTIV,
+    Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
     Arbeidstype.KUN_YTELSE
 )
 private val AKTIVITETS_GRUPPER = listOf(
@@ -99,7 +101,7 @@ object BeregnUtbetalingsgrader {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
             utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                utbetalingsgrad = utledGrad(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres),
+                utbetalingsgrad = utledGrad(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
                 normalArbeidstid = info.jobberNormalt,
                 faktiskArbeidstid = info.jobberNå
             )
@@ -110,10 +112,15 @@ object BeregnUtbetalingsgrader {
         )
     }
 
-    private fun utledGrad(uttaksgrad: Prosent,
-                          gradertMotTilsyn: Boolean,
-                          spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean): Prosent {
+    private fun utledGrad(
+        uttaksgrad: Prosent,
+        gradertMotTilsyn: Boolean,
+        spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
+        type: String
+    ): Prosent {
         return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
+            HUNDRE_PROSENT
+        } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad

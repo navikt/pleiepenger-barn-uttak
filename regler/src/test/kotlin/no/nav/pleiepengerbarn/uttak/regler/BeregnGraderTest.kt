@@ -16,6 +16,7 @@ internal class BeregnGraderTest {
     private val ARBEIDSGIVER1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
     private val ARBEIDSGIVER2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "987654321")
     private val IKKE_YRKESAKTIV = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV.kode)
+    private val IKKE_YRKESAKTIV_UTEN_ERSTATNING = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode)
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
@@ -276,6 +277,69 @@ internal class BeregnGraderTest {
             Årsak.AVKORTET_MOT_INNTEKT,
             Prosent(80),
             IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
+            ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+    }
+
+    @Test
+    internal fun `AT + AVSLUTTA ARBEIDSFORHOLD ikke erstattet og omsorgsstønad (frilans)`() {
+        val grader = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(3),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            ),
+            ytelseType = YtelseType.PSB
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(88),
+            ARBEIDSGIVER1 to Prosent(100),
+            ARBEIDSGIVER2 to Prosent(100),
+            FRILANS to Prosent(0)
+        )
+
+        val grader4 = BeregnGrader.beregn(
+            pleiebehov = PROSENT_100,
+            etablertTilsyn = IKKE_ETABLERT_TILSYN,
+            andreSøkeresTilsyn = NULL_PROSENT,
+            andreSøkeresTilsynReberegnet = false,
+            arbeid = mapOf(
+                ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(4),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                IKKE_YRKESAKTIV_UTEN_ERSTATNING to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(8),
+                    jobberNå = Duration.ofHours(0)
+                ),
+                FRILANS to ArbeidsforholdPeriodeInfo(
+                    jobberNormalt = Duration.ofHours(1),
+                    jobberNå = Duration.ofHours(1)
+                )
+            ),
+            ytelseType = YtelseType.PSB
+        )
+
+        grader4.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(80),
+            IKKE_YRKESAKTIV_UTEN_ERSTATNING to Prosent(100),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
