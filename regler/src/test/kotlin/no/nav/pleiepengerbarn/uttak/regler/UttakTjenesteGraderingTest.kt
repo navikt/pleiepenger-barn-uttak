@@ -374,6 +374,7 @@ internal class UttakTjenesteGraderingTest {
     @Test
     internal fun `En uttaksperiode med tilsyn og uttak på annen part som tilsammen er over 80 prosent skal føre til avslag`() {
         val annenPartsBehandlingUUID = nesteBehandlingUUID()
+        val behandlingUUID = nesteBehandlingUUID()
         val grunnlag = RegelGrunnlag(
             saksnummer = nesteSaksnummer(),
             søker = Søker(
@@ -412,14 +413,14 @@ internal class UttakTjenesteGraderingTest {
             tilsynsperioder = mapOf(
                 helePerioden to Prosent(45)
             ).somTilsynperioder(),
-            behandlingUUID = nesteBehandlingUUID(),
+            behandlingUUID = behandlingUUID,
             arbeid = listOf(
                 Arbeid(
                     Arbeidsforhold(type = "FL"),
                     mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
                 )
             ),
-            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
+            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID, behandlingUUID))
 
         )
 

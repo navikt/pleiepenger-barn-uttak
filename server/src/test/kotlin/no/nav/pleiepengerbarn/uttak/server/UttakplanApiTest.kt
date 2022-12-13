@@ -495,15 +495,15 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `flere søkere flere perioder, masse endringer og tilsyn fortsatt ikke stjele`() {
-        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-13")
-        val søknadsperiodeTo = LukketPeriode("2020-10-19/2020-10-25")
+        val søknadsperiode = LukketPeriode("2020-10-12/2020-10-12")
+        val søknadsperiodeTo = LukketPeriode("2020-10-14/2020-10-14")
 
         // Opprett uttaksplan 1 for søker 1
         val saksnummerSøker1 = nesteSaksnummer()
         val grunnlag1Søker1 = lagGrunnlag(
-            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            søktUttak = listOf(SøktUttak(søknadsperiode, Duration.parse("PT7H30M")), SøktUttak(søknadsperiodeTo, Duration.parse("PT7H30M"))),
             arbeid = listOf(
-                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))),
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(60)))),
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
         ).copy(saksnummer = saksnummerSøker1)
@@ -513,9 +513,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val saksnummerSøker2 = nesteSaksnummer()
         val behandlingUUIDSøker2 = nesteBehandlingId()
         val grunnlagSøker2 = lagGrunnlag(
-            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            søktUttak = listOf(SøktUttak(søknadsperiode, Duration.parse("PT7H30M")), SøktUttak(søknadsperiodeTo, Duration.parse("PT7H30M"))),
             arbeid = listOf(
-                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))),
+                Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(60)), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)))),
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
         ).copy(
@@ -532,7 +532,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         // Opprett Uttaksplan 2 for søker 1
         val behandling2UUIDSøker1 = nesteBehandlingId()
         val grunnlag2Søker1 = lagGrunnlag(
-            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            søktUttak = listOf(SøktUttak(søknadsperiode, Duration.parse("PT7H30M")), SøktUttak(søknadsperiodeTo, Duration.parse("PT7H30M"))),
             arbeid = listOf(
                 Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
             ),
@@ -540,6 +540,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         ).copy(
             saksnummer = saksnummerSøker1,
             behandlingUUID = behandling2UUIDSøker1,
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(30), søknadsperiodeTo to FULL_DAG.prosent(30)),
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandlingUUIDSøker2, behandling2UUIDSøker1), søknadsperiodeTo to listOf(behandling2UUIDSøker1, behandlingUUIDSøker2)),
             sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag1Søker1.behandlingUUID, behandlingUUIDSøker2 to behandlingUUIDSøker2)
         )
@@ -551,28 +552,28 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         // Opprett Uttaksplan 2 for søker 1
         val behandling2UUIDSøker2 = nesteBehandlingId()
         val grunnlag2Søker2 = lagGrunnlag(
-            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            søktUttak = listOf(SøktUttak(søknadsperiode, Duration.parse("PT7H30M")), SøktUttak(søknadsperiodeTo, Duration.parse("PT7H30M"))),
             arbeid = listOf(
                 Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
             ),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100, søknadsperiodeTo to Pleiebehov.PROSENT_100)
         ).copy(
-            saksnummer = saksnummerSøker1,
+            saksnummer = saksnummerSøker2,
             behandlingUUID = behandling2UUIDSøker2,
-            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(40), søknadsperiodeTo to FULL_DAG.prosent(40)),
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(30), søknadsperiodeTo to FULL_DAG.prosent(30)),
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandling2UUIDSøker2, behandling2UUIDSøker1), søknadsperiodeTo to listOf(behandling2UUIDSøker1, behandling2UUIDSøker2)),
             sisteVedtatteUttaksplanForBehandling = mapOf(behandling2UUIDSøker1 to grunnlag2Søker1.behandlingUUID, behandling2UUIDSøker2 to grunnlagSøker2.behandlingUUID)
         )
         val uttaksplan2Søker2 = grunnlag2Søker2.opprettUttaksplan()
 
         assertThat(uttaksplan2Søker2.perioder.keys).hasSize(2)
-        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(1)
-        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(1)
+        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(0)
+        assertThat(uttaksplan2Søker2.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(2)
 
         // Opprett Uttaksplan 2 for søker 1
         val behandling3UUIDSøker1 = nesteBehandlingId()
         val grunnlag3Søker1 = lagGrunnlag(
-            søktUttak = listOf(SøktUttak(søknadsperiode), SøktUttak(søknadsperiodeTo)),
+            søktUttak = listOf(SøktUttak(søknadsperiode, Duration.parse("PT7H30M")), SøktUttak(søknadsperiodeTo, Duration.parse("PT7H30M"))),
             arbeid = listOf(
                 Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiodeTo to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))),
             ),
@@ -580,14 +581,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         ).copy(
             saksnummer = saksnummerSøker1,
             behandlingUUID = behandling3UUIDSøker1,
-            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(40), søknadsperiodeTo to FULL_DAG.prosent(40)),
+            tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(30), søknadsperiodeTo to FULL_DAG.prosent(30)),
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(behandling2UUIDSøker2, behandling3UUIDSøker1), søknadsperiodeTo to listOf(behandling3UUIDSøker1, behandling2UUIDSøker2)),
             sisteVedtatteUttaksplanForBehandling = mapOf(behandling3UUIDSøker1 to grunnlag2Søker1.behandlingUUID, behandling2UUIDSøker2 to behandling2UUIDSøker2)
         )
         val uttaksplan3Søker1 = grunnlag3Søker1.opprettUttaksplan()
         assertThat(uttaksplan3Søker1.perioder.keys).hasSize(2)
-        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(1)
-        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(1)
+        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.IKKE_OPPFYLT }).hasSize(0)
+        assertThat(uttaksplan3Søker1.perioder.values.filter{ it -> it.utfall == Utfall.OPPFYLT }).hasSize(2)
     }
 
     @Test

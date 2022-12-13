@@ -61,6 +61,15 @@ data class RegelGrunnlag(
         return null
     }
 
+    fun finnEtablertTilsyn(periode: LukketPeriode): Duration {
+        val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull { it.overlapperHelt(periode) }
+        return if (etablertTilsynPeriode != null) {
+            this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
+        } else {
+            Duration.ZERO
+        }
+    }
+
     fun finnBeredskap(periode: LukketPeriode): Utfall? {
         val overlappendePeriode = this.beredskapsperioder.keys.firstOrNull {it.overlapperHelt(periode)}
         if (overlappendePeriode != null) {
