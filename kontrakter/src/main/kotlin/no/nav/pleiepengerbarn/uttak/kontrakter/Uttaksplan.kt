@@ -36,7 +36,7 @@ enum class OverseEtablertTilsynÅrsak {
 }
 
 enum class Endringsstatus {
-    NY, ENDRET, UENDRET
+    NY, ENDRET, UENDRET, UENDRET_RESULTAT
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
