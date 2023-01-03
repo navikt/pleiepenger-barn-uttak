@@ -1,6 +1,15 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.Utbetalingsgrader
+import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
+import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
@@ -145,15 +154,6 @@ private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, Arbeidsforh
         )
     }
     return arbeid
-}
-
-private fun RegelGrunnlag.finnEtablertTilsyn(periode: LukketPeriode): Duration {
-    val etablertTilsynPeriode = this.tilsynsperioder.keys.firstOrNull { it.overlapperHelt(periode) }
-    return if (etablertTilsynPeriode != null) {
-        this.tilsynsperioder[etablertTilsynPeriode] ?: Duration.ZERO
-    } else {
-        Duration.ZERO
-    }
 }
 
 private fun Duration.prosentAvFullDag(): Prosent {
