@@ -1,6 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.AnnenPart
+import no.nav.pleiepengerbarn.uttak.kontrakter.Endringsstatus
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import java.math.RoundingMode
 import java.time.Duration
@@ -33,7 +37,7 @@ object EndringsstatusOppdaterer {
             return if (infoFraNyUttaksplan.sammenlign(infoFraForrigeUttaksplan!!)) {
                 Endringsstatus.UENDRET
             } else if (FeatureToggle.isActive("ENDRINGER_ENDRINGSUTLEDER")
-                && infoFraNyUttaksplan.sammenlignUtenArbeidstid(infoFraForrigeUttaksplan)
+                && infoFraNyUttaksplan.sammenlignUtenArbeidstid(infoFraForrigeUttaksplan!!)
             ) {
                 Endringsstatus.UENDRET_RESULTAT
             } else {
@@ -85,7 +89,10 @@ object EndringsstatusOppdaterer {
                 graderingMotTilsyn = null,
                 oppgittTilsyn = null,
                 beredskap = null,
-                nattevåk = null
+                nattevåk = null,
+                inngangsvilkår = mapOf(),
+                utenlandsopphold = null,
+                utenlandsoppholdUtenÅrsak = false
             )
         } else {
             val oppdatertGraderingMotTilsyn = if (this.graderingMotTilsyn != null) {
@@ -143,7 +150,10 @@ object EndringsstatusOppdaterer {
             graderingMotTilsyn = null,
             oppgittTilsyn = null,
             beredskap = null,
-            nattevåk = null
+            nattevåk = null,
+            inngangsvilkår = mapOf(),
+            utenlandsopphold = null,
+            utenlandsoppholdUtenÅrsak = false
         )
     }
 }
