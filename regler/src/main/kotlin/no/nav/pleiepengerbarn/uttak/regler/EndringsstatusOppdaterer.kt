@@ -73,7 +73,12 @@ object EndringsstatusOppdaterer {
                         RoundingMode.HALF_UP
                     )
                 )
-            }
+            }.sortedWith(
+                compareBy(
+                    { it.arbeidsforhold.type },
+                    { it.arbeidsforhold.organisasjonsnummer },
+                    { it.arbeidsforhold.aktørId })
+            )
         if (FeatureToggle.isActive("ENDRINGER_ENDRINGSUTLEDER")) {
             return this.copy(
                 // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
@@ -135,7 +140,12 @@ object EndringsstatusOppdaterer {
                     faktiskArbeidstid = Duration.ZERO,
                     normalArbeidstid = Duration.ZERO
                 )
-            }
+            }.sortedWith(
+                compareBy(
+                    { it.arbeidsforhold.type },
+                    { it.arbeidsforhold.organisasjonsnummer },
+                    { it.arbeidsforhold.aktørId })
+            )
         return this.copy(
             // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
             kildeBehandlingUUID = "",
