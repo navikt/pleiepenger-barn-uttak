@@ -1,6 +1,20 @@
 package no.nav.pleiepengerbarn.uttak.regler.domene
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeid
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.Barn
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
+import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
+import no.nav.pleiepengerbarn.uttak.kontrakter.Søker
+import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
+import no.nav.pleiepengerbarn.uttak.kontrakter.UtenlandsoppholdInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
+import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.Vilkårsperiode
+import no.nav.pleiepengerbarn.uttak.kontrakter.YtelseType
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
 import java.util.*
@@ -94,6 +108,11 @@ data class RegelGrunnlag(
         val inngangsvilkårForPeriode = inngangsvilkårForPeriode(periode)
         val utfallInngangsvikår = inngangsvilkårForPeriode.utfallInngangsvilkår()
         return Pair(utfallInngangsvikår, inngangsvilkårForPeriode)
+    }
+
+    fun finnOppgittTilsyn(periode: LukketPeriode): Duration? {
+        val søktUttak = this.søktUttak.firstOrNull { it.periode.overlapperHelt(periode) }
+        return søktUttak?.oppgittTilsyn
     }
 
     private fun inngangsvilkårForPeriode(periode: LukketPeriode): Map<String, Utfall> {

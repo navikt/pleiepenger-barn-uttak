@@ -24,7 +24,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
-import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
@@ -41,8 +40,6 @@ internal object UttaksplanRegler {
         InngangsvilkårIkkeOppfyltRegel(),
         UtenlandsoppholdRegel(),
         MaxAntallDagerRegel()
-// NB: erstartet inntil videre med  BarnsDødPeriodeRegel
-// BarnsDødRegel()
     )
 
     internal fun fastsettUttaksplan(
@@ -223,10 +220,5 @@ internal object UttaksplanRegler {
         val nattevåk = this.finnNattevåk(periode)
         val beredskap = this.finnBeredskap(periode)
         return finnOverseEtablertTilsynÅrsak(nattevåk, beredskap)
-    }
-
-    private fun RegelGrunnlag.finnOppgittTilsyn(periode: LukketPeriode): Duration? {
-        val søktUttak = this.søktUttak.firstOrNull { it.periode.overlapperHelt(periode) }
-        return søktUttak?.oppgittTilsyn
     }
 }
