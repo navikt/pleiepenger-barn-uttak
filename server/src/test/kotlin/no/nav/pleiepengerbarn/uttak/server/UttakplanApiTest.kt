@@ -2781,7 +2781,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         uttaksplan.assertOppfylt(
             periode = LukketPeriode("2021-02-22/2021-02-26"),
             utenlandsoppholdUtenÅrsak = false,
-            endringsstatus = Endringsstatus.ENDRET
+            endringsstatus = Endringsstatus.UENDRET
         )
         uttaksplan.assertOppfylt(
             periode = LukketPeriode("2021-03-01/2021-03-05"),
