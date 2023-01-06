@@ -36,9 +36,7 @@ object EndringsstatusOppdaterer {
             val infoFraForrigeUttaksplan = forrigeUttaksplan!!.perioder[periodeFraForrigeUttaksplan]
             return if (infoFraNyUttaksplan.sammenlign(infoFraForrigeUttaksplan!!)) {
                 Endringsstatus.UENDRET
-            } else if (FeatureToggle.isActive("ENDRINGER_ENDRINGSUTLEDER")
-                && infoFraNyUttaksplan.sammenlignUtenArbeidstid(infoFraForrigeUttaksplan!!)
-            ) {
+            } else if (infoFraNyUttaksplan.sammenlignUtenArbeidstid(infoFraForrigeUttaksplan)) {
                 Endringsstatus.UENDRET_RESULTAT
             } else {
                 Endringsstatus.ENDRET
@@ -65,8 +63,17 @@ object EndringsstatusOppdaterer {
      * Setter alle BigDecimal felter til 2 desimaler og nullstiller felter som ikke er viktig for sammenligning av perioder ifm setting av uttaksperiodetype.
      */
     private fun UttaksperiodeInfo.nullstillUviktigeFelt(): UttaksperiodeInfo {
-        val oppdaterteUtbetalingsgrader =
-            this.utbetalingsgrader.map {
+        return this.copy(
+            // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
+            kildeBehandlingUUID = "",
+            knekkpunktTyper = setOf(),
+            endringsstatus = null,
+            annenPart = AnnenPart.ALENE,
+            // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
+            uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
+            søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
+            pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
+            utbetalingsgrader = this.utbetalingsgrader.map {
                 it.copy(
                     utbetalingsgrad = it.utbetalingsgrad.setScale(
                         2,
@@ -78,60 +85,32 @@ object EndringsstatusOppdaterer {
                     { it.arbeidsforhold.type },
                     { it.arbeidsforhold.organisasjonsnummer },
                     { it.arbeidsforhold.aktørId })
-            )
-        if (FeatureToggle.isActive("ENDRINGER_ENDRINGSUTLEDER")) {
-            return this.copy(
-                // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
-                kildeBehandlingUUID = "",
-                knekkpunktTyper = setOf(),
-                endringsstatus = null,
-                annenPart = AnnenPart.ALENE,
-                // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
-                uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
-                søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
-                pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
-                utbetalingsgrader = oppdaterteUtbetalingsgrader,
-                graderingMotTilsyn = null,
-                oppgittTilsyn = null,
-                beredskap = null,
-                nattevåk = null,
-                inngangsvilkår = mapOf(),
-                utenlandsopphold = null,
-                utenlandsoppholdUtenÅrsak = false
-            )
-        } else {
-            val oppdatertGraderingMotTilsyn = if (this.graderingMotTilsyn != null) {
-                val gmt = this.graderingMotTilsyn!!
-                gmt.copy(
-                    etablertTilsyn = gmt.etablertTilsyn.setScale(2, RoundingMode.HALF_UP),
-                    andreSøkeresTilsyn = gmt.andreSøkeresTilsyn.setScale(2, RoundingMode.HALF_UP),
-                    tilgjengeligForSøker = gmt.tilgjengeligForSøker.setScale(2, RoundingMode.HALF_UP)
-                )
-            } else {
-                null
-            }
-            return this.copy(
-                // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
-                kildeBehandlingUUID = "",
-                knekkpunktTyper = setOf(),
-                endringsstatus = null,
-                annenPart = AnnenPart.ALENE,
-                // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
-                uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
-                søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
-                pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
-                utbetalingsgrader = oppdaterteUtbetalingsgrader,
-                graderingMotTilsyn = oppdatertGraderingMotTilsyn,
-            )
-        }
+            ),
+            graderingMotTilsyn = null,
+            oppgittTilsyn = null,
+            beredskap = null,
+            nattevåk = null,
+            inngangsvilkår = mapOf(),
+            utenlandsopphold = null,
+            utenlandsoppholdUtenÅrsak = false
+        )
     }
 
     /**
      * Setter alle BigDecimal felter til 2 desimaler og nullstiller felter som ikke er viktig for sammenligning av perioder ifm setting av uttaksperiodetype.
      */
     private fun UttaksperiodeInfo.nullstillUviktigeFeltUtvidet(): UttaksperiodeInfo {
-        val oppdaterteUtbetalingsgrader =
-            this.utbetalingsgrader.map {
+        return this.copy(
+            // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
+            kildeBehandlingUUID = "",
+            knekkpunktTyper = setOf(),
+            endringsstatus = null,
+            annenPart = AnnenPart.ALENE,
+            // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
+            uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
+            søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
+            pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
+            utbetalingsgrader = this.utbetalingsgrader.map {
                 it.copy(
                     utbetalingsgrad = it.utbetalingsgrad.setScale(
                         2,
@@ -145,18 +124,7 @@ object EndringsstatusOppdaterer {
                     { it.arbeidsforhold.type },
                     { it.arbeidsforhold.organisasjonsnummer },
                     { it.arbeidsforhold.aktørId })
-            )
-        return this.copy(
-            // Nullstilles da disse feltene ikke er viktig for denne sammenligningen
-            kildeBehandlingUUID = "",
-            knekkpunktTyper = setOf(),
-            endringsstatus = null,
-            annenPart = AnnenPart.ALENE,
-            // Setter alle grader til 2 desimaler slik at de kan sammenlignes.
-            uttaksgrad = this.uttaksgrad.setScale(2, RoundingMode.HALF_UP),
-            søkersTapteArbeidstid = this.søkersTapteArbeidstid?.setScale(2, RoundingMode.HALF_UP),
-            pleiebehov = this.pleiebehov.setScale(2, RoundingMode.HALF_UP),
-            utbetalingsgrader = oppdaterteUtbetalingsgrader,
+            ),
             graderingMotTilsyn = null,
             oppgittTilsyn = null,
             beredskap = null,

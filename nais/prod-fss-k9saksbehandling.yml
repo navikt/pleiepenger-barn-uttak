@@ -62,5 +62,3 @@ spec:
       value: PROD
 
     # Feature toggles
-    - name: ENDRINGER_ENDRINGSUTLEDER
-      value: "true"
