@@ -65,3 +65,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
+    - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT
+      value: "true"

@@ -101,7 +101,7 @@ object BeregnUtbetalingsgrader {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
             utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                utbetalingsgrad = utledGrad(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
+                utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
                 normalArbeidstid = info.jobberNormalt,
                 faktiskArbeidstid = info.jobberNå
             )
@@ -112,7 +112,7 @@ object BeregnUtbetalingsgrader {
         )
     }
 
-    private fun utledGrad(
+    private fun utledGradForSpesialhåndtering(
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
@@ -121,6 +121,8 @@ object BeregnUtbetalingsgrader {
         return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
         } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
+            HUNDRE_PROSENT
+        } else if(FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad
