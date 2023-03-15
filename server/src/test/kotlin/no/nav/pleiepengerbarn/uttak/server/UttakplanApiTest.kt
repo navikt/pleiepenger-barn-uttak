@@ -1340,6 +1340,31 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Livets sluttfase - Simulerer at uttaksplan ikke er endret når det er kvote igjen, men det er under en dag`() {
+        val søknadsperiode = LukketPeriode("2022-07-29/2022-12-26")
+        val behandlingUUID1 = nesteBehandlingId()
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(8), Duration.ofHours(2).plusMinutes(5))))
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(arbeidSøker1),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = behandlingUUID1,
+            saksnummer = nesteSaksnummer()
+        ).copy(
+            ytelseType = YtelseType.PLS
+        )
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(59.94).setScale(2))
+
+        val simuleringsresultat = grunnlag1Søker1.simulering()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+    }
+
+    @Test
     internal fun `Livets sluttfase - første behandling blir innvilget, deretter overlappende periode avslått på pleiebehov, kvoteInfo skal gjenspeile det`() {
         val søknadsperiode = LukketPeriode("2021-09-20/2021-09-22")
         val behandlingUUID1 = nesteBehandlingId()
