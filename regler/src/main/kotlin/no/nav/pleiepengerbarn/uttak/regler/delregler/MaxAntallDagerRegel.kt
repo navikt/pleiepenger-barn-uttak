@@ -34,38 +34,23 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
-                val forbrukteDagerDennePerioen =
-                    BigDecimal(periode.virkedager()) * (info.uttaksgrad
-                            .divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
+                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
-                        nyePerioder,
-                        periode,
-                        info,
-                        maxDatoHittil
-                    )
+                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
                 } else if (forbrukteDagerDennePerioen <= rest) {
                     // Hvis det er nok dager igjen, så settes hele periode til oppfylt
                     nyePerioder[periode] = info
                     rest -= forbrukteDagerDennePerioen
                 } else {
                     // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
-                    if (rest >= BigDecimal.ONE) { // hvis det er minimum en hel dag igjen
-                        val restHeleDager = rest.setScale(0, RoundingMode.UP)
-                        val restHeleDagerMedEventuellHelg =
-                            if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
-                        nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
-                        if (restHeleDagerMedEventuellHelg > BigDecimal.ONE) {
-                            // Bare hvis det er mer igjen som skal vurderes
-                            kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
-                        }
-                    } else if (rest > BigDecimal.ZERO && rest < BigDecimal.ONE) {
-                        logger.info("Skulle egentlig fått innvilget delvis dag. Rest igjen av kvote er mer enn 0, men mindre enn 1.")
-                        //TODO støtte å innvilge deler av en dag
+                    val restHeleDager = rest.setScale(0, RoundingMode.UP)
+                    val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
+                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
+                    if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
+                        kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
                     }
-
                     rest = BigDecimal.ZERO
                 }
             } else {
@@ -81,19 +66,25 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 maxDatoHittil,
                 BigDecimal(maxDager).setScale(2)
             ),
-                totaltForbruktKvote = totaltForbruktKvote
+            totaltForbruktKvote = totaltForbruktKvote
         )
 
-        if (forbrukteDager > BigDecimal.valueOf(60)) {
-            throw java.lang.IllegalStateException("Forbrukt kvote for denne behandlingen er mer enn 60 dager.")
+        if (forbrukteDager > BigDecimal.valueOf(61)) {
+            throw java.lang.IllegalStateException("Forbrukt kvote for denne behandlingen er mer enn 61 dager. $forbrukteDager antall forbrukte dager.")
         }
 
-        if (totaltForbruktKvote > BigDecimal.valueOf(60)) {
-            logger.info("Totalt forbrukt kvote er mer enn 60 dager.")
+        if (forbrukteDager > BigDecimal.valueOf(60) && forbrukteDager < BigDecimal.valueOf(61)) {
+            logger.info("Forbrukt kvote for denne behandlingen er mellom 60 og 61 dager: $forbrukteDager antall forbrukte dager.")
+        }
+
+        if (totaltForbruktKvote >= BigDecimal.valueOf(61)) {
+            logger.info("Totalt forbrukt kvote er mer enn 61 dager: $totaltForbruktKvote")
         }
 
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
+
+    private fun erDetFlereDagerIgjenÅVurdere(periode: LukketPeriode, restHeleDagerMedEventuellHelg: BigDecimal) = !periode.tom.isBefore(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()))
 
     private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(
         forBrukteDagerHittil: BigDecimal,
