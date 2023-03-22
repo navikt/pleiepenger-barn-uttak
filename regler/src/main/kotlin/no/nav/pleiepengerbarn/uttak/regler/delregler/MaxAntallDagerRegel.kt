@@ -34,9 +34,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
-                val forbrukteDagerDennePerioen =
-                    BigDecimal(periode.virkedager()) * (info.uttaksgrad
-                            .divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
+                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
@@ -50,8 +48,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     val restHeleDager = rest.setScale(0, RoundingMode.UP)
                     val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
                     nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
-                    if (restHeleDagerMedEventuellHelg >= BigDecimal.ONE && erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
-                        // Bare hvis det er mer igjen som skal vurderes
+                    if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
                         kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
                     }
                     rest = BigDecimal.ZERO
