@@ -1357,7 +1357,63 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(59.94).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60.68).setScale(2))
+
+        val simuleringsresultat = grunnlag1Søker1.simulering()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+    }
+
+    @Test
+    internal fun `Livets sluttfase - Innvilger en hel dag når bruker egentlig har under en dag igjen, så kvoten kan gå over 60 dager`() {
+        val søknadsperiode = LukketPeriode("2022-11-30/2023-02-22")
+        val behandlingUUID1 = nesteBehandlingId()
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
+        val arbeidSøker2 = Arbeid(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123956789"), mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
+        val arbeidSøker4 = Arbeid(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123956769"), mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
+        val arbeidSøker5 = Arbeid(ARBEIDSFORHOLD2, mapOf(LukketPeriode("2022-11-30/2022-12-31") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
+        val arbeidSøker6 = Arbeid(FRILANS1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(0).plusMinutes(2), Duration.ofHours(0).plusMinutes(2))))
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(arbeidSøker1, arbeidSøker2, arbeidSøker4, arbeidSøker5, arbeidSøker6),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = behandlingUUID1,
+            saksnummer = nesteSaksnummer()
+        ).copy(
+            ytelseType = YtelseType.PLS
+        )
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60.39).setScale(2))
+
+        val simuleringsresultat = grunnlag1Søker1.simulering()
+
+        assertThat(simuleringsresultat.uttakplanEndret).isFalse
+    }
+
+    @Test
+    internal fun `Livets sluttfase - 120 dager med 50% skal bli innvilget`() {
+        val søknadsperiode = LukketPeriode("2023-01-02/2023-06-16")
+        val behandlingUUID1 = nesteBehandlingId()
+
+        val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2023-01-02/2023-06-16") to ArbeidsforholdPeriodeInfo(Duration.ofHours(8), Duration.ofHours(4))))
+
+        val grunnlag1Søker1 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(arbeidSøker1),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
+            behandlingUUID = behandlingUUID1,
+            saksnummer = nesteSaksnummer()
+        ).copy(
+            ytelseType = YtelseType.PLS
+        )
+
+        val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
+        assertThat(uttakplan1søker1.kvoteInfo).isNotNull
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60.00).setScale(2))
+        assertThat(uttakplan1søker1.perioder[LukketPeriode("2023-06-12/2023-06-16")]!!.utfall).isEqualTo(Utfall.OPPFYLT)
 
         val simuleringsresultat = grunnlag1Søker1.simulering()
 
