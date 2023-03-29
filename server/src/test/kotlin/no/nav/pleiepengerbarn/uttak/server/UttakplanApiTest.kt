@@ -7,6 +7,8 @@ import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -28,6 +30,16 @@ import kotlin.test.fail
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
+
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
+    }
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
@@ -2389,7 +2401,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Livets sluttfase - Andre parter har brukt opp alle dagene, men søker får fraværet innvilget fordi det er før datoen dagene ble brukt opp`() {
+    internal fun `Livets sluttfase - Andre parter har brukt opp alle dagene, så søker får avslag fordi vi ikke lenger innvilger utover kvota`() {
         val saksnummer = nesteSaksnummer()
         val søknadsperiode = LukketPeriode("2022-02-01/2022-05-13")
         val annenPartsBehandlingUUID = nesteBehandlingId()
@@ -2477,16 +2489,13 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
 
         assertThat(uttaksplan2.kvoteInfo).isNotNull
-        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65).setScale(2))
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
-        uttaksplan2.assertOppfylt(
-            perioder = listOf(LukketPeriode("2022-03-07/2022-03-11")),
-            grad = HUNDRE_PROSENT,
-            gradPerArbeidsforhold = mapOf(
-                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
-            ),
-            oppfyltÅrsak = Årsak.FULL_DEKNING,
-            endringsstatus = Endringsstatus.NY
+        uttaksplan2.assertIkkeOppfylt(
+            periode = LukketPeriode("2022-03-07/2022-03-11"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.MAKS_DAGER_OVERSTEGET),
+            setOf(),
+            Endringsstatus.NY
         )
 
         // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
@@ -2495,7 +2504,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
         assertThat(hentetUttaksplan.kvoteInfo).isNotNull
-        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(65).setScale(2))
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
     }
 
     @Test

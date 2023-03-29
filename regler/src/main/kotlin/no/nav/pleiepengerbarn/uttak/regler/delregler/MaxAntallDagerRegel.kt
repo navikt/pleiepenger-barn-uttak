@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.FeatureToggle
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
@@ -38,7 +39,11 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
-                    kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
+                    if (FeatureToggle.isActive("GIR_ALDRI_MER_ENN_60_DAGER")) {
+                        nyePerioder[periode] = info.settIkkeoppfylt()
+                    } else {
+                        kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
+                    }
                 } else if (forbrukteDagerDennePerioen <= rest) {
                     // Hvis det er nok dager igjen, så settes hele periode til oppfylt
                     nyePerioder[periode] = info
@@ -49,7 +54,11 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
                     nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
                     if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
-                        kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
+                        if (FeatureToggle.isActive("GIR_ALDRI_MER_ENN_60_DAGER")) {
+                            nyePerioder[LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom)] = info.settIkkeoppfylt()
+                        } else {
+                            kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
+                        }
                     }
                     rest = BigDecimal.ZERO
                 }
