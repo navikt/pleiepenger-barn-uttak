@@ -9,9 +9,6 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
-
-env:
-  IMAGE_BASE_CR: ghcr.io/${{ github.repository }}/server
   
 jobs:
   docker-and-nais-deploy:
@@ -19,12 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Hente kode
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3
+
       - name: Sette opp Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11.x'
-          distribution: 'adopt'
+          java-version: 17
+          distribution: temurin
+          cache: maven
           
       - name: Bygge jar
         env:
@@ -33,14 +32,20 @@ jobs:
         run: |
           mvn verify --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false -Drevision= -Dchangelist= -Dsha1="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"
           echo "TAG=$(expr $(date +%Y%m%d%H%M%S))-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-          
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Bygg og last opp Docker image
         run: |
-          docker build --pull --tag ${IMAGE_BASE_CR?}:${TAG?} --tag ${IMAGE_BASE_CR}:latest .
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username "x-access-token" --password-stdin ghcr.io
-          docker push ${IMAGE_BASE_CR} --all-tags
+          docker build --pull --tag ${IMAGE_BASE?}:${TAG?} --tag ${IMAGE_BASE}:latest .
+          docker push ${IMAGE_BASE} --all-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_BASE: ghcr.io/${{ github.repository }}/server
 
       - name: Lukk gamle issues
         uses: actions/github-script@v6

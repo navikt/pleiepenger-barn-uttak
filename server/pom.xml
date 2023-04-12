@@ -15,9 +15,41 @@
         <springdoc.version>1.7.0</springdoc.version>
         <logback.logstash.version>7.3</logback.logstash.version>
         <postgres.version>42.6.0</postgres.version>
+        <micrometer.version>1.10.5</micrometer.version>
     </properties>
 
     <dependencies>
+    <!-- 	Stygg workaround for å kjøre tester med servlet-api versjon 6 inntil
+            Jetty 12 kommer med støtte for servlet-api 6.
+            Begge avhengighetene kan fjernes når det skjer for spring boot injecter siste versjon.
+    -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet.</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>test</scope>
+        </dependency>
+    <!-- workaround end -->
+
+    <!-- Spring boot CVE fixes -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.13.10</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.0</version>
+        </dependency>
+    <!-- CVE fix end -->
 
         <dependency>
             <groupId>no.nav.pleiepengerbarn.uttak</groupId>
@@ -29,13 +61,6 @@
             <groupId>no.nav.pleiepengerbarn.uttak</groupId>
             <artifactId>regler</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- CallID propagering -->
-        <dependency>
-            <groupId>no.nav.familie.felles</groupId>
-            <artifactId>log</artifactId>
-            <version>1.20210607085527_b0c86f4</version>
         </dependency>
 
         <!-- Kotlin -->
@@ -115,9 +140,8 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
-
-
 
         <!-- Testing -->
         <dependency>
