@@ -1,7 +1,7 @@
 name: Pull request bygg
 
 on:
-  pull_request_target:
+  pull_request:
     paths-ignore:
       - '**.md'
       - '**.MD'
@@ -16,15 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Hente kode
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
       - name: Sette opp Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11.x'
-          distribution: 'adopt'
+          java-version: 17
+          distribution: temurin
+          cache: maven
       - name: Bygge JAR
         run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false
         env:

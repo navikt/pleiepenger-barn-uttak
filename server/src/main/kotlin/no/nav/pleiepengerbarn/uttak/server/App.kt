@@ -1,6 +1,5 @@
 package no.nav.pleiepengerbarn.uttak.server
 
-import no.nav.familie.log.filter.LogFilter
 import org.slf4j.LoggerFactory
 import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 import org.springframework.core.io.ClassPathResource
 import java.util.*
-import javax.annotation.PostConstruct
 
 
 @SpringBootApplication
