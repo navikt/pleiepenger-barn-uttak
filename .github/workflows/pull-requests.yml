@@ -30,5 +30,5 @@ jobs:
         run: mvn install --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.PLEIEPENGER_UTTAK_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.READER_TOKEN }}
 
