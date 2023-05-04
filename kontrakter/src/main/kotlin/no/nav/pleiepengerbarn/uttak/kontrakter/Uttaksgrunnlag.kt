@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.math.BigDecimal
 import java.time.Duration
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,6 +61,6 @@ data class UtenlandsoppholdInfo(
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class OverstyrtInput(
-    @JsonProperty("overstyrtUttaksgrad") val overstyrtUttaksgrad: Duration,
+    @JsonProperty("overstyrtUttaksgrad") val overstyrtUttaksgrad: BigDecimal,
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold
 )
