@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.math.BigDecimal
 import java.time.Duration
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -21,6 +22,7 @@ data class Uttaksgrunnlag (
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
     @JsonProperty("pleiebehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
 
+    @JsonProperty("overstyrtInput") val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
@@ -53,4 +55,12 @@ data class SøktUttak(
 data class UtenlandsoppholdInfo(
     @JsonProperty("utenlandsoppholdÅrsak") val utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak,
     @JsonProperty("landkode") val landkode: String?
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class OverstyrtInput(
+    @JsonProperty("overstyrtUttaksgrad") val overstyrtUttaksgrad: BigDecimal,
+    @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold
 )
