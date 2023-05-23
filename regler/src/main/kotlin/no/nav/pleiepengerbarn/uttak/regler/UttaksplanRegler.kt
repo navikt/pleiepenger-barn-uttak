@@ -195,8 +195,9 @@ internal object UttaksplanRegler {
         val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
+        val overstyrtInput = grunnlag.finnOverstyrtInput(periode, arbeidPerArbeidsforhold.keys)
 
-        return BeregnGrader.beregn(
+        val beregnGraderGrunnlag = BeregnGraderGrunnlag(
             pleiebehov = pleiebehov,
             etablertTilsyn = etablertTilsyn,
             oppgittTilsyn = oppgittTilsyn,
@@ -204,7 +205,11 @@ internal object UttaksplanRegler {
             andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
             arbeid = arbeidPerArbeidsforhold,
             overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
-            ytelseType = grunnlag.ytelseType
+            ytelseType = grunnlag.ytelseType,
+            overstyrtInput = overstyrtInput
+        )
+        return BeregnGrader.beregn(
+            beregnGraderGrunnlag
         )
     }
 

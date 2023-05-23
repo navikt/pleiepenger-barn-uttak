@@ -80,6 +80,47 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Overstyrt uttaksgrad av IKKE_YRKESAKTIV`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-08")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    IKKE_YRKESAKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+        ).copy(overstyrtInput = mapOf(LukketPeriode("2020-01-01/2020-01-02") to OverstyrtInput(overstyrtUttaksgrad = BigDecimal.ZERO, arbeidsforhold = IKKE_YRKESAKTIV)))
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-01/2020-01-02")),
+            grad = BigDecimal.ZERO,
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to BigDecimal.ZERO
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-03/2020-01-03"), LukketPeriode("2020-01-06/2020-01-08")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
     internal fun `Enkelt uttak over lengre perioder kan slås sammen`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-03-31")
         val grunnlag = lagGrunnlag(

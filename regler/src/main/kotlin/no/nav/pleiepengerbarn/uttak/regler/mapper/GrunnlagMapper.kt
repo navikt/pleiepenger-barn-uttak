@@ -55,6 +55,7 @@ object GrunnlagMapper {
             nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
             kravprioritetForBehandlinger = kravprioritetForBehandlinger,
             utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
+            overstyrtInput = uttaksgrunnlag.overstyrtInput,
             commitId = commitId
         )
     }

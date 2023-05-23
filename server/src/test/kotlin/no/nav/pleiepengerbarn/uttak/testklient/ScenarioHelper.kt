@@ -13,6 +13,7 @@ internal val INGENTING = Duration.ZERO
 internal val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
 
 internal val ARBEIDSFORHOLD1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
+internal val IKKE_YRKESAKTIV = Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123456789")
 internal val ARBEIDSFORHOLD2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val ARBEIDSFORHOLD3 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "121212121")
