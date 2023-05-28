@@ -1,0 +1,14 @@
+name: Dependency Submission
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "pom.xml"
+      - "**/pom.xml"
+  workflow_dispatch:
+  
+jobs:
+  deps:
+    uses: navikt/sif-gha-workflows/.github/workflows/maven-dependency-submission.yml@main
+    secrets: inherit
