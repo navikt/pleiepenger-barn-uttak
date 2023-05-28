@@ -29,5 +29,8 @@ data class Arbeidsforhold(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class ArbeidsforholdPeriodeInfo(
     @JsonProperty("jobberNormalt") val jobberNormalt: Duration,
-    @JsonProperty("jobberNå") val jobberNå: Duration
-)
+    @JsonProperty("jobberNå") val jobberNå: Duration,
+    @JsonProperty("tilkommet") val tilkommet: Boolean? = null
+) {
+    constructor(jobberNormalt: Duration, jobberNå: Duration) : this(jobberNormalt, jobberNå, null)
+}

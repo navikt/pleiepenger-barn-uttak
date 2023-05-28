@@ -6,5 +6,6 @@ import java.time.Duration
 data class Utbetalingsgrad(
     val utbetalingsgrad: Prosent,
     val normalArbeidstid: Duration,
-    val faktiskArbeidstid: Duration?
+    val faktiskArbeidstid: Duration?,
+    val tilkommet: Boolean?
 )

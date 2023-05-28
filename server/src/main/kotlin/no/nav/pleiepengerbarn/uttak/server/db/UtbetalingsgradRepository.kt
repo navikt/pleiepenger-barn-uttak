@@ -28,8 +28,8 @@ class UtbetalingsgradRepository {
 
         val sql = """
             insert into 
-            utbetalingsgrad(id, uttaksperiode_id, arbeidstype, organisasjonsnummer, aktoer_id, arbeidsforhold_id, normal_arbeidstid, faktisk_arbeidstid, utbetalingsgrad)
-            values(nextval('seq_utbetalingsgrad'), ?, ?, ?, ?, ?, ?, ?, ?)
+            utbetalingsgrad(id, uttaksperiode_id, arbeidstype, organisasjonsnummer, aktoer_id, arbeidsforhold_id, normal_arbeidstid, faktisk_arbeidstid, utbetalingsgrad, tilkommet)
+            values(nextval('seq_utbetalingsgrad'), ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         jdbcTemplate.batchUpdate(sql, object : BatchPreparedStatementSetter {
@@ -50,6 +50,7 @@ class UtbetalingsgradRepository {
                     statement.setString(6, normalArbeidstid.toString())
                     statement.setString(7, faktiskArbeidstid?.toString())
                     statement.setBigDecimal(8, utbetalingsgrad)
+                    statement.setBoolean(9, tilkommet?:false)
                 }
 
             }
@@ -63,7 +64,7 @@ class UtbetalingsgradRepository {
     internal fun hentUtbetalingsgrader(uttaksresultatId: Long): Map<Long, List<Utbetalingsgrader>> {
 
         val sql = """
-            select ug.uttaksperiode_id, ug.arbeidstype, ug.organisasjonsnummer, ug.aktoer_id, ug.arbeidsforhold_id, ug.normal_arbeidstid, ug.faktisk_arbeidstid, ug.utbetalingsgrad
+            select ug.uttaksperiode_id, ug.arbeidstype, ug.organisasjonsnummer, ug.aktoer_id, ug.arbeidsforhold_id, ug.normal_arbeidstid, ug.faktisk_arbeidstid, ug.utbetalingsgrad, ug.tilkommet
             from uttaksresultat ur, uttaksperiode up, utbetalingsgrad ug
             where ur.id = ? and ur.id = up.uttaksresultat_id and up.id = ug.uttaksperiode_id
             order by ug.arbeidstype, ug.organisasjonsnummer, ug.aktoer_id, ug.arbeidsforhold_id
@@ -81,7 +82,8 @@ class UtbetalingsgradRepository {
                 ),
                 normalArbeidstid = Duration.parse(rs.getString("normal_arbeidstid")),
                 faktiskArbeidstid = Duration.parse(rs.getString("faktisk_arbeidstid")),
-                utbetalingsgrad = rs.getBigDecimal("utbetalingsgrad")
+                utbetalingsgrad = rs.getBigDecimal("utbetalingsgrad"),
+                tilkommet = rs.getBoolean("tilkommet")
             )
             UttaksperiodeIdOgUtbetalingsgrader(uttaksperiodeId, utbetalingsgrader)
         }

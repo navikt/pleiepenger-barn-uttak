@@ -183,7 +183,8 @@ internal object UttaksplanRegler {
                 arbeidsforhold = it.key,
                 utbetalingsgrad = utbetalingsgrad,
                 normalArbeidstid = it.value.normalArbeidstid,
-                faktiskArbeidstid = it.value.faktiskArbeidstid
+                faktiskArbeidstid = it.value.faktiskArbeidstid,
+                tilkommet = it.value.tilkommet
             )
         }
     }
