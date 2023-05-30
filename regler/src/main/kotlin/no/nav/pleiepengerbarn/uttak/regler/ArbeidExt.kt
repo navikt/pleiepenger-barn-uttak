@@ -16,9 +16,12 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
         this.filter {
             Arbeidstype.values()
                 .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+                    && it.value.tilkommet != true
         }
     } else {
-        this
+        this.filter {
+            it.value.tilkommet != true
+        }
     }
     oppdatertArbeid.values.forEach {
         sumJobberNå += if (it.jobberNå > it.jobberNormalt) {

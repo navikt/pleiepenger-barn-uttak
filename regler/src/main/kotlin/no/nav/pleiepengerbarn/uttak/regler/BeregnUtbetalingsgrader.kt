@@ -54,6 +54,8 @@ object BeregnUtbetalingsgrader {
         arbeid.entries.filter {
             !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
+        }.filter {
+            it.value.tilkommet != true
         }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
@@ -103,7 +105,8 @@ object BeregnUtbetalingsgrader {
             utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
                 utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
                 normalArbeidstid = info.jobberNormalt,
-                faktiskArbeidstid = info.jobberNå
+                faktiskArbeidstid = info.jobberNå,
+                tilkommet = info.tilkommet
             )
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
@@ -149,7 +152,8 @@ object BeregnUtbetalingsgrader {
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
                     utbetalingsgrad = utbetalingsgrad,
                     normalArbeidstid = info.jobberNormalt,
-                    faktiskArbeidstid = info.jobberNå
+                    faktiskArbeidstid = info.jobberNå,
+                    tilkommet = info.tilkommet
                 )
                 sumTimerForbrukt += timerForbrukt
             }
@@ -204,6 +208,9 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforhold
 }
 
 private fun ArbeidsforholdPeriodeInfo.taptArbeid(): Duration {
+    if (tilkommet == true) {
+        return Duration.ZERO
+    }
     if (jobberNå > jobberNormalt) {
         return Duration.ZERO
     }

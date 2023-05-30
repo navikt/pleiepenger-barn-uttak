@@ -78,7 +78,8 @@ object EndringsstatusOppdaterer {
                     utbetalingsgrad = it.utbetalingsgrad.setScale(
                         2,
                         RoundingMode.HALF_UP
-                    )
+                    ),
+                    tilkommet = (it.tilkommet == true)
                 )
             }.sortedWith(
                 compareBy(
@@ -117,7 +118,8 @@ object EndringsstatusOppdaterer {
                         RoundingMode.HALF_UP
                     ),
                     faktiskArbeidstid = Duration.ZERO,
-                    normalArbeidstid = Duration.ZERO
+                    normalArbeidstid = Duration.ZERO,
+                    tilkommet = (it.tilkommet == true)
                 )
             }.sortedWith(
                 compareBy(

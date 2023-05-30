@@ -150,7 +150,8 @@ private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, Arbeidsforh
     forEach { utbetalingsgrader ->
         arbeid[utbetalingsgrader.arbeidsforhold] = ArbeidsforholdPeriodeInfo(
             utbetalingsgrader.normalArbeidstid,
-            utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO
+            utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO,
+            utbetalingsgrader.tilkommet
         )
     }
     return arbeid

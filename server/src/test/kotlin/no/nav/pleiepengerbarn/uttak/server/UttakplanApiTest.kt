@@ -152,6 +152,47 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         )
     }
 
+    @Test
+    internal fun `Vanlig arbeidsforhold kombinert med arbeidsforhold som er tilkommet`() {
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD2,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG.prosent(70),
+                            jobberNå = FULL_DAG.prosent(70).prosent(50),
+                            tilkommet = true
+                        )
+                    )
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD3,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG.prosent(20),
+                            jobberNå = INGENTING
+                        )
+                    )
+                ),
+            ),
+            pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
+        )
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = LukketPeriode("2020-10-12/2020-10-16"),
+            grad = Prosent(100),
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD2 to Prosent(0),
+                ARBEIDSFORHOLD3 to Prosent(100)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
 
     @Test
     internal fun `Uttak på to arbeidsforhold hvor det ene har faktisk arbeid større enn normalt arbeid`() {
