@@ -106,7 +106,7 @@ object BeregnUtbetalingsgrader {
                 utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
                 normalArbeidstid = info.jobberNormalt,
                 faktiskArbeidstid = info.jobberNå,
-                tilkommet = false
+                tilkommet = info.tilkommet
             )
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
