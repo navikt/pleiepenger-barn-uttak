@@ -66,6 +66,6 @@ spec:
     - name: UTVIDET_LOGGING
       value: "false"
     - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT
-      value: "true"
+      value: "2023-06-01"
     - name: GIR_ALDRI_MER_ENN_60_DAGER
       value: "true"

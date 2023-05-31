@@ -5,6 +5,8 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -25,6 +27,15 @@ internal class UttakTjenesteGraderingTest {
         private const val aktørIdBarn = "456"
     }
 
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "2023-06-01")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+    }
 
     private val helePerioden =
         LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))

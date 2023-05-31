@@ -198,14 +198,17 @@ internal object UttaksplanRegler {
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
 
         return BeregnGrader.beregn(
-            pleiebehov = pleiebehov,
-            etablertTilsyn = etablertTilsyn,
-            oppgittTilsyn = oppgittTilsyn,
-            andreSøkeresTilsyn = andrePartersTilsyn,
-            andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
-            arbeid = arbeidPerArbeidsforhold,
-            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
-            ytelseType = grunnlag.ytelseType
+            BeregnGraderGrunnlag(
+                pleiebehov = pleiebehov,
+                etablertTilsyn = etablertTilsyn,
+                oppgittTilsyn = oppgittTilsyn,
+                andreSøkeresTilsyn = andrePartersTilsyn,
+                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                arbeid = arbeidPerArbeidsforhold,
+                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
+                ytelseType = grunnlag.ytelseType,
+                periode = periode
+            )
         )
     }
 

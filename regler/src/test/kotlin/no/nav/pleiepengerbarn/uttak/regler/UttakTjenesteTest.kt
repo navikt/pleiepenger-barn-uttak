@@ -5,6 +5,8 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -22,6 +24,15 @@ internal class UttakTjenesteTest {
         private const val aktørIdBarn = "456"
     }
 
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "2023-06-01")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+    }
 
     @Test
     fun `Enkel uttaksperiode uten annen informasjon`() {

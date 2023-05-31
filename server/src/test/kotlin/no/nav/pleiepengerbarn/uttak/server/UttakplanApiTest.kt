@@ -34,11 +34,13 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     @BeforeEach
     internal fun setUp() {
         System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "2023-06-01")
     }
 
     @AfterEach
     internal fun tearDown() {
         System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
     }
 
     @Test
@@ -75,6 +77,54 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             periode = LukketPeriode("2020-01-09/2020-01-10"),
             ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
             knekkpunktTyper = setOf(KnekkpunktType.PLEIEBEHOV),
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
+    internal fun `IKKE_YRKESAKTIV skal spesialhåndteres fra satt dato og settes til hundre prosent`() {
+        val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    IKKE_YRKESAKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(50),
+                ARBEIDSFORHOLD1 to Prosent(50)
+                ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to HUNDRE_PROSENT,
+                ARBEIDSFORHOLD1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
     }
