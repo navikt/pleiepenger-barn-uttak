@@ -100,15 +100,19 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                 } else {
                     Prosent.valueOf(100)
                 }
+                val beregnGraderGrunnlag = BeregnGraderGrunnlag(
+                    pleiebehov = pleiebehov,
+                    etablertTilsyn = etablertTilsyn,
+                    oppgittTilsyn = annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
+                    andreSøkeresTilsyn = sumAndreSøkeresTilsyn,
+                    andreSøkeresTilsynReberegnet = true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
+                    overseEtablertTilsynÅrsak = finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
+                    arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
+                    ytelseType = ytelseType,
+                    periode = periode
+                )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
-                    pleiebehov,
-                    etablertTilsyn,
-                    annenPartsOverlappendePeriodeInfo.oppgittTilsyn,
-                    sumAndreSøkeresTilsyn,
-                    true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
-                    finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
-                    annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
-                    ytelseType,
+                    beregnGraderGrunnlag,
                     forrigeUttaksgrad
                 )
                 if (gjelderDenneBehandlingen(uttaksplanMedUUIDMedKrav.behandlingUUID)) {

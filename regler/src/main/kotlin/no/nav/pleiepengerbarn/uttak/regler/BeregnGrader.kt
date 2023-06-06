@@ -8,46 +8,29 @@ import java.time.Duration
 
 internal object BeregnGrader {
 
-    internal fun beregn(
-        pleiebehov: Pleiebehov,
-        etablertTilsyn: Duration,
-        oppgittTilsyn: Duration? = null,
-        andreSøkeresTilsyn: Prosent,
-        andreSøkeresTilsynReberegnet: Boolean,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        ytelseType: YtelseType
-    ): GraderBeregnet {
-        val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+    internal fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet {
+        val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
         val søkersTapteArbeidstid =
-            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
-        val uttaksgradResultat = avklarUttaksgrad(
-            ytelseType,
-            pleiebehov,
-            etablertTilsynsprosent,
-            andreSøkeresTilsyn,
-            arbeid,
-            overseEtablertTilsynÅrsak,
-            finnØnsketUttaksgradProsent(oppgittTilsyn)
-        )
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val uttaksgradResultat = avklarUttaksgrad(beregnGraderGrunnlag, etablertTilsynsprosent, finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn))
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
-            arbeid
+            beregnGraderGrunnlag
         )
 
         return GraderBeregnet(
-            pleiebehov = pleiebehov,
+            pleiebehov = beregnGraderGrunnlag.pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
                 etablertTilsyn = etablertTilsynsprosent,
-                andreSøkeresTilsyn = andreSøkeresTilsyn,
-                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                andreSøkeresTilsyn = beregnGraderGrunnlag.andreSøkeresTilsyn,
+                andreSøkeresTilsynReberegnet = beregnGraderGrunnlag.andreSøkeresTilsynReberegnet,
                 tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
                 overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
-            oppgittTilsyn = oppgittTilsyn,
+            oppgittTilsyn = beregnGraderGrunnlag.oppgittTilsyn,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
@@ -55,48 +38,37 @@ internal object BeregnGrader {
     }
 
     internal fun beregnMedMaksGrad(
-        pleiebehov: Pleiebehov,
-        etablertTilsyn: Duration,
-        oppgittTilsyn: Duration? = null,
-        andreSøkeresTilsyn: Prosent,
-        andreSøkeresTilsynReberegnet: Boolean,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        ytelseType: YtelseType,
+        beregnGraderGrunnlag: BeregnGraderGrunnlag,
         maksGradIProsent: Prosent
     ): GraderBeregnet {
-        val etablertTilsynsprosent = finnEtablertTilsynsprosent(etablertTilsyn)
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+        val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
         val søkersTapteArbeidstid =
-            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
-        val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(oppgittTilsyn);
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+        val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn);
         val ønsketUttaksgrad = finnMaksGrad(ønsketUttaksgradProsent, maksGradIProsent)
         val uttaksgradResultat = avklarUttaksgrad(
-            ytelseType,
-            pleiebehov,
+            beregnGraderGrunnlag,
             etablertTilsynsprosent,
-            andreSøkeresTilsyn,
-            arbeid,
-            overseEtablertTilsynÅrsak,
             ønsketUttaksgrad
         )
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
-            arbeid
+            beregnGraderGrunnlag
         )
 
         return GraderBeregnet(
-            pleiebehov = pleiebehov,
+            pleiebehov = beregnGraderGrunnlag.pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
                 etablertTilsyn = etablertTilsynsprosent,
-                andreSøkeresTilsyn = andreSøkeresTilsyn,
-                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                andreSøkeresTilsyn = beregnGraderGrunnlag.andreSøkeresTilsyn,
+                andreSøkeresTilsynReberegnet = beregnGraderGrunnlag.andreSøkeresTilsynReberegnet,
                 tilgjengeligForSøker = uttaksgradResultat.restTilSøker,
                 overseEtablertTilsynÅrsak = uttaksgradResultat.overseEtablertTilsynÅrsak
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
-            oppgittTilsyn = oppgittTilsyn,
+            oppgittTilsyn = beregnGraderGrunnlag.oppgittTilsyn,
             uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
@@ -111,42 +83,39 @@ internal object BeregnGrader {
     }
 
     private fun avklarUttaksgrad(
-        ytelseType: YtelseType,
-        pleiebehov: Pleiebehov,
+        beregnGraderGrunnlag: BeregnGraderGrunnlag,
         etablertTilsynprosent: Prosent,
-        andreSøkeresTilsyn: Prosent,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
         ønsketUttaksgradProsent: Prosent
     ): UttaksgradResultat {
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = arbeid.seBortFraAndreArbeidsforhold()
+
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
         val søkersTapteArbeidstid =
-            arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
 
         val restTilSøker =
-            finnRestTilSøker(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
+            finnRestTilSøker(beregnGraderGrunnlag.pleiebehov, etablertTilsynprosent, beregnGraderGrunnlag.andreSøkeresTilsyn, beregnGraderGrunnlag.overseEtablertTilsynÅrsak)
 
         if (restTilSøker < TJUE_PROSENT) {
             val forLavGradÅrsak =
-                utledForLavGradÅrsak(pleiebehov, etablertTilsynprosent, andreSøkeresTilsyn, overseEtablertTilsynÅrsak)
-            if (!(ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
+                utledForLavGradÅrsak(beregnGraderGrunnlag.pleiebehov, etablertTilsynprosent, beregnGraderGrunnlag.andreSøkeresTilsyn, beregnGraderGrunnlag.overseEtablertTilsynÅrsak)
+            if (!(beregnGraderGrunnlag.ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
                     ikkeOppfyltÅrsak = forLavGradÅrsak,
-                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                    overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
             }
         }
-        val seBortFraAndreArbeidsforhold = arbeid.seBortFraAndreArbeidsforhold()
+        val seBortFraAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
         if (seBortFraAndreArbeidsforhold) {
-            val søkersTapteArbeidstidUtenAndreArbeidsforhold = arbeid.finnSøkersTapteArbeidstid(true)
+            val søkersTapteArbeidstidUtenAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true)
             if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
                     ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID,
-                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                    overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
             }
         } else {
@@ -155,7 +124,7 @@ internal object BeregnGrader {
                     restTilSøker,
                     Prosent.ZERO,
                     ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID,
-                    overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                    overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
             }
         }
@@ -164,7 +133,7 @@ internal object BeregnGrader {
                 restTilSøker,
                 Prosent.ZERO,
                 ikkeOppfyltÅrsak = Årsak.FOR_LAV_ØNSKET_UTTAKSGRAD,
-                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
         }
 
@@ -173,7 +142,7 @@ internal object BeregnGrader {
                 restTilSøker,
                 ønsketUttaksgradProsent,
                 oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE,
-                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
         }
         if (restTilSøker < søkersTapteArbeidstid) {
@@ -181,22 +150,22 @@ internal object BeregnGrader {
                 restTilSøker,
                 restTilSøker,
                 oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
-                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
         }
-        if (arbeid.fulltFravær()) {
+        if (beregnGraderGrunnlag.arbeid.fulltFravær()) {
             return UttaksgradResultat(
                 restTilSøker,
                 søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
                 oppfyltÅrsak = Årsak.FULL_DEKNING,
-                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+                overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
         }
         return UttaksgradResultat(
             restTilSøker,
             søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
-            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak
+            overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
         )
     }
 
