@@ -34,12 +34,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     @BeforeEach
     internal fun setUp() {
         System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
-        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "2023-06-01")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO", "2023-06-01")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "true")
     }
 
     @AfterEach
     internal fun tearDown() {
         System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")
         System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
     }
 

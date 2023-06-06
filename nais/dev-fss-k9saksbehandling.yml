@@ -65,7 +65,9 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
+    - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO
+      value: "2023-05-01"
     - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT
-      value: "2023-06-01"
+      value: "true"
     - name: GIR_ALDRI_MER_ENN_60_DAGER
       value: "true"

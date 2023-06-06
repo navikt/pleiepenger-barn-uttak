@@ -130,7 +130,8 @@ object BeregnUtbetalingsgrader {
             HUNDRE_PROSENT
         } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
-        } else if(!periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")))) {
+        } else if(FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") &&
+            !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad

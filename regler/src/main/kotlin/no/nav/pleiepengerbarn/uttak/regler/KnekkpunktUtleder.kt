@@ -39,7 +39,7 @@ internal object KnekkpunktUtleder {
         finnForSøkersDød(knekkpunkMap, regelGrunnlag.søker)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
-        finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap)
+        if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
@@ -49,7 +49,7 @@ internal object KnekkpunktUtleder {
     }
 
     private fun finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>) {
-        val startDato = LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT"))
+        val startDato = LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO"))
         oppdaterKnekkpunktMap(knekkpunkMap, startDato, KnekkpunktType.START_SPESIALHÅNDTERING_TILKOMMEN)
     }
 

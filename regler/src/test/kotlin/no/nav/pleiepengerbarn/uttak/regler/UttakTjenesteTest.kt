@@ -26,11 +26,13 @@ internal class UttakTjenesteTest {
 
     @BeforeEach
     internal fun setUp() {
-        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "2023-06-01")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO", "2023-06-01")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "false")
     }
 
     @AfterEach
     internal fun tearDown() {
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")
         System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
     }
 
