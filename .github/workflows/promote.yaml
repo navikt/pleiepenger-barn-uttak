@@ -26,15 +26,19 @@ jobs:
             });
 
       - name: Setter IMAGE som brukes i deploy filen & tag for kode checkout
+        env:
+          TAG_INPUT: ${{ steps.issue_comment.outputs.title }}
+          SHA_INPUT: ${{ steps.issue_comment.outputs.sha }}
+          CLUSTER_INPUT: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
         run: |
-          echo "IMAGE=$IMAGE_BASE:$(echo ${{ steps.issue_comment.outputs.title }} | awk '{print $NF}' | grep -oE '[[:alnum:]_-]+')" >> $GITHUB_ENV
-          echo "SHA=$(echo ${{ steps.issue_comment.outputs.sha }} | awk '{print $NF}' | grep -oE '[[:alnum:]_-]+')" >> $GITHUB_ENV
-          echo "CLUSTER=$(echo ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }} | grep -oE '[[:alnum:]_-]+')" >> $GITHUB_ENV
+          echo "IMAGE=$IMAGE_BASE:$(echo $TAG_INPUT | awk '{print $NF}')" >> $GITHUB_ENV
+          echo "SHA=$(echo $SHA_INPUT | awk '{print $NF}')" >> $GITHUB_ENV
+          echo "CLUSTER=$CLUSTER_INPUT" >> $GITHUB_ENV
 
       - name: Sjekk ut kode
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
         with:
-          ref: ${{ env.TAG }}
+          ref: ${{ env.SHA }}
 
       - name: Promoter til cluster og namespace
         uses: nais/deploy/actions/deploy@v1
