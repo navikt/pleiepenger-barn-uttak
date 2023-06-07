@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
@@ -19,5 +20,6 @@ data class BeregnGraderGrunnlag (
     val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
     val ytelseType: YtelseType,
+    val periode: LukketPeriode,
     val overstyrtInput: OverstyrtInput? = null
 )

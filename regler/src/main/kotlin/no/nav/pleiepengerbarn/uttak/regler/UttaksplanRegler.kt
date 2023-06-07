@@ -183,7 +183,8 @@ internal object UttaksplanRegler {
                 arbeidsforhold = it.key,
                 utbetalingsgrad = utbetalingsgrad,
                 normalArbeidstid = it.value.normalArbeidstid,
-                faktiskArbeidstid = it.value.faktiskArbeidstid
+                faktiskArbeidstid = it.value.faktiskArbeidstid,
+                tilkommet = it.value.tilkommet
             )
         }
     }
@@ -197,19 +198,19 @@ internal object UttaksplanRegler {
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode, arbeidPerArbeidsforhold.keys)
 
-        val beregnGraderGrunnlag = BeregnGraderGrunnlag(
-            pleiebehov = pleiebehov,
-            etablertTilsyn = etablertTilsyn,
-            oppgittTilsyn = oppgittTilsyn,
-            andreSøkeresTilsyn = andrePartersTilsyn,
-            andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
-            arbeid = arbeidPerArbeidsforhold,
-            overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
-            ytelseType = grunnlag.ytelseType,
-            overstyrtInput = overstyrtInput
-        )
         return BeregnGrader.beregn(
-            beregnGraderGrunnlag
+            BeregnGraderGrunnlag(
+                pleiebehov = pleiebehov,
+                etablertTilsyn = etablertTilsyn,
+                oppgittTilsyn = oppgittTilsyn,
+                andreSøkeresTilsyn = andrePartersTilsyn,
+                andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                arbeid = arbeidPerArbeidsforhold,
+                overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
+                ytelseType = grunnlag.ytelseType,
+                periode = periode,
+                overstyrtInput = overstyrtInput
+            )
         )
     }
 

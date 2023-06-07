@@ -5,9 +5,12 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.RoundingMode
 import java.time.Duration
+import java.time.LocalDate
 
 internal class BeregnGraderTest {
 
@@ -21,6 +24,19 @@ internal class BeregnGraderTest {
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
+    private val PERIODE = LukketPeriode(LocalDate.now(), LocalDate.now())
+
+    @BeforeEach
+    internal fun setUp() {
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO", "2023-06-01")
+        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "false")
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")
+        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+    }
 
     @Test
     internal fun `100 prosent vanlig uttak`() {
@@ -33,7 +49,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -56,7 +73,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PLS
+                ytelseType = YtelseType.PLS,
+                periode = PERIODE
             )
         )
 
@@ -79,7 +97,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PLS
+                ytelseType = YtelseType.PLS,
+                periode = PERIODE
             )
         )
 
@@ -102,7 +121,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -124,7 +144,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -146,7 +167,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -168,7 +190,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -198,7 +221,8 @@ internal class BeregnGraderTest {
                     jobberNå = Duration.ofHours(1)
                 )
             ),
-            ytelseType = YtelseType.PSB
+            ytelseType = YtelseType.PSB,
+            periode = PERIODE
         )
     )
 
@@ -225,7 +249,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -259,7 +284,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -291,7 +317,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -326,7 +353,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -358,7 +386,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -386,7 +415,8 @@ internal class BeregnGraderTest {
                         jobberNå = INGENTING
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -417,7 +447,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(1).plusMinutes(30)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -447,7 +478,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(2).plusMinutes(15)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -477,7 +509,8 @@ internal class BeregnGraderTest {
                         jobberNå = Duration.ofHours(2)
                     )
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -504,7 +537,8 @@ internal class BeregnGraderTest {
                     ),
                     ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -531,7 +565,8 @@ internal class BeregnGraderTest {
                     ),
                     ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -554,7 +589,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -576,7 +612,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(70)),
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -598,7 +635,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -621,7 +659,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -644,7 +683,8 @@ internal class BeregnGraderTest {
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -668,7 +708,8 @@ internal class BeregnGraderTest {
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -692,7 +733,8 @@ internal class BeregnGraderTest {
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -717,7 +759,8 @@ internal class BeregnGraderTest {
                     ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25)),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -742,7 +785,8 @@ internal class BeregnGraderTest {
                     DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -767,7 +811,8 @@ internal class BeregnGraderTest {
                     DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -793,7 +838,8 @@ internal class BeregnGraderTest {
                     INAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -820,7 +866,8 @@ internal class BeregnGraderTest {
                     DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -849,7 +896,8 @@ internal class BeregnGraderTest {
                     ),
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 
@@ -872,7 +920,8 @@ internal class BeregnGraderTest {
                 arbeid = mapOf(
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))
                 ),
-                ytelseType = YtelseType.PSB
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE
             )
         )
 

@@ -108,7 +108,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     andreSøkeresTilsynReberegnet = true, //NB: Alltid true her siden dette er en del av reberegning, men verdien brukes her ikke til noe.
                     overseEtablertTilsynÅrsak = finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
                     arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
-                    ytelseType = ytelseType
+                    ytelseType = ytelseType,
+                    periode = periode
                 )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     beregnGraderGrunnlag,
@@ -153,7 +154,8 @@ private fun List<Utbetalingsgrader>.tilArbeid(): Map<Arbeidsforhold, Arbeidsforh
     forEach { utbetalingsgrader ->
         arbeid[utbetalingsgrader.arbeidsforhold] = ArbeidsforholdPeriodeInfo(
             utbetalingsgrader.normalArbeidstid,
-            utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO
+            utbetalingsgrader.faktiskArbeidstid ?: Duration.ZERO,
+            utbetalingsgrader.tilkommet
         )
     }
     return arbeid

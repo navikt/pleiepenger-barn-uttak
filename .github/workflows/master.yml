@@ -79,7 +79,7 @@ jobs:
                owner: context.issue.owner,
                repo: context.issue.repo,
                labels: ['deployment'],
-               body: 'Kommenter enten "/promote dev-fss k9saksbehandling" eller "/promote prod-fss k9saksbehandling"',
+               body: '${{ github.sha }}',
                title: 'Deploy av ${{ env.TAG }}'})
              .then(response => {
                      core.setOutput('number', response.data.number);
@@ -95,5 +95,5 @@ jobs:
                             issue_number: ${{ steps.createdeployissue.outputs.number }} }
             github.rest.issues.createComment({...issue,
                                     title: 'Deploy av ${{ env.TAG }}',
-                                    body: '/promote dev-fss k9saksbehandling'})
+                                    body: '/promote dev-fss'})
 

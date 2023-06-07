@@ -17,7 +17,7 @@ internal object BeregnGrader {
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
-            beregnGraderGrunnlag.arbeid
+            beregnGraderGrunnlag
         )
 
         return GraderBeregnet(
@@ -55,7 +55,7 @@ internal object BeregnGrader {
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
-            beregnGraderGrunnlag.arbeid
+            beregnGraderGrunnlag
         )
 
         return GraderBeregnet(

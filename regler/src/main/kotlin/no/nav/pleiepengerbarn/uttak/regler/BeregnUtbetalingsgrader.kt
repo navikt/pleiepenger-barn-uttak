@@ -2,11 +2,13 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
+import java.time.LocalDate
 
 enum class Arbeidstype(val kode: String) {
     ARBEIDSTAKER("AT"),
@@ -46,14 +48,16 @@ object BeregnUtbetalingsgrader {
     internal fun beregn(
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
-        arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>
+        beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
-        arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
+        beregnGraderGrunnlag.arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
 
         var sumJobberNormalt = Duration.ZERO
-        arbeid.entries.filter {
+        beregnGraderGrunnlag.arbeid.entries.filter {
             !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
+        }.filter {
+            it.value.tilkommet != true
         }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
@@ -62,11 +66,11 @@ object BeregnUtbetalingsgrader {
 
         var gjenværendeTimerSomDekkes = timerSomDekkes
 
-        val spesialhåndteringsgruppeSkalSpesialhåndteres = arbeid.harSpesialhåndteringstilfelle()
+        val spesialhåndteringsgruppeSkalSpesialhåndteres = beregnGraderGrunnlag.arbeid.harSpesialhåndteringstilfelle()
 
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
-            val arbeidForAktivitetsgruppe = arbeid.forAktivitetsgruppe(aktivitetsgruppe)
+            val arbeidForAktivitetsgruppe = beregnGraderGrunnlag.arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES) {
                 val utbetalingsgraderForSpesialhåndtering =
                     beregnForSpesialhåndtertGruppe(
@@ -74,7 +78,8 @@ object BeregnUtbetalingsgrader {
                         gjenværendeTimerSomDekkes,
                         uttaksgrad,
                         gradertMotTilsyn,
-                        spesialhåndteringsgruppeSkalSpesialhåndteres
+                        spesialhåndteringsgruppeSkalSpesialhåndteres,
+                        beregnGraderGrunnlag.periode
                     )
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {
@@ -96,14 +101,16 @@ object BeregnUtbetalingsgrader {
         gjenværendeTimerSomDekkes: Duration,
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
-        spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean
+        spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
+        periode: LukketPeriode
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
             utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
+                utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, periode),
                 normalArbeidstid = info.jobberNormalt,
-                faktiskArbeidstid = info.jobberNå
+                faktiskArbeidstid = info.jobberNå,
+                tilkommet = info.tilkommet
             )
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
@@ -116,13 +123,15 @@ object BeregnUtbetalingsgrader {
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
-        type: String
+        type: String,
+        periode: LukketPeriode
     ): Prosent {
         return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
         } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
-        } else if(FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) {
+        } else if(FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") &&
+            !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad
@@ -149,7 +158,8 @@ object BeregnUtbetalingsgrader {
                 utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
                     utbetalingsgrad = utbetalingsgrad,
                     normalArbeidstid = info.jobberNormalt,
-                    faktiskArbeidstid = info.jobberNå
+                    faktiskArbeidstid = info.jobberNå,
+                    tilkommet = info.tilkommet
                 )
                 sumTimerForbrukt += timerForbrukt
             }
@@ -204,6 +214,9 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforhold
 }
 
 private fun ArbeidsforholdPeriodeInfo.taptArbeid(): Duration {
+    if (tilkommet == true) {
+        return Duration.ZERO
+    }
     if (jobberNå > jobberNormalt) {
         return Duration.ZERO
     }

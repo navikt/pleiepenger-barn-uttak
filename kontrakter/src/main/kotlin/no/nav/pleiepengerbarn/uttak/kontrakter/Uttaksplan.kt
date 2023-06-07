@@ -66,8 +66,11 @@ data class Utbetalingsgrader @JsonCreator constructor(
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
     @JsonProperty("normalArbeidstid") val normalArbeidstid: Duration,
     @JsonProperty("faktiskArbeidstid") val faktiskArbeidstid: Duration?,
-    @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent
-)
+    @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent,
+    @JsonProperty("tilkommet") val tilkommet: Boolean? = null
+) {
+    constructor(arbeidsforhold: Arbeidsforhold, normalArbeidstid: Duration, faktiskArbeidstid: Duration?, utbetalingsgrad: Prosent) : this(arbeidsforhold, normalArbeidstid, faktiskArbeidstid, utbetalingsgrad, false)
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
