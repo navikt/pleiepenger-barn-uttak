@@ -5,14 +5,15 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
+import java.time.LocalDate
 
 internal object BeregnGrader {
 
     internal fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode)
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper, beregnGraderGrunnlag.periode)
         val uttaksgradResultat = avklarUttaksgrad(beregnGraderGrunnlag, etablertTilsynsprosent, finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn))
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
@@ -42,9 +43,9 @@ internal object BeregnGrader {
         maksGradIProsent: Prosent
     ): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode)
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper, beregnGraderGrunnlag.periode)
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn);
         val ønsketUttaksgrad = finnMaksGrad(ønsketUttaksgradProsent, maksGradIProsent)
         val uttaksgradResultat = avklarUttaksgrad(
@@ -88,9 +89,9 @@ internal object BeregnGrader {
         ønsketUttaksgradProsent: Prosent
     ): UttaksgradResultat {
 
-        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
+        val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode)
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper, beregnGraderGrunnlag.periode)
 
         val restTilSøker =
             finnRestTilSøker(beregnGraderGrunnlag.pleiebehov, etablertTilsynprosent, beregnGraderGrunnlag.andreSøkeresTilsyn, beregnGraderGrunnlag.overseEtablertTilsynÅrsak)
@@ -107,9 +108,9 @@ internal object BeregnGrader {
                 )
             }
         }
-        val seBortFraAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold()
+        val seBortFraAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode)
         if (seBortFraAndreArbeidsforhold) {
-            val søkersTapteArbeidstidUtenAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true)
+            val søkersTapteArbeidstidUtenAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true, beregnGraderGrunnlag.periode)
             if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
@@ -254,7 +255,10 @@ internal object BeregnGrader {
 
 }
 
-private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(): Boolean {
+private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(periode: LukketPeriode): Boolean {
+    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") &&
+        !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))
+
     val harIkkeYrkesaktiv = this.keys.any {
         GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
             Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type })
@@ -265,7 +269,7 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeids
                 && !(Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær())
     }
 
-    return harIkkeYrkesaktiv && harAndreArbeidsforhold
+    return harIkkeYrkesaktiv && harAndreArbeidsforhold && !nyeReglerGjelder
 }
 
 private fun ArbeidsforholdPeriodeInfo.utenArbeidtid() =

@@ -66,7 +66,7 @@ object BeregnUtbetalingsgrader {
 
         var gjenværendeTimerSomDekkes = timerSomDekkes
 
-        val spesialhåndteringsgruppeSkalSpesialhåndteres = beregnGraderGrunnlag.arbeid.harSpesialhåndteringstilfelle()
+        val spesialhåndteringsgruppeSkalSpesialhåndteres = beregnGraderGrunnlag.arbeid.harSpesialhåndteringstilfelle(beregnGraderGrunnlag.periode)
 
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
