@@ -10,8 +10,7 @@ import java.time.Duration
 import java.time.LocalDate
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(
-    skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean,
-    periode: LukketPeriode
+    skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean
 ): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
@@ -20,8 +19,6 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
             Arbeidstype.values()
                 .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
                     && it.value.tilkommet != true
-                    && (!FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") &&
-                    periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO"))))
         }
     } else {
         this.filter {
@@ -72,8 +69,8 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndterin
     }
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 
-    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT") &&
-    !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))
+    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+            && !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))
 
     return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær && !nyeReglerGjelder
 }

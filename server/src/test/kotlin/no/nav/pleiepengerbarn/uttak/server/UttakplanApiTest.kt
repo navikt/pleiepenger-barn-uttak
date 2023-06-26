@@ -108,10 +108,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertIkkeOppfylt(
-            periode = LukketPeriode("2023-05-29/2023-05-31"),
-            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),
-            knekkpunktTyper = setOf(),
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(50),
+                ARBEIDSFORHOLD1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
 
@@ -1516,14 +1520,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val behandlingUUID1 = nesteBehandlingId()
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
-        //val arbeidSøker2 = Arbeid(Arbeidsforhold(type = "AT", organisasjonsnummer = "965874368"), mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
-        //val arbeidSøker4 = Arbeid(Arbeidsforhold(type = "AT", organisasjonsnummer = "368594762"), mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
         val arbeidSøker5 = Arbeid(ARBEIDSFORHOLD2, mapOf(LukketPeriode("2022-11-30/2022-12-31") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
         val arbeidSøker6 = Arbeid(FRILANS1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(0).plusMinutes(2), Duration.ofHours(0).plusMinutes(2))))
         val grunnlag1Søker1 = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(arbeidSøker1, arbeidSøker5, arbeidSøker6),
-            //arbeid = listOf(arbeidSøker1, arbeidSøker2, arbeidSøker4, arbeidSøker5, arbeidSøker6),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             behandlingUUID = behandlingUUID1,
             saksnummer = nesteSaksnummer()
