@@ -143,7 +143,10 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ),
                 Arbeid(
                     ARBEIDSFORHOLD1,
-                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(2), jobberNå = INGENTING, tilkommet = true))
+                    mapOf(
+                        LukketPeriode("2023-05-29/2023-05-31") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = false), // k9-sak knekker perioden og setter false på feature-toggle-dato.
+                        LukketPeriode("2023-06-01/2023-06-02") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = true)
+                    )
                 )
             ),
             pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
@@ -156,10 +159,14 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertIkkeOppfylt(
-            periode = LukketPeriode("2023-05-29/2023-05-31"),
-            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_TAPT_ARBEIDSTID),
-            knekkpunktTyper = setOf(),
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(75),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(75),
+                ARBEIDSFORHOLD1 to Prosent(75)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
 
@@ -170,7 +177,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 IKKE_YRKESAKTIV to Prosent(100),
                 ARBEIDSFORHOLD1 to Prosent(0)
             ),
-            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            
+            /*
+             * Ved tilkommet aktivitet får man årsaken AVKORTET_MOT_INNTEKT
+             * fremfor FULL_DEKNING
+             */
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
 
