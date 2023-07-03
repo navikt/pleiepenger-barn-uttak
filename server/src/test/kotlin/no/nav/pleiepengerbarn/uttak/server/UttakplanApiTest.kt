@@ -114,7 +114,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to Prosent(50),
                 ARBEIDSFORHOLD1 to Prosent(50)
-                ),
+            ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
@@ -129,6 +129,63 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
+    }
+
+    @Test
+    internal fun `IKKE_YRKESAKTIV skal spesialhåndteres fra satt dato og settes til hundre prosent når tilkommen er satt til true`() {
+        val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    IKKE_YRKESAKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING, tilkommet = false))
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(
+                        LukketPeriode("2023-05-29/2023-05-31") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = false), // k9-sak knekker perioden og setter false på feature-toggle-dato.
+                        LukketPeriode("2023-06-01/2023-06-02") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = true)
+                    )
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(75),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(75),
+                ARBEIDSFORHOLD1 to Prosent(75)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(100),
+                ARBEIDSFORHOLD1 to Prosent(0)
+            ),
+            
+            /*
+             * Ved tilkommet aktivitet får man årsaken AVKORTET_MOT_INNTEKT
+             * fremfor FULL_DEKNING
+             */
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
     }
 
     @Test
@@ -1475,13 +1532,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val behandlingUUID1 = nesteBehandlingId()
 
         val arbeidSøker1 = Arbeid(ARBEIDSFORHOLD1, mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
-        val arbeidSøker2 = Arbeid(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123956789"), mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
-        val arbeidSøker4 = Arbeid(Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "123956769"), mapOf(LukketPeriode("2023-01-01/2023-02-22") to ArbeidsforholdPeriodeInfo(Duration.ofHours(7).plusMinutes(30), Duration.ZERO)))
         val arbeidSøker5 = Arbeid(ARBEIDSFORHOLD2, mapOf(LukketPeriode("2022-11-30/2022-12-31") to ArbeidsforholdPeriodeInfo(Duration.ofHours(3).plusMinutes(45), Duration.ZERO)))
         val arbeidSøker6 = Arbeid(FRILANS1, mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(Duration.ofHours(0).plusMinutes(2), Duration.ofHours(0).plusMinutes(2))))
         val grunnlag1Søker1 = lagGrunnlag(
             søknadsperiode = søknadsperiode,
-            arbeid = listOf(arbeidSøker1, arbeidSøker2, arbeidSøker4, arbeidSøker5, arbeidSøker6),
+            arbeid = listOf(arbeidSøker1, arbeidSøker5, arbeidSøker6),
             pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_100),
             behandlingUUID = behandlingUUID1,
             saksnummer = nesteSaksnummer()

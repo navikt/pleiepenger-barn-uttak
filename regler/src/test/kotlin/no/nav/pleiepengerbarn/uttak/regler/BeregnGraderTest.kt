@@ -24,7 +24,7 @@ internal class BeregnGraderTest {
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
-    private val PERIODE = LukketPeriode(LocalDate.now(), LocalDate.now())
+    private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
 
     @BeforeEach
     internal fun setUp() {
@@ -786,7 +786,7 @@ internal class BeregnGraderTest {
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
                 ),
                 ytelseType = YtelseType.PSB,
-                periode = PERIODE
+                periode = LukketPeriode("2023-01-01/2023-01-31")
             )
         )
 
