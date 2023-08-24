@@ -58,7 +58,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
 
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(periode: LukketPeriode): Boolean {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
     val harSpesialhåndteringAktivitetstyper = any {
         Arbeidstype.values()
             .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
@@ -70,7 +70,8 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndterin
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 
     val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
-            && !periode.fom.isBefore(LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")))
+            && nyeReglerUtbetalingsgrad != null
+            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
 
     return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær && !nyeReglerGjelder
 }

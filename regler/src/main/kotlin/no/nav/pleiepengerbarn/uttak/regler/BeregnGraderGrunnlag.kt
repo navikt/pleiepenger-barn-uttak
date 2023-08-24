@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.time.Duration
+import java.time.LocalDate
 
 
 data class BeregnGraderGrunnlag (
@@ -13,5 +14,6 @@ data class BeregnGraderGrunnlag (
     val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
     val ytelseType: YtelseType,
-    val periode: LukketPeriode
+    val periode: LukketPeriode,
+    val nyeReglerUtbetalingsgrad: LocalDate?
 )

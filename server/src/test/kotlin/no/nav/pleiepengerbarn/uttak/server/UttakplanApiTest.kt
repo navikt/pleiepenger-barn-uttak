@@ -34,14 +34,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     @BeforeEach
     internal fun setUp() {
         System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
-        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO", "2023-06-01")
         System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "true")
     }
 
     @AfterEach
     internal fun tearDown() {
         System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
-        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")
         System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
     }
 
@@ -99,6 +97,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 )
             ),
             pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+            nyeReglerUtbetalingsgrad = LocalDate.parse("2023-06-01")
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
@@ -150,6 +149,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 )
             ),
             pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+            nyeReglerUtbetalingsgrad = LocalDate.parse("2023-06-01")
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)

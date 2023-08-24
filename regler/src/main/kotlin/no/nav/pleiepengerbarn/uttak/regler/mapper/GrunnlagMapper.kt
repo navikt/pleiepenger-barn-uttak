@@ -41,6 +41,7 @@ object GrunnlagMapper {
             barn = uttaksgrunnlag.barn,
             søker = uttaksgrunnlag.søker,
             pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
+            nyeReglerUtbetalingsgrad = uttaksgrunnlag.nyeReglerUtbetalingsgrad,
             søktUttak = søknadsperioderSortert,
             trukketUttak = uttaksgrunnlag.trukketUttak,
             arbeid = uttaksgrunnlag.arbeid,

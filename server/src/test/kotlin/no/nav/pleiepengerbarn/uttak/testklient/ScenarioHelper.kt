@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import java.time.Duration
+import java.time.LocalDate
 import java.util.*
 
 internal val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
@@ -56,7 +57,8 @@ internal fun lagGrunnlag(
     nattevåk: Map<LukketPeriode, Utfall> = mapOf(),
     bereskap: Map<LukketPeriode, Utfall> = mapOf(),
     saksnummer: Saksnummer = nesteSaksnummer(),
-    behandlingUUID: BehandlingUUID = nesteBehandlingId()
+    behandlingUUID: BehandlingUUID = nesteBehandlingId(),
+    nyeReglerUtbetalingsgrad: LocalDate? = null
 ): Uttaksgrunnlag {
     return Uttaksgrunnlag(
         ytelseType = ytelseType,
@@ -69,7 +71,8 @@ internal fun lagGrunnlag(
         pleiebehov = pleiebehov,
         tilsynsperioder = tilsynsperioder,
         nattevåksperioder = nattevåk,
-        beredskapsperioder = bereskap
+        beredskapsperioder = bereskap,
+        nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad
     )
 }
 
