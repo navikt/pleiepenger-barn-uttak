@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.Arbeidstype
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -15,6 +16,7 @@ internal val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
 
 internal val ARBEIDSFORHOLD1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
 internal val IKKE_YRKESAKTIV = Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "987654321")
+internal val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
 internal val ARBEIDSFORHOLD2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val ARBEIDSFORHOLD3 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "121212121")

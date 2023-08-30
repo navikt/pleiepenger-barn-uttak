@@ -131,11 +131,12 @@ object BeregnUtbetalingsgrader {
     ): Prosent {
         return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
-        } else if(type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
+        } else if (type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
-        } else if(FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+        } else if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
             && nyeReglerUtbetalingsgrad != null
-            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)) {
+            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
+            && !gradertMotTilsyn) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad

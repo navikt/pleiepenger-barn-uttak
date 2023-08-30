@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
+import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -183,6 +184,60 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
              * fremfor FULL_DEKNING
              */
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
+    }
+
+    @Test
+    internal fun `KUN_YTELSE skal spesialhåndteres fra satt dato og graderes grunnet tilsyn`() {
+        val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    KUN_YTELSE,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING, tilkommet = false))
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(
+                        LukketPeriode("2023-05-29/2023-05-31") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = false), // k9-sak knekker perioden og setter false på feature-toggle-dato.
+                        LukketPeriode("2023-06-01/2023-06-02") to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(4), Duration.ofHours(1), tilkommet = true)
+                    )
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+            nyeReglerUtbetalingsgrad = LocalDate.parse("2023-06-01")
+        ).copy(tilsynsperioder = mapOf(søknadsperiode to FULL_DAG.prosent(13)))
+
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(75),
+            gradPerArbeidsforhold = mapOf(
+                KUN_YTELSE to Prosent(75),
+                ARBEIDSFORHOLD1 to Prosent(75)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
+            grad = Prosent(87),
+            gradPerArbeidsforhold = mapOf(
+                KUN_YTELSE to Prosent(87),
+                ARBEIDSFORHOLD1 to Prosent(0)
+            ),
+            oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
             endringsstatus = Endringsstatus.NY
         )
 
