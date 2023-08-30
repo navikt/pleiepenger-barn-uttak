@@ -90,7 +90,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             arbeid = listOf(
                 Arbeid(
                     IKKE_YRKESAKTIV,
-                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
                 ),
                 Arbeid(
                     ARBEIDSFORHOLD1,
@@ -121,7 +121,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
-            grad = Prosent(50),
+            grad = Prosent(75),
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to HUNDRE_PROSENT,
                 ARBEIDSFORHOLD1 to Prosent(50)

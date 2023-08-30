@@ -51,10 +51,12 @@ object BeregnUtbetalingsgrader {
         beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
         beregnGraderGrunnlag.arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
+        val brukNyeRegler = beregnGraderGrunnlag.nyeReglerUtbetalingsgrad != null
+                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.nyeReglerUtbetalingsgrad)
 
         var sumJobberNormalt = Duration.ZERO
         beregnGraderGrunnlag.arbeid.entries.filter {
-            !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
+            brukNyeRegler || !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
         }.filter {
             it.value.tilkommet != true
@@ -71,7 +73,7 @@ object BeregnUtbetalingsgrader {
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = beregnGraderGrunnlag.arbeid.forAktivitetsgruppe(aktivitetsgruppe)
-            if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES) {
+            if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !brukNyeRegler) {
                 val utbetalingsgraderForSpesialhåndtering =
                     beregnForSpesialhåndtertGruppe(
                         arbeidForAktivitetsgruppe,
@@ -129,14 +131,11 @@ object BeregnUtbetalingsgrader {
         periode: LukketPeriode,
         nyeReglerUtbetalingsgrad: LocalDate?
     ): Prosent {
-        return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
+        return if (nyeReglerUtbetalingsgrad != null && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)) {
+            uttaksgrad
+        } else if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
         } else if (type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
-            HUNDRE_PROSENT
-        } else if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
-            && nyeReglerUtbetalingsgrad != null
-            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
-            && !gradertMotTilsyn) {
             HUNDRE_PROSENT
         } else {
             uttaksgrad
