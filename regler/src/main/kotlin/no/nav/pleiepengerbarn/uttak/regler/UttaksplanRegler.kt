@@ -207,7 +207,8 @@ internal object UttaksplanRegler {
                 arbeid = arbeidPerArbeidsforhold,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
-                periode = periode
+                periode = periode,
+                nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad
             )
         )
     }

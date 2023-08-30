@@ -15,6 +15,7 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
+import java.time.LocalDate
 import java.util.*
 
 internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair<Boolean, Prosent> {
@@ -45,7 +46,8 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair
             søkersPleiebehov,
             søkersEtablertTilsyn,
             søkersNattevåk,
-            søkersBeredskap
+            søkersBeredskap,
+            nyeReglerUtbetalingsgrad
         )
     } else {
         finnAndreSøkeresTilsynFraUttaksperioder(periode)
@@ -73,7 +75,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     pleiebehov: Pleiebehov,
     etablertTilsyn: Duration,
     nattevåkUtfall: Utfall?,
-    beredskapUtfall: Utfall?
+    beredskapUtfall: Utfall?,
+    nyeReglerUtbetalingsgrad: LocalDate?
 ): Prosent {
     if (this.barn.dødsdato != null && this.barn.dødsdato!! <= periode.fom) {
         return Prosent.ZERO
@@ -109,7 +112,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     overseEtablertTilsynÅrsak = finnOverseEtablertTilsynÅrsak(nattevåkUtfall, beredskapUtfall),
                     arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType = ytelseType,
-                    periode = periode
+                    periode = periode,
+                    nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad
                 )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     beregnGraderGrunnlag,

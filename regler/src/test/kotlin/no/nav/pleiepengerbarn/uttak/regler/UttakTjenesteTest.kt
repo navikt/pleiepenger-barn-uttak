@@ -24,18 +24,6 @@ internal class UttakTjenesteTest {
         private const val aktørIdBarn = "456"
     }
 
-    @BeforeEach
-    internal fun setUp() {
-        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO", "2023-06-01")
-        System.setProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT", "false")
-    }
-
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO")
-        System.clearProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
-    }
-
     @Test
     fun `Enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
