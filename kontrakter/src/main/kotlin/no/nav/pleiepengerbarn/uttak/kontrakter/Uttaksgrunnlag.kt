@@ -64,5 +64,13 @@ data class UtenlandsoppholdInfo(
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class OverstyrtInput(
     @JsonProperty("overstyrtUttaksgrad") val overstyrtUttaksgrad: BigDecimal,
+    @JsonProperty("overstyrtUtbetalingsgradPerArbeidsforhold") val overstyrtUtbetalingsgradPerArbeidsforhold: List<OverstyrtUtbetalingsgradPerArbeidsforhold>,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class OverstyrtUtbetalingsgradPerArbeidsforhold(
+    @JsonProperty("overstyrtUtbetalingsgrad") val overstyrtUtbetalingsgrad: BigDecimal,
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold
 )
