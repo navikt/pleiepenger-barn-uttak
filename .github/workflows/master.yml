@@ -20,7 +20,7 @@ jobs:
       contents: read
     steps:
       - name: Hente kode
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Sette opp Java
         uses: actions/setup-java@v3
