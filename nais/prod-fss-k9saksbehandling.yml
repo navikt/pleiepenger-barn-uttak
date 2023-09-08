@@ -62,8 +62,6 @@ spec:
       value: PROD
 
     # Feature toggles
-    - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO
-      value: "9999-12-31" # TODO endre denne før prodsetting
     - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT
       value: "false"
     - name: GIR_ALDRI_MER_ENN_60_DAGER

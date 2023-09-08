@@ -35,14 +35,14 @@
         <dependency>
             <groupId>no.nav.fpsak.tidsserie</groupId>
             <artifactId>fpsak-tidsserie</artifactId>
-            <version>2.5.5</version>
+            <version>2.6.8</version>
         </dependency>
 
         <!-- CallID propagering -->
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
             <artifactId>log</artifactId>
-            <version>2.20230210162649_a258d57-SPRING_BOOT_3</version>
+            <version>2.20230905101454_06fa3d7</version>
         </dependency>
     </dependencies>
 

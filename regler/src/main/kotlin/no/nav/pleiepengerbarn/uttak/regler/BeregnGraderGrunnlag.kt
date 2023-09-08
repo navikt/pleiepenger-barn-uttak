@@ -9,6 +9,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.kontrakter.YtelseType
 import java.time.Duration
+import java.time.LocalDate
 
 
 data class BeregnGraderGrunnlag (
@@ -21,5 +22,6 @@ data class BeregnGraderGrunnlag (
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
     val ytelseType: YtelseType,
     val periode: LukketPeriode,
+    val nyeReglerUtbetalingsgrad: LocalDate?,
     val overstyrtInput: OverstyrtInput? = null
 )

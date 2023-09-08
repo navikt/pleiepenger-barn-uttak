@@ -18,6 +18,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Vilkårsperiode
 import no.nav.pleiepengerbarn.uttak.kontrakter.YtelseType
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
+import java.time.LocalDate
 import java.util.*
 
 data class RegelGrunnlag(
@@ -27,6 +28,7 @@ data class RegelGrunnlag(
     val barn: Barn,
     val søker: Søker,
     val pleiebehov: Map<LukketPeriode, Pleiebehov>,
+    val nyeReglerUtbetalingsgrad: LocalDate? = null,
     val søktUttak: List<SøktUttak>,
     val trukketUttak: List<LukketPeriode> = listOf(),
     val arbeid: List<Arbeid>,

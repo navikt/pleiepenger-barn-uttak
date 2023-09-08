@@ -209,6 +209,7 @@ internal object UttaksplanRegler {
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
                 periode = periode,
+                nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad,
                 overstyrtInput = overstyrtInput
             )
         )

@@ -2,10 +2,12 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
+import java.time.LocalDate
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(
     skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean
@@ -56,7 +58,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
 
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(): Boolean {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
     val harSpesialhåndteringAktivitetstyper = any {
         Arbeidstype.values()
             .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
@@ -67,5 +69,9 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndterin
     }
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 
-    return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær
+    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
+            && nyeReglerUtbetalingsgrad != null
+            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
+
+    return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær && !nyeReglerGjelder
 }

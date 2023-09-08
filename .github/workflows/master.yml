@@ -14,6 +14,10 @@ jobs:
   docker-and-nais-deploy:
     name: Laste opp docker image og deploye app
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      packages: write
+      contents: read
     steps:
       - name: Hente kode
         uses: actions/checkout@v3

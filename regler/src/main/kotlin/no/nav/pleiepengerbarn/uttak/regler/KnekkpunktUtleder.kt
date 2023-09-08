@@ -39,7 +39,7 @@ internal object KnekkpunktUtleder {
         finnForSøkersDød(knekkpunkMap, regelGrunnlag.søker)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
-        if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap)
+        if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
         finnForOverstyrtInput(knekkpunkMap, regelGrunnlag.overstyrtInput)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
@@ -49,9 +49,10 @@ internal object KnekkpunktUtleder {
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
     }
 
-    private fun finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>) {
-        val startDato = LocalDate.parse(System.getenv("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO") ?: System.getProperty("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT_DATO"))
-        oppdaterKnekkpunktMap(knekkpunkMap, startDato, KnekkpunktType.START_SPESIALHÅNDTERING_TILKOMMEN)
+    private fun finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, nyeReglerUtbetalingsgrad: LocalDate?) {
+        if (nyeReglerUtbetalingsgrad != null) {
+            oppdaterKnekkpunktMap(knekkpunkMap, nyeReglerUtbetalingsgrad, KnekkpunktType.START_SPESIALHÅNDTERING_TILKOMMEN)
+        }
     }
 
     private fun finnForUtenlandsopphold(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, utenlandsopphold: Set<LukketPeriode>) {
