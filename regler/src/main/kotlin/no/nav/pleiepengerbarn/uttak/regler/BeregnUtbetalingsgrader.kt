@@ -83,9 +83,7 @@ object BeregnUtbetalingsgrader {
                         uttaksgrad,
                         gradertMotTilsyn,
                         spesialhåndteringsgruppeSkalSpesialhåndteres,
-                        beregnGraderGrunnlag.periode,
-                        beregnGraderGrunnlag.nyeReglerUtbetalingsgrad,
-                        beregnGraderGrunnlag.overstyrtInput
+                        beregnGraderGrunnlag
                     )
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {
@@ -109,17 +107,15 @@ object BeregnUtbetalingsgrader {
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
-        periode: LukketPeriode,
-        nyeReglerUtbetalingsgrad: LocalDate?,
-        overstyrtInput: OverstyrtInput?
+        beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
-            utbetalingsgrader[arbeidsforhold] = if (overstyrtInput != null && overstyrtInput.overstyrtUtbetalingsgradPerArbeidsforhold.any { it.arbeidsforhold == arbeidsforhold }) {
-                utledGradForOverstyrte(arbeidsforhold, info, overstyrtInput)
+            utbetalingsgrader[arbeidsforhold] = if (beregnGraderGrunnlag.overstyrtInput != null && beregnGraderGrunnlag.overstyrtInput.overstyrtUtbetalingsgradPerArbeidsforhold.any { it.arbeidsforhold == arbeidsforhold }) {
+                utledGradForOverstyrte(arbeidsforhold, info, beregnGraderGrunnlag.overstyrtInput)
             } else {
                 Utbetalingsgrad(
-                    utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, periode, nyeReglerUtbetalingsgrad),
+                    utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad),
                     normalArbeidstid = info.jobberNormalt,
                     faktiskArbeidstid = info.jobberNå,
                     tilkommet = info.tilkommet
