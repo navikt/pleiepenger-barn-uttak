@@ -117,8 +117,8 @@ internal object BeregnGrader {
                 )
             }
         }
-        val seBortFraAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad)
-        if (seBortFraAndreArbeidsforhold) {
+
+        if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
             val søkersTapteArbeidstidUtenAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true)
             if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
                 return UttaksgradResultat(

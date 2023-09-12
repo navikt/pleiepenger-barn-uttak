@@ -130,7 +130,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             endringsstatus = Endringsstatus.NY
         )
     }
-         t
+
+    @Test
     internal fun `Overstyrt uttaksgrad av IKKE_YRKESAKTIV`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-08")
         val grunnlag = lagGrunnlag(
@@ -142,7 +143,15 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 )
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
-        ).copy(overstyrtInput = mapOf(LukketPeriode("2020-01-01/2020-01-02") to OverstyrtInput(overstyrtUttaksgrad = BigDecimal.ZERO, arbeidsforhold = IKKE_YRKESAKTIV)))
+        ).copy(overstyrtInput = mapOf(
+            LukketPeriode("2020-01-01/2020-01-02") to
+                OverstyrtInput(overstyrtUttaksgrad = BigDecimal.ZERO,
+                    overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
+                        OverstyrtUtbetalingsgradPerArbeidsforhold(overstyrtUtbetalingsgrad = BigDecimal.ZERO, arbeidsforhold = IKKE_YRKESAKTIV))),
+            LukketPeriode("2020-01-03/2020-01-03") to
+                    OverstyrtInput(overstyrtUttaksgrad = BigDecimal.valueOf(70),
+                        overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
+                            OverstyrtUtbetalingsgradPerArbeidsforhold(overstyrtUtbetalingsgrad = BigDecimal.valueOf(60), arbeidsforhold = IKKE_YRKESAKTIV)))))
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
@@ -161,7 +170,16 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             endringsstatus = Endringsstatus.NY
         )
         uttaksplan.assertOppfylt(
-            perioder = listOf(LukketPeriode("2020-01-03/2020-01-03"), LukketPeriode("2020-01-06/2020-01-08")),
+            perioder = listOf(LukketPeriode("2020-01-03/2020-01-03")),
+            grad = BigDecimal.valueOf(70),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to BigDecimal.valueOf(60)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-06/2020-01-08")),
             grad = HUNDRE_PROSENT,
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to HUNDRE_PROSENT

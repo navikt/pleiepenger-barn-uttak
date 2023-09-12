@@ -71,9 +71,9 @@ data class RegelGrunnlag(
         }
     }
 
-    fun finnOverstyrtInput(periode: LukketPeriode, arbeidsforhold: Set<Arbeidsforhold>): OverstyrtInput? {
+    fun finnOverstyrtInput(periode: LukketPeriode): OverstyrtInput? {
         this.overstyrtInput.forEach {
-            if (it.key.overlapperHelt(periode) && arbeidsforhold.contains(it.value.arbeidsforhold)) {
+            if (it.key.overlapperHelt(periode)) {
                 return it.value
             }
         }

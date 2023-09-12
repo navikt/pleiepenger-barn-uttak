@@ -196,7 +196,7 @@ internal object UttaksplanRegler {
         val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
-        val overstyrtInput = grunnlag.finnOverstyrtInput(periode, arbeidPerArbeidsforhold.keys)
+        val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
         return BeregnGrader.beregn(
             BeregnGraderGrunnlag(
