@@ -37,7 +37,7 @@ jobs:
           mvn verify --batch-mode --settings ./.m2/settings.xml --file pom.xml -DtrimStackTrace=false -Drevision= -Dchangelist= -Dsha1="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(echo $GITHUB_SHA | cut -c1-7)"
           echo "TAG=$(expr $(date +%Y%m%d%H%M%S))-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
