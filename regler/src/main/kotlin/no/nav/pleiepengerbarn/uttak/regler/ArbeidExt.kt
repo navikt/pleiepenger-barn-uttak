@@ -69,8 +69,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndterin
     }
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 
-    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
-            && nyeReglerUtbetalingsgrad != null
+    val nyeReglerGjelder = nyeReglerUtbetalingsgrad != null
             && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
 
     return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær && !nyeReglerGjelder

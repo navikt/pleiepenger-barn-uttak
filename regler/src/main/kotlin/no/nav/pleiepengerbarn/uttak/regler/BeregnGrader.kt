@@ -256,8 +256,7 @@ internal object BeregnGrader {
 }
 
 private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeidsforhold(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
-    val nyeReglerGjelder = FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")
-            && nyeReglerUtbetalingsgrad != null
+    val nyeReglerGjelder = nyeReglerUtbetalingsgrad != null
             && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
 
     val harIkkeYrkesaktiv = this.keys.any {
