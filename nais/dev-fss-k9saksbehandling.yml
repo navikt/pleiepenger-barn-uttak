@@ -65,7 +65,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
-    - name: SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT
-      value: "true"
     - name: GIR_ALDRI_MER_ENN_60_DAGER
       value: "true"
