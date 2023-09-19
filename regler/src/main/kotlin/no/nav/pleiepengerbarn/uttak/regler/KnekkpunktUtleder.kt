@@ -39,7 +39,7 @@ internal object KnekkpunktUtleder {
         finnForSøkersDød(knekkpunkMap, regelGrunnlag.søker)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
-        if (FeatureToggle.isActive("SPESIALHANDTERING_SKAL_GI_HUNDREPROSENT")) finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
+        finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
         finnForOverstyrtInput(knekkpunkMap, regelGrunnlag.overstyrtInput)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
