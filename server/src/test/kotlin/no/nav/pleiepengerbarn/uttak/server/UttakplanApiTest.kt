@@ -164,18 +164,20 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.ZERO
             ),
-            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
             endringsstatus = Endringsstatus.NY
         )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-01/2020-01-02"), true)
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2020-01-03/2020-01-03")),
             grad = BigDecimal.valueOf(70),
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.valueOf(60)
             ),
-            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
             endringsstatus = Endringsstatus.NY
         )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-03/2020-01-03"), true)
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2020-01-06/2020-01-08")),
             grad = HUNDRE_PROSENT,
@@ -185,8 +187,112 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.FULL_DEKNING,
             endringsstatus = Endringsstatus.NY
         )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-06/2020-01-08"), false)
     }
 
+    @Test
+    internal fun `Overstyrer uttaksgrad og utbetalingsgrad for deler av en periode`() {
+        val søknadsperiode = LukketPeriode("2020-01-06/2020-01-10")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    IKKE_YRKESAKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-06/2020-01-10") to Pleiebehov.PROSENT_100),
+        ).copy(overstyrtInput = mapOf(
+            LukketPeriode("2020-01-06/2020-01-08") to
+                    OverstyrtInput(overstyrtUttaksgrad = BigDecimal.ZERO,
+                        overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
+                            OverstyrtUtbetalingsgradPerArbeidsforhold(overstyrtUtbetalingsgrad = BigDecimal.ZERO, arbeidsforhold = IKKE_YRKESAKTIV)))))
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-06/2020-01-08")),
+            grad = BigDecimal.ZERO,
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to BigDecimal.ZERO
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-06/2020-01-08"), true)
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-09/2020-01-10")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-09/2020-01-10"), false)
+    }
+
+    @Test
+    internal fun `Overstyrer kun utbetalingsgrad for ett arbeidsforhold`() {
+        val søknadsperiode = LukketPeriode("2020-01-06/2020-01-10")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    IKKE_YRKESAKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-06/2020-01-10") to Pleiebehov.PROSENT_100),
+        ).copy(overstyrtInput = mapOf(
+            LukketPeriode("2020-01-06/2020-01-08") to
+                    OverstyrtInput(overstyrtUttaksgrad = null,
+                        overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
+                            OverstyrtUtbetalingsgradPerArbeidsforhold(overstyrtUtbetalingsgrad = BigDecimal.ZERO, arbeidsforhold = IKKE_YRKESAKTIV)))))
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        // perioden hvor kun IKKE_YRKESAKTIV har blitt overstyrt
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-06/2020-01-08")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to BigDecimal.ZERO,
+                ARBEIDSFORHOLD1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-06/2020-01-08"), true)
+
+        // perioden hvor ingen aktiviteter har blitt overstyrt
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2020-01-09/2020-01-10")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                IKKE_YRKESAKTIV to Prosent(50),
+                ARBEIDSFORHOLD1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+        uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-09/2020-01-10"), false)
+
+    }
 
     @Test
     internal fun `IKKE_YRKESAKTIV skal spesialhåndteres fra satt dato og settes til hundre prosent når tilkommen er satt til true`() {
@@ -3658,6 +3764,11 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
         assertThat(periodeInfo.søkersTapteArbeidstid).isEqualByComparingTo(søkersTapteArbeidstid)
         assertThat(periodeInfo.getSøkersTapteTimer()).isEqualTo(søkersTapteTimer)
+    }
+
+    private fun Uttaksplan.assertManueltOverstyrt(periode: LukketPeriode, manueltOverstyrt: Boolean) {
+        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
+        assertThat(periodeInfo.manueltOverstyrt).isEqualTo(manueltOverstyrt)
     }
 
     private fun Uttaksplan.assertIkkeOppfylt(periode: LukketPeriode,

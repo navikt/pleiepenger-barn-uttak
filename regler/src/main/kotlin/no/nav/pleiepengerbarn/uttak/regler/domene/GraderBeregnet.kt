@@ -10,5 +10,6 @@ data class GraderBeregnet(
     val oppgittTilsyn: Duration?,
     val uttaksgrad: Prosent,
     val utbetalingsgrader: Map<Arbeidsforhold, Utbetalingsgrad>,
-    val årsak: Årsak
+    val årsak: Årsak,
+    val manueltOverstyrt: Boolean = false
 )

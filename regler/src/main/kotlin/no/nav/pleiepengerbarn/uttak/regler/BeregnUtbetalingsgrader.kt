@@ -49,6 +49,7 @@ object BeregnUtbetalingsgrader {
 
     internal fun beregn(
         uttaksgrad: Prosent,
+        overstyrtUttaksgrad: Prosent? = null,
         gradertMotTilsyn: Boolean,
         beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
@@ -65,7 +66,7 @@ object BeregnUtbetalingsgrader {
         }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
-
+        val faktiskUttaksgrad = overstyrtUttaksgrad ?: uttaksgrad
         val timerSomDekkes = sumJobberNormalt.prosent(uttaksgrad)
 
         var gjenværendeTimerSomDekkes = timerSomDekkes
@@ -80,7 +81,7 @@ object BeregnUtbetalingsgrader {
                     beregnForSpesialhåndtertGruppe(
                         arbeidForAktivitetsgruppe,
                         gjenværendeTimerSomDekkes,
-                        uttaksgrad,
+                        faktiskUttaksgrad,
                         gradertMotTilsyn,
                         spesialhåndteringsgruppeSkalSpesialhåndteres,
                         beregnGraderGrunnlag
@@ -118,7 +119,8 @@ object BeregnUtbetalingsgrader {
                     utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad),
                     normalArbeidstid = info.jobberNormalt,
                     faktiskArbeidstid = info.jobberNå,
-                    tilkommet = info.tilkommet
+                    tilkommet = info.tilkommet,
+                    overstyrt = false
                 )
             }
         }
@@ -136,7 +138,8 @@ object BeregnUtbetalingsgrader {
             utbetalingsgrad = overstyrtUtbetalingsgradPåArbeidsforhold!!.overstyrtUtbetalingsgrad,
             normalArbeidstid = info.jobberNormalt,
             faktiskArbeidstid = info.jobberNå,
-            tilkommet = info.tilkommet
+            tilkommet = info.tilkommet,
+            overstyrt = true
         )
     }
 
@@ -184,7 +187,8 @@ object BeregnUtbetalingsgrader {
                     utbetalingsgrad = utbetalingsgrad,
                     normalArbeidstid = info.jobberNormalt,
                     faktiskArbeidstid = info.jobberNå,
-                    tilkommet = info.tilkommet
+                    tilkommet = info.tilkommet,
+                    overstyrt = false
                 )
                 sumTimerForbrukt += timerForbrukt
             }

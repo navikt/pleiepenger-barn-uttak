@@ -118,7 +118,8 @@ internal object UttaksplanRegler {
                 annenPart = grunnlag.annenPart(søktUttaksperiode),
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                manueltOverstyrt = grader.manueltOverstyrt
             )
         } else {
             if (grader.årsak.oppfylt) {
@@ -140,7 +141,8 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                    manueltOverstyrt = grader.manueltOverstyrt
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -155,7 +157,8 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                    manueltOverstyrt = grader.manueltOverstyrt
                 )
             }
         }
