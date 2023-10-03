@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.Barn
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
 import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
 import no.nav.pleiepengerbarn.uttak.kontrakter.Søker
@@ -42,6 +43,7 @@ data class RegelGrunnlag(
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val kravprioritetForBehandlinger: Map<LukketPeriode, List<UUID>> = mapOf(),
     val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf(),
+    val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
     val commitId: String = ""
 ) {
 
@@ -67,6 +69,15 @@ data class RegelGrunnlag(
         } else {
             Pleiebehov.PROSENT_0
         }
+    }
+
+    fun finnOverstyrtInput(periode: LukketPeriode): OverstyrtInput? {
+        this.overstyrtInput.forEach {
+            if (it.key.overlapperHelt(periode)) {
+                return it.value
+            }
+        }
+        return null
     }
 
     fun finnNattevåk(periode: LukketPeriode): Utfall? {

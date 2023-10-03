@@ -7,5 +7,6 @@ data class Utbetalingsgrad(
     val utbetalingsgrad: Prosent,
     val normalArbeidstid: Duration,
     val faktiskArbeidstid: Duration?,
-    val tilkommet: Boolean?
+    val tilkommet: Boolean?,
+    val overstyrt: Boolean?
 )

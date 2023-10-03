@@ -1,6 +1,13 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
+import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.kontrakter.YtelseType
 import java.time.Duration
 import java.time.LocalDate
 
@@ -15,5 +22,6 @@ data class BeregnGraderGrunnlag (
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
     val ytelseType: YtelseType,
     val periode: LukketPeriode,
-    val nyeReglerUtbetalingsgrad: LocalDate?
+    val nyeReglerUtbetalingsgrad: LocalDate?,
+    val overstyrtInput: OverstyrtInput? = null
 )

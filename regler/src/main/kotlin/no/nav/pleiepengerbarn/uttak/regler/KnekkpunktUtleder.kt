@@ -40,6 +40,7 @@ internal object KnekkpunktUtleder {
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
         finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
+        finnForOverstyrtInput(knekkpunkMap, regelGrunnlag.overstyrtInput)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
@@ -97,6 +98,10 @@ internal object KnekkpunktUtleder {
 
     private fun finnForTilsynsperiode(knekkpunkMap: KnekkpunktMap, tilsyn: Map<LukketPeriode, Duration>) {
         tilsyn.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.TILSYNSPERIODE) }
+    }
+
+    private fun finnForOverstyrtInput(knekkpunkMap: KnekkpunktMap, overstyrtInput: Map<LukketPeriode, OverstyrtInput>) {
+        overstyrtInput.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.OVERSTYRT_INPUT) }
     }
 
     private fun finnForFerie(knekkpunktMap: KnekkpunktMap, ferier:List<LukketPeriode>) {

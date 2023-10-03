@@ -1,0 +1,1 @@
+ALTER TABLE uttaksperiode ADD COLUMN manuelt_overstyrt boolean NOT NULL DEFAULT false;

@@ -17,9 +17,11 @@ internal object BeregnGrader {
         val uttaksgradResultat = avklarUttaksgrad(beregnGraderGrunnlag, etablertTilsynsprosent, finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn))
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
+            uttaksgradResultat.overstyrtUttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
             beregnGraderGrunnlag
         )
+        val faktiskUttaksgrad = uttaksgradResultat.overstyrtUttaksgrad ?: uttaksgradResultat.uttaksgrad
 
         return GraderBeregnet(
             pleiebehov = beregnGraderGrunnlag.pleiebehov,
@@ -32,9 +34,10 @@ internal object BeregnGrader {
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
             oppgittTilsyn = beregnGraderGrunnlag.oppgittTilsyn,
-            uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
+            uttaksgrad = faktiskUttaksgrad.setScale(0, RoundingMode.HALF_UP),
             utbetalingsgrader = utbetalingsgrader,
-            årsak = uttaksgradResultat.årsak()
+            årsak = uttaksgradResultat.årsak(),
+            manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true }
         )
     }
 
@@ -55,6 +58,7 @@ internal object BeregnGrader {
         )
         val utbetalingsgrader = BeregnUtbetalingsgrader.beregn(
             uttaksgradResultat.uttaksgrad,
+            uttaksgradResultat.overstyrtUttaksgrad,
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
             beregnGraderGrunnlag
         )
@@ -96,6 +100,8 @@ internal object BeregnGrader {
         val restTilSøker =
             finnRestTilSøker(beregnGraderGrunnlag.pleiebehov, etablertTilsynprosent, beregnGraderGrunnlag.andreSøkeresTilsyn, beregnGraderGrunnlag.overseEtablertTilsynÅrsak)
 
+        val overstyrtUttak = if (beregnGraderGrunnlag.overstyrtInput != null) beregnGraderGrunnlag.overstyrtInput.overstyrtUttaksgrad else null
+
         if (restTilSøker < TJUE_PROSENT) {
             val forLavGradÅrsak =
                 utledForLavGradÅrsak(beregnGraderGrunnlag.pleiebehov, etablertTilsynprosent, beregnGraderGrunnlag.andreSøkeresTilsyn, beregnGraderGrunnlag.overseEtablertTilsynÅrsak)
@@ -103,18 +109,20 @@ internal object BeregnGrader {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
+                    overstyrtUttak,
                     ikkeOppfyltÅrsak = forLavGradÅrsak,
                     overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
             }
         }
-        val seBortFraAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad)
-        if (seBortFraAndreArbeidsforhold) {
+
+        if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
             val søkersTapteArbeidstidUtenAndreArbeidsforhold = beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true)
             if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
+                    overstyrtUttak,
                     ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID,
                     overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
@@ -124,6 +132,7 @@ internal object BeregnGrader {
                 return UttaksgradResultat(
                     restTilSøker,
                     Prosent.ZERO,
+                    overstyrtUttak,
                     ikkeOppfyltÅrsak = Årsak.FOR_LAV_TAPT_ARBEIDSTID,
                     overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
@@ -133,6 +142,7 @@ internal object BeregnGrader {
             return UttaksgradResultat(
                 restTilSøker,
                 Prosent.ZERO,
+                overstyrtUttak,
                 ikkeOppfyltÅrsak = Årsak.FOR_LAV_ØNSKET_UTTAKSGRAD,
                 overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
@@ -142,6 +152,7 @@ internal object BeregnGrader {
             return UttaksgradResultat(
                 restTilSøker,
                 ønsketUttaksgradProsent,
+                overstyrtUttak,
                 oppfyltÅrsak = Årsak.AVKORTET_MOT_SØKERS_ØNSKE,
                 overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
@@ -150,6 +161,7 @@ internal object BeregnGrader {
             return UttaksgradResultat(
                 restTilSøker,
                 restTilSøker,
+                overstyrtUttak,
                 oppfyltÅrsak = Årsak.GRADERT_MOT_TILSYN,
                 overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
@@ -158,6 +170,7 @@ internal object BeregnGrader {
             return UttaksgradResultat(
                 restTilSøker,
                 søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
+                overstyrtUttak,
                 oppfyltÅrsak = Årsak.FULL_DEKNING,
                 overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
@@ -165,6 +178,7 @@ internal object BeregnGrader {
         return UttaksgradResultat(
             restTilSøker,
             søkersTapteArbeidstid.setScale(2, RoundingMode.HALF_UP),
+            overstyrtUttak,
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
         )

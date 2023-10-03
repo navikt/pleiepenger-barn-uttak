@@ -3,6 +3,8 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtUtbetalingsgradPerArbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
@@ -47,6 +49,7 @@ object BeregnUtbetalingsgrader {
 
     internal fun beregn(
         uttaksgrad: Prosent,
+        overstyrtUttaksgrad: Prosent? = null,
         gradertMotTilsyn: Boolean,
         beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
@@ -63,7 +66,7 @@ object BeregnUtbetalingsgrader {
         }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
-
+        val faktiskUttaksgrad = overstyrtUttaksgrad ?: uttaksgrad
         val timerSomDekkes = sumJobberNormalt.prosent(uttaksgrad)
 
         var gjenværendeTimerSomDekkes = timerSomDekkes
@@ -78,11 +81,10 @@ object BeregnUtbetalingsgrader {
                     beregnForSpesialhåndtertGruppe(
                         arbeidForAktivitetsgruppe,
                         gjenværendeTimerSomDekkes,
-                        uttaksgrad,
+                        faktiskUttaksgrad,
                         gradertMotTilsyn,
                         spesialhåndteringsgruppeSkalSpesialhåndteres,
-                        beregnGraderGrunnlag.periode,
-                        beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
+                        beregnGraderGrunnlag
                     )
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {
@@ -90,7 +92,8 @@ object BeregnUtbetalingsgrader {
                 val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(
                     gjenværendeTimerSomDekkes,
                     arbeidForAktivitetsgruppe,
-                    fordeling
+                    fordeling,
+                    beregnGraderGrunnlag.overstyrtInput
                 )
                 gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
                 alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
@@ -105,21 +108,38 @@ object BeregnUtbetalingsgrader {
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
-        periode: LukketPeriode,
-        nyeReglerUtbetalingsgrad: LocalDate?
+        beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         arbeid.forEach { (arbeidsforhold, info) ->
-            utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, periode, nyeReglerUtbetalingsgrad),
-                normalArbeidstid = info.jobberNormalt,
-                faktiskArbeidstid = info.jobberNå,
-                tilkommet = info.tilkommet
-            )
+            utbetalingsgrader[arbeidsforhold] = if (beregnGraderGrunnlag.overstyrtInput != null && beregnGraderGrunnlag.overstyrtInput.overstyrtUtbetalingsgradPerArbeidsforhold.any { it.arbeidsforhold == arbeidsforhold }) {
+                utledGradForOverstyrte(arbeidsforhold, info, beregnGraderGrunnlag.overstyrtInput)
+            } else {
+                Utbetalingsgrad(
+                    utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad),
+                    normalArbeidstid = info.jobberNormalt,
+                    faktiskArbeidstid = info.jobberNå,
+                    tilkommet = info.tilkommet,
+                    overstyrt = false
+                )
+            }
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
             utbetalingsgrader,
             gjenværendeTimerSomDekkes
+        )
+    }
+
+    private fun utledGradForOverstyrte(arbeidsforhold: Arbeidsforhold, info: ArbeidsforholdPeriodeInfo, overstyrtInput: OverstyrtInput): Utbetalingsgrad {
+        val overstyrtUtbetalingsgradPåArbeidsforhold: OverstyrtUtbetalingsgradPerArbeidsforhold? = overstyrtInput.overstyrtUtbetalingsgradPerArbeidsforhold.find {
+            it.arbeidsforhold == arbeidsforhold
+        }
+        return Utbetalingsgrad(
+            utbetalingsgrad = overstyrtUtbetalingsgradPåArbeidsforhold!!.overstyrtUtbetalingsgrad,
+            normalArbeidstid = info.jobberNormalt,
+            faktiskArbeidstid = info.jobberNå,
+            tilkommet = info.tilkommet,
+            overstyrt = true
         )
     }
 
@@ -145,14 +165,18 @@ object BeregnUtbetalingsgrader {
     private fun beregnForAktivitetsGruppe(
         taptArbeidstidSomDekkes: Duration,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
-        fordeling: Map<Arbeidsforhold, Prosent>
+        fordeling: Map<Arbeidsforhold, Prosent>,
+        overstyrtInput: OverstyrtInput?
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         var sumTimerForbrukt = Duration.ZERO
         arbeid.forEach { (arbeidsforhold, info) ->
             val fordelingsprosent = fordeling[arbeidsforhold]
                 ?: throw IllegalStateException("Dette skal ikke skje. Finner ikke fordeling for $arbeidsforhold.")
-            if (info.jobberNormalt > Duration.ZERO) {
+
+            if (overstyrtInput != null && overstyrtInput.overstyrtUtbetalingsgradPerArbeidsforhold.any { it.arbeidsforhold == arbeidsforhold }) {
+                utbetalingsgrader[arbeidsforhold] = utledGradForOverstyrte(arbeidsforhold, info, overstyrtInput)
+            } else if (info.jobberNormalt > Duration.ZERO) {
                 val timerForbrukt = min(
                     taptArbeidstidSomDekkes.prosent(fordelingsprosent),
                     info.taptArbeid()
@@ -163,7 +187,8 @@ object BeregnUtbetalingsgrader {
                     utbetalingsgrad = utbetalingsgrad,
                     normalArbeidstid = info.jobberNormalt,
                     faktiskArbeidstid = info.jobberNå,
-                    tilkommet = info.tilkommet
+                    tilkommet = info.tilkommet,
+                    overstyrt = false
                 )
                 sumTimerForbrukt += timerForbrukt
             }

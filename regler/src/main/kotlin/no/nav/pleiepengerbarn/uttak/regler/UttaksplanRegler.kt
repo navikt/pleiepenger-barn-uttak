@@ -118,7 +118,8 @@ internal object UttaksplanRegler {
                 annenPart = grunnlag.annenPart(søktUttaksperiode),
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                manueltOverstyrt = grader.manueltOverstyrt
             )
         } else {
             if (grader.årsak.oppfylt) {
@@ -140,7 +141,8 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                    manueltOverstyrt = grader.manueltOverstyrt
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -155,7 +157,8 @@ internal object UttaksplanRegler {
                     annenPart = grunnlag.annenPart(søktUttaksperiode),
                     nattevåk = nattevåk,
                     beredskap = beredskap,
-                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
+                    manueltOverstyrt = grader.manueltOverstyrt
                 )
             }
         }
@@ -196,6 +199,7 @@ internal object UttaksplanRegler {
         val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
+        val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
         return BeregnGrader.beregn(
             BeregnGraderGrunnlag(
@@ -208,7 +212,8 @@ internal object UttaksplanRegler {
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
                 periode = periode,
-                nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad
+                nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad,
+                overstyrtInput = overstyrtInput
             )
         )
     }

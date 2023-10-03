@@ -93,7 +93,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("endringsstatus") val endringsstatus: Endringsstatus? = null,
     @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false,
     @JsonProperty("utenlandsopphold") val utenlandsopphold: Utenlandsopphold? = null,
-) {
+    @JsonProperty("manueltOverstyrt") val manueltOverstyrt: Boolean = false
+    ) {
 
     companion object {
 
@@ -109,7 +110,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             annenPart: AnnenPart,
             nattevåk: Utfall?,
             beredskap: Utfall?,
-            utenlandsopphold: Utenlandsopphold?): UttaksperiodeInfo {
+            utenlandsopphold: Utenlandsopphold?,
+            manueltOverstyrt: Boolean = false): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -130,7 +132,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 annenPart = annenPart,
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                utenlandsopphold = utenlandsopphold
+                utenlandsopphold = utenlandsopphold,
+                manueltOverstyrt = manueltOverstyrt
             )
         }
 
@@ -147,7 +150,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             annenPart: AnnenPart,
             nattevåk: Utfall?,
             beredskap: Utfall?,
-            utenlandsopphold: Utenlandsopphold?): UttaksperiodeInfo {
+            utenlandsopphold: Utenlandsopphold?,
+            manueltOverstyrt: Boolean = false): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -167,7 +171,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 annenPart = annenPart,
                 nattevåk = nattevåk,
                 beredskap = beredskap,
-                utenlandsopphold = utenlandsopphold
+                utenlandsopphold = utenlandsopphold,
+                manueltOverstyrt = manueltOverstyrt
             )
         }
 
