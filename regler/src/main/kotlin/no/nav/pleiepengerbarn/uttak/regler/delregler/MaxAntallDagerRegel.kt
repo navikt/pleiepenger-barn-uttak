@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.util.UUID
 
 internal class MaxAntallDagerRegel : UttaksplanRegel {
 
@@ -164,7 +165,7 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
 
 private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
-    val relevantePerioder = mutableListOf<LukketPeriode>()
+    val relevantePerioder = mutableMapOf<LukketPeriode, UUID>()
 
     this.kravprioritetForBehandlinger.forEach { (kravprioritetsperiode, behandlingsUUIDer) ->
         for (behandlingUUID in behandlingsUUIDer) {
@@ -176,9 +177,9 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
 
                 annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                     if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
-                        if (info.utfall == Utfall.OPPFYLT) {
+                        if (info.utfall == Utfall.OPPFYLT && !(relevantePerioder.containsKey(annenPartsPeriode) && relevantePerioder.containsValue(behandlingUUID))) {
                             antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
-                            relevantePerioder.add(annenPartsPeriode)
+                            relevantePerioder[annenPartsPeriode] = behandlingUUID
                         }
                     }
                 }
@@ -196,7 +197,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
         }
     }
 
-    val maxDatoHittil = relevantePerioder.maxOfOrNull { it.tom }
+    val maxDatoHittil = relevantePerioder.maxOfOrNull { it.key.tom }
 
     return Pair(antallDager, maxDatoHittil)
 }
