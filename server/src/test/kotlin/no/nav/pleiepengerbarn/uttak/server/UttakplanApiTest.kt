@@ -2874,6 +2874,93 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Livets sluttfase - Allerede innvilget uttak overlapper kravprioritet og skal kun telle en gang slik at annen søker får de resterende 18 dagene`() {
+        val saksnummer = nesteSaksnummer()
+        val søknadsperiode = LukketPeriode("2023-09-21/2023-11-17")
+        val annenPartsBehandlingUUID = nesteBehandlingId()
+
+        val grunnlag = lagGrunnlag(
+            ytelseType = YtelseType.PLS,
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1, mapOf(
+                        søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                    )
+                )
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_200),
+            saksnummer = saksnummer,
+            behandlingUUID = annenPartsBehandlingUUID
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(
+                søknadsperiode to listOf(annenPartsBehandlingUUID)
+            )
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan.kvoteInfo).isNotNull
+        assertThat(uttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(42).setScale(2))
+
+        val søkersBehandlingUUID = nesteBehandlingId()
+        val søknadsperiode2 = LukketPeriode("2023-09-22/2023-10-17")
+
+        val grunnlag2 = lagGrunnlag(
+            ytelseType = YtelseType.PLS,
+            søknadsperiode = søknadsperiode2,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(søknadsperiode to Pleiebehov.PROSENT_200),
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = søkersBehandlingUUID
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(
+                LukketPeriode("2023-09-21/2023-09-21") to listOf(annenPartsBehandlingUUID),
+                LukketPeriode("2023-10-18/2023-11-17") to listOf(annenPartsBehandlingUUID),
+                søknadsperiode2 to listOf(annenPartsBehandlingUUID, søkersBehandlingUUID)
+            )
+        )
+
+        val postResponse2 = testClient.opprettUttaksplan(grunnlag2)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan2 = postResponse2.body ?: fail("Mangler uttaksplan")
+
+        assertThat(uttaksplan2.kvoteInfo).isNotNull
+        assertThat(uttaksplan2.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        uttaksplan2.assertOppfylt(
+            perioder = listOf(
+                LukketPeriode("2023-09-22/2023-09-22"),
+                LukketPeriode("2023-09-25/2023-09-29"),
+                LukketPeriode("2023-10-02/2023-10-06"),
+                LukketPeriode("2023-10-09/2023-10-13"),
+                LukketPeriode("2023-10-16/2023-10-17")
+            ),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        // sjekker at kallet som frontend bruker også henter ut dataen, fra basen
+        val hentResponse = testClient.hentUttaksplan(grunnlag2.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val hentetUttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        assertThat(hentetUttaksplan.kvoteInfo).isNotNull
+        assertThat(hentetUttaksplan.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+    }
+
+    @Test
     internal fun `Livets sluttfase - Samtidig uttak hvor første søker får over full dag ved viderebehandling`() {
         val saksnummer = nesteSaksnummer()
         val søknadsperiode = LukketPeriode("2022-02-07/2022-02-07")
