@@ -177,7 +177,10 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
 
                 annenPartsUttaksplan.perioder.forEach { (annenPartsPeriode, info) ->
                     if (annenPartsPeriode.overlapperDelvis(kravprioritetsperiode)) {
-                        if (info.utfall == Utfall.OPPFYLT && !(relevantePerioder.containsKey(annenPartsPeriode) && relevantePerioder.containsValue(behandlingUUID))) {
+                        if (relevantePerioder.containsKey(annenPartsPeriode) && relevantePerioder[annenPartsPeriode] == behandlingUUID) {
+                            continue;
+                        }
+                        if (info.utfall == Utfall.OPPFYLT) {
                             antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
                             relevantePerioder[annenPartsPeriode] = behandlingUUID
                         }
