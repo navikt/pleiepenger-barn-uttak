@@ -40,7 +40,8 @@ internal class UttaksperiodeRepository {
             select 
                 id, fom, tom,
                 pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, tilgjengelig_for_soker,
-                uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn,
+                uttaksgrad, uttaksgradUtenReduksjonGrunnetInntektsgradering, uttaksgradMedReduksjonGrunnetInntektsgradering,
+                aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn,
                 inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
                 nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet, endringsstatus, utenlandsopphold_uten_aarsak,
                 landkode, utenlandsopphold_aarsak, manuelt_overstyrt
@@ -93,7 +94,9 @@ internal class UttaksperiodeRepository {
                     endringsstatus = endringsstatus,
                     utenlandsoppholdUtenÅrsak = rs.getBoolean("utenlandsopphold_uten_aarsak"),
                     utenlandsopphold = Utenlandsopphold(rs.getString("landkode"), UtenlandsoppholdÅrsak.valueOf(rs.getString("utenlandsopphold_aarsak"))),
-                    manueltOverstyrt = rs.getBoolean("manuelt_overstyrt")
+                    manueltOverstyrt = rs.getBoolean("manuelt_overstyrt"),
+                    uttaksgradUtenReduksjonGrunnetInntektsgradering = rs.getBigDecimal("uttaksgradUtenReduksjonGrunnetInntektsgradering"),
+                    uttaksgradMedReduksjonGrunnetInntektsgradering = rs.getBigDecimal("uttaksgradMedReduksjonGrunnetInntektsgradering")
                 )
             )
         }
@@ -129,11 +132,13 @@ internal class UttaksperiodeRepository {
         val sql = """
             insert into 
                 uttaksperiode (id, uttaksresultat_id, fom, tom, pleiebehov, etablert_tilsyn, andre_sokeres_tilsyn, andre_sokeres_tilsyn_reberegnet,
-                    tilgjengelig_for_soker, uttaksgrad, aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn, inngangsvilkar, knekkpunkt_typer,
+                    tilgjengelig_for_soker, uttaksgrad, uttaksgradUtenReduksjonGrunnetInntektsgradering, uttaksgradMedReduksjonGrunnetInntektsgradering, 
+                    aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn, inngangsvilkar, knekkpunkt_typer,
                     kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap, endringsstatus, utenlandsopphold_uten_aarsak,
                     landkode, utenlandsopphold_aarsak, manuelt_overstyrt)
                 values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn, :andre_sokeres_tilsyn_reberegnet,
-                    :tilgjengelig_for_soker, :uttaksgrad, :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :oppgitt_tilsyn, :inngangsvilkar, :knekkpunkt_typer,
+                    :tilgjengelig_for_soker, :uttaksgrad, :uttaksgradUtenReduksjonGrunnetInntektsgradering, :uttaksgradMedReduksjonGrunnetInntektsgradering,
+                    :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :oppgitt_tilsyn, :inngangsvilkar, :knekkpunkt_typer,
                     :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
                     :nattevåk::utfall, :beredskap::utfall, :endringsstatus::endringsstatus, :utenlandsopphold_uten_aarsak, :landkode, :utenlandsopphold_aarsak, :manuelt_overstyrt)
        
@@ -165,6 +170,8 @@ internal class UttaksperiodeRepository {
             .addValue("landkode", info.utenlandsopphold?.landkode)
             .addValue("utenlandsopphold_aarsak", info.utenlandsopphold?.årsak.toString())
             .addValue("manuelt_overstyrt", info.manueltOverstyrt)
+            .addValue("uttaksgradUtenReduksjonGrunnetInntektsgradering",info.uttaksgradUtenReduksjonGrunnetInntektsgradering )
+            .addValue("uttaksgradMedReduksjonGrunnetInntektsgradering", info.uttaksgradMedReduksjonGrunnetInntektsgradering)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long

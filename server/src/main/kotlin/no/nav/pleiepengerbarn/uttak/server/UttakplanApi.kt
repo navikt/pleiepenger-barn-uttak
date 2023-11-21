@@ -33,6 +33,8 @@ class UttakplanApi {
         const val UttaksplanPath = "/uttaksplan"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
+        const val UttaksplanNedjusterSøkersUttaksgradPath = "/uttaksplan/nedjusterUttaksgrad"
+
         const val BehandlingUUID = "behandlingUUID"
 
         private val logger = LoggerFactory.getLogger(this::class.java)
@@ -123,12 +125,50 @@ class UttakplanApi {
         )
     }
 
+
+    @PostMapping(
+        UttaksplanNedjusterSøkersUttaksgradPath,
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    @Operation(description = "Nedjusterer søkers uttaksgrad. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
+    fun nedjusterSøkersUttaksgrad(
+        @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
+        uriComponentsBuilder: UriComponentsBuilder
+    ): ResponseEntity<Uttaksplan> {
+        val logMelding = if (utvidetLogging) {
+            "Nedjustering av søkers uttaksgrad for behandling=${uttaksgrunnlag.behandlingUUID} grunnlag=$uttaksgrunnlag"
+        } else {
+            "Nedjustering av søkers uttaksgrad  for behandling=${uttaksgrunnlag.behandlingUUID}"
+        }
+        logger.info(logMelding)
+        uttaksgrunnlag.valider()
+        val gjeldendeUttaksplan =
+            uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
+        val forrigeUttaksplans =
+            uttakRepository.hentForrige(saksnummer = uttaksgrunnlag.saksnummer, UUID.fromString(uttaksgrunnlag.behandlingUUID))
+
+        val nyUttaksplan = gjeldendeUttaksplan?.let { nedjusterSøkersUttaksgrad(uttaksgrunnlag, it, forrigeUttaksplans) }
+        val uri =
+            uriComponentsBuilder.path(UttaksplanPath).queryParam(BehandlingUUID, uttaksgrunnlag.behandlingUUID).build()
+                .toUri()
+
+        if (utvidetLogging) {
+            logger.info("Resultat for behandling=${uttaksgrunnlag.behandlingUUID} uttaksplan=$nyUttaksplan")
+        }
+        return ResponseEntity
+            .created(uri)
+            .body(nyUttaksplan)
+    }
+
+
     private fun simuler(uttaksgrunnlag: Uttaksgrunnlag): Simulering {
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
-        val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
-        return Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret)
+        val simulertUttaksplanMedNedjustertUttaksgrad = NedjusterUttaksgradTjeneste.nedjusterUttaksgrad(uttaksgrunnlag, simulertUttaksplan)
+        val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplanMedNedjustertUttaksgrad)
+        return Simulering(forrigeUttaksplan, simulertUttaksplanMedNedjustertUttaksgrad, uttaksplanEndret)
     }
 
     private fun lagUttaksplan(
@@ -140,7 +180,12 @@ class UttakplanApi {
         val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
 
         val regelGrunnlag =
-            GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, vedtatteUttaksplanerPerBehandling, forrigeUttaksplan)
+            GrunnlagMapper.tilRegelGrunnlag(
+                uttaksgrunnlag,
+                andrePartersUttaksplanerPerBehandling,
+                vedtatteUttaksplanerPerBehandling,
+                forrigeUttaksplan
+            )
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {
@@ -155,6 +200,33 @@ class UttakplanApi {
 
         return uttaksplan
     }
+
+    private fun nedjusterSøkersUttaksgrad(
+        uttaksgrunnlag: Uttaksgrunnlag,
+        gjeldendeUttaksplan: Uttaksplan,
+        forrigeUttaksplan: Uttaksplan?,
+        ): Uttaksplan {
+        val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
+        val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
+
+        val regelGrunnlag =
+            GrunnlagMapper.tilRegelGrunnlag(
+                uttaksgrunnlag,
+                andrePartersUttaksplanerPerBehandling,
+                vedtatteUttaksplanerPerBehandling,
+                forrigeUttaksplan
+            )
+
+        var uttaksplan = NedjusterUttaksgradTjeneste.nedjusterUttaksgrad(uttaksgrunnlag, gjeldendeUttaksplan)
+
+        // Trenger vi å kjøre endringsstatusoppdaterer her?
+        uttaksplan = EndringsstatusOppdaterer.oppdater(forrigeUttaksplan, uttaksplan)
+
+        uttakRepository.lagre(regelGrunnlag, uttaksplan)
+
+        return uttaksplan
+    }
+
 
     private fun hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {
         val unikeBehandlinger =

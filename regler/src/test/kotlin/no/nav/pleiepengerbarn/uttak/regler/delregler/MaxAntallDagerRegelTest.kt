@@ -498,5 +498,7 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfa
         pleiebehov = Pleiebehov.PROSENT_100.prosent,
         søkersTapteArbeidstid = null,
         uttaksgrad = HUNDRE_PROSENT,
-        årsaker = setOf()
+        årsaker = setOf(),
+        uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
+        uttaksgradMedReduksjonGrunnetInntektsgradering = null
     )
