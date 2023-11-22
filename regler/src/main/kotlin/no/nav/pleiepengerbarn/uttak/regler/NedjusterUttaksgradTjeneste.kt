@@ -18,7 +18,7 @@ object NedjusterUttaksgradTjeneste {
         if (nedjustertUttaksgradTidslinje.isEmpty) {
             return uttaksplan
         }
-        
+
         val uttaksplanTidslinje = lagTimeline(uttaksplan)
         val resultatTidslinje = uttaksplanTidslinje.combine(
             nedjustertUttaksgradTidslinje,

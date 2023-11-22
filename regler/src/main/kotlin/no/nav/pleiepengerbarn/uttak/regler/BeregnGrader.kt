@@ -50,7 +50,7 @@ internal object BeregnGrader {
         val søkersTapteArbeidstid =
             beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn);
-        val ønsketUttaksgrad = finnMaksGrad(ønsketUttaksgradProsent, maksGradIProsent)
+        val ønsketUttaksgrad = minOf(ønsketUttaksgradProsent, maksGradIProsent)
         val uttaksgradResultat = avklarUttaksgrad(
             beregnGraderGrunnlag,
             etablertTilsynsprosent,
@@ -78,13 +78,6 @@ internal object BeregnGrader {
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
         )
-    }
-
-    private fun finnMaksGrad(ønsketUttaksgradProsent: Prosent, maksGradIProsent: Prosent): Prosent {
-        if (maksGradIProsent < ønsketUttaksgradProsent) {
-            return maksGradIProsent;
-        }
-        return ønsketUttaksgradProsent;
     }
 
     private fun avklarUttaksgrad(
