@@ -40,7 +40,8 @@ internal class BeregnGraderTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                andreSøkeresTilsynMedNedjustering = null
             )
         )
 
@@ -65,7 +66,8 @@ internal class BeregnGraderTest {
                 ),
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                andreSøkeresTilsynMedNedjustering = null
             )
         )
 
@@ -90,7 +92,8 @@ internal class BeregnGraderTest {
                 ),
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                andreSøkeresTilsynMedNedjustering = null
             )
         )
 

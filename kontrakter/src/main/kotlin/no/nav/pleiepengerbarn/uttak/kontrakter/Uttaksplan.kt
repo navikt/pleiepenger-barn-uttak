@@ -143,6 +143,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
         fun oppfylt(
             uttaksgrad: Prosent,
+            uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent,
             utbetalingsgrader: List<Utbetalingsgrader>,
             søkersTapteArbeidstid: Prosent,
             oppgittTilsyn: Duration?,
@@ -164,6 +165,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             return UttaksperiodeInfo(
                 utfall = Utfall.OPPFYLT,
                 uttaksgrad = uttaksgrad,
+                uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradUtenReduksjonGrunnetInntektsgradering,
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                 oppgittTilsyn = oppgittTilsyn,
@@ -178,7 +180,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utenlandsopphold = utenlandsopphold,
                 manueltOverstyrt = manueltOverstyrt,
                 uttaksgradMedReduksjonGrunnetInntektsgradering = null,
-                uttaksgradUtenReduksjonGrunnetInntektsgradering = null
             )
         }
 

@@ -1,25 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.KnekkpunktType
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utbetalingsgrader
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utenlandsopphold
-import no.nav.pleiepengerbarn.uttak.kontrakter.UtenlandsoppholdInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.UtenlandsoppholdÅrsak
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
-import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
-import no.nav.pleiepengerbarn.uttak.regler.delregler.BarnsDødPeriodeRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.FerieRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.IkkeOppfylt
-import no.nav.pleiepengerbarn.uttak.regler.delregler.InngangsvilkårIkkeOppfyltRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.MaxAntallDagerRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.SøkersDødRegel
-import no.nav.pleiepengerbarn.uttak.regler.delregler.TilBeregningAvGrad
-import no.nav.pleiepengerbarn.uttak.regler.delregler.UtenlandsoppholdRegel
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
@@ -130,6 +112,7 @@ internal object UttaksplanRegler {
                 }
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
                     uttaksgrad = grader.uttaksgrad,
+                    uttaksgradUtenReduksjonGrunnetInntektsgradering = grader.uttaksgradUtenReduksjonGrunnetInntektsgradering,
                     utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     oppgittTilsyn = grader.oppgittTilsyn,
@@ -196,18 +179,31 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
+        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode, false)
+        val andrePartersTilsynUtenNedjustering = grunnlag.finnAndreSøkeresTilsyn(periode, true).second
+
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
-        return BeregnGrader.beregn(
+        var erForrigeVedtatteGrunnlagForBehandlingNedjustert = false;
+
+        if (grunnlag.forrigeUttaksplan != null) {
+            val periodeFraForrigeUttaksplan = grunnlag.forrigeUttaksplan.perioder[periode]
+            if (periodeFraForrigeUttaksplan != null) {
+                erForrigeVedtatteGrunnlagForBehandlingNedjustert = periodeFraForrigeUttaksplan.uttaksgradMedReduksjonGrunnetInntektsgradering != null;
+            }
+        }
+
+        val beregnetMedNedjustering = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsyn,
                 oppgittTilsyn = oppgittTilsyn,
-                andreSøkeresTilsyn = andrePartersTilsyn,
+                andreSøkeresTilsyn = andrePartersTilsynUtenNedjustering,
                 andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
+                andreSøkeresTilsynMedNedjustering = andrePartersTilsyn,
+                erForrigeVedtatteGrunnlagForBehandlingNedjustert = erForrigeVedtatteGrunnlagForBehandlingNedjustert,
                 arbeid = arbeidPerArbeidsforhold,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
@@ -216,6 +212,7 @@ internal object UttaksplanRegler {
                 overstyrtInput = overstyrtInput
             )
         )
+        return beregnetMedNedjustering;
     }
 
     private fun RegelGrunnlag.avklarOverseEtablertTilsynÅrsak(
@@ -223,7 +220,7 @@ internal object UttaksplanRegler {
         etablertTilsyn: Duration
     ): OverseEtablertTilsynÅrsak? {
         val etablertTilsynsprosent = BigDecimal(etablertTilsyn.toMillis()).setScale(2, RoundingMode.HALF_UP)
-                .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
+            .divide(BigDecimal(FULL_DAG.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
         if (etablertTilsynsprosent > Prosent.ZERO && etablertTilsynsprosent < TI_PROSENT) {
             return OverseEtablertTilsynÅrsak.FOR_LAVT
         }
