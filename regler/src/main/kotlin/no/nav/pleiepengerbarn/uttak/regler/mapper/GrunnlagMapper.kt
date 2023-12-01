@@ -57,6 +57,7 @@ object GrunnlagMapper {
             kravprioritetForBehandlinger = kravprioritetForBehandlinger,
             utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
             overstyrtInput = uttaksgrunnlag.overstyrtInput,
+            inntektsgradering = uttaksgrunnlag.inntektsgradering,
             commitId = commitId
         )
     }

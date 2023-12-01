@@ -113,6 +113,7 @@ internal object UttaksplanRegler {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.oppfylt(
                     uttaksgrad = grader.uttaksgrad,
                     uttaksgradUtenReduksjonGrunnetInntektsgradering = grader.uttaksgradUtenReduksjonGrunnetInntektsgradering,
+                    uttaksgradMedReduksjonGrunnetInntektsgradering = grader.uttaksgradMedReduksjonGrunnetInntektsgradering,
                     utbetalingsgrader = grader.tilUtbetalingsgrader(true),
                     søkersTapteArbeidstid = grader.søkersTapteArbeidstid,
                     oppgittTilsyn = grader.oppgittTilsyn,
@@ -186,6 +187,8 @@ internal object UttaksplanRegler {
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
+        val inntektsgradering = grunnlag.finnInntektsgradering(periode);
+
         var erForrigeVedtatteGrunnlagForBehandlingNedjustert = false;
 
         if (grunnlag.forrigeUttaksplan != null) {
@@ -209,7 +212,8 @@ internal object UttaksplanRegler {
                 ytelseType = grunnlag.ytelseType,
                 periode = periode,
                 nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad,
-                overstyrtInput = overstyrtInput
+                overstyrtInput = overstyrtInput,
+                inntektsgradering = inntektsgradering
             )
         )
         return beregnetMedNedjustering;

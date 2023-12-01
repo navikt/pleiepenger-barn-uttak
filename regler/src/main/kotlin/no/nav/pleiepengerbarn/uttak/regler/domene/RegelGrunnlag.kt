@@ -1,21 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.domene
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeid
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Barn
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.OverseEtablertTilsynÅrsak
-import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
-import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
-import no.nav.pleiepengerbarn.uttak.kontrakter.Saksnummer
-import no.nav.pleiepengerbarn.uttak.kontrakter.Søker
-import no.nav.pleiepengerbarn.uttak.kontrakter.SøktUttak
-import no.nav.pleiepengerbarn.uttak.kontrakter.UtenlandsoppholdInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
-import no.nav.pleiepengerbarn.uttak.kontrakter.Vilkårsperiode
-import no.nav.pleiepengerbarn.uttak.kontrakter.YtelseType
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.time.Duration
 import java.time.LocalDate
@@ -44,6 +29,7 @@ data class RegelGrunnlag(
     val kravprioritetForBehandlinger: Map<LukketPeriode, List<UUID>> = mapOf(),
     val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf(),
     val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
+    val inntektsgradering: Map<LukketPeriode, Inntektsgradering> = mapOf(),
     val commitId: String = ""
 ) {
 
@@ -79,6 +65,16 @@ data class RegelGrunnlag(
         }
         return null
     }
+
+    fun finnInntektsgradering(periode: LukketPeriode): Inntektsgradering? {
+        this.inntektsgradering.forEach {
+            if (it.key.overlapperHelt(periode)) {
+                return it.value
+            }
+        }
+        return null
+    }
+
 
     fun finnNattevåk(periode: LukketPeriode): Utfall? {
         val overlappendePeriode = this.nattevåksperioder.keys.firstOrNull {it.overlapperHelt(periode)}

@@ -29,7 +29,10 @@ internal object BeregnGrader {
             uttaksgradResultat.oppfyltÅrsak == Årsak.GRADERT_MOT_TILSYN,
             beregnGraderGrunnlag
         )
-        val faktiskUttaksgrad = uttaksgradResultat.overstyrtUttaksgrad ?: uttaksgradResultat.uttaksgrad
+        val uttaksgradMedReduksjonGrunnetInntektsgradering =
+            getUttaksgradJustertMotInntektsgradering(beregnGraderGrunnlag, uttaksgradResultat)
+        val faktiskUttaksgrad = uttaksgradResultat.overstyrtUttaksgrad ?: uttaksgradMedReduksjonGrunnetInntektsgradering
+        ?: uttaksgradResultat.uttaksgrad
         return GraderBeregnet(
             pleiebehov = beregnGraderGrunnlag.pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
@@ -42,12 +45,31 @@ internal object BeregnGrader {
             søkersTapteArbeidstid = søkersTapteArbeidstid,
             oppgittTilsyn = beregnGraderGrunnlag.oppgittTilsyn,
             uttaksgrad = faktiskUttaksgrad.setScale(0, RoundingMode.HALF_UP),
+            uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgradUtenReduksjonGrunnetInntektsgradering,
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak(),
             manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true }
         )
     }
+
+    private fun getUttaksgradJustertMotInntektsgradering(
+        beregnGraderGrunnlag: BeregnGraderGrunnlag,
+        uttaksgradResultat: UttaksgradResultat
+    ): BigDecimal? =
+        if (beregnGraderGrunnlag.inntektsgradering != null && skalNedjustereGrunnetInntekt(
+                beregnGraderGrunnlag,
+                uttaksgradResultat
+            )
+        ) beregnGraderGrunnlag.inntektsgradering.uttaksgrad
+        else null
+
+    private fun skalNedjustereGrunnetInntekt(
+        beregnGraderGrunnlag: BeregnGraderGrunnlag,
+        uttaksgradResultat: UttaksgradResultat
+    ) = beregnGraderGrunnlag.inntektsgradering != null &&
+            beregnGraderGrunnlag.inntektsgradering.uttaksgrad.setScale(2, RoundingMode.HALF_UP)
+                .compareTo(uttaksgradResultat.uttaksgrad.setScale(2, RoundingMode.HALF_UP)) < 0
 
     internal fun beregnMedMaksGrad(
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
@@ -75,6 +97,10 @@ internal object BeregnGrader {
             beregnGraderGrunnlag
         )
 
+        val uttaksgradMedReduksjonGrunnetInntektsgradering =
+            getUttaksgradJustertMotInntektsgradering(beregnGraderGrunnlag, uttaksgradResultat)
+        val faktiskUttaksgrad = uttaksgradMedReduksjonGrunnetInntektsgradering ?: uttaksgradResultat.uttaksgrad
+
         return GraderBeregnet(
             pleiebehov = beregnGraderGrunnlag.pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
@@ -86,8 +112,9 @@ internal object BeregnGrader {
             ),
             søkersTapteArbeidstid = søkersTapteArbeidstid,
             oppgittTilsyn = beregnGraderGrunnlag.oppgittTilsyn,
-            uttaksgrad = uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP),
-            uttaksgradUtenReduksjonGrunnetInntektsgradering =  uttaksgradResultat.uttaksgradUtenReduksjonGrunnetInntektsgradering,
+            uttaksgrad = faktiskUttaksgrad.setScale(0, RoundingMode.HALF_UP),
+            uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgradUtenReduksjonGrunnetInntektsgradering,
+            uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak()
         )

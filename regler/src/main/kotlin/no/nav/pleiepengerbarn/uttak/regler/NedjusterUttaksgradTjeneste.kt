@@ -57,7 +57,7 @@ private fun lagTimeline(uttaksplan: Uttaksplan): LocalDateTimeline<Uttaksperiode
 }
 
 private fun lagTimeline(uttaksgrunnlag: Uttaksgrunnlag): LocalDateTimeline<BigDecimal> {
-    val segmenter = uttaksgrunnlag.nedjustertSøkersUttaksgrad.map { (periode, info) ->
+    val segmenter = uttaksgrunnlag.inntektsgradering.map { (periode, info) ->
         LocalDateSegment(
             periode.fom,
             periode.tom,

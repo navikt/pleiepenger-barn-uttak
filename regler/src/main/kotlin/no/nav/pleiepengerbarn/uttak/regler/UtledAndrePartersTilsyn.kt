@@ -1,15 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utbetalingsgrader
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
-import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
@@ -100,7 +91,11 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                 sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
                 sumAndreSøkeresTilsynMedNedjustering += annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering ?: annenPartsOverlappendePeriodeInfo.uttaksgrad
             } else {
+                val inntektsgradering = if (annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering != null)
+                    Inntektsgradering(annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering!!.setScale(2, RoundingMode.HALF_UP))
+                else null
                 val forrigeUttaksgrad = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
+                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgradUtenReduksjonGrunnetInntektsgradering ?:
                     uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
                 } else {
                     Prosent.valueOf(100)
@@ -116,7 +111,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType = ytelseType,
                     periode = periode,
-                    nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad
+                    nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad,
+                    inntektsgradering = inntektsgradering,
                 )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     beregnGraderGrunnlag,

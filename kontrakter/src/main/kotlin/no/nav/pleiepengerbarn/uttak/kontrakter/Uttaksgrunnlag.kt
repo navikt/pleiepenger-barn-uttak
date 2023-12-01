@@ -25,7 +25,7 @@ data class Uttaksgrunnlag (
     @JsonProperty("nyeReglerUtbetalingsgrad") val nyeReglerUtbetalingsgrad: LocalDate? = null,
 
     @JsonProperty("overstyrtInput") val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
-    @JsonProperty("nedjustertSøkersUttaksgrad") val nedjustertSøkersUttaksgrad: Map<LukketPeriode, NedjustertUttaksgrad> = mapOf(),
+    @JsonProperty("inntektsgradering") val inntektsgradering: Map<LukketPeriode, Inntektsgradering> = mapOf(),
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
@@ -79,7 +79,7 @@ data class OverstyrtUtbetalingsgradPerArbeidsforhold(
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
-data class NedjustertUttaksgrad(
+data class Inntektsgradering(
     @JsonProperty("uttaksgrad") val uttaksgrad: BigDecimal,
 )
 

@@ -4,7 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
-import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -19,8 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils
 import java.math.BigDecimal
-import java.time.Duration
-import java.util.UUID
+import java.util.*
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,24 +52,26 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = UUID.randomUUID().toString(),
-            saksnummer=RandomStringUtils.random(4)
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.ZERO),
+            )
         )
 
         val postResponse = testClient.opprettUttaksplan(grunnlag)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        val uttaksplan = postResponse.body ?: fail("Mangler uttaksplan")
 
-        val grunnlagNedjustertUttaksgrad = grunnlag.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
-                LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.ZERO),
-                )
+
+
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            NULL_PROSENT,
+            HUNDRE_PROSENT,
+            Endringsstatus.NY
         )
-
-
-        val postResponseNedjustering = testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgrad)
-        val uttaksplan = postResponseNedjustering.body ?: fail("Mangler uttaksplan")
-
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), NULL_PROSENT, HUNDRE_PROSENT, Endringsstatus.NY)
         uttaksplan.assertOppfylt(LukketPeriode("2020-01-03/2020-01-03"), null, HUNDRE_PROSENT, Endringsstatus.NY)
         uttaksplan.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.NY)
         uttaksplan.assertIkkeOppfylt(
@@ -82,7 +82,6 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         )
 
     }
-
 
 
     @Test
@@ -98,19 +97,16 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = UUID.randomUUID().toString(),
-            saksnummer=RandomStringUtils.random(4)
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.ZERO),
+            )
         )
 
         testClient.opprettUttaksplan(grunnlagOriginal)
 
-        val grunnlagNedjustertUttaksgradOriginal = grunnlagOriginal.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
-                LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.ZERO),
-            )
-        )
-
-        testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgradOriginal)
 
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
@@ -122,22 +118,23 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = UUID.randomUUID().toString(),
-            saksnummer=grunnlagOriginal.saksnummer
-        )
-
-        testClient.opprettUttaksplan(grunnlag)
-
-        val grunnlagNedjustertUttaksgrad = grunnlag.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
+            saksnummer = grunnlagOriginal.saksnummer
+        ).copy(
+            inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
             )
         )
 
-        val postResponseNedjustering = testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgrad)
-        val uttaksplan = postResponseNedjustering.body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), BigDecimal.TEN, HUNDRE_PROSENT, Endringsstatus.ENDRET)
+        val uttaksplan = testClient.opprettUttaksplan(grunnlag).body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            BigDecimal.TEN,
+            HUNDRE_PROSENT,
+            Endringsstatus.ENDRET
+        )
         uttaksplan.assertOppfylt(LukketPeriode("2020-01-03/2020-01-03"), null, HUNDRE_PROSENT, Endringsstatus.UENDRET)
         uttaksplan.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.UENDRET)
         uttaksplan.assertIkkeOppfylt(
@@ -163,19 +160,16 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = originalBehandlingUUID,
-            saksnummer=RandomStringUtils.random(4)
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.ZERO),
+            )
         )
 
         testClient.opprettUttaksplan(grunnlagOriginal)
 
-        val grunnlagNedjustertUttaksgradOriginal = grunnlagOriginal.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
-                LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.ZERO),
-            )
-        )
-
-        testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgradOriginal)
 
         val behandlingUUID = UUID.randomUUID().toString()
         val grunnlag = lagGrunnlag(
@@ -188,28 +182,38 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = behandlingUUID,
-            saksnummer=grunnlagOriginal.saksnummer
-        ).copy(sisteVedtatteUttaksplanForBehandling = mapOf(behandlingUUID to originalBehandlingUUID))
-
-        testClient.opprettUttaksplan(grunnlag)
-
-        val grunnlagNedjustertUttaksgrad = grunnlag.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
+            saksnummer = grunnlagOriginal.saksnummer
+        ).copy(
+            sisteVedtatteUttaksplanForBehandling = mapOf(behandlingUUID to originalBehandlingUUID),
+            inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-03") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
             )
         )
 
-        val postResponseNedjustering = testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgrad)
-        val uttaksplan = postResponseNedjustering.body ?: fail("Mangler uttaksplan")
+        val uttaksplan = testClient.opprettUttaksplan(grunnlag).body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), BigDecimal.TEN, HUNDRE_PROSENT, Endringsstatus.ENDRET)
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-03/2020-01-03"), BigDecimal.TEN, HUNDRE_PROSENT, Endringsstatus.ENDRET)
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            BigDecimal.TEN,
+            HUNDRE_PROSENT,
+            Endringsstatus.ENDRET
+        )
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-03/2020-01-03"),
+            BigDecimal.TEN,
+            HUNDRE_PROSENT,
+            Endringsstatus.ENDRET
+        )
         uttaksplan.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.UENDRET)
         uttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-09/2020-01-10"),
             ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
-            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.PLEIEBEHOV, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
             endringsstatus = Endringsstatus.UENDRET
         )
 
@@ -229,19 +233,16 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = annenPartsBehandling,
-            saksnummer=RandomStringUtils.random(4)
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-03") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
+            )
         )
 
         testClient.opprettUttaksplan(grunnlagOriginal)
 
-        val grunnlagNedjustertUttaksgradOriginal = grunnlagOriginal.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
-                LukketPeriode("2020-01-01/2020-01-03") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
-            )
-        )
-
-        testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgradOriginal)
 
         val nyBehandling = UUID.randomUUID().toString()
         val grunnlag = lagGrunnlag(
@@ -254,22 +255,25 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = nyBehandling,
-            saksnummer=RandomStringUtils.random(4)
-        ).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)), sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling))
-
-        testClient.opprettUttaksplan(grunnlag)
-
-        val grunnlagNedjustertUttaksgrad = grunnlag.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling)
+        ).copy(
+            inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-03") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
             )
         )
 
-        val postResponseNedjustering = testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgrad)
-        val uttaksplan = postResponseNedjustering.body ?: fail("Mangler uttaksplan")
+        val uttaksplan = testClient.opprettUttaksplan(grunnlag).body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-03"), BigDecimal.TEN, BigDecimal.valueOf(90), Endringsstatus.NY)
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-03"),
+            BigDecimal.TEN,
+            BigDecimal.valueOf(90),
+            Endringsstatus.NY
+        )
         uttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-06/2020-01-08"),
             ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
@@ -300,19 +304,15 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = annenPartsBehandling,
-            saksnummer=RandomStringUtils.random(4)
-        )
-
-        testClient.opprettUttaksplan(grunnlagOriginal)
-
-        val grunnlagNedjustertUttaksgradOriginal = grunnlagOriginal.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
             )
         )
 
-        testClient.nedjusterSøkersUttaksgrad(grunnlagNedjustertUttaksgradOriginal)
+        testClient.opprettUttaksplan(grunnlagOriginal)
 
         val nyBehandling = UUID.randomUUID().toString()
         val grunnlag = lagGrunnlag(
@@ -325,13 +325,20 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = nyBehandling,
-            saksnummer=RandomStringUtils.random(4)
-        ).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)), sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling))
+            saksnummer = RandomStringUtils.random(4)
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling)
+        )
 
-        val opprettUttaksplanResponse = testClient.opprettUttaksplan(grunnlag)
-        val uttaksplan = opprettUttaksplanResponse.body ?: fail("Mangler uttaksplan")
+        val uttaksplan = testClient.opprettUttaksplan(grunnlag).body ?: fail("Mangler uttaksplan")
 
-        uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), null, BigDecimal.valueOf(90), Endringsstatus.NY)
+        uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(90),
+            Endringsstatus.NY
+        )
         uttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-03/2020-01-03"),
             ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
@@ -372,19 +379,16 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = part1Behandling1,
-            saksnummer= part1Sak
+            saksnummer = part1Sak
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
+            )
         )
 
         testClient.opprettUttaksplan(part1Grunnlag)
 
-        val part1GrunnlagNedjustertUttaksgrad = part1Grunnlag.copy(
-            nedjustertSøkersUttaksgrad = mapOf(
-                LukketPeriode("2020-01-01/2020-01-02") to
-                        NedjustertUttaksgrad(uttaksgrad = BigDecimal.TEN),
-            )
-        )
-
-        testClient.nedjusterSøkersUttaksgrad(part1GrunnlagNedjustertUttaksgrad)
 
         // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 10 = 90% i første periode, ellers avslag
         val part2Behandling = UUID.randomUUID().toString()
@@ -399,13 +403,20 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = part2Behandling,
-            saksnummer= part2Sak
-        ).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling1, part2Behandling)),
-            sisteVedtatteUttaksplanForBehandling = mapOf(part1Behandling1 to part1Behandling1))
+            saksnummer = part2Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling1, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(part1Behandling1 to part1Behandling1)
+        )
 
         val part2Uttaksplan = testClient.opprettUttaksplan(part2Grunnlag).body ?: fail("Mangler uttaksplan")
 
-        part2Uttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), null, BigDecimal.valueOf(90), Endringsstatus.NY)
+        part2Uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(90),
+            Endringsstatus.NY
+        )
         part2Uttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-03/2020-01-03"),
             ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
@@ -425,7 +436,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             endringsstatus = Endringsstatus.NY
         )
 
-        // Revurdering part 1, får 100 - 90 = 10% i første periode => avslag
+        // Revurdering part 1, får 100 - 90 = 10% i første periode
         val part1Behandling2 = UUID.randomUUID().toString()
         val part2Grunnlag2 = lagGrunnlag(
             søknadsperiode = søknadsperiode,
@@ -437,22 +448,45 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = part1Behandling2,
-            saksnummer=part1Sak
-        ).copy(kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
-            sisteVedtatteUttaksplanForBehandling = mapOf(part1Behandling2 to part1Behandling2, part2Behandling to part2Behandling))
+            saksnummer = part1Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(
+                part1Behandling2 to part1Behandling2,
+                part2Behandling to part2Behandling
+            )
+        )
 
         val part2Uttaksplan2 = testClient.opprettUttaksplan(part2Grunnlag2).body ?: fail("Mangler uttaksplan")
 
-        part2Uttaksplan2.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), null, BigDecimal.valueOf(10), Endringsstatus.UENDRET)
-        part2Uttaksplan2.assertOppfylt(LukketPeriode("2020-01-03/2020-01-03"), null, HUNDRE_PROSENT, Endringsstatus.UENDRET)
-        part2Uttaksplan2.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.UENDRET)
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(10),
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-03/2020-01-03"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-06/2020-01-08"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
         part2Uttaksplan2.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-09/2020-01-10"),
             ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
-            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.PLEIEBEHOV, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
             endringsstatus = Endringsstatus.UENDRET
         )
-
 
 
         // Simulering part 2, gir 100% i første periode
@@ -465,7 +499,12 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         )
         val simulerUttaksplan = grunnlagForrigeBehandling.simulering();
 
-        simulerUttaksplan.simulertUttaksplan.assertOppfylt(LukketPeriode("2020-01-01/2020-01-02"), null, HUNDRE_PROSENT, Endringsstatus.ENDRET)
+        simulerUttaksplan.simulertUttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.ENDRET
+        )
         simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-03/2020-01-03"),
             ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
@@ -481,16 +520,17 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-09/2020-01-10"),
             ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
-            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.PLEIEBEHOV, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
             endringsstatus = Endringsstatus.UENDRET
         )
 
         assertThat(simulerUttaksplan.uttakplanEndret).isTrue();
 
     }
-
-
-
 
 
     private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
@@ -556,8 +596,12 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             Utfall.OPPFYLT -> {
                 if (nedjustertGrad != null) {
                     assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(nedjustertGrad)
-                    assertThat(periodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering).isEqualByComparingTo(nedjustertGrad)
-                    assertThat(periodeInfo.uttaksgradUtenReduksjonGrunnetInntektsgradering).isEqualByComparingTo(fullGrad)
+                    assertThat(periodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering).isEqualByComparingTo(
+                        nedjustertGrad
+                    )
+                    assertThat(periodeInfo.uttaksgradUtenReduksjonGrunnetInntektsgradering).isEqualByComparingTo(
+                        fullGrad
+                    )
                     assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
                 } else {
                     assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(fullGrad)

@@ -15,6 +15,7 @@ internal class UttaksplanMergerTest {
     private fun oppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.oppfylt(
         uttaksgrad = hundreProsent,
         uttaksgradUtenReduksjonGrunnetInntektsgradering = hundreProsent,
+        uttaksgradMedReduksjonGrunnetInntektsgradering = null,
         utbetalingsgrader = mapOf(arbeidsforhold1 to hundreProsent).somUtbetalingsgrader(),
         søkersTapteArbeidstid = Prosent(100),
         oppgittTilsyn = null,
