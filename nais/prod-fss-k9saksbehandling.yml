@@ -63,4 +63,4 @@ spec:
 
     # Feature toggles
     - name: GIR_ALDRI_MER_ENN_60_DAGER
-      value: "false"
+      value: "true"
