@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.server
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -270,8 +271,8 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-03"),
-            BigDecimal.TEN,
-            BigDecimal.valueOf(90),
+            BigDecimal.valueOf(20),
+            BigDecimal.valueOf(80),
             Endringsstatus.NY
         )
         uttaksplan.assertIkkeOppfylt(
@@ -336,7 +337,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
             null,
-            BigDecimal.valueOf(90),
+            BigDecimal.valueOf(80),
             Endringsstatus.NY
         )
         uttaksplan.assertIkkeOppfylt(
@@ -361,9 +362,8 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
     }
 
 
-    // Denne testen er litt rar, må vi lage logikk som låser grad/innvilgelse for å unngå avslag under 20%?
     @Test
-    internal fun `Annen parts uttak med nedjustert søkers uttaksgrad - Uttaksplan for behandling uten nedjustering - annen parts sak revurderes`() {
+    internal fun `Annen parts uttak med nedjustert søkers uttaksgrad under 20% - Uttaksplan for behandling uten nedjustering - annen parts sak revurderes`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
 
         // Første søknad, Part 1, nedjustering av kvote fra 100 til 10
@@ -390,7 +390,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         testClient.opprettUttaksplan(part1Grunnlag)
 
 
-        // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 10 = 90% i første periode, ellers avslag
+        // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 20 = 80% i første periode, ellers avslag
         val part2Behandling = UUID.randomUUID().toString()
         val part2Sak = RandomStringUtils.random(4)
         val part2Grunnlag = lagGrunnlag(
@@ -414,7 +414,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         part2Uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
             null,
-            BigDecimal.valueOf(90),
+            BigDecimal.valueOf(80),
             Endringsstatus.NY
         )
         part2Uttaksplan.assertIkkeOppfylt(
@@ -436,7 +436,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             endringsstatus = Endringsstatus.NY
         )
 
-        // Revurdering part 1, får 100 - 90 = 10% i første periode
+        // Revurdering part 1, får 100 - 80 = 20% i første periode
         val part1Behandling2 = UUID.randomUUID().toString()
         val part2Grunnlag2 = lagGrunnlag(
             søknadsperiode = søknadsperiode,
@@ -462,8 +462,8 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         part2Uttaksplan2.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
             null,
-            BigDecimal.valueOf(10),
-            Endringsstatus.UENDRET
+            BigDecimal.valueOf(20),
+            Endringsstatus.ENDRET
         )
         part2Uttaksplan2.assertOppfylt(
             LukketPeriode("2020-01-03/2020-01-03"),
@@ -489,7 +489,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         )
 
 
-        // Simulering part 2, gir 100% i første periode
+        // Simulering part 2, gir 80% i første periode
         val grunnlagForrigeBehandling = part2Grunnlag.copy(
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
             sisteVedtatteUttaksplanForBehandling = mapOf(
@@ -502,7 +502,183 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         simulerUttaksplan.simulertUttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
             null,
+            BigDecimal.valueOf(80),
+            Endringsstatus.ENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-03/2020-01-03"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+
+        assertThat(simulerUttaksplan.uttakplanEndret).isFalse();
+
+    }
+
+
+    @Test
+    internal fun `Annen parts uttak med nedjustert søkers uttaksgrad over 20% - Uttaksplan for behandling uten nedjustering - annen parts sak revurderes`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+
+        // Første søknad, Part 1, nedjustering av kvote fra 100 til 10
+        val part1Behandling1 = UUID.randomUUID().toString()
+        val part1Sak = RandomStringUtils.random(4)
+        val part1Grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part1Behandling1,
+            saksnummer = part1Sak
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.valueOf(40)),
+            )
+        )
+
+        testClient.opprettUttaksplan(part1Grunnlag)
+
+
+        // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 40 = 60% i første periode, ellers avslag
+        val part2Behandling = UUID.randomUUID().toString()
+        val part2Sak = RandomStringUtils.random(4)
+        val part2Grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part2Behandling,
+            saksnummer = part2Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling1, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(part1Behandling1 to part1Behandling1)
+        )
+
+        val part2Uttaksplan = testClient.opprettUttaksplan(part2Grunnlag).body ?: fail("Mangler uttaksplan")
+
+        part2Uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(60),
+            Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-03/2020-01-03"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(),
+            endringsstatus = Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(KnekkpunktType.PLEIEBEHOV, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.NY
+        )
+
+        // Revurdering part 1, reduserer grunnet inntekt til 20%
+        val part1Behandling2 = UUID.randomUUID().toString()
+        val part2Grunnlag2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part1Behandling2,
+            saksnummer = part1Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(
+                part1Behandling2 to part1Behandling2,
+                part2Behandling to part2Behandling
+            ),
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.valueOf(20)),
+            )
+
+        )
+
+        val part2Uttaksplan2 = testClient.opprettUttaksplan(part2Grunnlag2).body ?: fail("Mangler uttaksplan")
+
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            BigDecimal.valueOf(20),
+            BigDecimal.valueOf(40),
+            Endringsstatus.ENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-03/2020-01-03"),
+            null,
             HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-06/2020-01-08"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+
+
+        // Simulering part 2, gir oppjustering fra 60% til 80% i første periode
+        val grunnlagForrigeBehandling = part2Grunnlag.copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(
+                part1Behandling2 to part1Behandling2,
+                part2Behandling to part2Behandling
+            )
+        )
+        val simulerUttaksplan = grunnlagForrigeBehandling.simulering();
+
+        simulerUttaksplan.simulertUttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(80),
             Endringsstatus.ENDRET
         )
         simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
@@ -533,56 +709,11 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
     }
 
 
-    private fun Uttaksgrunnlag.opprettUttaksplan(slåSammenPerioder: Boolean = false): Uttaksplan {
-        val postResponse = testClient.opprettUttaksplan(this)
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-        val hentResponse = testClient.hentUttaksplan(this.behandlingUUID, slåSammenPerioder)
-        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
-        Thread.sleep(25) //Vent 25 ms for å sikre at uttaksplaner ikke havner på samme timestamp
-        return hentResponse.body ?: fail("Mangler uttaksplan")
-    }
 
     private fun Uttaksgrunnlag.simulering(): Simulering {
         val postResponse = testClient.simulerUttaksplan(this)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
         return postResponse.body ?: fail("Mangler simulering")
-    }
-
-
-    private fun Uttaksplan.assertOppfylt(
-        perioder: List<LukketPeriode>,
-        grad: Prosent = HUNDRE_PROSENT,
-        gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
-        oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING,
-        endringsstatus: Endringsstatus
-    ) {
-        perioder.forEach { assertOppfylt(it, grad, gradPerArbeidsforhold, oppfyltÅrsak, endringsstatus) }
-    }
-
-    private fun Uttaksplan.assertOppfylt(
-        periode: LukketPeriode,
-        grad: Prosent = HUNDRE_PROSENT,
-        gradPerArbeidsforhold: Map<Arbeidsforhold, Prosent> = mapOf(ARBEIDSFORHOLD1 to HUNDRE_PROSENT),
-        oppfyltÅrsak: Årsak = Årsak.FULL_DEKNING,
-        endringsstatus: Endringsstatus = Endringsstatus.NY,
-        utenlandsoppholdUtenÅrsak: Boolean = false
-    ) {
-        val periodeInfo = perioder[periode] ?: fail("Finner ikke periode: $periode")
-        when (periodeInfo.utfall) {
-            Utfall.OPPFYLT -> {
-                assertThat(periodeInfo.årsaker).isEqualTo(setOf(oppfyltÅrsak))
-                assertThat(periodeInfo.uttaksgrad).isEqualByComparingTo(grad)
-                assertThat(periodeInfo.endringsstatus).isEqualTo(endringsstatus)
-                gradPerArbeidsforhold.forEach { (arbeidsforhold, prosent) ->
-                    val utbetalingsgrad =
-                        periodeInfo.utbetalingsgrader.first { it.arbeidsforhold == arbeidsforhold }.utbetalingsgrad
-                    assertThat(utbetalingsgrad).isEqualByComparingTo(prosent)
-                }
-                assertThat(periodeInfo.utenlandsoppholdUtenÅrsak).isEqualTo(utenlandsoppholdUtenÅrsak)
-            }
-
-            else -> fail("Perioden $periode er ikke oppfylt")
-        }
     }
 
     private fun Uttaksplan.assertOppfylt(

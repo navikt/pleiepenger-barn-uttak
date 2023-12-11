@@ -32,7 +32,6 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
-                andreSøkeresTilsynMedNedjustering = null,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -58,7 +57,6 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = Prosent(81),
-                andreSøkeresTilsynMedNedjustering = null,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -84,7 +82,6 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = Prosent(100),
-                andreSøkeresTilsynMedNedjustering = null,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)

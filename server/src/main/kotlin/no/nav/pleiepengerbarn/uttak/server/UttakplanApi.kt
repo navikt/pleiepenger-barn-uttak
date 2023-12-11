@@ -166,9 +166,8 @@ class UttakplanApi {
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
         val simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
-        val simulertUttaksplanMedNedjustertUttaksgrad = NedjusterUttaksgradTjeneste.nedjusterUttaksgrad(uttaksgrunnlag, simulertUttaksplan)
-        val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplanMedNedjustertUttaksgrad)
-        return Simulering(forrigeUttaksplan, simulertUttaksplanMedNedjustertUttaksgrad, uttaksplanEndret)
+        val uttaksplanEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
+        return Simulering(forrigeUttaksplan, simulertUttaksplan, uttaksplanEndret)
     }
 
     private fun lagUttaksplan(

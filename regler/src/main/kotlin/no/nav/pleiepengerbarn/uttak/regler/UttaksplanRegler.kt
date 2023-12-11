@@ -180,33 +180,20 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode, false)
-        val andrePartersTilsynUtenNedjustering = grunnlag.finnAndreSøkeresTilsyn(periode, true).second
-
+        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
         val inntektsgradering = grunnlag.finnInntektsgradering(periode);
 
-        var erForrigeVedtatteGrunnlagForBehandlingNedjustert = false;
-
-        if (grunnlag.forrigeUttaksplan != null) {
-            val periodeFraForrigeUttaksplan = grunnlag.forrigeUttaksplan.perioder[periode]
-            if (periodeFraForrigeUttaksplan != null) {
-                erForrigeVedtatteGrunnlagForBehandlingNedjustert = periodeFraForrigeUttaksplan.uttaksgradMedReduksjonGrunnetInntektsgradering != null;
-            }
-        }
-
-        val beregnetMedNedjustering = BeregnGrader.beregn(
+        val beregnet = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsyn,
                 oppgittTilsyn = oppgittTilsyn,
-                andreSøkeresTilsyn = andrePartersTilsynUtenNedjustering,
+                andreSøkeresTilsyn = andrePartersTilsyn,
                 andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
-                andreSøkeresTilsynMedNedjustering = andrePartersTilsyn,
-                erForrigeVedtatteGrunnlagForBehandlingNedjustert = erForrigeVedtatteGrunnlagForBehandlingNedjustert,
                 arbeid = arbeidPerArbeidsforhold,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
@@ -216,7 +203,7 @@ internal object UttaksplanRegler {
                 inntektsgradering = inntektsgradering
             )
         )
-        return beregnetMedNedjustering;
+        return beregnet;
     }
 
     private fun RegelGrunnlag.avklarOverseEtablertTilsynÅrsak(
