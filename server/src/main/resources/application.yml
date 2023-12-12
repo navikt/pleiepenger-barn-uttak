@@ -33,12 +33,6 @@ management:
         include: info, health, prometheus
       base-path: /internal/actuator
 
-springdoc:
-  api-docs:
-    path: /internal/api-docs
-  swagger-ui:
-    path: /internal/swagger
-
 info:
   app:
     name: Pleiepenger barn uttak
