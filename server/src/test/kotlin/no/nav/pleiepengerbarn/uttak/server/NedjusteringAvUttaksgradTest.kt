@@ -88,6 +88,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
     @Test
     internal fun `Uttak med nedjustert søkers uttaksgrad i forrige behandling med endring til gjeldende`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+        val inntektsgraderingOriginal = BigDecimal.ZERO
         val grunnlagOriginal = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -102,13 +103,30 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
-                        Inntektsgradering(uttaksgrad = BigDecimal.ZERO),
+                        Inntektsgradering(uttaksgrad = inntektsgraderingOriginal),
             )
         )
 
-        testClient.opprettUttaksplan(grunnlagOriginal)
+        val uttaksplanOriginal = testClient.opprettUttaksplan(grunnlagOriginal).body ?: fail("Mangler uttaksplan")
+
+        uttaksplanOriginal.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            inntektsgraderingOriginal,
+            HUNDRE_PROSENT,
+            Endringsstatus.NY
+        )
+        uttaksplanOriginal.assertOppfylt(LukketPeriode("2020-01-03/2020-01-03"), null, HUNDRE_PROSENT, Endringsstatus.NY)
+        uttaksplanOriginal.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.NY)
+        uttaksplanOriginal.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(KnekkpunktType.PLEIEBEHOV),
+            endringsstatus = Endringsstatus.NY
+        )
 
 
+
+        val inntektsgradering = BigDecimal.valueOf(30)
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -123,7 +141,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
-                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = inntektsgradering),
             )
         )
 
@@ -132,7 +150,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
-            BigDecimal.TEN,
+            inntektsgradering,
             HUNDRE_PROSENT,
             Endringsstatus.ENDRET
         )
@@ -151,6 +169,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
     internal fun `Uttak med nedjustert søkers uttaksgrad i forrige behandling med endring til gjeldende og ulik periode`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
         val originalBehandlingUUID = UUID.randomUUID().toString()
+        val originalInntektsgradering = BigDecimal.ZERO
         val grunnlagOriginal = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -165,14 +184,40 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
-                        Inntektsgradering(uttaksgrad = BigDecimal.ZERO),
+                        Inntektsgradering(uttaksgrad = originalInntektsgradering),
             )
         )
 
-        testClient.opprettUttaksplan(grunnlagOriginal)
+        val uttaksplanOriginal = testClient.opprettUttaksplan(grunnlagOriginal).body ?: fail("Mangler uttaksplan")
+
+
+
+        uttaksplanOriginal.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            originalInntektsgradering,
+            HUNDRE_PROSENT,
+            Endringsstatus.NY
+        )
+        uttaksplanOriginal.assertOppfylt(
+            LukketPeriode("2020-01-03/2020-01-03"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.NY
+        )
+        uttaksplanOriginal.assertOppfylt(LukketPeriode("2020-01-06/2020-01-08"), null, HUNDRE_PROSENT, Endringsstatus.NY)
+        uttaksplanOriginal.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.PLEIEBEHOV
+            ),
+            endringsstatus = Endringsstatus.NY
+        )
+
 
 
         val behandlingUUID = UUID.randomUUID().toString()
+        val inntektsgraderingprosent = BigDecimal.valueOf(50)
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -188,7 +233,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             sisteVedtatteUttaksplanForBehandling = mapOf(behandlingUUID to originalBehandlingUUID),
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-03") to
-                        Inntektsgradering(uttaksgrad = BigDecimal.TEN),
+                        Inntektsgradering(uttaksgrad = inntektsgraderingprosent),
             )
         )
 
@@ -196,13 +241,13 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-01/2020-01-02"),
-            BigDecimal.TEN,
+            inntektsgraderingprosent,
             HUNDRE_PROSENT,
             Endringsstatus.ENDRET
         )
         uttaksplan.assertOppfylt(
             LukketPeriode("2020-01-03/2020-01-03"),
-            BigDecimal.TEN,
+            inntektsgraderingprosent,
             HUNDRE_PROSENT,
             Endringsstatus.ENDRET
         )
