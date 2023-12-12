@@ -19,37 +19,6 @@
     </properties>
 
     <dependencies>
-    <!-- 	Stygg workaround for å kjøre tester med servlet-api versjon 6 inntil
-            Jetty 12 kommer med støtte for servlet-api 6.
-            Begge avhengighetene kan fjernes når det skjer for spring boot injecter siste versjon.
-    -->
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet.</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-            <scope>test</scope>
-        </dependency>
-    <!-- workaround end -->
-
-    <!-- Spring boot CVE fixes -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.13.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.2</version>
-        </dependency>
-    <!-- CVE fix end -->
 
         <dependency>
             <groupId>no.nav.pleiepengerbarn.uttak</groupId>
