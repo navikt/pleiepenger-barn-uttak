@@ -1,5 +1,8 @@
 package no.nav.pleiepengerbarn.uttak.server
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.PostConstruct
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
@@ -15,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.util.*
 
 @RestController
+@Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
 class UttakplanApi {
 
     @Autowired
@@ -44,6 +48,7 @@ class UttakplanApi {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
+    @Operation(description = "Opprette en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun opprettUttaksplan(
         @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
         uriComponentsBuilder: UriComponentsBuilder
@@ -76,6 +81,7 @@ class UttakplanApi {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplan(
         @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
         uriComponentsBuilder: UriComponentsBuilder
@@ -98,6 +104,7 @@ class UttakplanApi {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
+    @Operation(description = "Simuler opprettelse av en ny uttaksplan for livets sluttfase. Tar inn grunnlaget som skal tas med i betraktning for å utlede uttaksplanen.")
     fun simulerUttaksplanForLivetsSluttfase(
         @RequestBody uttaksgrunnlag: Uttaksgrunnlag,
         uriComponentsBuilder: UriComponentsBuilder
@@ -183,6 +190,12 @@ class UttakplanApi {
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        description = "Hent uttaksplan for gitt behandling.",
+        parameters = [
+            Parameter(name = "behandlingUUID", description = "UUID for behandling som skal hentes.")
+        ]
+    )
     fun hentUttaksplanForBehandling(
         @RequestParam behandlingUUID: BehandlingUUID,
         @RequestParam slåSammenLikePerioder: Boolean = false
@@ -202,6 +215,15 @@ class UttakplanApi {
     }
 
     @DeleteMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        description = "Slett siste uttaksplan for behandling.",
+        parameters = [
+            Parameter(
+                name = "behandlingUUID",
+                description = "UUID for behandling hvor siste uttaksplan som skal slettes."
+            )
+        ]
+    )
     fun slettUttaksplan(@RequestParam behandlingUUID: BehandlingUUID): ResponseEntity<Unit> {
         logger.info("Sletter uttaksplan for behandling=$behandlingUUID")
         val behandlingUUIDParsed = try {

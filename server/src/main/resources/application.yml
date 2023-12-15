@@ -3,6 +3,24 @@ server:
   servlet:
     context-path: /pleiepenger-barn-uttak
 
+no.nav:
+  navn: 'Pleiepenger Barn Uttak'
+  versjon: '@project.version@'
+  beskrivelse: 'Håndterer uttak av pleiepenger barn på tvers av omsorgspersoner.'
+  security:
+    jwt:
+      issuer:
+        azure:
+          accepted_audience: 'pleiepenger-barn-uttak'
+
+
+management:
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
   health :
     diskspace:
       enabled: false
@@ -14,6 +32,12 @@ server:
       exposure:
         include: info, health, prometheus
       base-path: /internal/actuator
+
+springdoc:
+  api-docs:
+    path: /internal/api-docs
+  swagger-ui:
+    path: /internal/swagger
 
 info:
   app:
