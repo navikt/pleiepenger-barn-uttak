@@ -41,12 +41,20 @@ internal object KnekkpunktUtleder {
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
         finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
         finnForOverstyrtInput(knekkpunkMap, regelGrunnlag.overstyrtInput)
+        finnForInntektsgradering(knekkpunkMap, regelGrunnlag.inntektsgradering)
 
         val knekkpunkter = mutableListOf<Knekkpunkt>()
         knekkpunkMap.forEach { (key, value) ->
             knekkpunkter.add(Knekkpunkt(key, value))
         }
         return knekkpunkter.toSortedSet(compareBy { it.knekk })
+    }
+
+    private fun finnForInntektsgradering(
+        knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>,
+        inntektsgradering: Map<LukketPeriode, Inntektsgradering>
+    ) {
+        inntektsgradering.entries.forEach { finnForPeriode(knekkpunkMap, it.key, KnekkpunktType.INNTEKTSGRADERING) }
     }
 
     private fun finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap: MutableMap<LocalDate, MutableSet<KnekkpunktType>>, nyeReglerUtbetalingsgrad: LocalDate?) {

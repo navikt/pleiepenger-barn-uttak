@@ -1,10 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.AnnenPart
-import no.nav.pleiepengerbarn.uttak.kontrakter.Endringsstatus
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
 import java.math.RoundingMode
 import java.time.Duration

@@ -33,6 +33,8 @@ class UttakplanApi {
         const val UttaksplanPath = "/uttaksplan"
         const val UttaksplanSimuleringPath = "/uttaksplan/simulering"
         const val UttaksplanSimuleringSluttfasePath = "/uttaksplan/simuleringLivetsSluttfase"
+        const val UttaksplanNedjusterSøkersUttaksgradPath = "/uttaksplan/nedjusterUttaksgrad"
+
         const val BehandlingUUID = "behandlingUUID"
 
         private val logger = LoggerFactory.getLogger(this::class.java)
@@ -140,7 +142,12 @@ class UttakplanApi {
         val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
 
         val regelGrunnlag =
-            GrunnlagMapper.tilRegelGrunnlag(uttaksgrunnlag, andrePartersUttaksplanerPerBehandling, vedtatteUttaksplanerPerBehandling, forrigeUttaksplan)
+            GrunnlagMapper.tilRegelGrunnlag(
+                uttaksgrunnlag,
+                andrePartersUttaksplanerPerBehandling,
+                vedtatteUttaksplanerPerBehandling,
+                forrigeUttaksplan
+            )
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
         if (forrigeUttaksplan != null) {

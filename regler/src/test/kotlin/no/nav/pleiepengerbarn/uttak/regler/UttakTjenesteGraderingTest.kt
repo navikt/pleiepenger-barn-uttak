@@ -262,6 +262,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = nesteBehandlingUUID().toString(),
                             uttaksgrad = Prosent(40),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(40),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(40),
                             oppgittTilsyn = null,
@@ -322,6 +324,8 @@ internal class UttakTjenesteGraderingTest {
                     perioder = mapOf(
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             uttaksgrad = Prosent(60),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(60),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             årsak = Årsak.GRADERT_MOT_TILSYN,
                             knekkpunktTyper = setOf(),
@@ -396,6 +400,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(40),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(40),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(40)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(40),
                             oppgittTilsyn = null,
@@ -815,6 +821,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(100),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -834,6 +842,8 @@ internal class UttakTjenesteGraderingTest {
                         helePerioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = tredjePartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(100),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(100),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,
@@ -909,6 +919,8 @@ internal class UttakTjenesteGraderingTest {
                         perioden to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
                             uttaksgrad = Prosent(60),
+                            uttaksgradUtenReduksjonGrunnetInntektsgradering = Prosent(60),
+                            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                             utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
                             søkersTapteArbeidstid = Prosent(100),
                             oppgittTilsyn = null,

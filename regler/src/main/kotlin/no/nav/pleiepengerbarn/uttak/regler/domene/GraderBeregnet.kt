@@ -9,6 +9,8 @@ data class GraderBeregnet(
     val søkersTapteArbeidstid: Prosent,
     val oppgittTilsyn: Duration?,
     val uttaksgrad: Prosent,
+    val uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent,
+    val uttaksgradMedReduksjonGrunnetInntektsgradering: Prosent?,
     val utbetalingsgrader: Map<Arbeidsforhold, Utbetalingsgrad>,
     val årsak: Årsak,
     val manueltOverstyrt: Boolean = false

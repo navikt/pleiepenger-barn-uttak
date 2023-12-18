@@ -209,6 +209,8 @@ internal class SimuleringTjenesteTest {
     private fun oppfylt(): UttaksperiodeInfo {
         return UttaksperiodeInfo.oppfylt(
             uttaksgrad = HUNDRE_PROSENT,
+            uttaksgradUtenReduksjonGrunnetInntektsgradering = HUNDRE_PROSENT,
+            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
             utbetalingsgrader = listOf(Utbetalingsgrader(ARBEIDSGIVER1, FULL_DAG, INGENTING, HUNDRE_PROSENT)),
             søkersTapteArbeidstid = HUNDRE_PROSENT,
             oppgittTilsyn = null,

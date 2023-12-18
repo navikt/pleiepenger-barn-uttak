@@ -1,15 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
-import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
-import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov
-import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utbetalingsgrader
-import no.nav.pleiepengerbarn.uttak.kontrakter.Utfall
-import no.nav.pleiepengerbarn.uttak.kontrakter.UttaksperiodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
-import no.nav.pleiepengerbarn.uttak.kontrakter.Årsak
+import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperHelt
 import java.math.BigDecimal
@@ -18,7 +9,9 @@ import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
-internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(periode: LukketPeriode): Pair<Boolean, Prosent> {
+internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(
+    periode: LukketPeriode
+): Pair<Boolean, Prosent> {
     val søkersEtablertTilsyn = finnEtablertTilsyn(periode)
     val søkersNattevåk = finnNattevåk(periode)
     val søkersBeredskap = finnBeredskap(periode)
@@ -89,6 +82,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     }
 
     var sumAndreSøkeresTilsyn = Prosent.ZERO
+    var sumAndreSøkeresTilsynMedNedjustering = Prosent.ZERO
 
     var oppdatertGrad = Prosent.ZERO
     for (uttaksplanMedUUIDMedKrav in uttaksplanerMedKrav) {
@@ -97,9 +91,21 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
         if (annenPartsOverlappendePeriodeInfo != null) {
             if (annenPartsOverlappendePeriodeInfo.harÅrsakSomIkkeTriggerReberegning()) {
                 sumAndreSøkeresTilsyn += annenPartsOverlappendePeriodeInfo.uttaksgrad
+                sumAndreSøkeresTilsynMedNedjustering += annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering
+                    ?: annenPartsOverlappendePeriodeInfo.uttaksgrad
             } else {
+                val inntektsgradering =
+                    if (annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering != null)
+                        Inntektsgradering(
+                            annenPartsOverlappendePeriodeInfo.uttaksgradMedReduksjonGrunnetInntektsgradering!!.setScale(
+                                2,
+                                RoundingMode.HALF_UP
+                            )
+                        )
+                    else null
                 val forrigeUttaksgrad = if (this.sisteVedtatteUttaksplanForBehandling.isNotEmpty()) {
-                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
+                    uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgradUtenReduksjonGrunnetInntektsgradering
+                        ?: uttaksplanMedKrav.finnOverlappendeUttaksperiode(periode)?.uttaksgrad ?: Prosent.valueOf(100)
                 } else {
                     Prosent.valueOf(100)
                 }
@@ -113,7 +119,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType = ytelseType,
                     periode = periode,
-                    nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad
+                    nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad,
+                    inntektsgradering = inntektsgradering,
                 )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
                     beregnGraderGrunnlag,
@@ -190,7 +197,7 @@ private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: Lukk
 
     val sumAndreSøkeresTilsyn = finnTilsynForUttaksPeriodeFraUttaksplaner(
         periode = periode,
-        uttaksplaner = andreVedtak
+        uttaksplaner = andreVedtak,
     )
 
     return finnTilsynForUttaksPeriodeFraUttaksplaner(
@@ -201,7 +208,9 @@ private fun RegelGrunnlag.finnAndreSøkeresTilsynFraUttaksperioder(periode: Lukk
 }
 
 private fun finnTilsynForUttaksPeriodeFraUttaksplaner(
-    periode: LukketPeriode, uttaksplaner: List<UttaksplanMedBehandlingUuid>, alleredeForbrukt: BigDecimal = Prosent.ZERO
+    periode: LukketPeriode,
+    uttaksplaner: List<UttaksplanMedBehandlingUuid>,
+    alleredeForbrukt: BigDecimal = Prosent.ZERO
 ): BigDecimal {
     var andreSøkeresTilsynsgrad = alleredeForbrukt
     uttaksplaner.forEach { uttaksplan ->
@@ -209,7 +218,8 @@ private fun finnTilsynForUttaksPeriodeFraUttaksplaner(
         if (overlappendePeriode != null) {
             val uttaksperiode = uttaksplan.uttaksplan.perioder[overlappendePeriode]
             if (uttaksperiode != null && uttaksperiode.utfall == Utfall.OPPFYLT) {
-                andreSøkeresTilsynsgrad += uttaksperiode.uttaksgrad
+                andreSøkeresTilsynsgrad +=
+                    uttaksperiode.uttaksgrad
             }
         }
     }

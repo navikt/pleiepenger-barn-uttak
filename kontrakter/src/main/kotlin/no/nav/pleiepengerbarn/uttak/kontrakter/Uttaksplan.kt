@@ -78,6 +78,8 @@ data class Utbetalingsgrader @JsonCreator constructor(
 data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("utfall") val utfall: Utfall,
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
+    @JsonProperty("uttaksgradMedReduksjonGrunnetInntektsgradering") val uttaksgradMedReduksjonGrunnetInntektsgradering: Prosent?,
+    @JsonProperty("uttaksgradUtenReduksjonGrunnetInntektsgradering") val uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent?,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
     @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration?,
@@ -133,12 +135,16 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 nattevåk = nattevåk,
                 beredskap = beredskap,
                 utenlandsopphold = utenlandsopphold,
-                manueltOverstyrt = manueltOverstyrt
-            )
+                manueltOverstyrt = manueltOverstyrt,
+                uttaksgradMedReduksjonGrunnetInntektsgradering = null,
+                uttaksgradUtenReduksjonGrunnetInntektsgradering = null
+                )
         }
 
         fun oppfylt(
             uttaksgrad: Prosent,
+            uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent?,
+            uttaksgradMedReduksjonGrunnetInntektsgradering: Prosent?,
             utbetalingsgrader: List<Utbetalingsgrader>,
             søkersTapteArbeidstid: Prosent,
             oppgittTilsyn: Duration?,
@@ -160,6 +166,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             return UttaksperiodeInfo(
                 utfall = Utfall.OPPFYLT,
                 uttaksgrad = uttaksgrad,
+                uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradUtenReduksjonGrunnetInntektsgradering,
                 utbetalingsgrader = utbetalingsgrader,
                 søkersTapteArbeidstid = søkersTapteArbeidstid,
                 oppgittTilsyn = oppgittTilsyn,
@@ -172,7 +179,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 nattevåk = nattevåk,
                 beredskap = beredskap,
                 utenlandsopphold = utenlandsopphold,
-                manueltOverstyrt = manueltOverstyrt
+                manueltOverstyrt = manueltOverstyrt,
+                uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             )
         }
 
