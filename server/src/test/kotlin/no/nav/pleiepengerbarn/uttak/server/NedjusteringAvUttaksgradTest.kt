@@ -548,7 +548,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             LukketPeriode("2020-01-01/2020-01-02"),
             null,
             BigDecimal.valueOf(80),
-            Endringsstatus.ENDRET
+            Endringsstatus.UENDRET
         )
         simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
             periode = LukketPeriode("2020-01-03/2020-01-03"),

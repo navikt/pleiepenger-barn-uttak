@@ -75,7 +75,7 @@ object EndringsstatusOppdaterer {
                         2,
                         RoundingMode.HALF_UP
                     ),
-                    tilkommet = (it.tilkommet == true)
+                    tilkommet = null
                 )
             }.sortedWith(
                 compareBy(
@@ -89,7 +89,10 @@ object EndringsstatusOppdaterer {
             nattevåk = null,
             inngangsvilkår = mapOf(),
             utenlandsopphold = null,
-            utenlandsoppholdUtenÅrsak = false
+            utenlandsoppholdUtenÅrsak = false,
+            uttaksgradMedReduksjonGrunnetInntektsgradering = null,
+            uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
+            manueltOverstyrt = false
         )
     }
 
