@@ -4,6 +4,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     //Oppfylt årsaker
     GRADERT_MOT_TILSYN(true),
     AVKORTET_MOT_INNTEKT(true),
+    OVERSTYRT_UTTAKSGRAD(true),
     AVKORTET_MOT_SØKERS_ØNSKE(true),
     @Deprecated("Bruk OPPFYLT_PGA_BARNETS_DØDSFALL_6_UKER eller OPPFYLT_PGA_BARNETS_DØDSFALL_12_UKER i stedet for OPPFYLT_PGA_BARNETS_DØDSFALL")
     OPPFYLT_PGA_BARNETS_DØDSFALL(true),

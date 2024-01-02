@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
@@ -48,6 +49,87 @@ internal class BeregnGraderTest {
             ARBEIDSGIVER1 to HUNDRE_PROSENT
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+    @Test
+    internal fun `Nedjustert uttaksgrad fra 100 til 50 grunnet inntektsgradering`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            BigDecimal.valueOf(50),
+            ARBEIDSGIVER1 to HUNDRE_PROSENT
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+
+    @Test
+    internal fun `Inntektsgradering på 20% og andre søkers tilsyn på 80%`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = BigDecimal.valueOf(80),
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING )
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
+            )
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            BigDecimal.valueOf(20),
+            ARBEIDSGIVER1 to BigDecimal.valueOf(20)
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+    }
+
+    @Test
+    internal fun `Overstyring og nedjustering grunnet inntekt`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
+            )
+        )
+
+        grader.assert(
+            Årsak.OVERSTYRT_UTTAKSGRAD,
+            BigDecimal.valueOf(30),
+            ARBEIDSGIVER1 to BigDecimal.valueOf(30)
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+        assertThat(grader.manueltOverstyrt).isTrue()
     }
 
     @Test

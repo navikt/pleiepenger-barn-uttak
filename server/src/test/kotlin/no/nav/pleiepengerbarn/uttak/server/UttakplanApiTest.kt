@@ -186,7 +186,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.ZERO
             ),
-            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            oppfyltÅrsak = Årsak.OVERSTYRT_UTTAKSGRAD,
             endringsstatus = Endringsstatus.NY
         )
         uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-01/2020-01-02"), true)
@@ -196,7 +196,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.valueOf(60)
             ),
-            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            oppfyltÅrsak = Årsak.OVERSTYRT_UTTAKSGRAD,
             endringsstatus = Endringsstatus.NY
         )
         uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-03/2020-01-03"), true)
@@ -252,7 +252,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.ZERO
             ),
-            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            oppfyltÅrsak = Årsak.OVERSTYRT_UTTAKSGRAD,
             endringsstatus = Endringsstatus.NY
         )
         uttaksplan.assertManueltOverstyrt(LukketPeriode("2020-01-06/2020-01-08"), true)
