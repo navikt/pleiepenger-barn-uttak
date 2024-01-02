@@ -33,6 +33,13 @@ internal object BeregnGrader {
             getUttaksgradJustertMotInntektsgradering(beregnGraderGrunnlag, uttaksgradResultat)
         val faktiskUttaksgrad = uttaksgradResultat.overstyrtUttaksgrad ?: uttaksgradMedReduksjonGrunnetInntektsgradering
         ?: uttaksgradResultat.uttaksgrad
+
+
+        val årsak = finnFaktiskÅrsak(
+            beregnGraderGrunnlag,
+            uttaksgradResultat
+        )
+
         return GraderBeregnet(
             pleiebehov = beregnGraderGrunnlag.pleiebehov,
             graderingMotTilsyn = GraderingMotTilsyn(
@@ -48,9 +55,30 @@ internal object BeregnGrader {
             uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgrad,
             utbetalingsgrader = utbetalingsgrader,
-            årsak = uttaksgradResultat.årsak(),
+            årsak = årsak,
             manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true }
         )
+    }
+
+    private fun finnFaktiskÅrsak(
+        beregnGraderGrunnlag: BeregnGraderGrunnlag,
+        uttaksgradResultat: UttaksgradResultat
+    ): Årsak {
+        if (uttaksgradResultat.overstyrtUttaksgrad != null &&
+            uttaksgradResultat.oppfyltÅrsak != null
+        ) {
+            return Årsak.OVERSTYRT_UTTAKSGRAD;
+        }
+
+        if (skalNedjustereGrunnetInntekt(
+                beregnGraderGrunnlag,
+                uttaksgradResultat
+            ) && uttaksgradResultat.uttaksgrad.setScale(2, RoundingMode.HALF_UP).compareTo(TJUE_PROSENT) > 0
+        ) {
+            return Årsak.AVKORTET_MOT_INNTEKT;
+        }
+
+        return uttaksgradResultat.årsak();
     }
 
     private fun getUttaksgradJustertMotInntektsgradering(
