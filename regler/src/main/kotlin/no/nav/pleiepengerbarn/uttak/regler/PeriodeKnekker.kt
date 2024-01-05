@@ -18,7 +18,7 @@ internal object PeriodeKnekker {
             )
             knekkpunkter.forEach { knekkpunkt ->
                 val knekkDato = knekkpunkt.knekk
-                if (!knekkDato.isEqual(søktUttaksperiode.periode.fom) && !knekkDato.isBefore(søktUttaksperiode.periode.fom) && !knekkDato.isAfter(søktUttaksperiode.periode.tom)) {
+                if (knekkDato.isAfter(søktUttaksperiode.periode.fom) && !knekkDato.isAfter(søktUttaksperiode.periode.tom)) {
                     val periode = LukketPeriode(
                             fom = rest.periode.fom,
                             tom = knekkDato.minusDays(1)
