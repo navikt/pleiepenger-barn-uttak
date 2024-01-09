@@ -25,6 +25,8 @@ enum class Årsak(val oppfylt: Boolean)  {
     INNGANGSVILKÅR_IKKE_OPPFYLT(false),
     FOR_LAV_INNTEKT(false),
     FOR_MANGE_DAGER_UTENLANDSOPPHOLD(false),
-    MAKS_DAGER_OVERSTEGET(false)
+    MAKS_DAGER_OVERSTEGET(false),
+    OVERSTYRT_UTTAK_AVSLAG(false),
+
 
 }

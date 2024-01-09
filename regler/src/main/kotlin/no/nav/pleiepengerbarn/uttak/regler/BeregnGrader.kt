@@ -64,16 +64,18 @@ internal object BeregnGrader {
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
         uttaksgradResultat: UttaksgradResultat
     ): Årsak {
-        if (uttaksgradResultat.overstyrtUttaksgrad != null &&
-            uttaksgradResultat.oppfyltÅrsak != null
+        if (uttaksgradResultat.overstyrtUttaksgrad != null
         ) {
+            if (uttaksgradResultat.overstyrtUttaksgrad.setScale(2, RoundingMode.HALF_UP).compareTo(TJUE_PROSENT) < 0) {
+                return Årsak.OVERSTYRT_UTTAK_AVSLAG;
+            }
             return Årsak.OVERSTYRT_UTTAKSGRAD;
         }
 
         if (skalNedjustereGrunnetInntekt(
                 beregnGraderGrunnlag,
                 uttaksgradResultat
-            ) && uttaksgradResultat.uttaksgrad.setScale(2, RoundingMode.HALF_UP).compareTo(TJUE_PROSENT) > 0
+            ) && uttaksgradResultat.uttaksgrad.setScale(2, RoundingMode.HALF_UP).compareTo(TJUE_PROSENT) >= 0
         ) {
             return Årsak.AVKORTET_MOT_INNTEKT;
         }
