@@ -78,7 +78,7 @@ object BeregnUtbetalingsgrader {
             val arbeidForAktivitetsgruppe = beregnGraderGrunnlag.arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             if (aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !brukNyeRegler) {
                 val utbetalingsgraderForSpesialhåndtering =
-                    beregnForSpesialhåndtertGruppe(
+                    beregnForSpesialhåndtertGruppeMedGamleRegler(
                         arbeidForAktivitetsgruppe,
                         gjenværendeTimerSomDekkes,
                         faktiskUttaksgrad,
@@ -102,7 +102,7 @@ object BeregnUtbetalingsgrader {
         return alleUtbetalingsgrader
     }
 
-    private fun beregnForSpesialhåndtertGruppe(
+    private fun beregnForSpesialhåndtertGruppeMedGamleRegler(
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
         gjenværendeTimerSomDekkes: Duration,
         uttaksgrad: Prosent,
@@ -116,7 +116,7 @@ object BeregnUtbetalingsgrader {
                 utledGradForOverstyrte(arbeidsforhold, info, beregnGraderGrunnlag.overstyrtInput)
             } else {
                 Utbetalingsgrad(
-                    utbetalingsgrad = utledGradForSpesialhåndtering(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type, beregnGraderGrunnlag.periode, beregnGraderGrunnlag.nyeReglerUtbetalingsgrad),
+                    utbetalingsgrad = utledGradForSpesialhåndteringMedGamleRegler(uttaksgrad, gradertMotTilsyn, spesialhåndteringsgruppeSkalSpesialhåndteres, arbeidsforhold.type),
                     normalArbeidstid = info.jobberNormalt,
                     faktiskArbeidstid = info.jobberNå,
                     tilkommet = info.tilkommet,
@@ -143,17 +143,13 @@ object BeregnUtbetalingsgrader {
         )
     }
 
-    private fun utledGradForSpesialhåndtering(
+    private fun utledGradForSpesialhåndteringMedGamleRegler(
         uttaksgrad: Prosent,
         gradertMotTilsyn: Boolean,
         spesialhåndteringsgruppeSkalSpesialhåndteres: Boolean,
-        type: String,
-        periode: LukketPeriode,
-        nyeReglerUtbetalingsgrad: LocalDate?
+        type: String
     ): Prosent {
-        return if (nyeReglerUtbetalingsgrad != null && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)) {
-            uttaksgrad
-        } else if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
+        return if (spesialhåndteringsgruppeSkalSpesialhåndteres && !gradertMotTilsyn && uttaksgrad > Prosent.ZERO) {
             HUNDRE_PROSENT
         } else if (type == Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode) {
             HUNDRE_PROSENT
