@@ -15,7 +15,7 @@
         <springdoc.version>1.7.0</springdoc.version>
         <logback.logstash.version>7.4</logback.logstash.version>
         <postgres.version>42.7.1</postgres.version>
-        <micrometer.version>1.12.1</micrometer.version>
+        <micrometer.version>1.12.2</micrometer.version>
     </properties>
 
     <dependencies>
