@@ -8,15 +8,6 @@ metadata:
 spec:
   image: {{image}}
   port: 8080
-  azure:
-    application:
-      enabled: true
-  accessPolicy:
-    inbound:
-      rules:
-        - application: k9-sak
-        - application: k9-formidling
-  webproxy: true
   replicas:
     min: 2
     max: 4
@@ -48,7 +39,8 @@ spec:
   secureLogs:
     enabled: true
   ingresses:
-    - https://k9-psb-uttak.dev.intern.nav.no
+    - https://pleiepenger-barn-uttak.q1.nais.preprod.local
+    - https://pleiepenger-barn-uttak.nais.preprod.local
   env:
     - name: APP_NAME
       value: "pleiepenger-barn-uttak"
