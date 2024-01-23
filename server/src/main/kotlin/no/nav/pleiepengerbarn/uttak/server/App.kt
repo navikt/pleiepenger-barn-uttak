@@ -1,6 +1,5 @@
 package no.nav.pleiepengerbarn.uttak.server
 
-import org.slf4j.LoggerFactory
 import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 import org.springframework.core.io.ClassPathResource
-import java.util.*
 
 
 @SpringBootApplication
@@ -19,8 +17,6 @@ import java.util.*
 @ConfigurationPropertiesScan("no.nav.pleiepengerbarn.uttak")
 @ComponentScan("no.nav.pleiepengerbarn.uttak")
 class App {
-
-    private val logger = LoggerFactory.getLogger(App::class.java)
 
     @Bean
     fun logFilter(): FilterRegistrationBean<LogFilter> {
