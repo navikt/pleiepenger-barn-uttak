@@ -2,3 +2,8 @@ server:
   port: ${PORT:8686}
   servlet:
     context-path: /pleiepenger-barn-uttak
+no.nav.security.jwt:
+  issuer:
+    azure:
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/azure/.well-known/openid-configuration
+      accepted_audience: pleiepenger-barn-uttak

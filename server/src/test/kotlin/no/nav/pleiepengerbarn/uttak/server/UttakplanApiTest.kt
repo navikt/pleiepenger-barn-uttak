@@ -7,6 +7,8 @@ import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,9 +31,19 @@ import kotlin.test.fail
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("postgres")
 @Tag("integration")
+@EnableMockOAuth2Server
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
-    private val testClient by lazy { PleiepengerBarnUttakTestClient(restTemplate) }
+    @Autowired
+    private lateinit var mockOAuth2Server: MockOAuth2Server
+
+    private val testClient by lazy {
+        val token = mockOAuth2Server.issueToken(
+            issuerId = "azure",
+            audience = "pleiepenger-barn-uttak"
+        ).serialize()
+        PleiepengerBarnUttakTestClient(restTemplate, token)
+    }
 
     @BeforeEach
     internal fun setUp() {
