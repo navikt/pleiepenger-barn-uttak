@@ -8,6 +8,15 @@ metadata:
 spec:
   image: {{image}}
   port: 8080
+  azure:
+    application:
+      enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: k9-sak
+        - application: k9-formidling
+  webproxy: true
   replicas:
     min: 2
     max: 4
