@@ -4,6 +4,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import no.nav.pleiepengerbarn.uttak.testklient.nesteSaksnummer
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit
 @ActiveProfiles("postgres")
 @Tag("integration")
 @Transactional
+@EnableMockOAuth2Server
 internal class UttakRepositoryTest {
 
     private companion object {

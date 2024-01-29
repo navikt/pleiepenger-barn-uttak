@@ -8,6 +8,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
+import no.nav.security.token.support.core.api.Protected
+import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -18,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.util.*
 
 @RestController
+@Protected
 @Tag(name = "Uttak API", description = "Operasjoner for uttak pleiepenger barn")
 class UttakplanApi {
 

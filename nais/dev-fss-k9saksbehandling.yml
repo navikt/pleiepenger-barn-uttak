@@ -49,8 +49,7 @@ spec:
   secureLogs:
     enabled: true
   ingresses:
-    - https://pleiepenger-barn-uttak.q1.nais.preprod.local
-    - https://pleiepenger-barn-uttak.nais.preprod.local
+    - https://k9-psb-uttak.dev.intern.nav.no
   env:
     - name: APP_NAME
       value: "pleiepenger-barn-uttak"
