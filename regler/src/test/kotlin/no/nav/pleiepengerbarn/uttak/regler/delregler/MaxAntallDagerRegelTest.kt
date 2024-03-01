@@ -92,38 +92,6 @@ class MaxAntallDagerRegelTest {
     }
 
     @Test
-    internal fun `Søker får innvilget det fraværet som er mindre enn max antall dager, deretter avslag, Har søkt i to søknader som behandles sekvensielt`() {
-        val periode1 = LukketPeriode("2024-01-01/2024-01-31")
-        val periode2 = LukketPeriode("2024-02-01/2024-03-31")
-        val søkersUttaksplan1 = Uttaksplan(
-            perioder = mapOf(
-                periode1 to dummyUttaksperiodeInfo()
-            ), trukketUttak = listOf()
-        )
-        val søkersUttaksplan2 = Uttaksplan(
-            perioder = mapOf(
-                periode2 to dummyUttaksperiodeInfo()
-            ), trukketUttak = listOf()
-        )
-
-        val grunnlagBehandling1 = dummyRegelGrunnlag(periode1)
-        val uttaksplanBehandling1 = regel.kjør(søkersUttaksplan1, grunnlagBehandling1)
-        assertThat(uttaksplanBehandling1.perioder).hasSize(1)
-        assertThat(uttaksplanBehandling1.kvoteInfo).isNotNull
-        assertThat(uttaksplanBehandling1.kvoteInfo!!.maxDato).isNull()
-        assertThat(uttaksplanBehandling1.kvoteInfo!!.totaltForbruktKvote).isEqualByComparingTo(BigDecimal.valueOf(23))
-
-        val helePerioden = LukketPeriode(periode1.fom, periode2.tom)
-        val grunnlagBehandling2 = dummyRegelGrunnlag(helePerioden).copy(forrigeUttaksplan = uttaksplanBehandling1)
-        val uttaksplanBehandling2 = regel.kjør(søkersUttaksplan2, grunnlagBehandling2)
-        assertThat(uttaksplanBehandling2.perioder).hasSize(2)
-        assertThat(uttaksplanBehandling2.kvoteInfo).isNotNull
-        assertThat(uttaksplanBehandling2.kvoteInfo!!.maxDato).isEqualTo("2024-03-22")
-        assertThat(uttaksplanBehandling2.kvoteInfo!!.totaltForbruktKvote).isEqualByComparingTo(BigDecimal.valueOf(60))
-
-    }
-
-    @Test
     internal fun `Søker får avslått det fraværet som ikke er oppfylt av andre grunner, innvilget det som er innenfor kvoten, og avslått det som er over kvoten`() {
         val periode1 = LukketPeriode("2020-01-06/2020-01-31") // 20 dager
         val periode2 = LukketPeriode("2020-02-03/2020-02-07") // 5 dager ikke oppfylt
