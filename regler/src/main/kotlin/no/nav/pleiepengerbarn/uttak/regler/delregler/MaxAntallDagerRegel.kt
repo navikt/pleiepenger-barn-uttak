@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.FeatureToggle
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
@@ -9,8 +8,10 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.math.min
 
 internal class MaxAntallDagerRegel : UttaksplanRegel {
 
@@ -36,7 +37,8 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
-                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
+                val uttaksgrad = info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP)
+                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * uttaksgrad
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
@@ -47,11 +49,12 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     rest -= forbrukteDagerDennePerioen
                 } else {
                     // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
-                    val restHeleDager = rest.setScale(0, RoundingMode.UP)
-                    val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
-                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
-                    if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
-                        nyePerioder[LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom)] = info.settIkkeoppfylt()
+                    val restVirkedagerGradert = rest.divide(uttaksgrad, 0, RoundingMode.UP).toInt() // ingen #div/0, treffer kode over om det er 0 uttaksgrad
+                    val tomInnvilget = plussVirkedager(periode.fom, restVirkedagerGradert-1)
+                    check(tomInnvilget <= periode.tom) { "Post-condition feilet: tomInnvilget $tomInnvilget er utenfor $periode. Uttaksgrad var $uttaksgrad og rest var $rest" }
+                    nyePerioder[LukketPeriode(periode.fom, tomInnvilget)] = info
+                    if (tomInnvilget < periode.tom) {
+                        nyePerioder[LukketPeriode(tomInnvilget.plusDays(1), periode.tom)] = info.settIkkeoppfylt()
                     }
                     rest = BigDecimal.ZERO
                 }
@@ -86,7 +89,17 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
-    private fun erDetFlereDagerIgjenÅVurdere(periode: LukketPeriode, restHeleDagerMedEventuellHelg: BigDecimal) = !periode.tom.isBefore(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()))
+    private fun plussVirkedager(inputDato: LocalDate, antallVirkedager: Int): LocalDate {
+        var restVirkedager = antallVirkedager
+        var dato = inputDato
+        while (restVirkedager > 0) {
+            dato = dato.plusDays(1);
+            if (dato.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                restVirkedager--;
+            }
+        }
+        return dato
+    }
 
     private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(
         forBrukteDagerHittil: BigDecimal,
@@ -137,7 +150,11 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
                         if (relevantePerioder.containsKey(annenPartsPeriode) && relevantePerioder[annenPartsPeriode] == behandlingUUID) {
                             // Ignorer.
                         } else if (info.utfall == Utfall.OPPFYLT) {
-                            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
+                            antallDager += (info.uttaksgrad.divide(
+                                HUNDRE_PROSENT,
+                                2,
+                                RoundingMode.HALF_UP
+                            ) * BigDecimal(annenPartsPeriode.virkedager()))
                             relevantePerioder[annenPartsPeriode] = behandlingUUID
                         }
                     }

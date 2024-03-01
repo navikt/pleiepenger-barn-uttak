@@ -92,6 +92,110 @@ class MaxAntallDagerRegelTest {
     }
 
     @Test
+    internal fun `Søker har 50% uttak, får innvilget i 120 ukedager, deretter avslag`() {
+        //120 ukedager er 24 uker
+        //1.jan 2024 er en mandag
+
+        //24 hele uker fra og med 1.jan 2024 slutter 16.juni 2024 (en søndag)
+
+        val periode1 = LukketPeriode("2024-01-01/2024-07-01")
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                periode1 to dummyUttaksperiodeInfo(uttaksgrad = Prosent(50))
+            ), trukketUttak = listOf()
+        )
+
+        val helePerioden = LukketPeriode(LocalDate.of(2024, Month.JANUARY, 1), LocalDate.of(2024, Month.JULY, 1))
+        val grunnlag = dummyRegelGrunnlag(helePerioden)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        val resultatPeriode = resultat.perioder.keys.first()
+        val resultatInfo = resultat.perioder.values.first()
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2024-01-01/2024-06-14"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+
+        val resultatPeriode2 = resultat.perioder.keys.last()
+        val resultatInfo2 = resultat.perioder.values.last()
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2024-06-15/2024-07-01"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+    }
+
+    @Test
+    internal fun `Søker har 50% uttak, søker om 121 virkedager og får innvilget 120 ukedager`() {
+        //120 ukedager er 24 uker
+        //1.jan 2024 er en mandag
+
+        //24 hele uker fra og med 1.jan 2024 slutter 16.juni 2024 (en søndag)
+
+        val periode1 = LukketPeriode("2024-01-01/2024-06-17")
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                periode1 to dummyUttaksperiodeInfo(uttaksgrad = Prosent(50))
+            ), trukketUttak = listOf()
+        )
+
+        val helePerioden = LukketPeriode(LocalDate.of(2024, Month.JANUARY, 1), LocalDate.of(2024, Month.JUNE, 15))
+        val grunnlag = dummyRegelGrunnlag(helePerioden)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        val resultatPeriode = resultat.perioder.keys.first()
+        val resultatInfo = resultat.perioder.values.first()
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2024-01-01/2024-06-14"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+
+        val resultatPeriode2 = resultat.perioder.keys.last()
+        val resultatInfo2 = resultat.perioder.values.last()
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2024-06-15/2024-06-17"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+
+    }
+
+    @Test
+    internal fun `Søker har lav uttakgrad`() {
+        //120 ukedager er 24 uker
+        //1.jan 2024 er en mandag
+
+        //24 hele uker fra og med 1.jan 2024 slutter 16.juni 2024 (en søndag)
+
+        val periode1 = LukketPeriode("2024-01-01/2024-06-17")
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                periode1 to dummyUttaksperiodeInfo(uttaksgrad = Prosent(50))
+            ), trukketUttak = listOf()
+        )
+
+        val helePerioden = LukketPeriode(LocalDate.of(2024, Month.JANUARY, 1), LocalDate.of(2024, Month.JUNE, 15))
+        val grunnlag = dummyRegelGrunnlag(helePerioden)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        val resultatPeriode = resultat.perioder.keys.first()
+        val resultatInfo = resultat.perioder.values.first()
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2024-01-01/2024-06-14"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+
+        val resultatPeriode2 = resultat.perioder.keys.last()
+        val resultatInfo2 = resultat.perioder.values.last()
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2024-06-15/2024-06-17"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+
+    }
+
+    @Test
     internal fun `Søker får avslått det fraværet som ikke er oppfylt av andre grunner, innvilget det som er innenfor kvoten, og avslått det som er over kvoten`() {
         val periode1 = LukketPeriode("2020-01-06/2020-01-31") // 20 dager
         val periode2 = LukketPeriode("2020-02-03/2020-02-07") // 5 dager ikke oppfylt
@@ -476,10 +580,10 @@ private fun dummyRegelGrunnlagMedAndreParter(
 )
 
 
-private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfall = Utfall.OPPFYLT) =
+private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfall = Utfall.OPPFYLT, uttaksgrad:Prosent = HUNDRE_PROSENT) =
     UttaksperiodeInfo(
         utfall = utfall,
-        utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+        utbetalingsgrader = mapOf(arbeidsforhold1 to uttaksgrad).somUtbetalingsgrader(),
         annenPart = AnnenPart.ALENE,
         beredskap = null,
         nattevåk = null,
@@ -494,7 +598,7 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfa
         oppgittTilsyn = oppgittTilsyn,
         pleiebehov = Pleiebehov.PROSENT_100.prosent,
         søkersTapteArbeidstid = null,
-        uttaksgrad = HUNDRE_PROSENT,
+        uttaksgrad = uttaksgrad,
         årsaker = setOf(),
         uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
         uttaksgradMedReduksjonGrunnetInntektsgradering = null
