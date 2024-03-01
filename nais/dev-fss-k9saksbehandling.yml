@@ -73,5 +73,3 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
-    - name: GIR_ALDRI_MER_ENN_60_DAGER
-      value: "true"

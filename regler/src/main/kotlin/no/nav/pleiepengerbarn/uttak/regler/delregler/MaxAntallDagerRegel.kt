@@ -40,11 +40,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
                 if (rest <= BigDecimal.ZERO) {
                     // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
-                    if (FeatureToggle.isActive("GIR_ALDRI_MER_ENN_60_DAGER")) {
-                        nyePerioder[periode] = info.settIkkeoppfylt()
-                    } else {
-                        kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, periode, info, maxDatoHittil)
-                    }
+                    nyePerioder[periode] = info.settIkkeoppfylt()
                 } else if (forbrukteDagerDennePerioen <= rest) {
                     // Hvis det er nok dager igjen, så settes hele periode til oppfylt
                     nyePerioder[periode] = info
@@ -55,11 +51,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
                     nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
                     if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
-                        if (FeatureToggle.isActive("GIR_ALDRI_MER_ENN_60_DAGER")) {
-                            nyePerioder[LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom)] = info.settIkkeoppfylt()
-                        } else {
-                            kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(nyePerioder, LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom), info, maxDatoHittil)
-                        }
+                        nyePerioder[LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom)] = info.settIkkeoppfylt()
                     }
                     rest = BigDecimal.ZERO
                 }
@@ -107,41 +99,6 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
             return maxDatoHittil
         }
         return null
-    }
-
-    private fun kanPeriodenInnvilgesFordiDenOverlapperMedTidligereInnvilgetPeriode(
-        nyePerioder: MutableMap<LukketPeriode, UttaksperiodeInfo>,
-        periode: LukketPeriode,
-        info: UttaksperiodeInfo,
-        maxDatoHittil: LocalDate?
-    ): Map<LukketPeriode, UttaksperiodeInfo> {
-        if (maxDatoHittil != null) {
-            if (sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
-                nyePerioder[periode] = info
-            } else if (sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(periode, maxDatoHittil)) {
-                nyePerioder[LukketPeriode(periode.fom, maxDatoHittil)] = info
-                nyePerioder[LukketPeriode(maxDatoHittil.plusDays(1), periode.tom)] = info.settIkkeoppfylt()
-            } else {
-                nyePerioder[periode] = info.settIkkeoppfylt()
-            }
-        } else {
-            nyePerioder[periode] = info.settIkkeoppfylt()
-        }
-        return nyePerioder
-    }
-
-    private fun sjekkOmNoeKanInnvilgesFordiDetOverlapperMedTidligereInnvilgetPeriode(
-        periode: LukketPeriode,
-        maxDatoHittil: LocalDate
-    ): Boolean {
-        return (periode.fom == maxDatoHittil || periode.fom.isBefore(maxDatoHittil))
-    }
-
-    private fun sjekkOmAltKanInnvilgesFordiDetErFørTidligereInnvilgetPeriode(
-        periode: LukketPeriode,
-        maxDatoHittil: LocalDate
-    ): Boolean {
-        return (periode.tom == maxDatoHittil || periode.tom.isBefore(maxDatoHittil))
     }
 
 }
