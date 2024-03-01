@@ -16,15 +16,6 @@ import java.util.*
 class MaxAntallDagerRegelTest {
     private val regel: MaxAntallDagerRegel = MaxAntallDagerRegel()
 
-    @BeforeEach
-    internal fun setUp() {
-        System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
-    }
-
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
-    }
     @Test
     internal fun `Pleiepenger sykt barn skal få innvilget uavhengig av kvote, og kvoteInfo skal derfor ikke være satt`() {
         val periode1 = LukketPeriode("2020-01-06/2020-04-03") // 65 dager

@@ -42,16 +42,6 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         PleiepengerBarnUttakTestClient(restTemplate, token)
     }
 
-    @BeforeEach
-    internal fun setUp() {
-        System.setProperty("GIR_ALDRI_MER_ENN_60_DAGER", "true")
-    }
-
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("GIR_ALDRI_MER_ENN_60_DAGER")
-    }
-
     @Test
     internal fun `Uttak med nedjustert søkers uttaksgrad grunnet inntektsgradering`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
