@@ -150,11 +150,7 @@ private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate
                         if (relevantePerioder.containsKey(annenPartsPeriode) && relevantePerioder[annenPartsPeriode] == behandlingUUID) {
                             // Ignorer.
                         } else if (info.utfall == Utfall.OPPFYLT) {
-                            antallDager += (info.uttaksgrad.divide(
-                                HUNDRE_PROSENT,
-                                2,
-                                RoundingMode.HALF_UP
-                            ) * BigDecimal(annenPartsPeriode.virkedager()))
+                            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(annenPartsPeriode.virkedager()))
                             relevantePerioder[annenPartsPeriode] = behandlingUUID
                         }
                     }
