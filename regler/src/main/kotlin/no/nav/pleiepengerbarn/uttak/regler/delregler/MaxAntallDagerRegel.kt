@@ -50,22 +50,26 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     val restHeleVirkedager = rest.divide(uttaksgrad, 0, RoundingMode.DOWN).toInt() // ingen #div/0, treffer kode over om det er 0 uttaksgrad
                     rest -= uttaksgrad * BigDecimal(restHeleVirkedager)
 
-                    val fårDagMedDelvisInnvilget = rest > Prosent.ZERO
-                    val tomInnvilget = if (fårDagMedDelvisInnvilget) plussVirkedager(periode.fom, restHeleVirkedager).minusDays(1) else plussVirkedager(periode.fom, restHeleVirkedager - 1)
-                    val fomIkkeInnvilget : LocalDate;
-                    nyePerioder[LukketPeriode(periode.fom, tomInnvilget)] = info
+                    val fårDagerHeltOppfylt = restHeleVirkedager > 0
+                    val fårDagMedDelvisOppfylt = rest > Prosent.ZERO
 
-                    if (fårDagMedDelvisInnvilget) {
-                        val delvisInnvilgetDato = plussVirkedager(tomInnvilget, 1)
-                        val restIProsenter = BigDecimal.valueOf(100) * rest
-                        nyePerioder[LukketPeriode(delvisInnvilgetDato, delvisInnvilgetDato)] = info.settDelvisOppfyltAvkortetMotKvote(restIProsenter)
-                        fomIkkeInnvilget = delvisInnvilgetDato.plusDays(1)
-                        rest = BigDecimal.ZERO
-                    } else {
-                        fomIkkeInnvilget = tomInnvilget.plusDays(1)
+                    var nestePeriodeFom = periode.fom;
+                    if (fårDagerHeltOppfylt) {
+                        val tomInnvilget = if (fårDagMedDelvisOppfylt)
+                            plussVirkedager(periode.fom, restHeleVirkedager).minusDays(1) //for å ta med helg når påfølgende mandag innvilges delvis
+                        else
+                            plussVirkedager(periode.fom, restHeleVirkedager - 1)
+                        nyePerioder[LukketPeriode(periode.fom, tomInnvilget)] = info
+                        nestePeriodeFom = tomInnvilget.plusDays(1)
                     }
-                    if (fomIkkeInnvilget <= periode.tom) {
-                        nyePerioder[LukketPeriode(fomIkkeInnvilget, periode.tom)] = info.settIkkeoppfylt()
+                    if (fårDagMedDelvisOppfylt) {
+                        val restIProsenter = BigDecimal.valueOf(100) * rest
+                        nyePerioder[LukketPeriode(nestePeriodeFom, nestePeriodeFom)] = info.settDelvisOppfyltAvkortetMotKvote(restIProsenter)
+                        rest = BigDecimal.ZERO
+                        nestePeriodeFom = nestePeriodeFom.plusDays(1)
+                    }
+                    if (nestePeriodeFom <= periode.tom) {
+                        nyePerioder[LukketPeriode(nestePeriodeFom, periode.tom)] = info.settIkkeoppfylt()
                     }
                 }
             } else {
