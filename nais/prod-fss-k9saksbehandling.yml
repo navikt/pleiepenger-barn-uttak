@@ -71,3 +71,5 @@ spec:
       value: PROD
 
     # Feature toggles
+    - name: MERGE_VED_SIMULERING
+      value: "false"
