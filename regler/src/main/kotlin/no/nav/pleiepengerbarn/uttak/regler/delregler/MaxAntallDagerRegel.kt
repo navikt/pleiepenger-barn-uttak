@@ -63,7 +63,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                         nestePeriodeFom = tomInnvilget.plusDays(1)
                     }
                     if (fårDagMedDelvisOppfylt) {
-                        val restIProsenter = BigDecimal.valueOf(100) * rest
+                        val restIProsenter = BigDecimal(100) * rest
                         nyePerioder[LukketPeriode(nestePeriodeFom, nestePeriodeFom)] = info.settDelvisOppfyltAvkortetMotKvote(restIProsenter)
                         rest = BigDecimal.ZERO
                         nestePeriodeFom = nestePeriodeFom.plusDays(1)
