@@ -51,7 +51,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                     rest -= uttaksgrad * BigDecimal(restHeleVirkedager)
 
                     val fårDagerHeltOppfylt = restHeleVirkedager > 0
-                    val fårDagMedDelvisOppfylt = rest > Prosent.ZERO
+                    val fårDagMedDelvisOppfylt = rest > BigDecimal.ZERO
 
                     var nestePeriodeFom = periode.fom;
                     if (fårDagerHeltOppfylt) {
