@@ -10,8 +10,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.util.UUID
-import kotlin.math.min
+import java.util.*
 
 internal class MaxAntallDagerRegel : UttaksplanRegel {
 
@@ -26,8 +25,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         if (grunnlag.ytelseType != YtelseType.PLS) {
             return uttaksplan
         }
-        val maxDager =
-            KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
+        val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
 
         val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil()
 
@@ -41,22 +39,34 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
                 val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * uttaksgrad
 
                 if (rest <= BigDecimal.ZERO) {
-                    // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
+                    // ingenting igjen på kvoten
                     nyePerioder[periode] = info.settIkkeoppfylt()
                 } else if (forbrukteDagerDennePerioen <= rest) {
-                    // Hvis det er nok dager igjen, så settes hele periode til oppfylt
+                    // nok dager igjen, setter hele perioden til oppfylt
                     nyePerioder[periode] = info
                     rest -= forbrukteDagerDennePerioen
                 } else {
-                    // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
-                    val restVirkedagerGradert = rest.divide(uttaksgrad, 0, RoundingMode.UP).toInt() // ingen #div/0, treffer kode over om det er 0 uttaksgrad
-                    val tomInnvilget = plussVirkedager(periode.fom, restVirkedagerGradert-1)
-                    check(tomInnvilget <= periode.tom) { "Post-condition feilet: tomInnvilget $tomInnvilget er utenfor $periode. Uttaksgrad var $uttaksgrad og rest var $rest" }
+                    // delvis nok dager igjen.
+                    val restHeleVirkedager = rest.divide(uttaksgrad, 0, RoundingMode.DOWN).toInt() // ingen #div/0, treffer kode over om det er 0 uttaksgrad
+                    rest -= uttaksgrad * BigDecimal(restHeleVirkedager)
+
+                    val fårDagMedDelvisInnvilget = rest > Prosent.ZERO
+                    val tomInnvilget = if (fårDagMedDelvisInnvilget) plussVirkedager(periode.fom, restHeleVirkedager).minusDays(1) else plussVirkedager(periode.fom, restHeleVirkedager - 1)
+                    val fomIkkeInnvilget : LocalDate;
                     nyePerioder[LukketPeriode(periode.fom, tomInnvilget)] = info
-                    if (tomInnvilget < periode.tom) {
-                        nyePerioder[LukketPeriode(tomInnvilget.plusDays(1), periode.tom)] = info.settIkkeoppfylt()
+
+                    if (fårDagMedDelvisInnvilget) {
+                        val delvisInnvilgetDato = plussVirkedager(tomInnvilget, 1)
+                        val restIProsenter = BigDecimal.valueOf(100) * rest
+                        nyePerioder[LukketPeriode(delvisInnvilgetDato, delvisInnvilgetDato)] = info.settDelvisOppfyltAvkortetMotKvote(restIProsenter)
+                        fomIkkeInnvilget = delvisInnvilgetDato.plusDays(1)
+                        rest = BigDecimal.ZERO
+                    } else {
+                        fomIkkeInnvilget = tomInnvilget.plusDays(1)
                     }
-                    rest = BigDecimal.ZERO
+                    if (fomIkkeInnvilget <= periode.tom) {
+                        nyePerioder[LukketPeriode(fomIkkeInnvilget, periode.tom)] = info.settIkkeoppfylt()
+                    }
                 }
             } else {
                 // Gjør ingenting med perioder som ikke er oppfylt
@@ -133,6 +143,22 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
     )
 }
 
+private fun UttaksperiodeInfo.settDelvisOppfyltAvkortetMotKvote(uttaksgrad: Prosent): UttaksperiodeInfo {
+    check(uttaksgrad > Prosent.ZERO) { "Uttakgrad må være over 0 for delvis oppfylt, var $uttaksgrad" }
+    check(uttaksgrad < Prosent.valueOf(100)) { "Uttakgrad må være under 100% for delvis oppfylt, var $uttaksgrad" }
+    check(uttaksgrad == uttaksgrad.setScale(2, RoundingMode.UP)) { "Uttaksgrad skal være avrundet til 2 desimaler" }
+    return this.copy(
+        årsaker = setOf(Årsak.AVKORTET_MOT_KVOTE),
+        utfall = Utfall.OPPFYLT,
+        uttaksgrad = uttaksgrad,
+        utbetalingsgrader = this.utbetalingsgrader.map {
+            it.copy(
+                utbetalingsgrad = uttaksgrad
+            )
+        }
+    )
+}
+
 private fun RegelGrunnlag.finnForbrukteDagerHittil(): Pair<BigDecimal, LocalDate?> {
     var antallDager = BigDecimal.ZERO
     val relevantePerioder = mutableMapOf<LukketPeriode, UUID>()
@@ -178,12 +204,11 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<Big
     var antallDager = BigDecimal.ZERO
     val relevantePerioder = mutableListOf<LukketPeriode>()
 
-    this.forEach { (annenPartsPeriode, info) ->
+    this.forEach { (periode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(
-                annenPartsPeriode.virkedager()
-            ))
-            relevantePerioder.add(annenPartsPeriode)
+            val uttaksgrad = info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP)
+            antallDager += uttaksgrad * BigDecimal(periode.virkedager())
+            relevantePerioder.add(periode)
         }
     }
     return Pair(antallDager, relevantePerioder)
