@@ -4,8 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -90,6 +88,84 @@ class MaxAntallDagerRegelTest {
         assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2020-03-28/2020-04-03"))
         assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
     }
+
+    @Test
+    internal fun `Søker har 50% uttak, får innvilget i 120 ukedager, deretter avslag`() {
+        //120 ukedager er 24 uker
+        //1.jan 2024 er en mandag
+
+        //24 hele uker fra og med 1.jan 2024 slutter 16.juni 2024 (en søndag)
+
+        val periode1 = LukketPeriode("2024-01-01/2024-07-01")
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                periode1 to dummyUttaksperiodeInfo(uttaksgrad = Prosent(50))
+            ), trukketUttak = listOf()
+        )
+
+        val helePerioden = LukketPeriode(LocalDate.of(2024, Month.JANUARY, 1), LocalDate.of(2024, Month.JULY, 1))
+        val grunnlag = dummyRegelGrunnlag(helePerioden)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        assertThat(resultat.perioder).hasSize(2)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        val resultatPeriode = resultat.perioder.keys.first()
+        val resultatInfo = resultat.perioder.values.first()
+        assertThat(resultatPeriode).isEqualTo(LukketPeriode("2024-01-01/2024-06-14"))
+        assertThat(resultatInfo.utfall).isEqualTo(Utfall.OPPFYLT)
+
+        val resultatPeriode2 = resultat.perioder.keys.last()
+        val resultatInfo2 = resultat.perioder.values.last()
+        assertThat(resultatPeriode2).isEqualTo(LukketPeriode("2024-06-15/2024-07-01"))
+        assertThat(resultatInfo2.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+    }
+
+    @Test
+    internal fun `Søker får delvis innvilget den dagen det går tomt for kvote`() {
+        //120 ukedager er 24 uker
+        //1.jan 2024 er en mandag
+
+        //24 hele uker fra og med 1.jan 2024 slutter 16.juni 2024 (en søndag)
+
+        val søkersUttaksplan = Uttaksplan(
+            perioder = mapOf(
+                LukketPeriode("2024-01-01/2024-01-01") to dummyUttaksperiodeInfo(uttaksgrad = Prosent(49)),
+                LukketPeriode("2024-01-02/2024-07-01") to dummyUttaksperiodeInfo(uttaksgrad = Prosent(50))
+            ), trukketUttak = listOf()
+        )
+
+        val helePerioden = LukketPeriode(LocalDate.of(2024, Month.JANUARY, 1), LocalDate.of(2024, Month.JULY, 1))
+        val grunnlag = dummyRegelGrunnlag(helePerioden)
+
+        val resultat = regel.kjør(søkersUttaksplan, grunnlag)
+        assertThat(resultat.perioder).hasSize(4)
+        assertThat(resultat.kvoteInfo).isNotNull
+        assertThat(resultat.kvoteInfo!!.maxDato).isNull()
+        assertThat(resultat.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
+
+        val perioder = resultat.perioder.keys.toList()
+
+        assertThat(perioder[0]).isEqualTo(LukketPeriode("2024-01-01/2024-01-01"));
+        assertThat(resultat.perioder[perioder[0]]!!.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultat.perioder[perioder[0]]!!.uttaksgrad).isEqualTo(Prosent(49))
+
+        assertThat(perioder[1]).isEqualTo(LukketPeriode("2024-01-02/2024-06-16"));
+        assertThat(resultat.perioder[perioder[1]]!!.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultat.perioder[perioder[1]]!!.uttaksgrad).isEqualTo(Prosent(50))
+
+        assertThat(perioder[2]).isEqualTo(LukketPeriode("2024-06-17/2024-06-17"));
+        assertThat(resultat.perioder[perioder[2]]!!.utfall).isEqualTo(Utfall.OPPFYLT)
+        assertThat(resultat.perioder[perioder[2]]!!.årsaker).isEqualTo(setOf(Årsak.AVKORTET_MOT_KVOTE))
+        assertThat(resultat.perioder[perioder[2]]!!.uttaksgrad).isEqualByComparingTo(Prosent(1))
+
+        assertThat(perioder[3]).isEqualTo(LukketPeriode("2024-06-18/2024-07-01"));
+        assertThat(resultat.perioder[perioder[3]]!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(resultat.perioder[perioder[3]]!!.uttaksgrad).isEqualByComparingTo(Prosent(0))
+    }
+
 
     @Test
     internal fun `Søker får avslått det fraværet som ikke er oppfylt av andre grunner, innvilget det som er innenfor kvoten, og avslått det som er over kvoten`() {
@@ -476,10 +552,10 @@ private fun dummyRegelGrunnlagMedAndreParter(
 )
 
 
-private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfall = Utfall.OPPFYLT) =
+private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfall = Utfall.OPPFYLT, uttaksgrad:Prosent = HUNDRE_PROSENT) =
     UttaksperiodeInfo(
         utfall = utfall,
-        utbetalingsgrader = mapOf(arbeidsforhold1 to Prosent(100)).somUtbetalingsgrader(),
+        utbetalingsgrader = mapOf(arbeidsforhold1 to uttaksgrad).somUtbetalingsgrader(),
         annenPart = AnnenPart.ALENE,
         beredskap = null,
         nattevåk = null,
@@ -494,7 +570,7 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfa
         oppgittTilsyn = oppgittTilsyn,
         pleiebehov = Pleiebehov.PROSENT_100.prosent,
         søkersTapteArbeidstid = null,
-        uttaksgrad = HUNDRE_PROSENT,
+        uttaksgrad = uttaksgrad,
         årsaker = setOf(),
         uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
         uttaksgradMedReduksjonGrunnetInntektsgradering = null

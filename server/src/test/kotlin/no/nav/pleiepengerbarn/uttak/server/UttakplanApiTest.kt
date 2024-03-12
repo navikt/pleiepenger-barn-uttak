@@ -1986,7 +1986,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60.68).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
         val simuleringsresultat = grunnlag1Søker1.simulering()
 
@@ -1994,7 +1994,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Livets sluttfase - Innvilger en hel dag når bruker egentlig har under en dag igjen, så kvoten kan gå over 60 dager`() {
+    internal fun `Livets sluttfase - Innvilger deler av dagen når bruker har under en dag igjen, så kvoten blir eksakt 60 dager`() {
         val søknadsperiode = LukketPeriode("2022-11-30/2023-02-22")
         val behandlingUUID1 = nesteBehandlingId()
 
@@ -2035,7 +2035,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         val uttakplan1søker1 = grunnlag1Søker1.opprettUttaksplan()
         assertThat(uttakplan1søker1.kvoteInfo).isNotNull
-        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60.39).setScale(2))
+        assertThat(uttakplan1søker1.kvoteInfo!!.totaltForbruktKvote).isEqualTo(BigDecimal.valueOf(60).setScale(2))
 
         val simuleringsresultat = grunnlag1Søker1.simulering()
 

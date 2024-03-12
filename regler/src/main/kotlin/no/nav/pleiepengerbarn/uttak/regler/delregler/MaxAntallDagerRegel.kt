@@ -1,7 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.regler.delregler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.FeatureToggle
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
@@ -9,8 +8,9 @@ import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.virkedager
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.DayOfWeek
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 internal class MaxAntallDagerRegel : UttaksplanRegel {
 
@@ -25,8 +25,7 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         if (grunnlag.ytelseType != YtelseType.PLS) {
             return uttaksplan
         }
-        val maxDager =
-            KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
+        val maxDager = KVOTER[grunnlag.ytelseType] ?: throw IllegalArgumentException("Ulovlig ytelsestype ${grunnlag.ytelseType}")
 
         val (forBrukteDagerHittil, maxDatoHittil) = grunnlag.finnForbrukteDagerHittil()
 
@@ -36,24 +35,42 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
 
         uttaksplan.perioder.forEach { (periode, info) ->
             if (info.utfall == Utfall.OPPFYLT) {
-                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP))
+                val uttaksgrad = info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP)
+                val forbrukteDagerDennePerioen = BigDecimal(periode.virkedager()) * uttaksgrad
 
                 if (rest <= BigDecimal.ZERO) {
-                    // Hvis ingenting igjen på kvoten så må undersøke om det fremdeles kan innvilges
+                    // ingenting igjen på kvoten
                     nyePerioder[periode] = info.settIkkeoppfylt()
                 } else if (forbrukteDagerDennePerioen <= rest) {
-                    // Hvis det er nok dager igjen, så settes hele periode til oppfylt
+                    // nok dager igjen, setter hele perioden til oppfylt
                     nyePerioder[periode] = info
                     rest -= forbrukteDagerDennePerioen
                 } else {
-                    // Bare delvis nok dager igjen, så deler derfor opp perioden i en oppfylt og en ikke oppfylt periode
-                    val restHeleDager = rest.setScale(0, RoundingMode.UP)
-                    val restHeleDagerMedEventuellHelg = if (restHeleDager > BigDecimal(5)) ((restHeleDager.divide(BigDecimal(5), 2, RoundingMode.HALF_UP)) * BigDecimal(2)) + restHeleDager - BigDecimal(2) else restHeleDager
-                    nyePerioder[LukketPeriode(periode.fom, periode.fom.plusDays((restHeleDagerMedEventuellHelg - BigDecimal.ONE).toLong()))] = info
-                    if (erDetFlereDagerIgjenÅVurdere(periode, restHeleDagerMedEventuellHelg)) {
-                        nyePerioder[LukketPeriode(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()), periode.tom)] = info.settIkkeoppfylt()
+                    // delvis nok dager igjen.
+                    val restHeleVirkedager = rest.divide(uttaksgrad, 0, RoundingMode.DOWN).toInt() // ingen #div/0, treffer kode over om det er 0 uttaksgrad
+                    rest -= uttaksgrad * BigDecimal(restHeleVirkedager)
+
+                    val fårDagerHeltOppfylt = restHeleVirkedager > 0
+                    val fårDagMedDelvisOppfylt = rest > BigDecimal.ZERO
+
+                    var nestePeriodeFom = periode.fom;
+                    if (fårDagerHeltOppfylt) {
+                        val tomInnvilget = if (fårDagMedDelvisOppfylt)
+                            plussVirkedager(periode.fom, restHeleVirkedager).minusDays(1) //for å ta med helg når påfølgende mandag innvilges delvis
+                        else
+                            plussVirkedager(periode.fom, restHeleVirkedager - 1)
+                        nyePerioder[LukketPeriode(periode.fom, tomInnvilget)] = info
+                        nestePeriodeFom = tomInnvilget.plusDays(1)
                     }
-                    rest = BigDecimal.ZERO
+                    if (fårDagMedDelvisOppfylt) {
+                        val restIProsenter = BigDecimal(100) * rest
+                        nyePerioder[LukketPeriode(nestePeriodeFom, nestePeriodeFom)] = info.settDelvisOppfyltAvkortetMotKvote(restIProsenter)
+                        rest = BigDecimal.ZERO
+                        nestePeriodeFom = nestePeriodeFom.plusDays(1)
+                    }
+                    if (nestePeriodeFom <= periode.tom) {
+                        nyePerioder[LukketPeriode(nestePeriodeFom, periode.tom)] = info.settIkkeoppfylt()
+                    }
                 }
             } else {
                 // Gjør ingenting med perioder som ikke er oppfylt
@@ -86,7 +103,17 @@ internal class MaxAntallDagerRegel : UttaksplanRegel {
         return uttaksplan.copy(perioder = nyePerioder, kvoteInfo = kvoteInfo)
     }
 
-    private fun erDetFlereDagerIgjenÅVurdere(periode: LukketPeriode, restHeleDagerMedEventuellHelg: BigDecimal) = !periode.tom.isBefore(periode.fom.plusDays(restHeleDagerMedEventuellHelg.toLong()))
+    private fun plussVirkedager(inputDato: LocalDate, antallVirkedager: Int): LocalDate {
+        var restVirkedager = antallVirkedager
+        var dato = inputDato
+        while (restVirkedager > 0) {
+            dato = dato.plusDays(1);
+            if (dato.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                restVirkedager--;
+            }
+        }
+        return dato
+    }
 
     private fun skalKunSetteMaxDatoHvisKvotenErbruktOpp(
         forBrukteDagerHittil: BigDecimal,
@@ -115,6 +142,22 @@ private fun UttaksperiodeInfo.settIkkeoppfylt(): UttaksperiodeInfo {
                     2,
                     RoundingMode.HALF_UP
                 )
+            )
+        }
+    )
+}
+
+private fun UttaksperiodeInfo.settDelvisOppfyltAvkortetMotKvote(uttaksgrad: Prosent): UttaksperiodeInfo {
+    check(uttaksgrad > Prosent.ZERO) { "Uttakgrad må være over 0 for delvis oppfylt, var $uttaksgrad" }
+    check(uttaksgrad < Prosent.valueOf(100)) { "Uttakgrad må være under 100% for delvis oppfylt, var $uttaksgrad" }
+    check(uttaksgrad == uttaksgrad.setScale(2, RoundingMode.UP)) { "Uttaksgrad skal være avrundet til 2 desimaler" }
+    return this.copy(
+        årsaker = setOf(Årsak.AVKORTET_MOT_KVOTE),
+        utfall = Utfall.OPPFYLT,
+        uttaksgrad = uttaksgrad,
+        utbetalingsgrader = this.utbetalingsgrader.map {
+            it.copy(
+                utbetalingsgrad = uttaksgrad
             )
         }
     )
@@ -165,12 +208,11 @@ private fun Map<LukketPeriode, UttaksperiodeInfo>.finnForbrukteDager(): Pair<Big
     var antallDager = BigDecimal.ZERO
     val relevantePerioder = mutableListOf<LukketPeriode>()
 
-    this.forEach { (annenPartsPeriode, info) ->
+    this.forEach { (periode, info) ->
         if (info.utfall == Utfall.OPPFYLT) {
-            antallDager += (info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP) * BigDecimal(
-                annenPartsPeriode.virkedager()
-            ))
-            relevantePerioder.add(annenPartsPeriode)
+            val uttaksgrad = info.uttaksgrad.divide(HUNDRE_PROSENT, 2, RoundingMode.HALF_UP)
+            antallDager += uttaksgrad * BigDecimal(periode.virkedager())
+            relevantePerioder.add(periode)
         }
     }
     return Pair(antallDager, relevantePerioder)
