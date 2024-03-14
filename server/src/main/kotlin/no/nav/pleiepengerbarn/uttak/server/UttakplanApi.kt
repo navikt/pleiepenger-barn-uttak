@@ -31,7 +31,6 @@ class UttakplanApi {
     private val commitId: String? = null
 
     private var utvidetLogging: Boolean = false
-    private var mergeVedSimulering: Boolean = false;
 
     companion object {
         const val UttaksplanPath = "/uttaksplan"
@@ -47,7 +46,6 @@ class UttakplanApi {
 
     init {
         utvidetLogging = System.getenv("UTVIDET_LOGGING").toBoolean()
-        mergeVedSimulering = System.getenv("MERGE_VED_SIMULERING").toBoolean()
     }
 
     @PostMapping(
@@ -134,7 +132,7 @@ class UttakplanApi {
         uttaksgrunnlag.valider()
         val forrigeUttaksplan = uttakRepository.hent(UUID.fromString(uttaksgrunnlag.behandlingUUID))
         var simulertUttaksplan = lagUttaksplan(uttaksgrunnlag, forrigeUttaksplan, false)
-        if (mergeVedSimulering && forrigeUttaksplan != null) {
+        if (forrigeUttaksplan != null) {
             simulertUttaksplan =
                 UttaksplanMerger.slåSammenUttaksplaner(forrigeUttaksplan, simulertUttaksplan, uttaksgrunnlag.trukketUttak)
         }

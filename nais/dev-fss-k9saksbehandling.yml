@@ -73,5 +73,3 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
-    - name: MERGE_VED_SIMULERING
-      value: "true"
