@@ -48,6 +48,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      deployments: read
     if: github.ref_name == 'master'
     needs: [build-app, verdikjede-tester]
     uses: navikt/sif-gha-workflows/.github/workflows/maven-deploy.yml@main
@@ -63,6 +64,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      deployments: read
     if: github.ref_name == 'master'
     needs: [build-app, verdikjede-tester, deploy-dev]
     uses: navikt/sif-gha-workflows/.github/workflows/maven-deploy.yml@main
