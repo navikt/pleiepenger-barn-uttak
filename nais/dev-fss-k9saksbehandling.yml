@@ -20,7 +20,7 @@ spec:
   webproxy: true
   replicas:
     min: 2
-    max: 4
+    max: 2
     cpuThresholdPercentage: 50
   liveness:
     path: /pleiepenger-barn-uttak/internal/actuator/health
@@ -33,11 +33,11 @@ spec:
     timeout: 10
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 2000m
+      memory: 500Mi
     requests:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 500m
+      memory: 200Mi
   vault:
     enabled: true
     paths:
