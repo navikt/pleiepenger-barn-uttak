@@ -16,7 +16,7 @@
         <logback.logstash.version>7.4</logback.logstash.version>
         <postgres.version>42.7.3</postgres.version>
         <micrometer.version>1.13.1</micrometer.version>
-        <tokensupport.version>4.1.7</tokensupport.version>
+        <tokensupport.version>4.1.8</tokensupport.version>
     </properties>
 
     <dependencies>
