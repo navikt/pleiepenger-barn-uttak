@@ -17,6 +17,7 @@
         <postgres.version>42.7.3</postgres.version>
         <micrometer.version>1.13.1</micrometer.version>
         <tokensupport.version>4.1.7</tokensupport.version>
+        <flyway.version>10.15.2</flyway.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,11 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
             <version>${flyway.version}</version>
         </dependency>
         <dependency>
