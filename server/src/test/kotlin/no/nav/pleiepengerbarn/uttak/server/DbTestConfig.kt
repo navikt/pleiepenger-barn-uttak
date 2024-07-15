@@ -42,7 +42,7 @@ class DbTestConfig {
     companion object {
         // Lazy because we only want it to be initialized when accessed
         private val postgres: KPostgreSQLContainer by lazy {
-            KPostgreSQLContainer("postgres:12.1")
+            KPostgreSQLContainer("postgres:12.11")
                     .withDatabaseName("databasename")
                     .withUsername("pleiepengerbarn_unit")
                     .withPassword("pleiepengerbarn_unit")
