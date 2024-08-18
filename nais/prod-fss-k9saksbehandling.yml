@@ -61,6 +61,8 @@ spec:
       value: jdbc:postgresql://A01DBVL012.adeo.no:5432/pleiepenger-barn-uttak
 
     # Appdynamics
+    - name: APPD_ENABLED
+      value: "true"
     - name: APPDYNAMICS_CONTROLLER_HOST_NAME
       value: appdynamics.adeo.no
     - name: APPDYNAMICS_CONTROLLER_PORT
@@ -69,5 +71,16 @@ spec:
       value: "true"
     - name: APPDYNAMICS_AGENT_ACCOUNT_NAME
       value: PROD
+      # open telemetry, kommenter inn og fjern appdynamics-config (og fra Dockerfile) når testet ut nok i dev
+    #    - name: "OTEL_EXPORTER_OTLP_ENDPOINT"
+    #      value: "https://elastic-apm.adeo.no"
+    #    - name: "OTEL_METRICS_EXPORTER"
+    #      value: "otlp"
+    #    - name: "OTEL_LOGS_EXPORTER"
+    #      value: "none"
+    #    - name: "OTEL_RESOURCE_ATTRIBUTES"
+    #      value: "service.name=pleiepenger-barn-uttak,service.version=pleiepenger-barn-uttak,deployment.environment=p"
+    #    - name: "OTEL_TRACES_EXPORTER"
+    #      value: "otlp"
 
     # Feature toggles
