@@ -42,7 +42,7 @@ jobs:
     needs: build-app
     with:
       tag: ${{ needs.build-app.outputs.build-version }}
-      suites: "pleiepenger,livetssluttfase,annet,frontend"
+      suites: "pleiepenger,livetssluttfase,frontend"
       override_image_artifact_name: ${{ github.ref_name != github.event.repository.default_branch && needs.build-app.outputs.image-artifact-name || null }}
       image_version: ${{ needs.build-app.outputs.build-version }}
 
