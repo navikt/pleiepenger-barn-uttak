@@ -22,8 +22,9 @@ jobs:
     uses: navikt/sif-gha-workflows/.github/workflows/maven-build-app-db.yml@main
     with:
       java-version: 21
-      build-image: ${{ github.ref_name == 'master' }}
-      push-image: ${{ github.ref_name == 'master' }}
+      build-image: ${{ github.actor != 'dependabot[bot]' }}
+      push-image: ${{ github.ref_name == github.event.repository.default_branch}}
+      upload-image: ${{ github.ref_name != github.event.repository.default_branch }}
       db_schema: pleiepengerbarnuttak_unit
       pg_version: 12
     secrets: inherit
@@ -36,11 +37,14 @@ jobs:
       contents: write
       issues: write
       packages: read
-    uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test.yml@main
-    if: github.ref_name == 'master'
+    uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
+    if: ${{github.actor != 'dependabot[bot]'}}
     needs: build-app
     with:
       tag: ${{ needs.build-app.outputs.build-version }}
+      suites: "pleiepenger,livetssluttfase,frontend"
+      override_image_artifact_name: ${{ github.ref_name != github.event.repository.default_branch && needs.build-app.outputs.image-artifact-name || null }}
+      image_version: ${{ needs.build-app.outputs.build-version }}
 
 
   deploy-dev:
@@ -48,7 +52,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    if: github.ref_name == 'master'
+    if: github.ref_name == github.event.repository.default_branch
     needs: [build-app, verdikjede-tester]
     uses: navikt/sif-gha-workflows/.github/workflows/maven-deploy.yml@main
     with:
@@ -63,7 +67,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    if: github.ref_name == 'master'
+    if: github.ref_name == github.event.repository.default_branch
     needs: [build-app, verdikjede-tester, deploy-dev]
     uses: navikt/sif-gha-workflows/.github/workflows/maven-deploy.yml@main
     with:
