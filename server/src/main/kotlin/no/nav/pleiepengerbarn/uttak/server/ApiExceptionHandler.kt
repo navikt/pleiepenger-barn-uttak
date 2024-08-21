@@ -18,4 +18,6 @@ class ApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()//.contentType(MediaType.TEXT_PLAIN).body(e.message)
     }
 
+
+
 }
