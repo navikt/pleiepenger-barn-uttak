@@ -16,7 +16,7 @@
         <logback.logstash.version>8.0</logback.logstash.version>
         <postgres.version>42.7.3</postgres.version>
         <micrometer.version>1.13.3</micrometer.version>
-        <tokensupport.version>5.0.1</tokensupport.version>
+        <tokensupport.version>5.0.2</tokensupport.version>
         <flyway.version>10.17.1</flyway.version>
     </properties>
 
