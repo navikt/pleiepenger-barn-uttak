@@ -46,6 +46,13 @@ spec:
   prometheus:
     enabled: true
     path: /pleiepenger-barn-uttak/internal/actuator/prometheus
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+      destinations:
+        - id: "grafana-lgtm"
+        - id: "elastic-apm"
   secureLogs:
     enabled: true
   ingresses:
@@ -60,17 +67,9 @@ spec:
     - name: DEFAULTDS_URL
       value: jdbc:postgresql://b27dbvl014.preprod.local:5432/pleiepenger-barn-uttak
 
-      # open telemetry
-    - name: "OTEL_EXPORTER_OTLP_ENDPOINT"
-      value: "https://elastic-apm.adeo.no"
-    - name: "OTEL_METRICS_EXPORTER"
-      value: "otlp"
-    - name: "OTEL_LOGS_EXPORTER"
-      value: "none"
-    - name: "OTEL_RESOURCE_ATTRIBUTES"
-      value: "service.name=pleiepenger-barn-uttak,service.version=pleiepenger-barn-uttak,deployment.environment=q"
-    - name: "OTEL_TRACES_EXPORTER"
-      value: "otlp"
+    # opentelemetry
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "service.name=pleiepenger-barn-uttak,service.namespace=k9saksbehandling,deployment.environment=q,nais.backend=elastic-apm;grafana-lgtm"
 
     # Feature toggles
     - name: UTVIDET_LOGGING
