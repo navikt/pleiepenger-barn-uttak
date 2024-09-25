@@ -32,7 +32,7 @@ object GrunnlagMapper {
 
         val kravprioritetForEgneBehandlinger = mutableMapOf<LukketPeriode, List<UUID>>()
         uttaksgrunnlag.kravprioritetForEgneBehandlinger.forEach { (periode, kravprio) ->
-            kravprioritetForBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
+            kravprioritetForEgneBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
         }
 
         val sisteVedtatteUttaksplanForBehandling = mutableMapOf<UUID, UUID>()

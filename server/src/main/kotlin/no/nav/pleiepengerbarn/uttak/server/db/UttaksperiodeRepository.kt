@@ -44,7 +44,7 @@ internal class UttaksperiodeRepository {
                 aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn,
                 inngangsvilkar, knekkpunkt_typer, kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak,
                 nattevåk, beredskap, andre_sokeres_tilsyn_reberegnet, endringsstatus, utenlandsopphold_uten_aarsak,
-                landkode, utenlandsopphold_aarsak, manuelt_overstyrt
+                landkode, utenlandsopphold_aarsak, manuelt_overstyrt, graderingMotEgetTilsyn
             from uttaksperiode
             where uttaksresultat_id = :uttaksresultat_id
         """.trimIndent()
@@ -136,12 +136,12 @@ internal class UttaksperiodeRepository {
                     tilgjengelig_for_soker, uttaksgrad, uttaksgradUtenReduksjonGrunnetInntektsgradering, uttaksgradMedReduksjonGrunnetInntektsgradering, 
                     aarsaker, utfall, sokers_tapte_arbeidstid, oppgitt_tilsyn, inngangsvilkar, knekkpunkt_typer,
                     kilde_behandling_uuid, annen_part, overse_etablert_tilsyn_arsak, nattevåk, beredskap, endringsstatus, utenlandsopphold_uten_aarsak,
-                    landkode, utenlandsopphold_aarsak, manuelt_overstyrt)
+                    landkode, utenlandsopphold_aarsak, manuelt_overstyrt, graderingMotEgetTilsyn)
                 values(nextval('seq_uttaksperiode'), :uttaksresultat_id, :fom, :tom, :pleiebehov, :etablert_tilsyn, :andre_sokeres_tilsyn, :andre_sokeres_tilsyn_reberegnet,
                     :tilgjengelig_for_soker, :uttaksgrad, :uttaksgradUtenReduksjonGrunnetInntektsgradering, :uttaksgradMedReduksjonGrunnetInntektsgradering,
                     :aarsaker, :utfall::utfall, :sokers_tapte_arbeidstid, :oppgitt_tilsyn, :inngangsvilkar, :knekkpunkt_typer,
                     :kilde_behandling_uuid, :annen_part::annen_part, :overse_etablert_tilsyn_arsak::overse_etablert_tilsyn_arsak,
-                    :nattevåk::utfall, :beredskap::utfall, :endringsstatus::endringsstatus, :utenlandsopphold_uten_aarsak, :landkode, :utenlandsopphold_aarsak, :manuelt_overstyrt)
+                    :nattevåk::utfall, :beredskap::utfall, :endringsstatus::endringsstatus, :utenlandsopphold_uten_aarsak, :landkode, :utenlandsopphold_aarsak, :manuelt_overstyrt, :graderingMotEgetTilsyn)
        
         """.trimIndent()
         val keyHolder = GeneratedKeyHolder()
@@ -173,6 +173,7 @@ internal class UttaksperiodeRepository {
             .addValue("manuelt_overstyrt", info.manueltOverstyrt)
             .addValue("uttaksgradUtenReduksjonGrunnetInntektsgradering",info.uttaksgradUtenReduksjonGrunnetInntektsgradering )
             .addValue("uttaksgradMedReduksjonGrunnetInntektsgradering", info.uttaksgradMedReduksjonGrunnetInntektsgradering)
+            .addValue("graderingMotEgetTilsyn", info.graderingMotEgetTilsyn)
 
         jdbcTemplate.update(sql, params, keyHolder, arrayOf("id"))
         return keyHolder.key as Long
