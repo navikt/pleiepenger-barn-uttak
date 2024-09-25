@@ -272,18 +272,6 @@ internal object BeregnGrader {
         )
     }
 
-    private fun maks(
-        p1: Prosent,
-        p2: Prosent
-    ): Prosent {
-        if (p1.compareTo(p2) < 0) {
-            return p2;
-        } else {
-            return p1
-        };
-    }
-
-
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
         if (ønsketUttaksgrad == null) {
             return HUNDRE_PROSENT
