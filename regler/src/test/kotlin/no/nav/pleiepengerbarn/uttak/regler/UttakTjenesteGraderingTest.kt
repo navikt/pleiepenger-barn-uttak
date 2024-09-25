@@ -5,8 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -272,7 +270,8 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -343,7 +342,8 @@ internal class UttakTjenesteGraderingTest {
                             oppgittTilsyn = null,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -411,7 +411,8 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -832,7 +833,8 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -853,7 +855,8 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -930,7 +933,8 @@ internal class UttakTjenesteGraderingTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()

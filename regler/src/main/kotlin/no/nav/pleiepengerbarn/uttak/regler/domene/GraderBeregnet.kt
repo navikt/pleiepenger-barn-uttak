@@ -6,6 +6,7 @@ import java.time.Duration
 data class GraderBeregnet(
     val pleiebehov: Pleiebehov,
     val graderingMotTilsyn: GraderingMotTilsyn,
+    val egetTilsynAndrePleietrengende: Prosent,
     val søkersTapteArbeidstid: Prosent,
     val oppgittTilsyn: Duration?,
     val uttaksgrad: Prosent,

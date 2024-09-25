@@ -33,6 +33,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -58,6 +59,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -65,7 +67,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
-                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
             )
         )
 
@@ -92,7 +94,8 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
-                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -111,6 +114,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -119,7 +123,7 @@ internal class BeregnGraderTest {
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
-                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1))),
             )
         )
 
@@ -146,6 +150,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -171,6 +176,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -189,6 +195,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.dividedBy(2))
@@ -220,6 +227,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -244,6 +252,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -268,6 +277,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                egetTilsynAndrePleietrengende = Prosent.ZERO
             )
         )
 
@@ -286,6 +296,7 @@ internal class BeregnGraderTest {
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
             andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
             andreSøkeresTilsynReberegnet = false,
             arbeid = mapOf(
                 ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -315,6 +326,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(
@@ -347,6 +359,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -381,6 +394,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -418,6 +432,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -452,6 +467,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -489,6 +505,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = Duration.ofHours(3), jobberNå = INGENTING),
@@ -519,6 +536,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -551,6 +569,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -583,6 +602,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -615,6 +635,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = Prosent(50),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -644,6 +665,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_200,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = Prosent(50),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -673,6 +695,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
                 andreSøkeresTilsyn = Prosent(0),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
@@ -696,6 +719,7 @@ internal class BeregnGraderTest {
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsyn = Prosent(0),
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
@@ -721,6 +745,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
                 andreSøkeresTilsyn = Prosent(0),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -746,6 +771,7 @@ internal class BeregnGraderTest {
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 oppgittTilsyn = FULL_DAG.prosent(40),
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
@@ -770,6 +796,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
@@ -796,6 +823,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(47),
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -822,6 +850,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = INGENTING,
                 andreSøkeresTilsyn = Prosent(47),
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -848,6 +877,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(50)),
@@ -876,6 +906,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     DAGPENGER to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING),
@@ -902,6 +933,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -930,6 +962,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -958,6 +991,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(40)),
@@ -988,6 +1022,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
@@ -1017,6 +1052,7 @@ internal class BeregnGraderTest {
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
                 andreSøkeresTilsyn = NULL_PROSENT,
+                egetTilsynAndrePleietrengende = NULL_PROSENT,
                 andreSøkeresTilsynReberegnet = false,
                 arbeid = mapOf(
                     IKKE_YRKESAKTIV to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = FULL_DAG.prosent(25))

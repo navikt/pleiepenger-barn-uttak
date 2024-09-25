@@ -222,7 +222,8 @@ internal class SimuleringTjenesteTest {
             annenPart = AnnenPart.ALENE,
             nattevåk = null,
             beredskap = null,
-            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+            graderingMotEgetTilsyn = NULL_PROSENT,
         )
     }
 

@@ -56,7 +56,8 @@ internal object BeregnGrader {
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgrad,
             utbetalingsgrader = utbetalingsgrader,
             årsak = årsak,
-            manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true }
+            manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true },
+            egetTilsynAndrePleietrengende = beregnGraderGrunnlag.egetTilsynAndrePleietrengende
         )
     }
 
@@ -151,7 +152,8 @@ internal object BeregnGrader {
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgrad,
             uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             utbetalingsgrader = utbetalingsgrader,
-            årsak = uttaksgradResultat.årsak()
+            årsak = uttaksgradResultat.årsak(),
+            egetTilsynAndrePleietrengende = beregnGraderGrunnlag.egetTilsynAndrePleietrengende
         )
     }
 
@@ -173,7 +175,10 @@ internal object BeregnGrader {
             finnRestTilSøker(
                 beregnGraderGrunnlag.pleiebehov,
                 etablertTilsynprosent,
-                beregnGraderGrunnlag.andreSøkeresTilsyn,
+                andreSøkeresTilsyn = maks(
+                    beregnGraderGrunnlag.andreSøkeresTilsyn,
+                    beregnGraderGrunnlag.egetTilsynAndrePleietrengende
+                ),
                 beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
 
@@ -266,6 +271,17 @@ internal object BeregnGrader {
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             overseEtablertTilsynÅrsak = beregnGraderGrunnlag.overseEtablertTilsynÅrsak
         )
+    }
+
+    private fun maks(
+        p1: Prosent,
+        p2: Prosent
+    ): Prosent {
+        if (p1.compareTo(p2) < 0) {
+            return p2;
+        } else {
+            return p1
+        };
     }
 
 

@@ -96,7 +96,8 @@ internal class UttaksperiodeRepository {
                     utenlandsopphold = Utenlandsopphold(rs.getString("landkode"), UtenlandsoppholdÅrsak.valueOf(rs.getString("utenlandsopphold_aarsak"))),
                     manueltOverstyrt = rs.getBoolean("manuelt_overstyrt"),
                     uttaksgradUtenReduksjonGrunnetInntektsgradering = rs.getBigDecimal("uttaksgradUtenReduksjonGrunnetInntektsgradering"),
-                    uttaksgradMedReduksjonGrunnetInntektsgradering = rs.getBigDecimal("uttaksgradMedReduksjonGrunnetInntektsgradering")
+                    uttaksgradMedReduksjonGrunnetInntektsgradering = rs.getBigDecimal("uttaksgradMedReduksjonGrunnetInntektsgradering"),
+                    graderingMotEgetTilsyn = rs.getBigDecimal("graderingMotEgetTilsyn"),
                 )
             )
         }

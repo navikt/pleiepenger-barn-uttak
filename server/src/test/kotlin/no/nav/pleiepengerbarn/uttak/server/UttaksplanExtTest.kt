@@ -74,8 +74,9 @@ internal class UttaksplanExtTest {
         uttaksgrad = HUNDRE_PROSENT,
         årsaker = setOf(),
         uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
-        uttaksgradMedReduksjonGrunnetInntektsgradering = null
-    )
+        uttaksgradMedReduksjonGrunnetInntektsgradering = null,
+        graderingMotEgetTilsyn = NULL_PROSENT
+        )
 
 
 }

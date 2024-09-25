@@ -10,6 +10,7 @@ data class BeregnGraderGrunnlag(
     val etablertTilsyn: Duration,
     val oppgittTilsyn: Duration? = null,
     val andreSøkeresTilsyn: Prosent,
+    val egetTilsynAndrePleietrengende: Prosent,
     val andreSøkeresTilsynReberegnet: Boolean,
     val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak? = null,
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
@@ -18,4 +19,4 @@ data class BeregnGraderGrunnlag(
     val nyeReglerUtbetalingsgrad: LocalDate?,
     val overstyrtInput: OverstyrtInput? = null,
     val inntektsgradering: Inntektsgradering? = null,
-)
+    )

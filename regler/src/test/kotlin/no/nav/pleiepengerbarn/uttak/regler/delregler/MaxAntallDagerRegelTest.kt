@@ -283,7 +283,8 @@ class MaxAntallDagerRegelTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         ),
                         annenPeriode2 to UttaksperiodeInfo.ikkeOppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
@@ -296,7 +297,7 @@ class MaxAntallDagerRegelTest {
                             nattevåk = null,
                             beredskap = null,
                             årsaker = setOf(Årsak.FOR_LAV_INNTEKT),
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
                         ),
                         annenPeriode3 to UttaksperiodeInfo.oppfylt(
                             kildeBehandlingUUID = annenPartsBehandlingUUID.toString(),
@@ -312,7 +313,8 @@ class MaxAntallDagerRegelTest {
                             annenPart = AnnenPart.ALENE,
                             nattevåk = null,
                             beredskap = null,
-                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                            utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
 
                     ),
@@ -537,7 +539,8 @@ private fun dummyRegelGrunnlagMedAndreParter(
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                            graderingMotEgetTilsyn = NULL_PROSENT
                 )
             ),
             trukketUttak = listOf()
@@ -573,5 +576,6 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null, utfall: Utfa
         uttaksgrad = uttaksgrad,
         årsaker = setOf(),
         uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
-        uttaksgradMedReduksjonGrunnetInntektsgradering = null
+        uttaksgradMedReduksjonGrunnetInntektsgradering = null,
+        graderingMotEgetTilsyn = NULL_PROSENT
     )

@@ -26,7 +26,8 @@ internal class UttaksplanMergerTest {
         annenPart = AnnenPart.ALENE,
         nattevåk = null,
         beredskap = null,
-        utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+        utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+        graderingMotEgetTilsyn = NULL_PROSENT
     )
 
     private fun ikkeOppfylt(behandlingUUID: BehandlingUUID) = UttaksperiodeInfo.ikkeOppfylt(

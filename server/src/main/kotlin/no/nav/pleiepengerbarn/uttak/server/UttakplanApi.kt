@@ -9,7 +9,6 @@ import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import no.nav.security.token.support.core.api.Protected
-import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -147,12 +146,14 @@ class UttakplanApi {
         lagre: Boolean
     ): Uttaksplan {
         val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
+        val egneUttaksplanerAndrePleietrengendePerBehandling = hentEgneUttaksplanerAndrePleietrengendePerBehandling(uttaksgrunnlag)
         val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
 
         val regelGrunnlag =
             GrunnlagMapper.tilRegelGrunnlag(
                 uttaksgrunnlag,
                 andrePartersUttaksplanerPerBehandling,
+                egneUttaksplanerAndrePleietrengendePerBehandling,
                 vedtatteUttaksplanerPerBehandling,
                 forrigeUttaksplan
             )
@@ -185,6 +186,22 @@ class UttakplanApi {
             }
         }
         return andrePartersUttaksplanerPerBehandling
+    }
+
+    private fun hentEgneUttaksplanerAndrePleietrengendePerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {
+        val unikeBehandlinger =
+            uttaksgrunnlag.kravprioritetForEgneBehandlinger.values.flatten()
+                .toSet()
+                .map { UUID.fromString(it) }
+        val egneUttaksplanerAndrePleietrengendePerBehandling = mutableMapOf<UUID, Uttaksplan>()
+
+        unikeBehandlinger.forEach { behandlingUUID ->
+            val uttaksplan = uttakRepository.hent(behandlingUUID)
+            if (uttaksplan != null) {
+                egneUttaksplanerAndrePleietrengendePerBehandling[behandlingUUID] = uttaksplan
+            }
+        }
+        return egneUttaksplanerAndrePleietrengendePerBehandling
     }
 
     private fun hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, Uttaksplan> {

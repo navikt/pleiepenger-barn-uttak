@@ -5,5 +5,5 @@ server:
 no.nav.security.jwt:
   issuer:
     azure:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/azure/.well-known/openid-configuration
-      accepted_audience: pleiepenger-barn-uttak
+      discoveryurl: http://vtp:8060/rest/azuread/.well-known/openid-configuration
+      accepted_audience: vtp
