@@ -106,7 +106,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
     @JsonProperty("uttaksgradMedReduksjonGrunnetInntektsgradering") val uttaksgradMedReduksjonGrunnetInntektsgradering: Prosent?,
     @JsonProperty("uttaksgradUtenReduksjonGrunnetInntektsgradering") val uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent?,
-    @JsonProperty("graderingMotEgetTilsyn") val graderingMotEgetTilsyn: Prosent?,
     @JsonProperty("utbetalingsgrader") val utbetalingsgrader: List<Utbetalingsgrader>,
     @JsonProperty("søkersTapteArbeidstid") val søkersTapteArbeidstid: Prosent?,
     @JsonProperty("oppgittTilsyn") val oppgittTilsyn: Duration?,
@@ -166,8 +165,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 manueltOverstyrt = manueltOverstyrt,
                 uttaksgradMedReduksjonGrunnetInntektsgradering = null,
                 uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
-                graderingMotEgetTilsyn = null
-
             )
         }
 
@@ -175,7 +172,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             uttaksgrad: Prosent,
             uttaksgradUtenReduksjonGrunnetInntektsgradering: Prosent?,
             uttaksgradMedReduksjonGrunnetInntektsgradering: Prosent?,
-            graderingMotEgetTilsyn: Prosent?,
             utbetalingsgrader: List<Utbetalingsgrader>,
             søkersTapteArbeidstid: Prosent,
             oppgittTilsyn: Duration?,
@@ -213,7 +209,6 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utenlandsopphold = utenlandsopphold,
                 manueltOverstyrt = manueltOverstyrt,
                 uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
-                graderingMotEgetTilsyn = graderingMotEgetTilsyn,
             )
         }
 

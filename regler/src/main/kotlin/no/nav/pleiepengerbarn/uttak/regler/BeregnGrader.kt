@@ -56,8 +56,7 @@ internal object BeregnGrader {
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgrad,
             utbetalingsgrader = utbetalingsgrader,
             årsak = årsak,
-            manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true },
-            egetTilsynAndrePleietrengende = beregnGraderGrunnlag.egetTilsynAndrePleietrengende
+            manueltOverstyrt = uttaksgradResultat.overstyrtUttaksgrad != null || utbetalingsgrader.any { it.value.overstyrt == true }
         )
     }
 
@@ -153,7 +152,6 @@ internal object BeregnGrader {
             uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             utbetalingsgrader = utbetalingsgrader,
             årsak = uttaksgradResultat.årsak(),
-            egetTilsynAndrePleietrengende = beregnGraderGrunnlag.egetTilsynAndrePleietrengende
         )
     }
 
@@ -176,7 +174,6 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.pleiebehov,
                 etablertTilsynprosent,
                 beregnGraderGrunnlag.andreSøkeresTilsyn,
-                beregnGraderGrunnlag.egetTilsynAndrePleietrengende,
                 beregnGraderGrunnlag.overseEtablertTilsynÅrsak
             )
 
@@ -189,7 +186,6 @@ internal object BeregnGrader {
                     beregnGraderGrunnlag.pleiebehov,
                     etablertTilsynprosent,
                     beregnGraderGrunnlag.andreSøkeresTilsyn,
-                    beregnGraderGrunnlag.egetTilsynAndrePleietrengende,
                     beregnGraderGrunnlag.overseEtablertTilsynÅrsak
                 )
             if (!(beregnGraderGrunnlag.ytelseType == YtelseType.PLS && restTilSøker > Prosent.ZERO && Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE == forLavGradÅrsak)) {
@@ -290,7 +286,6 @@ internal object BeregnGrader {
         pleiebehov: Pleiebehov,
         etablertTilsynsprosent: Prosent,
         andreSøkeresTilsyn: Prosent,
-        egetTilsynAndrePleietrengende: Prosent,
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
     ): BigDecimal {
         if (pleiebehov == Pleiebehov.PROSENT_0) {
@@ -301,14 +296,13 @@ internal object BeregnGrader {
             return pleiebehovprosent - andreSøkeresTilsyn
         }
         val gradertMotTilsyn = HUNDRE_PROSENT - etablertTilsynsprosent
-        val gradertMotEgetTilsyn = HUNDRE_PROSENT - egetTilsynAndrePleietrengende;
         val restTilSøker =
             pleiebehovprosent - (etablertTilsynsprosent * (pleiebehovprosent.divide(
                 HUNDRE_PROSENT,
                 2,
                 RoundingMode.HALF_UP
             ))) - andreSøkeresTilsyn
-        val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, gradertMotEgetTilsyn, restTilSøker)
+        val minsteAvRestTilSøkerOgGraderingMotTilsyn = minOf(gradertMotTilsyn, restTilSøker)
         if (minsteAvRestTilSøkerOgGraderingMotTilsyn < Prosent.ZERO) {
             return Prosent.ZERO
         }
@@ -319,7 +313,6 @@ internal object BeregnGrader {
         pleiebehov: Pleiebehov,
         etablertTilsynsprosent: Prosent,
         andreSøkeresTilsyn: Prosent,
-        egetTilsynAndrePleietrengende: Prosent,
         overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
     ): Årsak? {
         if (pleiebehov == Pleiebehov.PROSENT_0) {
@@ -328,17 +321,11 @@ internal object BeregnGrader {
         if (overseEtablertTilsynÅrsak != null) {
             if (andreSøkeresTilsyn > ÅTTI_PROSENT) {
                 return Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE
-            } else if (egetTilsynAndrePleietrengende > ÅTTI_PROSENT) {
-                return Årsak.FOR_LAV_REST_PGA_EGET_TILSYN_ANDRE_PLEIETRENGENDE
             }
         } else {
             when {
                 andreSøkeresTilsyn > ÅTTI_PROSENT -> {
                     return Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE
-                }
-
-                egetTilsynAndrePleietrengende > ÅTTI_PROSENT -> {
-                    return Årsak.FOR_LAV_REST_PGA_EGET_TILSYN_ANDRE_PLEIETRENGENDE
                 }
 
                 etablertTilsynsprosent > ÅTTI_PROSENT -> {
@@ -349,10 +336,6 @@ internal object BeregnGrader {
                     return Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE
                 }
 
-                andreSøkeresTilsyn + egetTilsynAndrePleietrengende > ÅTTI_PROSENT -> {
-                    // TODO: Kva kombinasjoner er gyldige her?
-                    return Årsak.FOR_LAV_REST_PGA_EGET_TILSYN_ANDRE_PLEIETRENGENDE_OG_ANDRE_SØKERE
-                }
             }
         }
         return null

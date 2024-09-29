@@ -271,7 +271,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -343,7 +342,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -412,7 +410,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -834,7 +831,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -856,7 +852,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()
@@ -934,7 +929,6 @@ internal class UttakTjenesteGraderingTest {
                             nattevåk = null,
                             beredskap = null,
                             utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                            graderingMotEgetTilsyn = NULL_PROSENT
                         )
                     ),
                     trukketUttak = listOf()

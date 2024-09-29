@@ -310,5 +310,4 @@ private fun dummyUttaksperiodeInfo(oppgittTilsyn: Duration? = null) = Uttaksperi
         årsaker = setOf(),
     uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
     uttaksgradMedReduksjonGrunnetInntektsgradering = null,
-    graderingMotEgetTilsyn = null
 )

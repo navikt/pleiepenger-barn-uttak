@@ -417,7 +417,6 @@ internal class UttakRepositoryTest {
                     nattevåk = null,
                     beredskap = null,
                     utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                    graderingMotEgetTilsyn = NULL_PROSENT
                 )
             )
         )
@@ -479,7 +478,6 @@ internal class UttakRepositoryTest {
                     nattevåk = null,
                     beredskap = null,
                     utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
-                    graderingMotEgetTilsyn = NULL_PROSENT
                 )
             ),
             trukketUttak = listOf()
@@ -542,7 +540,6 @@ internal class UttakRepositoryTest {
                     nattevåk = null,
                     beredskap = null,
                     utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
-                    graderingMotEgetTilsyn = NULL_PROSENT
                 )
 
             ),

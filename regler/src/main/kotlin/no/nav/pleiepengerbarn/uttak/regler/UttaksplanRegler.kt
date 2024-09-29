@@ -15,7 +15,8 @@ internal object UttaksplanRegler {
     private val PeriodeRegler = linkedSetOf(
         FerieRegel(),
         SøkersDødRegel(),
-        BarnsDødPeriodeRegel()
+        BarnsDødPeriodeRegel(),
+        TilsynForAndrePleietrengendeRegel()
     )
 
     private val UttaksplanRegler = linkedSetOf(
@@ -127,7 +128,6 @@ internal object UttaksplanRegler {
                     beredskap = beredskap,
                     utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
                     manueltOverstyrt = grader.manueltOverstyrt,
-                    graderingMotEgetTilsyn = grader.egetTilsynAndrePleietrengende
                 )
             } else {
                 perioder[søktUttaksperiode] = UttaksperiodeInfo.ikkeOppfylt(
@@ -196,7 +196,6 @@ internal object UttaksplanRegler {
                 etablertTilsyn = etablertTilsyn,
                 oppgittTilsyn = oppgittTilsyn,
                 andreSøkeresTilsyn = andrePartersTilsyn,
-                egetTilsynAndrePleietrengende = egetTilsynAndrePleitrengende,
                 andreSøkeresTilsynReberegnet = andreSøkeresTilsynReberegnet,
                 arbeid = arbeidPerArbeidsforhold,
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
