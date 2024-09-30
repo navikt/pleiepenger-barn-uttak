@@ -182,7 +182,6 @@ internal object UttaksplanRegler {
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
         val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
-        val egetTilsynAndrePleitrengende = grunnlag.finnEgetTilsynForAndrePleietrengende(periode)
 
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
