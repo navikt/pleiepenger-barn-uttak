@@ -151,7 +151,7 @@ internal object BeregnGrader {
             uttaksgradUtenReduksjonGrunnetInntektsgradering = uttaksgradResultat.uttaksgrad,
             uttaksgradMedReduksjonGrunnetInntektsgradering = uttaksgradMedReduksjonGrunnetInntektsgradering,
             utbetalingsgrader = utbetalingsgrader,
-            årsak = uttaksgradResultat.årsak()
+            årsak = uttaksgradResultat.årsak(),
         )
     }
 
@@ -268,7 +268,6 @@ internal object BeregnGrader {
         )
     }
 
-
     private fun finnØnsketUttaksgradProsent(ønsketUttaksgrad: Duration?): Prosent {
         if (ønsketUttaksgrad == null) {
             return HUNDRE_PROSENT
@@ -336,6 +335,7 @@ internal object BeregnGrader {
                 andreSøkeresTilsyn + etablertTilsynsprosent > ÅTTI_PROSENT -> {
                     return Årsak.FOR_LAV_REST_PGA_ETABLERT_TILSYN_OG_ANDRE_SØKERE
                 }
+
             }
         }
         return null

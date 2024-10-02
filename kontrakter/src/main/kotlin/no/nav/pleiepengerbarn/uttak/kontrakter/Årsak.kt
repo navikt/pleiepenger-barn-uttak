@@ -21,6 +21,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     FOR_LAV_TAPT_ARBEIDSTID(false),
     FOR_LAV_ØNSKET_UTTAKSGRAD(false),
     LOVBESTEMT_FERIE(false),
+    ANNEN_PLEIETRENGENDE_MED_HØYERE_PRIO(false),
     BARNETS_DØDSFALL(false),
     SØKERS_DØDSFALL(false),
     INNGANGSVILKÅR_IKKE_OPPFYLT(false),

@@ -12,6 +12,7 @@ object GrunnlagMapper {
     fun tilRegelGrunnlag(
         uttaksgrunnlag: Uttaksgrunnlag,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
+        egneUttaksplanerAllePleietrengendePerBehandling: Map<UUID, Uttaksplan>,
         vedtatteUttaksplanerPerBehandling: Map<UUID, Uttaksplan>,
         forrigeUttaksplan: Uttaksplan?,
         commitId: String = ""
@@ -28,6 +29,12 @@ object GrunnlagMapper {
         uttaksgrunnlag.kravprioritetForBehandlinger.forEach { (periode, kravprio) ->
             kravprioritetForBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
         }
+
+        val kravprioritetForEgneBehandlinger = mutableMapOf<LukketPeriode, List<UUID>>()
+        uttaksgrunnlag.kravprioritetForEgneBehandlinger.forEach { (periode, kravprio) ->
+            kravprioritetForEgneBehandlinger[periode] = kravprio.map { UUID.fromString(it) }
+        }
+
         val sisteVedtatteUttaksplanForBehandling = mutableMapOf<UUID, UUID>()
         uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
             .forEach { (behandling, originalBehandling) ->
@@ -49,12 +56,14 @@ object GrunnlagMapper {
             lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
             inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
             andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
+            egneUttaksplanerAllePleietrengendePerBehandling = egneUttaksplanerAllePleietrengendePerBehandling,
             vedtatteUttaksplanPerBehandling = vedtatteUttaksplanerPerBehandling,
             sisteVedtatteUttaksplanForBehandling = sisteVedtatteUttaksplanForBehandling,
             forrigeUttaksplan = forrigeUttaksplan,
             beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
             nattevåksperioder = uttaksgrunnlag.nattevåksperioder,
             kravprioritetForBehandlinger = kravprioritetForBehandlinger,
+            kravprioritetForEgneBehandlinger = kravprioritetForEgneBehandlinger,
             utenlandsoppholdperioder = uttaksgrunnlag.utenlandsoppholdperioder,
             overstyrtInput = uttaksgrunnlag.overstyrtInput,
             inntektsgradering = uttaksgrunnlag.inntektsgradering,

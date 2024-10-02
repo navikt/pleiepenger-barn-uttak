@@ -1,6 +1,7 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import no.nav.pleiepengerbarn.uttak.testklient.nesteSaksnummer
@@ -415,7 +416,7 @@ internal class UttakRepositoryTest {
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
                 )
             )
         )
@@ -476,7 +477,7 @@ internal class UttakRepositoryTest {
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak)
+                    utenlandsopphold = Utenlandsopphold(landkode, utenlandsoppholdÅrsak),
                 )
             ),
             trukketUttak = listOf()
@@ -538,7 +539,7 @@ internal class UttakRepositoryTest {
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
                 )
 
             ),
