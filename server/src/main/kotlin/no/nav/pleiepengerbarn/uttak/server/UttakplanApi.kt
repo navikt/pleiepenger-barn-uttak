@@ -155,7 +155,8 @@ class UttakplanApi {
                 andrePartersUttaksplanerPerBehandling,
                 egneUttaksplanerAndrePleietrengendePerBehandling,
                 vedtatteUttaksplanerPerBehandling,
-                forrigeUttaksplan
+                forrigeUttaksplan,
+                commitId?: ""
             )
 
         var uttaksplan = UttakTjeneste.uttaksplan(regelGrunnlag)
