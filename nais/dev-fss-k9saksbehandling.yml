@@ -65,7 +65,7 @@ spec:
     - name: DEFAULTDS_USERNAME
       value: pleiepenger-barn-uttak
     - name: DEFAULTDS_URL
-      value: jdbc:postgresql://b27dbvl014.preprod.local:5432/pleiepenger-barn-uttak
+      value: jdbc:postgresql://b27dbvl028.preprod.local:5432/pleiepenger-barn-uttak
 
     # opentelemetry
     - name: OTEL_RESOURCE_ATTRIBUTES
