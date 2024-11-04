@@ -29,8 +29,7 @@ internal class GrunnlagMapperTest {
                 ),
                 andrePartersUttakplanPerBehandling = mapOf(),
                 vedtatteUttaksplanerPerBehandling = mapOf(),
-                forrigeUttaksplan = null,
-                egneUttaksplanerAllePleietrengendePerBehandling = mapOf(),
+                forrigeUttaksplan = null
             )
         }
     }
@@ -47,9 +46,8 @@ internal class GrunnlagMapperTest {
                 ),
                 andrePartersUttakplanPerBehandling = mapOf(),
                 vedtatteUttaksplanerPerBehandling = mapOf(),
-                forrigeUttaksplan = null,
-                egneUttaksplanerAllePleietrengendePerBehandling = mapOf(),
-                )
+                forrigeUttaksplan = null
+            )
         }
     }
 
@@ -66,9 +64,8 @@ internal class GrunnlagMapperTest {
             ),
             andrePartersUttakplanPerBehandling = mapOf(),
             vedtatteUttaksplanerPerBehandling = mapOf(),
-            forrigeUttaksplan = null,
-            egneUttaksplanerAllePleietrengendePerBehandling = mapOf(),
-            )
+            forrigeUttaksplan = null
+        )
     }
 
     private fun lagUttaksgrunnag(

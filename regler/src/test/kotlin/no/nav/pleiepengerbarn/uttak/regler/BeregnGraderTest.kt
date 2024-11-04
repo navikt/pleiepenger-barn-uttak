@@ -65,7 +65,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
-                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
             )
         )
 
@@ -92,7 +92,7 @@ internal class BeregnGraderTest {
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
-                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
+                inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
             )
         )
 
@@ -119,7 +119,7 @@ internal class BeregnGraderTest {
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
-                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1))),
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
             )
         )
 

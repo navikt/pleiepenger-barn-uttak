@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
-import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -54,7 +53,7 @@ internal class RegelGrunnlagExtKtTest {
                     annenPart = AnnenPart.ALENE,
                     nattevåk = null,
                     beredskap = null,
-                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN),
+                    utenlandsopphold = Utenlandsopphold(null, UtenlandsoppholdÅrsak.INGEN)
                 )
             )
         )
