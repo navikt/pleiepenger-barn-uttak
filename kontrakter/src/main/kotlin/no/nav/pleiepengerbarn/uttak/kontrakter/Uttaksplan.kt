@@ -41,44 +41,27 @@ enum class Endringsstatus {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan @JsonCreator constructor(
     @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
     @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null,
     @JsonProperty("commitId") val commitId: String = ""
 ) {
-    constructor(perioder: Map<LukketPeriode, UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>) : this(
-        perioder,
-        trukketUttak,
-        null,
-        ""
-    )
+    constructor(perioder: Map<LukketPeriode, UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>) : this(perioder, trukketUttak, null, "")
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class KvoteInfo @JsonCreator constructor(
-    @JsonProperty("maxDato") val maxDato: LocalDate?,
-    @JsonProperty("totaltForbruktKvote") val totaltForbruktKvote: BigDecimal
+        @JsonProperty("maxDato") val maxDato: LocalDate?,
+        @JsonProperty("totaltForbruktKvote") val totaltForbruktKvote: BigDecimal
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utbetalingsgrader @JsonCreator constructor(
     @JsonProperty("arbeidsforhold") val arbeidsforhold: Arbeidsforhold,
     @JsonProperty("normalArbeidstid") val normalArbeidstid: Duration,
@@ -86,21 +69,12 @@ data class Utbetalingsgrader @JsonCreator constructor(
     @JsonProperty("utbetalingsgrad") val utbetalingsgrad: Prosent,
     @JsonProperty("tilkommet") val tilkommet: Boolean? = null
 ) {
-    constructor(
-        arbeidsforhold: Arbeidsforhold,
-        normalArbeidstid: Duration,
-        faktiskArbeidstid: Duration?,
-        utbetalingsgrad: Prosent
-    ) : this(arbeidsforhold, normalArbeidstid, faktiskArbeidstid, utbetalingsgrad, false)
+    constructor(arbeidsforhold: Arbeidsforhold, normalArbeidstid: Duration, faktiskArbeidstid: Duration?, utbetalingsgrad: Prosent) : this(arbeidsforhold, normalArbeidstid, faktiskArbeidstid, utbetalingsgrad, false)
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("utfall") val utfall: Utfall,
     @JsonProperty("uttaksgrad") val uttaksgrad: Prosent,
@@ -122,7 +96,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
     @JsonProperty("utenlandsoppholdUtenÅrsak") val utenlandsoppholdUtenÅrsak: Boolean = false,
     @JsonProperty("utenlandsopphold") val utenlandsopphold: Utenlandsopphold? = null,
     @JsonProperty("manueltOverstyrt") val manueltOverstyrt: Boolean = false
-) {
+    ) {
 
     companion object {
 
@@ -139,8 +113,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             nattevåk: Utfall?,
             beredskap: Utfall?,
             utenlandsopphold: Utenlandsopphold?,
-            manueltOverstyrt: Boolean = false
-        ): UttaksperiodeInfo {
+            manueltOverstyrt: Boolean = false): UttaksperiodeInfo {
 
             val årsakerMedOppfylt = årsaker.filter { it.oppfylt }
             require(årsakerMedOppfylt.isEmpty()) {
@@ -164,8 +137,8 @@ data class UttaksperiodeInfo @JsonCreator constructor(
                 utenlandsopphold = utenlandsopphold,
                 manueltOverstyrt = manueltOverstyrt,
                 uttaksgradMedReduksjonGrunnetInntektsgradering = null,
-                uttaksgradUtenReduksjonGrunnetInntektsgradering = null,
-            )
+                uttaksgradUtenReduksjonGrunnetInntektsgradering = null
+                )
         }
 
         fun oppfylt(
@@ -184,8 +157,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
             nattevåk: Utfall?,
             beredskap: Utfall?,
             utenlandsopphold: Utenlandsopphold?,
-            manueltOverstyrt: Boolean = false
-        ): UttaksperiodeInfo {
+            manueltOverstyrt: Boolean = false): UttaksperiodeInfo {
 
             require(årsak.oppfylt) {
                 "Kan ikke sette periode til oppfylt med årsak som ikke er for oppfylt. ($årsak)"
@@ -235,11 +207,7 @@ data class UttaksperiodeInfo @JsonCreator constructor(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class GraderingMotTilsyn @JsonCreator constructor(
     @JsonProperty("etablertTilsyn") val etablertTilsyn: Prosent,
     @JsonProperty("overseEtablertTilsynÅrsak") val overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
@@ -250,19 +218,15 @@ data class GraderingMotTilsyn @JsonCreator constructor(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    setterVisibility = JsonAutoDetect.Visibility.NONE,
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Utenlandsopphold @JsonCreator constructor(
     @JsonProperty("erEøsLand") val erEøsLand: Boolean?,
     @JsonProperty("landkode") val landkode: String? = null,
     @JsonProperty("årsak") val årsak: UtenlandsoppholdÅrsak = UtenlandsoppholdÅrsak.INGEN
 ) {
     constructor(landkode: String?, utenlandsoppholdÅrsak: UtenlandsoppholdÅrsak) : this(
-        RegionUtil().erIEØS(landkode),
-        landkode,
-        utenlandsoppholdÅrsak
+            RegionUtil().erIEØS(landkode),
+            landkode,
+            utenlandsoppholdÅrsak
     )
 }
