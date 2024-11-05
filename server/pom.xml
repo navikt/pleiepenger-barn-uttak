@@ -17,7 +17,7 @@
         <postgres.version>42.7.4</postgres.version>
         <micrometer.version>1.13.4</micrometer.version>
         <tokensupport.version>5.0.8</tokensupport.version>
-        <flyway.version>10.20.0</flyway.version>
+        <flyway.version>10.20.1</flyway.version>
     </properties>
 
     <dependencies>
