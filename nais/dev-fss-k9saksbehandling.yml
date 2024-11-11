@@ -74,3 +74,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
+    - name: INKLUDER_TILKOMMET_UTEN_ARBEIDSTID
+      value: "true"
