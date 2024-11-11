@@ -45,6 +45,12 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         PleiepengerBarnUttakTestClient(restTemplate, token)
     }
 
+
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID")
+    }
+
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
         val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
@@ -765,6 +771,50 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
         )
+    }
+
+    @Test
+    internal fun `Vanlig arbeidsforhold kombinert med omsorgsstønad som er tilkommet`() {
+        System.setProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID", "true")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
+            arbeid = listOf(
+                Arbeid(
+                    FRILANS1,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = INGENTING,
+                            jobberNå = INGENTING,
+                            tilkommet = true
+                        )
+                    )
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD3,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG.prosent(20),
+                            jobberNå = INGENTING
+                        )
+                    )
+                ),
+            ),
+            pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
+        ).copy(inntektsgradering = mapOf(LukketPeriode("2020-10-12/2020-10-16") to Inntektsgradering( uttaksgrad = BigDecimal.valueOf(70))))
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = LukketPeriode("2020-10-12/2020-10-16"),
+            grad = BigDecimal.valueOf(70),
+            gradPerArbeidsforhold = mapOf(
+                FRILANS1 to Prosent(0),
+                ARBEIDSFORHOLD3 to Prosent(100)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
     }
 
     @Test
