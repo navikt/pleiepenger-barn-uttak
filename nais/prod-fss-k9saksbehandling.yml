@@ -72,3 +72,5 @@ spec:
       value: "service.name=pleiepenger-barn-uttak,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
 
     # Feature toggles
+    - name: INKLUDER_TILKOMMET_UTEN_ARBEIDSTID
+      value: "false"
