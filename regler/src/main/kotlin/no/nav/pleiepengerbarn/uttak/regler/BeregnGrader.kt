@@ -17,7 +17,7 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
             )
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper, gjelderNyeRegler(beregnGraderGrunnlag))
         val uttaksgradResultat = avklarUttaksgrad(
             beregnGraderGrunnlag,
             etablertTilsynsprosent,
@@ -110,6 +110,7 @@ internal object BeregnGrader {
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
         maksGradIProsent: Prosent
     ): GraderBeregnet {
+        val nyeReglerGjelder = gjelderNyeRegler(beregnGraderGrunnlag)
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper =
             beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(
@@ -117,7 +118,10 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
             )
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(
+                skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper,
+                nyeReglerGjelder
+            )
         val ønsketUttaksgradProsent = finnØnsketUttaksgradProsent(beregnGraderGrunnlag.oppgittTilsyn);
         val ønsketUttaksgrad = minOf(ønsketUttaksgradProsent, maksGradIProsent)
         val uttaksgradResultat = avklarUttaksgrad(
@@ -155,6 +159,12 @@ internal object BeregnGrader {
         )
     }
 
+    private fun gjelderNyeRegler(beregnGraderGrunnlag: BeregnGraderGrunnlag): Boolean {
+        val nyeReglerGjelder = beregnGraderGrunnlag.nyeReglerUtbetalingsgrad != null
+                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.nyeReglerUtbetalingsgrad)
+        return nyeReglerGjelder
+    }
+
     private fun avklarUttaksgrad(
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
         etablertTilsynprosent: Prosent,
@@ -167,7 +177,10 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
             )
         val søkersTapteArbeidstid =
-            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper)
+            beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(
+                skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper,
+                gjelderNyeRegler(beregnGraderGrunnlag)
+            )
 
         val restTilSøker =
             finnRestTilSøker(
@@ -201,7 +214,10 @@ internal object BeregnGrader {
 
         if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
             val søkersTapteArbeidstidUtenAndreArbeidsforhold =
-                beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(true)
+                beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(
+                    true,
+                    gjelderNyeRegler(beregnGraderGrunnlag)
+                )
             if (søkersTapteArbeidstidUtenAndreArbeidsforhold < TJUE_PROSENT) {
                 return UttaksgradResultat(
                     restTilSøker,
