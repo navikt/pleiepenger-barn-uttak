@@ -6,12 +6,10 @@ import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
-import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
-import java.util.UUID
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -732,8 +729,53 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `Vanlig arbeidsforhold kombinert med arbeidsforhold som er tilkommet`() {
+    internal fun `Vanlig arbeidsforhold kombinert med arbeidsforhold som er tilkommet - gamle regler`() {
         val grunnlag = lagGrunnlag(
+            nyeReglerUtbetalingsgrad = LocalDate.of(2020, 10, 17),
+            søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD2,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG.prosent(70),
+                            jobberNå = FULL_DAG.prosent(70).prosent(50),
+                            tilkommet = true
+                        )
+                    )
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD3,
+                    mapOf(
+                        HELE_2020 to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG.prosent(20),
+                            jobberNå = INGENTING
+                        )
+                    )
+                ),
+            ),
+            pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
+        )
+
+        val uttaksplan = grunnlag.opprettUttaksplan()
+
+        uttaksplan.assertOppfylt(
+            periode = LukketPeriode("2020-10-12/2020-10-16"),
+            grad = Prosent(61),
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD2 to Prosent(0),
+                ARBEIDSFORHOLD3 to Prosent(61)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+
+    @Test
+    internal fun `Vanlig arbeidsforhold kombinert med arbeidsforhold som er tilkommet - nye regler`() {
+        val grunnlag = lagGrunnlag(
+            nyeReglerUtbetalingsgrad = LocalDate.of(2020, 10, 12),
             søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
             arbeid = listOf(
                 Arbeid(
@@ -800,7 +842,15 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 ),
             ),
             pleiebehov = mapOf(HELE_2020 to Pleiebehov.PROSENT_100),
-        ).copy(inntektsgradering = mapOf(LukketPeriode("2020-10-12/2020-10-16") to Inntektsgradering( uttaksgrad = BigDecimal.valueOf(70))))
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-10-12/2020-10-16") to Inntektsgradering(
+                    uttaksgrad = BigDecimal.valueOf(
+                        70
+                    )
+                )
+            )
+        )
 
         val uttaksplan = grunnlag.opprettUttaksplan()
 
