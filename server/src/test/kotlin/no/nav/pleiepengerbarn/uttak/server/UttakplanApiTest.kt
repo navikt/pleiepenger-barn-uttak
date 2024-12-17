@@ -763,8 +763,8 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             periode = LukketPeriode("2020-10-12/2020-10-16"),
             grad = Prosent(61),
             gradPerArbeidsforhold = mapOf(
-                ARBEIDSFORHOLD2 to Prosent(0),
-                ARBEIDSFORHOLD3 to Prosent(61)
+                ARBEIDSFORHOLD2 to Prosent(50),
+                ARBEIDSFORHOLD3 to Prosent(100)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY

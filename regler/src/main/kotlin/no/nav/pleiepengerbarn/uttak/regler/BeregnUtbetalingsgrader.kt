@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtUtbetalingsgradPerArbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
@@ -10,7 +9,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
-import java.time.LocalDate
 
 enum class Arbeidstype(val kode: String) {
     ARBEIDSTAKER("AT"),
@@ -62,7 +60,7 @@ object BeregnUtbetalingsgrader {
             brukNyeRegler || !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
         }.filter {
-            it.value.tilkommet != true
+            it.value.tilkommet != true || !brukNyeRegler
         }.forEach {
             sumJobberNormalt += it.value.jobberNormalt
         }
@@ -88,12 +86,13 @@ object BeregnUtbetalingsgrader {
                     )
                 alleUtbetalingsgrader.putAll(utbetalingsgraderForSpesialhåndtering.utbetalingsgrad)
             } else {
-                val fordeling = finnFordeling(arbeidForAktivitetsgruppe)
+                val fordeling = finnFordeling(arbeidForAktivitetsgruppe, brukNyeRegler)
                 val utbetalingsgraderOgGjenværendeTimerSomDekkes = beregnForAktivitetsGruppe(
                     gjenværendeTimerSomDekkes,
                     arbeidForAktivitetsgruppe,
                     fordeling,
-                    beregnGraderGrunnlag.overstyrtInput
+                    beregnGraderGrunnlag.overstyrtInput,
+                    brukNyeRegler
                 )
                 gjenværendeTimerSomDekkes = utbetalingsgraderOgGjenværendeTimerSomDekkes.gjenværendeTimerSomDekkes
                 alleUtbetalingsgrader.putAll(utbetalingsgraderOgGjenværendeTimerSomDekkes.utbetalingsgrad)
@@ -162,7 +161,8 @@ object BeregnUtbetalingsgrader {
         taptArbeidstidSomDekkes: Duration,
         arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
         fordeling: Map<Arbeidsforhold, Prosent>,
-        overstyrtInput: OverstyrtInput?
+        overstyrtInput: OverstyrtInput?,
+        brukNyeRegler: Boolean
     ): UtbetalingsgraderOgGjenværendeTimerSomDekkes {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         var sumTimerForbrukt = Duration.ZERO
@@ -175,7 +175,7 @@ object BeregnUtbetalingsgrader {
             } else if (info.jobberNormalt > Duration.ZERO) {
                 val timerForbrukt = min(
                     taptArbeidstidSomDekkes.prosent(fordelingsprosent),
-                    info.taptArbeid()
+                    info.taptArbeid(brukNyeRegler)
                 )
                 val utbetalingsgrad = BigDecimal(timerForbrukt.toMillis()).setScale(2, RoundingMode.HALF_UP)
                         .divide(BigDecimal(info.jobberNormalt.toMillis()), 2, RoundingMode.HALF_UP) * HUNDRE_PROSENT
@@ -205,16 +205,16 @@ object BeregnUtbetalingsgrader {
 
     private fun min(duration1: Duration, duration2: Duration) = if (duration1 < duration2) duration1 else duration2
 
-    private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>): Map<Arbeidsforhold, Prosent> {
+    private fun finnFordeling(arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>, brukNyeRegler: Boolean): Map<Arbeidsforhold, Prosent> {
         var sumTapt = Duration.ZERO
         arbeid.values.forEach {
-            sumTapt += it.taptArbeid()
+            sumTapt += it.taptArbeid(brukNyeRegler)
         }
         val fordeling = mutableMapOf<Arbeidsforhold, Prosent>()
 
         arbeid.forEach {
             if (sumTapt != Duration.ZERO) {
-                val tapt = it.value.taptArbeid()
+                val tapt = it.value.taptArbeid(brukNyeRegler)
                 fordeling[it.key] = ((BigDecimal(tapt.toMillis()).setScale(8, RoundingMode.HALF_UP)
                         .divide(BigDecimal(sumTapt.toMillis()), 8, RoundingMode.HALF_UP)) * HUNDRE_PROSENT).setScale(2, RoundingMode.HALF_UP)
             } else {
@@ -246,8 +246,8 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforhold
     }
 }
 
-private fun ArbeidsforholdPeriodeInfo.taptArbeid(): Duration {
-    if (tilkommet == true) {
+private fun ArbeidsforholdPeriodeInfo.taptArbeid(brukNyeRegler: Boolean): Duration {
+    if (tilkommet == true && brukNyeRegler) {
         return Duration.ZERO
     }
     if (jobberNå > jobberNormalt) {
