@@ -2,7 +2,6 @@ package no.nav.pleiepengerbarn.uttak.regler
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
-import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
 import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtUtbetalingsgradPerArbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
@@ -10,7 +9,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
-import java.time.LocalDate
 
 enum class Arbeidstype(val kode: String) {
     ARBEIDSTAKER("AT"),
@@ -18,6 +16,8 @@ enum class Arbeidstype(val kode: String) {
     DAGPENGER("DP"),
     SELVSTENDIG_NÆRINGSDRIVENDE("SN"),
     IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
+    SELVSTENDIG_NÆRINGSDRIVENDE_IKKE_AKTIV("SL_IKKE_AKTIV"),
+    FRILANSER_IKKE_AKTIV("FL_IKKE_AKTIV"),
     IKKE_YRKESAKTIV_UTEN_ERSTATNING("IKKE_YRKESAKTIV_UTEN_ERSTATNING"),
     KUN_YTELSE("BA"),
     INAKTIV("MIDL_INAKTIV"),
@@ -28,7 +28,9 @@ enum class Arbeidstype(val kode: String) {
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
     Arbeidstype.IKKE_YRKESAKTIV,
     Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
-    Arbeidstype.KUN_YTELSE
+    Arbeidstype.KUN_YTELSE,
+    Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE_IKKE_AKTIV,
+    Arbeidstype.FRILANSER_IKKE_AKTIV,
 )
 private val AKTIVITETS_GRUPPER = listOf(
     setOf(
