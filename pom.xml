@@ -8,7 +8,7 @@
 		<revision>1.0.0</revision>
 		<sha1></sha1>
 		<changelist>-SNAPSHOT</changelist>
-		<kotlin.version>2.1.0</kotlin.version>
+		<kotlin.version>2.1.10</kotlin.version>
 		<threeten-extra.version>1.5.0</threeten-extra.version>
 	</properties>
 
