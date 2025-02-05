@@ -59,7 +59,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
 
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelle(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelleForGamleRegler(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
     val harSpesialhåndteringAktivitetstyper = any {
         Arbeidstype.values()
             .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES

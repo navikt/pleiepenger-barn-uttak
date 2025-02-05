@@ -60,11 +60,17 @@ data class UtenlandsoppholdInfo(
     @JsonProperty("landkode") val landkode: String?
 )
 
+/** Overstyring av uttak
+ * overstyrtUttaksgrad bestemmer hvilken pleiepengegrad som skal settes på perioden
+ * skalUttaksgradOverstyreTimerDekket bestemmer om den overstyrte uttaksgraden skal gi endring i antall timer som dekkes og videre påvirke utbetalingsgradene for hver aktivitet
+ * overstyrtUtbetalingsgradPerArbeidsforhold overstyrer utbetalingsgrader per aktivitet. Dersom denne er satt for en aktivitet overstyrer dette det som regnes ut fra timer som dekkes. Dette gjelder også dersom skalUttaksgradOverstyreTimerDekket er satt til true
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class OverstyrtInput(
     @JsonProperty("overstyrtUttaksgrad") val overstyrtUttaksgrad: BigDecimal?,
+    @JsonProperty("skalUttaksgradOverstyreTimerDekket") val skalUttaksgradOverstyreTimerDekket: Boolean?,
     @JsonProperty("overstyrtUtbetalingsgradPerArbeidsforhold") val overstyrtUtbetalingsgradPerArbeidsforhold: List<OverstyrtUtbetalingsgradPerArbeidsforhold>,
 )
 
