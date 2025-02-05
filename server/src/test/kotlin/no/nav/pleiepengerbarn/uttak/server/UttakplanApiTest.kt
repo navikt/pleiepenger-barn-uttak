@@ -157,6 +157,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-01/2020-01-02") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.ZERO,
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.ZERO,
@@ -167,6 +168,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-03/2020-01-03") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.valueOf(70),
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.valueOf(
@@ -230,6 +232,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-01/2020-01-02") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.valueOf(15),
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.valueOf(15),
@@ -240,6 +243,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-03/2020-01-03") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.valueOf(70),
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.valueOf(
@@ -303,6 +307,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-09/2020-01-10") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.valueOf(20),
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = HUNDRE_PROSENT, arbeidsforhold = ARBEIDSFORHOLD1
@@ -358,6 +363,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-09/2020-01-10") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.valueOf(15),
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = HUNDRE_PROSENT, arbeidsforhold = ARBEIDSFORHOLD1
@@ -409,6 +415,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-06/2020-01-08") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = BigDecimal.ZERO,
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.ZERO,
@@ -470,6 +477,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
                 LukketPeriode("2020-01-06/2020-01-08") to
                         OverstyrtInput(
                             overstyrtUttaksgrad = null,
+                            skalUttaksgradOverstyreTimerDekket = null,
                             overstyrtUtbetalingsgradPerArbeidsforhold = listOf(
                                 OverstyrtUtbetalingsgradPerArbeidsforhold(
                                     overstyrtUtbetalingsgrad = BigDecimal.ZERO,

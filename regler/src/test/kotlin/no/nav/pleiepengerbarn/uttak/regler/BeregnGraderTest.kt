@@ -119,7 +119,7 @@ internal class BeregnGraderTest {
                 periode = PERIODE,
                 nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
-                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), null, listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
             )
         )
 
@@ -127,6 +127,63 @@ internal class BeregnGraderTest {
             Årsak.OVERSTYRT_UTTAKSGRAD,
             BigDecimal.valueOf(30),
             ARBEIDSGIVER1 to BigDecimal.valueOf(30)
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+        assertThat(grader.manueltOverstyrt).isTrue()
+    }
+
+    @Test
+    internal fun `Overstyring av uttaksgrad med endring av timer dekket`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = null,
+                inntektsgradering = null,
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), true, listOf())
+            )
+        )
+
+        grader.assert(
+            Årsak.OVERSTYRT_UTTAKSGRAD,
+            BigDecimal.valueOf(30),
+            ARBEIDSGIVER1 to BigDecimal.valueOf(30)
+        )
+        assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
+        assertThat(grader.manueltOverstyrt).isTrue()
+    }
+
+    @Test
+    internal fun `Overstyring av uttaksgrad med endring av timer dekket og overstyring av utbetalingsgrad`() {
+        // Overstyring av utbetalingsgrad trumfer overstyring av timer dekket
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING)
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = null,
+                inntektsgradering = null,
+                overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), true, listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(50), ARBEIDSGIVER1)))
+            )
+        )
+
+        grader.assert(
+            Årsak.OVERSTYRT_UTTAKSGRAD,
+            BigDecimal.valueOf(30),
+            ARBEIDSGIVER1 to BigDecimal.valueOf(50)
         )
         assertThat(grader.graderingMotTilsyn.overseEtablertTilsynÅrsak).isNull()
         assertThat(grader.manueltOverstyrt).isTrue()
