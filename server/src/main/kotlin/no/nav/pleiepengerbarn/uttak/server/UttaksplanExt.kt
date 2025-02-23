@@ -20,7 +20,7 @@ internal fun Uttaksplan.slåSammenLikePerioder(): Uttaksplan {
     //Slå sammen perioder og bygg nye perioder
     val nyePerioder = mutableMapOf<LukketPeriode, UttaksperiodeInfo>()
     perioderMedLikInfo.forEach { (info, perioder) ->
-        val sammenslåttePerioder = perioder.slåSammen()
+        val sammenslåttePerioder = perioder.slåSammen(this.perioder)
         sammenslåttePerioder.forEach { sammenslåttPeriode ->
             nyePerioder[sammenslåttPeriode] = info
         }
@@ -29,7 +29,7 @@ internal fun Uttaksplan.slåSammenLikePerioder(): Uttaksplan {
     return Uttaksplan(perioder = nyePerioder, trukketUttak = this.trukketUttak, kvoteInfo = this.kvoteInfo, commitId = this.commitId)
 }
 
-private fun List<LukketPeriode>.slåSammen(): List<LukketPeriode> {
+private fun List<LukketPeriode>.slåSammen(allePerioder: Map<LukketPeriode, UttaksperiodeInfo>): List<LukketPeriode> {
     val sortertePerioder = this.sortedBy { it.fom }
 
     var nyPeriode: LukketPeriode? = null
@@ -41,16 +41,32 @@ private fun List<LukketPeriode>.slåSammen(): List<LukketPeriode> {
         } else if (bareHelgEllerIngenDagerMellom(nyPeriode!!.tom, periode.fom)) {
             nyPeriode = LukketPeriode(nyPeriode!!.fom, periode.tom)
         } else {
+            if (slutterPåFredagOgHelgErInkludertIUttaksplanen(nyPeriode!!, allePerioder)) {
+                nyPeriode = utvidOverHelgIEtterkant(nyPeriode!!)
+            }
             nyePerioder.add(nyPeriode!!)
             nyPeriode = periode
         }
     }
     if (nyPeriode != null) {
+        if (slutterPåFredagOgHelgErInkludertIUttaksplanen(nyPeriode!!, allePerioder)) {
+            nyPeriode = utvidOverHelgIEtterkant(nyPeriode!!)
+        }
         nyePerioder.add(nyPeriode!!)
+
     }
 
     return nyePerioder
 }
+
+private fun utvidOverHelgIEtterkant(nyPeriode: LukketPeriode) =
+    LukketPeriode(nyPeriode.fom, nyPeriode.tom.plusDays(2))
+
+private fun slutterPåFredagOgHelgErInkludertIUttaksplanen(
+    nyPeriode: LukketPeriode,
+    allePerioder: Map<LukketPeriode, UttaksperiodeInfo>
+): Boolean =
+    nyPeriode.tom.dayOfWeek == DayOfWeek.FRIDAY && allePerioder.any { it.key.fom.isAfter(nyPeriode.tom) }
 
 internal fun bareHelgEllerIngenDagerMellom(dato1: LocalDate, dato2: LocalDate): Boolean {
     require(dato1 < dato2) {"Dato1($dato1) må være før dato2($dato2)."}
