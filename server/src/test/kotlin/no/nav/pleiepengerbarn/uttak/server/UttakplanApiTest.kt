@@ -696,6 +696,53 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
+    internal fun `Utvider sammenslått periode over helg ved endring på mandag`() {
+        val søknadsperiode1 = LukketPeriode("2025-02-01/2025-02-23")
+        val søknadsperiode2 = LukketPeriode("2025-02-24/2025-03-31")
+
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = LukketPeriode("2025-02-01/2025-03-31"),
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode1 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING), søknadsperiode2 to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = HALV_DAG))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2025-02-01/2025-03-31") to Pleiebehov.PROSENT_100),
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID, true)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2025-02-03/2025-02-23")),
+            grad = HUNDRE_PROSENT,
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to HUNDRE_PROSENT
+            ),
+            oppfyltÅrsak = Årsak.FULL_DEKNING,
+            endringsstatus = Endringsstatus.NY
+        )
+
+
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2025-02-24/2025-03-31")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                ARBEIDSFORHOLD1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+
+
+    @Test
     internal fun `Enkelt uttak på flere arbeidsforhold`() {
         val grunnlag = lagGrunnlag(
             søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),

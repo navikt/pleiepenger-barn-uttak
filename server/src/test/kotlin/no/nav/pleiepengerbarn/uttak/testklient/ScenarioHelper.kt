@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.util.*
 
 internal val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
+internal val HALV_DAG = Duration.ofHours(3).plusMinutes(45)
 internal val INGENTING = Duration.ZERO
 
 internal val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
