@@ -20,13 +20,13 @@ enum class Arbeidstype(val kode: String) {
 }
 
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
-    Arbeidstype.IKKE_YRKESAKTIV,
     Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
     Arbeidstype.KUN_YTELSE
 )
 private val AKTIVITETS_GRUPPER = listOf(
     setOf(
         Arbeidstype.ARBEIDSTAKER,
+        Arbeidstype.IKKE_YRKESAKTIV,
         Arbeidstype.FRILANSER,
         Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
     ),

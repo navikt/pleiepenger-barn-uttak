@@ -21,7 +21,6 @@ internal class BeregnGraderTest {
     private val IKKE_YRKESAKTIV_UTEN_ERSTATNING = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode)
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
-    private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
     private val NYE_REGLER_UTBETALINGSGRAD_DATO = LocalDate.parse("2023-06-01")
@@ -461,8 +460,8 @@ internal class BeregnGraderTest {
 
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(80),
-            IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
+            Prosent(92),
+            IKKE_YRKESAKTIV to Prosent(100).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
@@ -840,9 +839,9 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(50),
+            Prosent(75),
             ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to Prosent(50)
+            IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -867,8 +866,8 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
-            ARBEIDSGIVER1 to Prosent(53),
-            IKKE_YRKESAKTIV to Prosent(53)
+            ARBEIDSGIVER1 to Prosent(40),
+            IKKE_YRKESAKTIV to Prosent(66)
         )
     }
 
@@ -893,8 +892,8 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
-            ARBEIDSGIVER1 to Prosent(53),
-            IKKE_YRKESAKTIV to Prosent(53)
+            ARBEIDSGIVER1 to Prosent(40),
+            IKKE_YRKESAKTIV to Prosent(66)
         )
     }
 
@@ -919,10 +918,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(63),
+            Prosent(75),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(75),
-            IKKE_YRKESAKTIV to Prosent(62.5)
+            IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -973,10 +972,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(80),
+            Prosent(87),
             ARBEIDSGIVER1 to Prosent(60),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(80)
+            IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -1001,10 +1000,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(80),
+            Prosent(87),
             ARBEIDSGIVER1 to Prosent(60),
             INAKTIV to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(80)
+            IKKE_YRKESAKTIV to Prosent(100)
         )
     }
 
@@ -1030,11 +1029,11 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(67),
+            Prosent(75),
             ARBEIDSGIVER1 to Prosent(60),
             ARBEIDSGIVER2 to Prosent(40),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(66.67).setScale(2, RoundingMode.HALF_UP)
+            IKKE_YRKESAKTIV to Prosent(100).setScale(2, RoundingMode.HALF_UP)
         )
     }
 
@@ -1060,10 +1059,10 @@ internal class BeregnGraderTest {
         )
 
         grader.assert(
-            Årsak.FOR_LAV_TAPT_ARBEIDSTID,
-            NULL_PROSENT,
-            ARBEIDSGIVER1 to NULL_PROSENT,
-            IKKE_YRKESAKTIV to NULL_PROSENT
+            Årsak.AVKORTET_MOT_INNTEKT,
+            BigDecimal(55),
+            ARBEIDSGIVER1 to BigDecimal(10),
+            IKKE_YRKESAKTIV to BigDecimal(100)
         )
     }
 

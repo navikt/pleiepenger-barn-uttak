@@ -119,9 +119,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
-            grad = Prosent(50),
+            grad = Prosent(75),
             gradPerArbeidsforhold = mapOf(
-                IKKE_YRKESAKTIV to Prosent(50),
+                IKKE_YRKESAKTIV to Prosent(100),
                 ARBEIDSFORHOLD1 to Prosent(50)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
@@ -498,7 +498,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         // perioden hvor kun IKKE_YRKESAKTIV har blitt overstyrt
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2020-01-06/2020-01-08")),
-            grad = Prosent(50),
+            grad = Prosent(75),
             gradPerArbeidsforhold = mapOf(
                 IKKE_YRKESAKTIV to BigDecimal.ZERO,
                 ARBEIDSFORHOLD1 to Prosent(50)
@@ -511,9 +511,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         // perioden hvor ingen aktiviteter har blitt overstyrt
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2020-01-09/2020-01-10")),
-            grad = Prosent(50),
+            grad = Prosent(75),
             gradPerArbeidsforhold = mapOf(
-                IKKE_YRKESAKTIV to Prosent(50),
+                IKKE_YRKESAKTIV to Prosent(100),
                 ARBEIDSFORHOLD1 to Prosent(50)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
@@ -568,9 +568,9 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
-            grad = Prosent(75),
+            grad = Prosent(91),
             gradPerArbeidsforhold = mapOf(
-                IKKE_YRKESAKTIV to Prosent(75),
+                IKKE_YRKESAKTIV to Prosent(100),
                 ARBEIDSFORHOLD1 to Prosent(75)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
