@@ -76,3 +76,5 @@ spec:
       value: "false"
     - name: INKLUDER_TILKOMMET_UTEN_ARBEIDSTID
       value: "true"
+    - name: IGNORER_UTBETALINGSGRAD_DIFF_SIMULERING
+      value: "true"
