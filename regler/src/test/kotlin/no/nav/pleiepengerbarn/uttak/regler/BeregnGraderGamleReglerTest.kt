@@ -11,7 +11,11 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
 
-internal class BeregnGraderTest {
+/**
+ * BeregnGraderTest er splittet i to tester, denne og BeregningNyeReglerTest. Denne innneholder alle testene
+ * fra BeregnGraderTest
+ */
+internal class BeregnGraderGamleReglerTest {
 
     private val IKKE_ETABLERT_TILSYN = Duration.ZERO
     private val INGENTING = Duration.ZERO
@@ -21,7 +25,6 @@ internal class BeregnGraderTest {
     private val IKKE_YRKESAKTIV_UTEN_ERSTATNING = Arbeidsforhold(type = Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING.kode)
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
-    private val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
     private val NYE_REGLER_UTBETALINGSGRAD_DATO = LocalDate.parse("2023-06-01")

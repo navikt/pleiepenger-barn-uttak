@@ -76,3 +76,5 @@ spec:
       value: "false"
     - name: IGNORER_UTBETALINGSGRAD_DIFF_SIMULERING
       value: "false"
+    - name: IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV
+      value: "false"
