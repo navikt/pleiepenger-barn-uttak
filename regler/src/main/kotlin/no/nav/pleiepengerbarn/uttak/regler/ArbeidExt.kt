@@ -18,7 +18,7 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
     val oppdatertArbeid = if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
         this.filter {
             Arbeidstype.values()
-                .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+                .find { arbeidstype -> arbeidstype.kode == it.key.type } !in getGruppeSomSkalSpesialhåndteres(nyeReglerGjelder)
                     && (it.value.tilkommet != true || !nyeReglerGjelder)
         }
     } else {
@@ -59,14 +59,14 @@ internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbe
 
 private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
-internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelleForGamleRegler(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
+internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelleForGamleRegler(brukNyeRegler: Boolean, periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
     val harSpesialhåndteringAktivitetstyper = any {
         Arbeidstype.values()
-            .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } in getGruppeSomSkalSpesialhåndteres(brukNyeRegler)
     }
     val andreAktiviteter = filter {
         Arbeidstype.values()
-            .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } !in getGruppeSomSkalSpesialhåndteres(brukNyeRegler)
     }
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 

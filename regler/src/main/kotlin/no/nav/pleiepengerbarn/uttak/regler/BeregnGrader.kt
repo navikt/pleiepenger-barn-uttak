@@ -378,12 +378,12 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.seBortFraAndreArbeids
             && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
 
     val harIkkeYrkesaktiv = this.keys.any {
-        GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
+        getGruppeSomSkalSpesialhåndteres(nyeReglerGjelder).contains(
             Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.type })
     }
     val harAndreArbeidsforhold = this.any {
         Arbeidstype.values()
-            .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !it.value.utenArbeidtid()
+            .find { arbeidstype -> arbeidstype.kode == it.key.type } !in getGruppeSomSkalSpesialhåndteres(nyeReglerGjelder) && !it.value.utenArbeidtid()
                 && !(Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær())
     }
 

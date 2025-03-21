@@ -1,43 +1,14 @@
 package no.nav.pleiepengerbarn.uttak.regler
 
-import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtInput
+import no.nav.pleiepengerbarn.uttak.kontrakter.OverstyrtUtbetalingsgradPerArbeidsforhold
+import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.regler.domene.Utbetalingsgrad
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
-
-enum class Arbeidstype(val kode: String) {
-    ARBEIDSTAKER("AT"),
-    FRILANSER("FL"),
-    DAGPENGER("DP"),
-    SELVSTENDIG_NÆRINGSDRIVENDE("SN"),
-    IKKE_YRKESAKTIV("IKKE_YRKESAKTIV"),
-    IKKE_YRKESAKTIV_UTEN_ERSTATNING("IKKE_YRKESAKTIV_UTEN_ERSTATNING"),
-    KUN_YTELSE("BA"),
-    INAKTIV("MIDL_INAKTIV"),
-    SYKEPENGER_AV_DAGPENGER("SP_AV_DP"),
-    PSB_AV_DP("PSB_AV_DP")
-}
-
-val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES = setOf(
-    Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
-    Arbeidstype.KUN_YTELSE
-)
-private val AKTIVITETS_GRUPPER = listOf(
-    setOf(
-        Arbeidstype.ARBEIDSTAKER,
-        Arbeidstype.IKKE_YRKESAKTIV,
-        Arbeidstype.FRILANSER,
-        Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
-    ),
-    setOf(
-        Arbeidstype.SYKEPENGER_AV_DAGPENGER,
-        Arbeidstype.PSB_AV_DP,
-        Arbeidstype.DAGPENGER,
-        Arbeidstype.INAKTIV
-    ),
-    GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
-)
 
 object BeregnUtbetalingsgrader {
 
@@ -47,8 +18,8 @@ object BeregnUtbetalingsgrader {
         gradertMotTilsyn: Boolean,
         beregnGraderGrunnlag: BeregnGraderGrunnlag
     ): Map<Arbeidsforhold, Utbetalingsgrad> {
-        beregnGraderGrunnlag.arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper()
         val brukNyeRegler = gjelderNyeRegler(beregnGraderGrunnlag)
+        beregnGraderGrunnlag.arbeid.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper(brukNyeRegler)
 
         // Timer som jobbes normalt
         var sumJobberNormalt = finnTotalNormalarbeidstid(beregnGraderGrunnlag, brukNyeRegler)
@@ -68,7 +39,7 @@ object BeregnUtbetalingsgrader {
         // Map for holde på utbetalingsgrader
         val alleUtbetalingsgrader = mutableMapOf<Arbeidsforhold, Utbetalingsgrad>()
         // Beregner utbetalingsgrad gruppevis
-        AKTIVITETS_GRUPPER.forEach { aktivitetsgruppe ->
+        getAktivitetsgruppe(brukNyeRegler).forEach { aktivitetsgruppe ->
             val arbeidForAktivitetsgruppe = beregnGraderGrunnlag.arbeid.forAktivitetsgruppe(aktivitetsgruppe)
             if (!gjelderSpesialgruppePåGamleRegler(aktivitetsgruppe, brukNyeRegler)) {
                 // HOVEDLØYPE FOR AKTIVITETER
@@ -91,6 +62,7 @@ object BeregnUtbetalingsgrader {
                 // Finner ut om vi skal har kombinasjonen IKKE_YREKSAKTIV/KUN_YTELSE og Frilans uten fravær på gamle regler
                 val spesialhåndteringsgruppeSkalSpesialhåndteres =
                     beregnGraderGrunnlag.arbeid.harSpesialhåndteringstilfelleForGamleRegler(
+                        brukNyeRegler,
                         beregnGraderGrunnlag.periode,
                         beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
                     )
@@ -113,7 +85,7 @@ object BeregnUtbetalingsgrader {
     private fun gjelderSpesialgruppePåGamleRegler(
         aktivitetsgruppe: Set<Arbeidstype>,
         brukNyeRegler: Boolean
-    ) = aktivitetsgruppe == GRUPPE_SOM_SKAL_SPESIALHÅNDTERES && !brukNyeRegler
+    ) = aktivitetsgruppe == getGruppeSomSkalSpesialhåndteres(brukNyeRegler) && !brukNyeRegler
 
     private fun gjelderNyeRegler(beregnGraderGrunnlag: BeregnGraderGrunnlag) =
         (beregnGraderGrunnlag.nyeReglerUtbetalingsgrad != null
@@ -125,7 +97,7 @@ object BeregnUtbetalingsgrader {
     ): Duration {
         var sumJobberNormalt1 = Duration.ZERO
         beregnGraderGrunnlag.arbeid.entries.filter {
-            brukNyeRegler || !GRUPPE_SOM_SKAL_SPESIALHÅNDTERES.contains(
+            brukNyeRegler || !getGruppeSomSkalSpesialhåndteres(brukNyeRegler).contains(
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
         }.filter {
             it.value.tilkommet != true || !brukNyeRegler
@@ -317,8 +289,8 @@ private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.forAktivitetsgruppe(a
     return arbeidForAktivitetsgruppe
 }
 
-private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper() {
-    val lovligeArbeidstyper = AKTIVITETS_GRUPPER.flatten().map { it.kode }.toSet()
+private fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.sjekkAtArbeidsforholdFinnesBlandtAktivitetsgrupper(skalBrukeNyeRegler: Boolean) {
+    val lovligeArbeidstyper = getAktivitetsgruppe(skalBrukeNyeRegler).flatten().map { it.kode }.toSet()
     this.keys.forEach {
         if (!lovligeArbeidstyper.contains(it.type)) {
             throw IllegalArgumentException("Ulovlig arbeidstype ${it.type}")

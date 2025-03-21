@@ -11,7 +11,11 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
 
-internal class BeregnGraderTest {
+/**
+ * BeregnGraderTest er splittet i to tester, denne og BeregningNyeReglerTest. Denne innneholder alle testene
+ * fra BeregnGraderTest
+ */
+internal class BeregnGraderGamleReglerTest {
 
     private val IKKE_ETABLERT_TILSYN = Duration.ZERO
     private val INGENTING = Duration.ZERO
@@ -460,8 +464,8 @@ internal class BeregnGraderTest {
 
         grader4.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(92),
-            IKKE_YRKESAKTIV to Prosent(100).setScale(2, RoundingMode.HALF_UP),
+            Prosent(80),
+            IKKE_YRKESAKTIV to Prosent(80).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
         )
@@ -839,9 +843,9 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(75),
+            Prosent(50),
             ARBEIDSGIVER1 to Prosent(50),
-            IKKE_YRKESAKTIV to Prosent(100)
+            IKKE_YRKESAKTIV to Prosent(50)
         )
     }
 
@@ -866,8 +870,8 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
-            ARBEIDSGIVER1 to Prosent(40),
-            IKKE_YRKESAKTIV to Prosent(66)
+            ARBEIDSGIVER1 to Prosent(53),
+            IKKE_YRKESAKTIV to Prosent(53)
         )
     }
 
@@ -892,8 +896,8 @@ internal class BeregnGraderTest {
         grader.assert(
             Årsak.GRADERT_MOT_TILSYN,
             Prosent(53),
-            ARBEIDSGIVER1 to Prosent(40),
-            IKKE_YRKESAKTIV to Prosent(66)
+            ARBEIDSGIVER1 to Prosent(53),
+            IKKE_YRKESAKTIV to Prosent(53)
         )
     }
 
@@ -918,10 +922,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(75),
+            Prosent(63),
             ARBEIDSGIVER1 to Prosent(50),
             ARBEIDSGIVER2 to Prosent(75),
-            IKKE_YRKESAKTIV to Prosent(100)
+            IKKE_YRKESAKTIV to Prosent(62.5)
         )
     }
 
@@ -972,10 +976,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(87),
+            Prosent(80),
             ARBEIDSGIVER1 to Prosent(60),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(100)
+            IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 
@@ -1000,10 +1004,10 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(87),
+            Prosent(80),
             ARBEIDSGIVER1 to Prosent(60),
             INAKTIV to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(100)
+            IKKE_YRKESAKTIV to Prosent(80)
         )
     }
 
@@ -1029,11 +1033,11 @@ internal class BeregnGraderTest {
 
         grader.assert(
             Årsak.AVKORTET_MOT_INNTEKT,
-            Prosent(75),
+            Prosent(67),
             ARBEIDSGIVER1 to Prosent(60),
             ARBEIDSGIVER2 to Prosent(40),
             DAGPENGER to Prosent(100),
-            IKKE_YRKESAKTIV to Prosent(100).setScale(2, RoundingMode.HALF_UP)
+            IKKE_YRKESAKTIV to Prosent(66.67).setScale(2, RoundingMode.HALF_UP)
         )
     }
 
@@ -1059,10 +1063,10 @@ internal class BeregnGraderTest {
         )
 
         grader.assert(
-            Årsak.AVKORTET_MOT_INNTEKT,
-            BigDecimal(55),
-            ARBEIDSGIVER1 to BigDecimal(10),
-            IKKE_YRKESAKTIV to BigDecimal(100)
+            Årsak.FOR_LAV_TAPT_ARBEIDSTID,
+            NULL_PROSENT,
+            ARBEIDSGIVER1 to NULL_PROSENT,
+            IKKE_YRKESAKTIV to NULL_PROSENT
         )
     }
 
