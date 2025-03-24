@@ -180,14 +180,21 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
+
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
         val inntektsgradering = grunnlag.finnInntektsgradering(periode);
 
-        val beregnet = BeregnGrader.beregn(
+        val brukNyeRegler = grunnlag.nyeReglerUtbetalingsgrad != null
+                && !periode.fom.isBefore(grunnlag.nyeReglerUtbetalingsgrad)
+
+        val gradberegnerGjeldendeRegler = if (brukNyeRegler) no.nav.pleiepengerbarn.uttak.regler.nye.BeregnGrader else no.nav.pleiepengerbarn.uttak.regler.gamle.BeregnGrader
+
+        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode, gradberegnerGjeldendeRegler)
+
+        val beregnet = gradberegnerGjeldendeRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsyn,

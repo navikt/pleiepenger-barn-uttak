@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.Arbeidstype
+import no.nav.pleiepengerbarn.uttak.regler.gamle.Arbeidstype
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*

@@ -4,6 +4,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
+import no.nav.pleiepengerbarn.uttak.regler.gamle.Arbeidstype
+import no.nav.pleiepengerbarn.uttak.regler.gamle.BeregnGrader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
