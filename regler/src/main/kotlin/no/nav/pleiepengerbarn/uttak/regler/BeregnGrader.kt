@@ -3,7 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 
-interface IBeregnGrader {
+interface BeregnGrader {
 
     fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet
 

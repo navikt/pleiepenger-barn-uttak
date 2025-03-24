@@ -11,7 +11,7 @@ import java.util.*
 
 internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(
     periode: LukketPeriode,
-    beregnGrader: IBeregnGrader
+    beregnGrader: BeregnGrader
 ): Pair<Boolean, Prosent> {
     val søkersEtablertTilsyn = finnEtablertTilsyn(periode)
     val søkersNattevåk = finnNattevåk(periode)
@@ -72,7 +72,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     nattevåkUtfall: Utfall?,
     beredskapUtfall: Utfall?,
     nyeReglerUtbetalingsgrad: LocalDate?,
-    beregnGrader: IBeregnGrader
+    beregnGrader: BeregnGrader
 ): Prosent {
     if (this.barn.dødsdato != null && this.barn.dødsdato!! <= periode.fom) {
         return Prosent.ZERO

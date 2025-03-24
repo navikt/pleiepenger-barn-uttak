@@ -2,12 +2,13 @@ package no.nav.pleiepengerbarn.uttak.regler.gamle
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.*
+import no.nav.pleiepengerbarn.uttak.regler.BeregnGrader
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
-internal object BeregnGrader : IBeregnGrader {
+internal object BeregnGraderGamleRegler : BeregnGrader {
 
     override fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
