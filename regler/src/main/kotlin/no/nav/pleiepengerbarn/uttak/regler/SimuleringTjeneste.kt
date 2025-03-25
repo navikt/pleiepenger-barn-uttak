@@ -20,11 +20,6 @@ private fun Uttaksplan.tilForenkletUttaksplan(): ForenkletUttaksplan {
     val perioder = mutableMapOf<LukketPeriode, ForenkletUttakInfo>()
     this.perioder.forEach {
         val utbetalingsgrader = mutableMapOf<Arbeidsforhold, ForenkletUttaksgrad>()
-        if (!FeatureToggle.isActive("IGNORER_UTBETALINGSGRAD_DIFF_SIMULERING")) {
-            it.value.utbetalingsgrader.forEach { utbetalingsgrad ->
-                utbetalingsgrader[utbetalingsgrad.arbeidsforhold] = ForenkletUttaksgrad(utbetalingsgrad.utbetalingsgrad)
-            }
-        }
         perioder[it.key] = ForenkletUttakInfo(
             uttaksgrad = it.value.uttaksgrad,
             utfall = it.value.utfall,
