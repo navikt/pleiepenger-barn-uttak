@@ -14,7 +14,6 @@ enum class Arbeidstype(val kode: String) {
 }
 
 val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_NYE_REGLER = setOf(
-    Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
     Arbeidstype.KUN_YTELSE
 )
 
@@ -27,6 +26,7 @@ val GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_GAMLE_REGLER = setOf(
 val STANDARD_HÅNDTERING_NYE_REGLER = setOf(
     Arbeidstype.ARBEIDSTAKER,
     Arbeidstype.IKKE_YRKESAKTIV,
+    Arbeidstype.IKKE_YRKESAKTIV_UTEN_ERSTATNING,
     Arbeidstype.FRILANSER,
     Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE
 )
