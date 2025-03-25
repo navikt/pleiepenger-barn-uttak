@@ -74,7 +74,5 @@ spec:
     # Feature toggles
     - name: INKLUDER_TILKOMMET_UTEN_ARBEIDSTID
       value: "false"
-    - name: IGNORER_UTBETALINGSGRAD_DIFF_SIMULERING
-      value: "false"
     - name: IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV
       value: "false"
