@@ -153,7 +153,7 @@ internal class SimuleringTjenesteTest {
     }
 
     @Test
-    fun `Samme periode med forskjellig utbetalingsgrad skal gi endring`() {
+    fun `Samme periode med forskjellig utbetalingsgrad skal ikke gi endring`() {
         val forrigeUttaksplan = Uttaksplan(
             perioder = mapOf(
                 LukketPeriode("2020-10-05/2020-10-09") to oppfylt()
@@ -167,7 +167,7 @@ internal class SimuleringTjenesteTest {
 
         val resultatEndret = SimuleringTjeneste.erResultatEndret(forrigeUttaksplan, simulertUttaksplan)
 
-        Assertions.assertThat(resultatEndret).isTrue
+        Assertions.assertThat(resultatEndret).isFalse()
     }
 
     @Test
