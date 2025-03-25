@@ -4,6 +4,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_200
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
+import no.nav.pleiepengerbarn.uttak.regler.gamle.Arbeidstype
+import no.nav.pleiepengerbarn.uttak.regler.gamle.BeregnGraderGamleRegler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -11,7 +13,7 @@ import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
 
-internal class BeregnGraderTest {
+internal class BeregnGraderNyeReglerGamleReglerTest {
 
     private val IKKE_ETABLERT_TILSYN = Duration.ZERO
     private val INGENTING = Duration.ZERO
@@ -28,7 +30,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent vanlig uttak`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -53,7 +55,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Nedjustert uttaksgrad fra 100 til 50 grunnet inntektsgradering`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -80,7 +82,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Inntektsgradering på 20% og andre søkers tilsyn på 80%`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -106,7 +108,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Overstyring og nedjustering grunnet inntekt`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -134,7 +136,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Overstyring av uttaksgrad med endring av timer dekket`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -163,7 +165,7 @@ internal class BeregnGraderTest {
     @Test
     internal fun `Overstyring av uttaksgrad med endring av timer dekket og overstyring av utbetalingsgrad`() {
         // Overstyring av utbetalingsgrad trumfer overstyring av timer dekket
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -191,7 +193,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent vanlig uttak med 81% tatt av andre søkere`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -216,7 +218,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent vanlig uttak med 100% tatt av andre søkere`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -241,7 +243,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent vanlig uttak`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -265,7 +267,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent uttak når annen part også tar ut 50 prosent`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -289,7 +291,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent uttak når annen part også tar ut 50 prosent, men pleiebehovet er 200 prosent`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_200,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -313,7 +315,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent arbeid når annen part også tar ut 50 prosent blir redusert`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -338,7 +340,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `50 prosent arbeid av en stilling på 10 timer, skal gi 50 prosent uttaksgrad og utbetalingsgrad`() {
-    val grader3 = BeregnGrader.beregn(
+    val grader3 = BeregnGraderGamleRegler.beregn(
         BeregnGraderGrunnlag(
             pleiebehov = PROSENT_100,
             etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -367,7 +369,7 @@ internal class BeregnGraderTest {
             FRILANS to Prosent(0)
         )
 
-        val grader4 = BeregnGrader.beregn(
+        val grader4 = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -399,7 +401,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `AT + AVSLUTTA ARBEIDSFORHOLD og omsorgsstønad (frilans)`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -433,7 +435,7 @@ internal class BeregnGraderTest {
             FRILANS to Prosent(0)
         )
 
-        val grader4 = BeregnGrader.beregn(
+        val grader4 = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -470,7 +472,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `AT + AVSLUTTA ARBEIDSFORHOLD ikke erstattet og omsorgsstønad (frilans)`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -504,7 +506,7 @@ internal class BeregnGraderTest {
             FRILANS to Prosent(0)
         )
 
-        val grader4 = BeregnGrader.beregn(
+        val grader4 = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -541,7 +543,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent fravær hos 2 arbeidsgivere`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -571,7 +573,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -603,7 +605,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mindre enn en 100 prosent stilling`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -635,7 +637,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Delvis arbeid hos 2 arbeidsgivere som tilsammen er mer enn en 100 prosent stilling`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -667,7 +669,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 100 prosent pleiebehov`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -696,7 +698,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Søker vil ha 100 prosent uttak hos to arbeidsgiver, og motpart har allerede tatt ut 50 prosent av 200 prosent pleiebehov`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_200,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -725,7 +727,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn skal redusere uttaksgrad og utbetalingsgrad`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
@@ -749,7 +751,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn og delvis arbeid som tilsammen er under 100 prosent skal føre til at søkt periode blir innvilget`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
@@ -773,7 +775,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Etablert tilsyn og delvis arbeid som tilsammen går utover 100 prosent skal føre til reduserte grader`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(60),
@@ -797,7 +799,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `100 prosent fravær, men kun 40 prosent pleiebehov`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -822,7 +824,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -848,7 +850,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold med tilsyn`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = FULL_DAG.prosent(47),
@@ -874,7 +876,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre arbeidsforhold med tilsyn fra annen søker`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = INGENTING,
@@ -900,7 +902,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes to andre arbeidsforhold`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -928,7 +930,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -954,7 +956,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -982,7 +984,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra INAKTIVT arbeidsforhold og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -1010,7 +1012,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes flere andre aktiviteter`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -1040,7 +1042,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Avslå periode dersom annet arbeidsforhold med IKKE_YRKESAKTIV gjør at uttaksgrad kommer under 20 prosent`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,
@@ -1069,7 +1071,7 @@ internal class BeregnGraderTest {
 
     @Test
     internal fun `Dersom ikke yrkesaktiv er eneste arbeidsforhold så skal det gi utbetalingsgrad`() {
-        val grader = BeregnGrader.beregn(
+        val grader = BeregnGraderGamleRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
                 etablertTilsyn = IKKE_ETABLERT_TILSYN,

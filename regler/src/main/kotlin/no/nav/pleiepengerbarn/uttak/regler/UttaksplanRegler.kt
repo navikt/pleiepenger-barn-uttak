@@ -4,8 +4,10 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.delregler.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
+import no.nav.pleiepengerbarn.uttak.regler.gamle.BeregnGraderGamleRegler
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import no.nav.pleiepengerbarn.uttak.regler.nye.BeregnGraderNyeRegler
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
@@ -180,14 +182,21 @@ internal object UttaksplanRegler {
         val pleiebehov = grunnlag.finnPleiebehov(periode)
         val etablertTilsyn = grunnlag.finnEtablertTilsyn(periode)
         val oppgittTilsyn = grunnlag.finnOppgittTilsyn(periode)
-        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode)
+
         val arbeidPerArbeidsforhold = grunnlag.finnArbeidPerArbeidsforhold(periode)
         val overseEtablertTilsynÅrsak = grunnlag.avklarOverseEtablertTilsynÅrsak(periode, etablertTilsyn)
         val overstyrtInput = grunnlag.finnOverstyrtInput(periode)
 
         val inntektsgradering = grunnlag.finnInntektsgradering(periode);
 
-        val beregnet = BeregnGrader.beregn(
+        val brukNyeRegler = grunnlag.nyeReglerUtbetalingsgrad != null
+                && !periode.fom.isBefore(grunnlag.nyeReglerUtbetalingsgrad)
+
+        val gradberegnerGjeldendeRegler = if (brukNyeRegler) BeregnGraderNyeRegler else BeregnGraderGamleRegler
+
+        val (andreSøkeresTilsynReberegnet, andrePartersTilsyn) = grunnlag.finnAndreSøkeresTilsyn(periode, gradberegnerGjeldendeRegler)
+
+        val beregnet = gradberegnerGjeldendeRegler.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = pleiebehov,
                 etablertTilsyn = etablertTilsyn,

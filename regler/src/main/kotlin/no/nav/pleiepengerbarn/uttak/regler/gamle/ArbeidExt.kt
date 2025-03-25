@@ -1,30 +1,27 @@
-package no.nav.pleiepengerbarn.uttak.regler
+package no.nav.pleiepengerbarn.uttak.regler.gamle
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.Arbeidsforhold
 import no.nav.pleiepengerbarn.uttak.kontrakter.ArbeidsforholdPeriodeInfo
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
 import no.nav.pleiepengerbarn.uttak.kontrakter.Prosent
+import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.LocalDate
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.finnSøkersTapteArbeidstid(
-    skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean,
-    nyeReglerGjelder: Boolean
+    skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper: Boolean
 ): Prosent {
     var sumJobberNå = Duration.ZERO
     var sumJobberNormalt = Duration.ZERO
     val oppdatertArbeid = if (skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper) {
         this.filter {
-            Arbeidstype.values()
+            Arbeidstype.entries
                 .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
-                    && (it.value.tilkommet != true || !nyeReglerGjelder)
         }
     } else {
-        this.filter {
-            it.value.tilkommet != true || !nyeReglerGjelder
-        }
+        this
     }
     oppdatertArbeid.values.forEach {
         sumJobberNå += if (it.jobberNå > it.jobberNormalt) {
@@ -61,17 +58,14 @@ private fun ArbeidsforholdPeriodeInfo.ikkeFravær() = jobberNormalt <= jobberNå
 
 internal fun Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>.harSpesialhåndteringstilfelleForGamleRegler(periode: LukketPeriode, nyeReglerUtbetalingsgrad: LocalDate?): Boolean {
     val harSpesialhåndteringAktivitetstyper = any {
-        Arbeidstype.values()
+        Arbeidstype.entries
             .find { arbeidstype -> arbeidstype.kode == it.key.type } in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
     }
     val andreAktiviteter = filter {
-        Arbeidstype.values()
+        Arbeidstype.entries
             .find { arbeidstype -> arbeidstype.kode == it.key.type } !in GRUPPE_SOM_SKAL_SPESIALHÅNDTERES
     }
     val harBareFrilansUtenFravær = andreAktiviteter.isNotEmpty() && andreAktiviteter.all { Arbeidstype.FRILANSER.kode == it.key.type && it.value.ikkeFravær() }
 
-    val nyeReglerGjelder = nyeReglerUtbetalingsgrad != null
-            && !periode.fom.isBefore(nyeReglerUtbetalingsgrad)
-
-    return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær && !nyeReglerGjelder
+    return harSpesialhåndteringAktivitetstyper && harBareFrilansUtenFravær
 }

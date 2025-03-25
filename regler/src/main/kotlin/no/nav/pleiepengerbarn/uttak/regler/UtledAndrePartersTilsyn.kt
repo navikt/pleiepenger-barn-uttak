@@ -10,7 +10,8 @@ import java.time.LocalDate
 import java.util.*
 
 internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(
-    periode: LukketPeriode
+    periode: LukketPeriode,
+    beregnGrader: BeregnGrader
 ): Pair<Boolean, Prosent> {
     val søkersEtablertTilsyn = finnEtablertTilsyn(periode)
     val søkersNattevåk = finnNattevåk(periode)
@@ -40,7 +41,8 @@ internal fun RegelGrunnlag.finnAndreSøkeresTilsyn(
             søkersEtablertTilsyn,
             søkersNattevåk,
             søkersBeredskap,
-            nyeReglerUtbetalingsgrad
+            nyeReglerUtbetalingsgrad,
+            beregnGrader,
         )
     } else {
         finnAndreSøkeresTilsynFraUttaksperioder(periode)
@@ -69,7 +71,8 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
     etablertTilsyn: Duration,
     nattevåkUtfall: Utfall?,
     beredskapUtfall: Utfall?,
-    nyeReglerUtbetalingsgrad: LocalDate?
+    nyeReglerUtbetalingsgrad: LocalDate?,
+    beregnGrader: BeregnGrader
 ): Prosent {
     if (this.barn.dødsdato != null && this.barn.dødsdato!! <= periode.fom) {
         return Prosent.ZERO
@@ -122,7 +125,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad,
                     inntektsgradering = inntektsgradering,
                 )
-                val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
+                val graderBeregnet = beregnGrader.beregnMedMaksGrad(
                     beregnGraderGrunnlag,
                     forrigeUttaksgrad
                 )
