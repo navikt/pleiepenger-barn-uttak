@@ -44,28 +44,24 @@ val YTELSER = setOf(
     Arbeidstype.INAKTIV
 )
 
-    fun getAktivitetsgruppe(skalBrukeNyeRegler: Boolean): List<Set<Arbeidstype>> {
-        if (FeatureToggle.isActive("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV")) {
-            if (skalBrukeNyeRegler) {
-                return listOf(
-                    STANDARD_HÅNDTERING_NYE_REGLER,
-                    YTELSER,
-                    GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_NYE_REGLER
-                )
-            }
-        }
+fun getAktivitetsgruppe(skalBrukeNyeRegler: Boolean): List<Set<Arbeidstype>> {
+    if (skalBrukeNyeRegler) {
         return listOf(
-            STANDARD_HÅNDTERING_GAMLE_REGLER,
+            STANDARD_HÅNDTERING_NYE_REGLER,
             YTELSER,
-            GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_GAMLE_REGLER
+            GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_NYE_REGLER
         )
     }
+    return listOf(
+        STANDARD_HÅNDTERING_GAMLE_REGLER,
+        YTELSER,
+        GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_GAMLE_REGLER
+    )
+}
 
-    fun getGruppeSomSkalSpesialhåndteres(skalBrukeNyeRegler: Boolean): Set<Arbeidstype> {
-        if (FeatureToggle.isActive("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV")) {
-            if (skalBrukeNyeRegler) {
-                return GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_NYE_REGLER
-            }
-        }
-        return GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_GAMLE_REGLER
+fun getGruppeSomSkalSpesialhåndteres(skalBrukeNyeRegler: Boolean): Set<Arbeidstype> {
+    if (skalBrukeNyeRegler) {
+        return GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_NYE_REGLER
     }
+    return GRUPPE_SOM_SKAL_SPESIALHÅNDTERES_GAMLE_REGLER
+}
