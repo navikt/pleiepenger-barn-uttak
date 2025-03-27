@@ -30,23 +30,8 @@ internal class BeregnGraderNyeReglerTest {
     private val NYE_REGLER_UTBETALINGSGRAD_DATO =  LocalDate.parse("2022-01-01")
     private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
 
-    companion object {
-        @BeforeAll
-        @JvmStatic
-        internal fun setUp() {
-            System.setProperty("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV", "true")
-        }
-
-        @AfterAll
-        @JvmStatic
-        internal fun cleanUp() {
-            System.clearProperty("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV")
-        }
-    }
-
     @Test
     internal fun `AT + AVSLUTTA ARBEIDSFORHOLD og omsorgsstønad (frilans)`() {
-        System.setProperty("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV", "true")
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,

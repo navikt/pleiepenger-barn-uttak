@@ -37,19 +37,9 @@ class UttakplanApiNyeReglerTest(@Autowired val restTemplate: TestRestTemplate) {
         PleiepengerBarnUttakTestClient(restTemplate, token)
     }
 
-    companion object {
-        @BeforeAll
-        @JvmStatic
-        internal fun setUp() {
-            System.setProperty("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV", "true")
-        }
-
-        @AfterAll
-        @JvmStatic
-        internal fun cleanUp() {
-            System.clearProperty("IKKE_YRKESAKTIV_VEKTES_SOM_YRKESAKTIV")
-            System.clearProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID")
-        }
+    @AfterEach
+    internal fun tearDown() {
+        System.clearProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID")
     }
 
     @Test
