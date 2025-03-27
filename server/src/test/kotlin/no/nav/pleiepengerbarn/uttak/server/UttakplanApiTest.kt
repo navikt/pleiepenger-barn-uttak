@@ -42,7 +42,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         PleiepengerBarnUttakTestClient(restTemplate, token)
     }
 
-
     @AfterEach
     internal fun tearDown() {
         System.clearProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID")
