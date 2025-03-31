@@ -42,7 +42,7 @@
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
             <artifactId>log</artifactId>
-            <version>3.20250320122046_7ca9dae</version>
+            <version>3.20250330150138_0502cea</version>
         </dependency>
     </dependencies>
 
