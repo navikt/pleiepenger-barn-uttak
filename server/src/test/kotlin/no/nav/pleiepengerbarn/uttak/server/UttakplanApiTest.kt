@@ -168,7 +168,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        // på gamle regler - kun 50% grad frilans, selv om 100% fravær
+        // på gamle regler - kun 50% grad frilans ikke aktiv, selv om 100% fravær
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
             grad = Prosent(50),
@@ -180,7 +180,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             endringsstatus = Endringsstatus.NY
         )
 
-        // på nye regler - bruker 100% grad frilans fordi 100% fravær fra frilans (i og med ikke aktiv)
+        // på nye regler - bruker 100% grad frilans ikke aktiv fordi 100% fravær fra frilans (i og med ikke aktiv)
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
             grad = Prosent(75),
@@ -224,7 +224,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        // på gamle regler - kun 50% grad frilans, selv om 100% fravær
+        // på gamle regler - kun 50% grad ikke aktiv sn, selv om 100% fravær, speiler den aktive
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
             grad = Prosent(50),
@@ -236,7 +236,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             endringsstatus = Endringsstatus.NY
         )
 
-        // på nye regler - bruker 100% grad frilans fordi 100% fravær fra frilans (i og med ikke aktiv)
+        // på nye regler - bruker 100% grad SN ikke aktiv fordi 100% fravær fra den aktiviteten (i og med ikke aktiv)
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
             grad = Prosent(75),
