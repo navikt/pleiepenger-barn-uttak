@@ -26,8 +26,11 @@ internal class BeregnGraderNyeReglerTest {
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
+    private val SN = Arbeidsforhold(type = Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
     private val NYE_REGLER_UTBETALINGSGRAD_DATO =  LocalDate.parse("2022-01-01")
+    private val IKKE_AKTIV_FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER_IKKE_AKTIV.kode)
+    private val IKKE_AKTIV_SN = Arbeidsforhold(type = Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE_IKKE_AKTIV.kode)
     private val FULL_DAG = Duration.ofHours(7).plusMinutes(30)
 
     @Test
@@ -98,6 +101,71 @@ internal class BeregnGraderNyeReglerTest {
             IKKE_YRKESAKTIV to Prosent(100).setScale(2, RoundingMode.HALF_UP),
             ARBEIDSGIVER1 to Prosent(100),
             FRILANS to Prosent(0)
+        )
+    }
+
+
+    @Test
+    internal fun `Frilans og frilans ikke aktiv vektes likt`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    IKKE_AKTIV_SN to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                    SN to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    )
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            )
+        )
+
+        grader.assert(
+            Årsak.FULL_DEKNING,
+            Prosent(100),
+            IKKE_AKTIV_SN to Prosent(100),
+            SN to Prosent(100),
+        )
+    }
+
+    @Test
+    internal fun `Selvstendig næringsdrivende og SN ikke aktiv vektes likt`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    IKKE_AKTIV_FRILANS to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                    FRILANS to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    )
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            )
+        )
+
+        grader.assert(
+            Årsak.FULL_DEKNING,
+            Prosent(100),
+            IKKE_AKTIV_FRILANS to Prosent(100),
+            FRILANS to Prosent(100),
         )
     }
 
@@ -208,7 +276,7 @@ internal class BeregnGraderNyeReglerTest {
     }
 
     @Test
-    internal fun `Se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
+    internal fun `Ikke se bort fra arbeidsforhold med DAGPENGER og IKKE_YRKESAKTIV dersom det finnes andre aktiviteter`() {
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
