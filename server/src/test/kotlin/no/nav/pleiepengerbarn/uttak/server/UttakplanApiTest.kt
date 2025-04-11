@@ -168,7 +168,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        // på gamle regler - kun 50% grad frilans ikke aktiv, selv om 100% fravær
+        // på gamle regler - kun 50% grad frilans ikke aktiv, selv om 100% fravær, fordi den speiler den aktive
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
             grad = Prosent(50),
@@ -224,7 +224,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        // på gamle regler - kun 50% grad ikke aktiv sn, selv om 100% fravær, speiler den aktive
+        // på gamle regler - kun 50% grad ikke aktiv sn, selv om 100% fravær, fordi den speiler den aktive
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
             grad = Prosent(50),
