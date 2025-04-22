@@ -28,6 +28,77 @@ internal class BeregnGraderGamleReglerTest {
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
     private val NYE_REGLER_UTBETALINGSGRAD_DATO = LocalDate.parse("2023-06-01")
+    private val IKKE_AKTVIV_SN = Arbeidsforhold(type = Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE_IKKE_AKTIV.kode)
+
+
+    @Test
+    internal fun `Selvstendig næringsdrivende ikke aktiv vektes likt som aktiv når gradert mot tilsyn`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = Duration.ofHours(3),
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    IKKE_AKTVIV_SN to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(8),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(8),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            )
+        )
+
+        grader.assert(
+            Årsak.GRADERT_MOT_TILSYN,
+            Prosent(60),
+            ARBEIDSGIVER1 to Prosent(60),
+            IKKE_AKTVIV_SN to Prosent(60),
+        )
+    }
+
+    @Test
+    internal fun `Aktivt arbeidsforhold vektes over ikke_aktiv_sn ved avkorting mot inntekt`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = Duration.ofHours(0),
+                andreSøkeresTilsyn = NULL_PROSENT,
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    IKKE_AKTVIV_SN to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(0)
+                    ),
+                    FRILANS to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(4)
+                    )
+                ),
+                ytelseType = YtelseType.PSB,
+                periode = PERIODE,
+                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(100),
+            IKKE_AKTVIV_SN to Prosent(50),
+            FRILANS to NULL_PROSENT
+        )
+    }
 
     @Test
     internal fun `100 prosent vanlig uttak`() {

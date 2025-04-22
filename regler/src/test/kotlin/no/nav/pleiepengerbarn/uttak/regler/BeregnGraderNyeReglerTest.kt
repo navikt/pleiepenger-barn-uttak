@@ -101,9 +101,8 @@ internal class BeregnGraderNyeReglerTest {
         )
     }
 
-
     @Test
-    internal fun `Selvstendig næringsdrivende ikke aktiv vektes likt som aktiv`() {
+    internal fun `Selvstendig næringsdrivende ikke aktiv vektes likt som aktiv ved avkorting mot inntekt`() {
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
@@ -118,6 +117,10 @@ internal class BeregnGraderNyeReglerTest {
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
+                    ),
+                    FRILANS to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(4)
                     )
                 ),
                 ytelseType = YtelseType.PSB,
@@ -127,15 +130,16 @@ internal class BeregnGraderNyeReglerTest {
         )
 
         grader.assert(
-            Årsak.FULL_DEKNING,
-            Prosent(100),
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(67),
             IKKE_AKTIV_SN to Prosent(100),
             ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
         )
     }
 
     @Test
-    internal fun `Frilans ikke aktiv vektes likt som aktiv`() {
+    internal fun `Frilans ikke aktiv vektes likt som aktiv ved avkorting mot inntekt`() {
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
@@ -150,6 +154,10 @@ internal class BeregnGraderNyeReglerTest {
                     ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
+                    ),
+                    FRILANS to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = Duration.ofHours(4),
+                        jobberNå = Duration.ofHours(4)
                     )
                 ),
                 ytelseType = YtelseType.PSB,
@@ -159,10 +167,11 @@ internal class BeregnGraderNyeReglerTest {
         )
 
         grader.assert(
-            Årsak.FULL_DEKNING,
-            Prosent(100),
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(67),
             IKKE_AKTIV_FRILANS to Prosent(100),
             ARBEIDSGIVER1 to Prosent(100),
+            FRILANS to Prosent(0)
         )
     }
 
