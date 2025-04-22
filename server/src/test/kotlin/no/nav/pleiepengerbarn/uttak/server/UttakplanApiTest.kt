@@ -138,69 +138,13 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
     }
 
     @Test
-    internal fun `FRILANSER_IKKE_AKTIV skal vektes mindre før nye regler, men likt etter`() {
+    internal fun `FRILANSER_IKKE_AKTIV skal vektes mindre enn aktiv før nye regler, men likt etter`() {
         val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
         val grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
                 Arbeid(
                     FRILANSER_IKKE_AKTIV,
-                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
-                ),
-                Arbeid(
-                    FRILANS1,
-                    mapOf(
-                        søknadsperiode to ArbeidsforholdPeriodeInfo(
-                            jobberNormalt = FULL_DAG,
-                            jobberNå = FULL_DAG.prosent(50)
-                        )
-                    )
-                )
-            ),
-            pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
-            nyeReglerUtbetalingsgrad = LocalDate.parse("2023-06-01")
-        )
-
-        val postResponse = testClient.opprettUttaksplan(grunnlag)
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
-
-        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
-        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
-        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
-
-        // på gamle regler - kun 50% grad frilans ikke aktiv, selv om 100% fravær, fordi den speiler den aktive
-        uttaksplan.assertOppfylt(
-            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
-            grad = Prosent(50),
-            gradPerArbeidsforhold = mapOf(
-                FRILANSER_IKKE_AKTIV to Prosent(50),
-                FRILANS1 to Prosent(50)
-            ),
-            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
-            endringsstatus = Endringsstatus.NY
-        )
-
-        // på nye regler - bruker 100% grad frilans ikke aktiv fordi 100% fravær fra frilans (i og med ikke aktiv)
-        uttaksplan.assertOppfylt(
-            perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
-            grad = Prosent(75),
-            gradPerArbeidsforhold = mapOf(
-                FRILANSER_IKKE_AKTIV to HUNDRE_PROSENT,
-                FRILANS1 to Prosent(50)
-            ),
-            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
-            endringsstatus = Endringsstatus.NY
-        )
-    }
-
-    @Test
-    internal fun `SN_IKKE_AKTIV skal vektes mindre før nye regler, men likt etter`() {
-        val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
-        val grunnlag = lagGrunnlag(
-            søknadsperiode = søknadsperiode,
-            arbeid = listOf(
-                Arbeid(
-                    SN_IKKE_AKTIV,
                     mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
                 ),
                 Arbeid(
@@ -224,13 +168,69 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
         val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
 
-        // på gamle regler - kun 50% grad ikke aktiv sn, selv om 100% fravær, fordi den speiler den aktive
+        // på gamle regler - kun 50% grad frilans ikke aktiv, selv om 100% fravær, fordi den speiler uttaksgraden (snittet av utbetalingsgradene)
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
+            grad = Prosent(50),
+            gradPerArbeidsforhold = mapOf(
+                FRILANSER_IKKE_AKTIV to Prosent(50),
+                SELVSTENDIG1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+
+        // på nye regler - bruker 100% grad frilans ikke aktiv fordi 100% fravær fra frilans (i og med ikke aktiv)
+        uttaksplan.assertOppfylt(
+            perioder = listOf(LukketPeriode("2023-06-01/2023-06-02")),
+            grad = Prosent(75),
+            gradPerArbeidsforhold = mapOf(
+                FRILANSER_IKKE_AKTIV to HUNDRE_PROSENT,
+                SELVSTENDIG1 to Prosent(50)
+            ),
+            oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
+            endringsstatus = Endringsstatus.NY
+        )
+    }
+
+    @Test
+    internal fun `SN_IKKE_AKTIV skal vektes mindre enn aktiv før nye regler, men likt etter`() {
+        val søknadsperiode = LukketPeriode("2023-05-29/2023-06-02")
+        val grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    SN_IKKE_AKTIV,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                ),
+                Arbeid(
+                    FRILANS1,
+                    mapOf(
+                        søknadsperiode to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG,
+                            jobberNå = FULL_DAG.prosent(50)
+                        )
+                    )
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2023-05-29/2023-06-02") to Pleiebehov.PROSENT_100),
+            nyeReglerUtbetalingsgrad = LocalDate.parse("2023-06-01")
+        )
+
+        val postResponse = testClient.opprettUttaksplan(grunnlag)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+
+        val hentResponse = testClient.hentUttaksplan(grunnlag.behandlingUUID)
+        assertThat(hentResponse.statusCode).isEqualTo(HttpStatus.OK)
+        val uttaksplan = hentResponse.body ?: fail("Mangler uttaksplan")
+
+        // på gamle regler - kun 50% grad ikke aktiv sn, selv om 100% fravær, fordi den speiler uttaksgraden (snittet av utbetalingsgradene)
         uttaksplan.assertOppfylt(
             perioder = listOf(LukketPeriode("2023-05-29/2023-05-31")),
             grad = Prosent(50),
             gradPerArbeidsforhold = mapOf(
                 SN_IKKE_AKTIV to Prosent(50),
-                SELVSTENDIG1 to Prosent(50)
+                FRILANS1 to Prosent(50)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
@@ -242,7 +242,7 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             grad = Prosent(75),
             gradPerArbeidsforhold = mapOf(
                 SN_IKKE_AKTIV to HUNDRE_PROSENT,
-                SELVSTENDIG1 to Prosent(50)
+                FRILANS1 to Prosent(50)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
             endringsstatus = Endringsstatus.NY
