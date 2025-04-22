@@ -4,8 +4,6 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.kontrakter.Pleiebehov.PROSENT_100
 import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -26,7 +24,6 @@ internal class BeregnGraderNyeReglerTest {
     private val INAKTIV = Arbeidsforhold(type = Arbeidstype.INAKTIV.kode)
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
-    private val SN = Arbeidsforhold(type = Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
     private val NYE_REGLER_UTBETALINGSGRAD_DATO =  LocalDate.parse("2022-01-01")
     private val IKKE_AKTIV_FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER_IKKE_AKTIV.kode)
@@ -106,7 +103,7 @@ internal class BeregnGraderNyeReglerTest {
 
 
     @Test
-    internal fun `Frilans og frilans ikke aktiv vektes likt`() {
+    internal fun `Selvstendig næringsdrivende ikke aktiv vektes likt som aktiv`() {
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
@@ -118,7 +115,7 @@ internal class BeregnGraderNyeReglerTest {
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
                     ),
-                    SN to ArbeidsforholdPeriodeInfo(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
                     )
@@ -133,12 +130,12 @@ internal class BeregnGraderNyeReglerTest {
             Årsak.FULL_DEKNING,
             Prosent(100),
             IKKE_AKTIV_SN to Prosent(100),
-            SN to Prosent(100),
+            ARBEIDSGIVER1 to Prosent(100),
         )
     }
 
     @Test
-    internal fun `Selvstendig næringsdrivende og SN ikke aktiv vektes likt`() {
+    internal fun `Frilans ikke aktiv vektes likt som aktiv`() {
         val grader = BeregnGrader.beregn(
             BeregnGraderGrunnlag(
                 pleiebehov = PROSENT_100,
@@ -150,7 +147,7 @@ internal class BeregnGraderNyeReglerTest {
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
                     ),
-                    FRILANS to ArbeidsforholdPeriodeInfo(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
                         jobberNormalt = Duration.ofHours(4),
                         jobberNå = Duration.ofHours(0)
                     )
@@ -165,7 +162,7 @@ internal class BeregnGraderNyeReglerTest {
             Årsak.FULL_DEKNING,
             Prosent(100),
             IKKE_AKTIV_FRILANS to Prosent(100),
-            FRILANS to Prosent(100),
+            ARBEIDSGIVER1 to Prosent(100),
         )
     }
 
