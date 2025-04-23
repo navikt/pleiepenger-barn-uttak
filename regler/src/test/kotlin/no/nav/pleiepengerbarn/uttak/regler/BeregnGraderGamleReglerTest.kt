@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
-import java.time.LocalDate
 
 /**
  * BeregnGraderTest er splittet i to tester, denne og BeregningNyeReglerTest. Denne innneholder alle testene
@@ -27,7 +26,6 @@ internal class BeregnGraderGamleReglerTest {
     private val DAGPENGER = Arbeidsforhold(type = Arbeidstype.DAGPENGER.kode)
     private val FRILANS = Arbeidsforhold(type = Arbeidstype.FRILANSER.kode)
     private val PERIODE = LukketPeriode("2023-01-01/2023-01-31")
-    private val NYE_REGLER_UTBETALINGSGRAD_DATO = LocalDate.parse("2023-06-01")
     private val IKKE_AKTVIV_SN = Arbeidsforhold(type = Arbeidstype.SELVSTENDIG_NÆRINGSDRIVENDE_IKKE_AKTIV.kode)
 
 
@@ -51,7 +49,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -87,7 +85,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -113,7 +111,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -138,7 +136,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
             )
         )
@@ -165,7 +163,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50))
             )
         )
@@ -191,7 +189,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
                 inntektsgradering = Inntektsgradering(BigDecimal.valueOf(50)),
                 overstyrtInput = OverstyrtInput(BigDecimal.valueOf(30), null, listOf(OverstyrtUtbetalingsgradPerArbeidsforhold(BigDecimal.valueOf(30), ARBEIDSGIVER1)))
             )
@@ -276,7 +274,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -301,7 +299,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PLS,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -326,7 +324,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -350,7 +348,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -374,7 +372,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -398,7 +396,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -430,7 +428,7 @@ internal class BeregnGraderGamleReglerTest {
             ),
             ytelseType = YtelseType.PSB,
             periode = PERIODE,
-            nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            nyeReglerUtbetalingsgrad = null,
         )
     )
 
@@ -459,7 +457,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -495,7 +493,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -529,7 +527,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -566,7 +564,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -600,7 +598,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -630,7 +628,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -663,7 +661,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -695,7 +693,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -727,7 +725,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -756,7 +754,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -785,7 +783,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -810,7 +808,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -834,7 +832,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -858,7 +856,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -883,7 +881,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -908,7 +906,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -934,7 +932,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -960,7 +958,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -987,7 +985,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1014,7 +1012,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = LukketPeriode("2023-01-01/2023-01-31"),
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1041,7 +1039,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1069,7 +1067,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1098,7 +1096,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1129,7 +1127,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
@@ -1154,7 +1152,7 @@ internal class BeregnGraderGamleReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                nyeReglerUtbetalingsgrad = null,
             )
         )
 
