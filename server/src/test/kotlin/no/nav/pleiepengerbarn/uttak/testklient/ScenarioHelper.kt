@@ -17,6 +17,8 @@ internal val HELE_2020 = LukketPeriode("2020-01-01/2020-12-31")
 
 internal val ARBEIDSFORHOLD1 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789")
 internal val IKKE_YRKESAKTIV = Arbeidsforhold(type = "IKKE_YRKESAKTIV", organisasjonsnummer = "987654321")
+internal val FRILANSER_IKKE_AKTIV = Arbeidsforhold(type = "FL_IKKE_AKTIV")
+internal val SN_IKKE_AKTIV = Arbeidsforhold(type = "SN_IKKE_AKTIV", organisasjonsnummer = "987654321")
 internal val KUN_YTELSE = Arbeidsforhold(type = Arbeidstype.KUN_YTELSE.kode)
 internal val ARBEIDSFORHOLD2 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
 internal val ARBEIDSFORHOLD3 = Arbeidsforhold(type = "AT", organisasjonsnummer = "123456789", arbeidsforholdId = UUID.randomUUID().toString())
