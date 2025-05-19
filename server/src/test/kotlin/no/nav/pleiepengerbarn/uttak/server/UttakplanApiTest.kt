@@ -7,7 +7,6 @@ import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,10 +39,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         PleiepengerBarnUttakTestClient(restTemplate, token)
     }
 
-    @AfterEach
-    internal fun tearDown() {
-        System.clearProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID")
-    }
 
     @Test
     internal fun `Enkelt uttak på et arbeidsforhold`() {
@@ -981,7 +976,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     internal fun `Vanlig arbeidsforhold kombinert med omsorgsstønad som er tilkommet`() {
-        System.setProperty("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID", "true")
         val grunnlag = lagGrunnlag(
             søknadsperiode = LukketPeriode("2020-10-12/2020-10-16"),
             arbeid = listOf(
@@ -1022,7 +1016,6 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
             periode = LukketPeriode("2020-10-12/2020-10-16"),
             grad = BigDecimal.valueOf(70),
             gradPerArbeidsforhold = mapOf(
-                FRILANS1 to Prosent(0),
                 ARBEIDSFORHOLD3 to Prosent(100)
             ),
             oppfyltÅrsak = Årsak.AVKORTET_MOT_INNTEKT,
