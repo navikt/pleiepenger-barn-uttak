@@ -219,16 +219,6 @@ object BeregnUtbetalingsgrader {
                 // trekker antall timer som dekkes for aktivitet fra restverdi som dekkes
                 sumTimerForbrukt += timerForbrukt
             }
-            // TODO: Fjern denne delen
-            else if (FeatureToggle.isActive("INKLUDER_TILKOMMET_UTEN_ARBEIDSTID") && info.tilkommet == true) {
-                utbetalingsgrader[arbeidsforhold] = Utbetalingsgrad(
-                    utbetalingsgrad = Prosent.ZERO,
-                    normalArbeidstid = Duration.ZERO,
-                    faktiskArbeidstid = Duration.ZERO,
-                    tilkommet = true,
-                    overstyrt = false
-                )
-            }
         }
         return UtbetalingsgraderOgGjenværendeTimerSomDekkes(
             utbetalingsgrader,
