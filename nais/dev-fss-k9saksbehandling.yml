@@ -47,6 +47,10 @@ spec:
     enabled: true
     path: /pleiepenger-barn-uttak/internal/actuator/prometheus
   observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
     autoInstrumentation:
       enabled: true
       runtime: java
