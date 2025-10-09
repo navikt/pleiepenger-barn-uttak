@@ -39,22 +39,24 @@ internal object UttaksplanRegler {
     }
 
     private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): Set<Årsak> {
-        val årsaker = mutableSetOf<Årsak>()
+        val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
         var overstyrtÅrsak: Årsak? = null
         PeriodeRegler.forEach { regel ->
             val utfall = regel.kjør(periode = søktUttaksperiode, grunnlag = grunnlag)
             if (utfall is IkkeOppfylt) {
-                årsaker.addAll(utfall.årsaker)
+                ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
             } else if (utfall is TilBeregningAvGrad) {
                 if (utfall.overstyrtÅrsak != null) {
                     overstyrtÅrsak = utfall.overstyrtÅrsak
                 }
             }
         }
-        if (overstyrtÅrsak != null) {
+        if (ikkeOppfyltÅrsaker.isNotEmpty()) {
+            return ikkeOppfyltÅrsaker
+        } else if (overstyrtÅrsak != null) {
             return setOf(overstyrtÅrsak!!)
         }
-        return årsaker
+        return emptySet()
     }
 
     private fun fastsettGrader(
