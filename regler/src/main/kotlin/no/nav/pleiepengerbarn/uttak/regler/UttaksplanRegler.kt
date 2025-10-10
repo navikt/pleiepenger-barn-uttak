@@ -6,6 +6,7 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import org.springframework.beans.factory.annotation.Value
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
@@ -14,7 +15,7 @@ internal object UttaksplanRegler {
 
     private var ikkeOverStyrIkkeOppfyltPeriodeRegel = false
     init {
-       ikkeOverStyrIkkeOppfyltPeriodeRegel = System.getenv("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL").toBoolean()
+       ikkeOverStyrIkkeOppfyltPeriodeRegel = getFeatureToggle("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL")
     }
 
     private val PeriodeRegler = linkedSetOf(
@@ -230,5 +231,11 @@ internal object UttaksplanRegler {
         val nattevåk = this.finnNattevåk(periode)
         val beredskap = this.finnBeredskap(periode)
         return finnOverseEtablertTilsynÅrsak(nattevåk, beredskap)
+    }
+
+    private fun getFeatureToggle(key: String): Boolean {
+        return System.getenv(key)?.toBoolean()
+            ?: System.getProperty(key)?.toBoolean()
+            ?: false
     }
 }

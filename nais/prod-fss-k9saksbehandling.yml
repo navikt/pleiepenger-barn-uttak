@@ -77,4 +77,4 @@ spec:
 
     # Feature toggles
     - name: IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL
-      value: "true""
+      value: "false"
