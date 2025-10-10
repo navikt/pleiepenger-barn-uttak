@@ -962,10 +962,9 @@ internal class UttakTjenesteGraderingTest {
         )
     }
 
+    // TODO: Når TSFF-2118 er prodsatt, skal utfall blir IKKE_OPPFYLT
     @Test
     internal fun `Uttak med rett etter barns død skal ikke innvilges i ferie`() {
-        System.setProperty("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL", "true")
-
         val periodeFom = LocalDate.of(2020, Month.JANUARY, 1)
         val periodeTom = LocalDate.of(2020, Month.JANUARY, 31)
         val periode = LukketPeriode(periodeFom, periodeTom)
@@ -1006,7 +1005,7 @@ internal class UttakTjenesteGraderingTest {
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
         val feriePeriodeUttaksplan = uttaksplan.perioder.get(lovbestemtFerie)
         assertThat(feriePeriodeUttaksplan).isNotNull
-        assertThat(feriePeriodeUttaksplan!!.utfall).isEqualTo(Utfall.IKKE_OPPFYLT)
+        assertThat(feriePeriodeUttaksplan!!.utfall).isEqualTo(Utfall.OPPFYLT)
     }
 
 }

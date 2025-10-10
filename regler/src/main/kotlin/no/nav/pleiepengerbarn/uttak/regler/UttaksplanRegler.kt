@@ -15,7 +15,7 @@ internal object UttaksplanRegler {
 
     private var ikkeOverStyrIkkeOppfyltPeriodeRegel = false
     init {
-       ikkeOverStyrIkkeOppfyltPeriodeRegel = getFeatureToggle("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL")
+       ikkeOverStyrIkkeOppfyltPeriodeRegel = System.getenv("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL").toBoolean()
     }
 
     private val PeriodeRegler = linkedSetOf(
@@ -231,11 +231,5 @@ internal object UttaksplanRegler {
         val nattevåk = this.finnNattevåk(periode)
         val beredskap = this.finnBeredskap(periode)
         return finnOverseEtablertTilsynÅrsak(nattevåk, beredskap)
-    }
-
-    private fun getFeatureToggle(key: String): Boolean {
-        return System.getenv(key)?.toBoolean()
-            ?: System.getProperty(key)?.toBoolean()
-            ?: false
     }
 }
