@@ -12,9 +12,9 @@ import java.time.Duration
 
 internal object UttaksplanRegler {
 
-    private var ikkeBrukOverstyrtInput = false
+    private var ikkeOverStyrIkkeOppfyltPeriodeRegel = false
     init {
-       ikkeBrukOverstyrtInput = System.getenv("IKKE_BRUK_OVERSTYRT_AARSAK").toBoolean()
+       ikkeOverStyrIkkeOppfyltPeriodeRegel = System.getenv("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL").toBoolean()
     }
 
     private val PeriodeRegler = linkedSetOf(
@@ -56,7 +56,7 @@ internal object UttaksplanRegler {
                 }
             }
         }
-        if (ikkeBrukOverstyrtInput && ikkeOppfyltÅrsaker.isNotEmpty()) {
+        if (ikkeOverStyrIkkeOppfyltPeriodeRegel && ikkeOppfyltÅrsaker.isNotEmpty()) {
             return ikkeOppfyltÅrsaker
         } else if (overstyrtÅrsak != null) {
             return setOf(overstyrtÅrsak!!)
