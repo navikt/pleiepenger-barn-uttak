@@ -76,3 +76,5 @@ spec:
       value: "service.name=pleiepenger-barn-uttak,service.namespace=k9saksbehandling,deployment.environment=p,nais.backend=elastic-apm;grafana-lgtm"
 
     # Feature toggles
+    - name: IKKE_BRUK_OVERSTYRT_AARSAK
+      value: "true""

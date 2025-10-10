@@ -12,6 +12,11 @@ import java.time.Duration
 
 internal object UttaksplanRegler {
 
+    private var ikkeBrukOverstyrtInput = false
+    init {
+       ikkeBrukOverstyrtInput = System.getenv("IKKE_BRUK_OVERSTYRT_AARSAK").toBoolean()
+    }
+
     private val PeriodeRegler = linkedSetOf(
         FerieRegel(),
         SøkersDødRegel(),
@@ -51,12 +56,12 @@ internal object UttaksplanRegler {
                 }
             }
         }
-        if (ikkeOppfyltÅrsaker.isNotEmpty()) {
+        if (ikkeBrukOverstyrtInput && ikkeOppfyltÅrsaker.isNotEmpty()) {
             return ikkeOppfyltÅrsaker
         } else if (overstyrtÅrsak != null) {
             return setOf(overstyrtÅrsak!!)
         }
-        return emptySet()
+        return ikkeOppfyltÅrsaker
     }
 
     private fun fastsettGrader(
