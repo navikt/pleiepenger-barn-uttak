@@ -43,6 +43,11 @@ internal object UttaksplanRegler {
         return fastsettUttaksplanRegler(perioder, grunnlag)
     }
 
+    /**
+     * Kjør gjennom alle perioderegler og same opp alle årsaker til ikke oppfylt. Dersom det er en overstyrt årsak (f.eks.
+     * barnets død) vil denne ha forrang over andre årsaker og returneres alene dersom toggle er av. Ellers vil ikke
+     * oppfylt årsaker ta presedens.
+     */
     private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): Set<Årsak> {
         val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
         var overstyrtÅrsak: Årsak? = null
