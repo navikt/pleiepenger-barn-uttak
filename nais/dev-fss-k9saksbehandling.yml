@@ -78,3 +78,5 @@ spec:
     # Feature toggles
     - name: UTVIDET_LOGGING
       value: "false"
+    - name: IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL
+      value: "true""

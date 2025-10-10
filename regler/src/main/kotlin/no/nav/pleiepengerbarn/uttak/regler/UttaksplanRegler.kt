@@ -6,11 +6,17 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
+import org.springframework.beans.factory.annotation.Value
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
 internal object UttaksplanRegler {
+
+    private var ikkeOverStyrIkkeOppfyltPeriodeRegel = false
+    init {
+       ikkeOverStyrIkkeOppfyltPeriodeRegel = System.getenv("IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL").toBoolean()
+    }
 
     private val PeriodeRegler = linkedSetOf(
         FerieRegel(),
@@ -38,23 +44,30 @@ internal object UttaksplanRegler {
         return fastsettUttaksplanRegler(perioder, grunnlag)
     }
 
+    /**
+     * Kjør gjennom alle perioderegler og samle opp alle årsaker til ikke oppfylt. Dersom det er en overstyrt årsak (f.eks.
+     * barnets død) vil denne ha forrang over andre årsaker og returneres alene dersom toggle er av. Ellers vil ikke
+     * oppfylt årsaker ta presedens.
+     */
     private fun fastsettPeriodeRegler(søktUttaksperiode: LukketPeriode, grunnlag: RegelGrunnlag): Set<Årsak> {
-        val årsaker = mutableSetOf<Årsak>()
+        val ikkeOppfyltÅrsaker = mutableSetOf<Årsak>()
         var overstyrtÅrsak: Årsak? = null
         PeriodeRegler.forEach { regel ->
             val utfall = regel.kjør(periode = søktUttaksperiode, grunnlag = grunnlag)
             if (utfall is IkkeOppfylt) {
-                årsaker.addAll(utfall.årsaker)
+                ikkeOppfyltÅrsaker.addAll(utfall.årsaker)
             } else if (utfall is TilBeregningAvGrad) {
                 if (utfall.overstyrtÅrsak != null) {
                     overstyrtÅrsak = utfall.overstyrtÅrsak
                 }
             }
         }
-        if (overstyrtÅrsak != null) {
+        if (ikkeOverStyrIkkeOppfyltPeriodeRegel && ikkeOppfyltÅrsaker.isNotEmpty()) {
+            return ikkeOppfyltÅrsaker
+        } else if (overstyrtÅrsak != null) {
             return setOf(overstyrtÅrsak!!)
         }
-        return årsaker
+        return ikkeOppfyltÅrsaker
     }
 
     private fun fastsettGrader(

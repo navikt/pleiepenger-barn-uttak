@@ -5,8 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Duration
@@ -962,6 +960,52 @@ internal class UttakTjenesteGraderingTest {
             mapOf(arbeidsforhold1 to Prosent(40)),
             Årsak.GRADERT_MOT_TILSYN
         )
+    }
+
+    // TODO: Når TSFF-2118 er prodsatt, skal utfall blir IKKE_OPPFYLT
+    @Test
+    internal fun `Uttak med rett etter barns død skal ikke innvilges i ferie`() {
+        val periodeFom = LocalDate.of(2020, Month.JANUARY, 1)
+        val periodeTom = LocalDate.of(2020, Month.JANUARY, 31)
+        val periode = LukketPeriode(periodeFom, periodeTom)
+        val periodeSøktUttak = SøktUttak(periode)
+        val lovbestemtFerie = LukketPeriode(
+            LocalDate.of(2020, Month.JANUARY, 30),
+            LocalDate.of(2020, Month.JANUARY, 31)
+        )
+
+        val grunnlag = RegelGrunnlag(
+            saksnummer = nesteSaksnummer(),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
+            barn = Barn(
+                aktørId = aktørIdBarn,
+                dødsdato = periodeFom.minusWeeks(2),
+                rettVedDød = RettVedDød.RETT_12_UKER
+            ),
+            pleiebehov = mapOf(
+                periode to Pleiebehov.PROSENT_100
+            ),
+            lovbestemtFerie =listOf(
+               lovbestemtFerie
+            ),
+            søktUttak = listOf(
+               periodeSøktUttak
+            ),
+            tilsynsperioder = mapOf(
+                periode to Prosent(20)
+            ).somTilsynperioder(),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(periode to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            behandlingUUID = nesteBehandlingUUID()
+        )
+
+        val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
+        val feriePeriodeUttaksplan = uttaksplan.perioder.get(lovbestemtFerie)
+        assertThat(feriePeriodeUttaksplan).isNotNull
+        assertThat(feriePeriodeUttaksplan!!.utfall).isEqualTo(Utfall.OPPFYLT)
     }
 
 }
