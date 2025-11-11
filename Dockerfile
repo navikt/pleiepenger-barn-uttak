@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/sif-baseimages/java-21:2025.11.04.1325Z
+FROM ghcr.io/navikt/sif-baseimages/java-21:2025.11.10.1734Z
 
 LABEL org.opencontainers.image.source=https://github.com/navikt/pleiepenger-barn-uttak
 
