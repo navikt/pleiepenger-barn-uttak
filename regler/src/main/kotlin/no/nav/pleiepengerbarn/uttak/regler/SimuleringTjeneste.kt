@@ -3,6 +3,7 @@ package no.nav.pleiepengerbarn.uttak.regler
 import no.nav.fpsak.tidsserie.LocalDateSegment
 import no.nav.fpsak.tidsserie.LocalDateTimeline
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
+import java.util.Objects
 
 object SimuleringTjeneste {
 
@@ -59,11 +60,9 @@ private data class ForenkletUttakInfo(val uttaksgrad: Prosent, val utfall: Utfal
     }
 
     override fun hashCode(): Int {
-        var result = uttaksgrad.hashCode()
-        result = 31 * result + utfall.hashCode()
-        result = 31 * result + årsaker.hashCode()
-        result = 31 * result + utbetalingsgrader.hashCode()
-        return result
+        //equals-metoden over anser 0 og 0.0 som like, da MÅ de også ha samme hash code
+        //det enkleste er da å ikke ta med uttaksgrad/utbetalingsgrad her
+        return Objects.hash(utfall, årsaker)
     }
 }
 
@@ -80,7 +79,9 @@ private data class ForenkletUttaksgrad(val utbetalingsgrad: Prosent) {
     }
 
     override fun hashCode(): Int {
-        return utbetalingsgrad.hashCode()
+        //equals-metoden over anser 0 og 0.0 som like, da MÅ de også ha samme hash code
+        //det enkleste er da å ikke ta med utbetalingsgrad her
+        return 1
     }
 }
 
