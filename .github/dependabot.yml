@@ -10,6 +10,10 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
+      exclude:
+        - "no.nav.*"
     open-pull-requests-limit: 20
     registries:
       - pleiepenger-barn-uttak
@@ -17,6 +21,8 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
   - package-ecosystem: docker
     directory: "/"
