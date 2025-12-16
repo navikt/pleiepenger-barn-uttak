@@ -95,7 +95,7 @@ internal object BeregnGrader {
             if (beregnGraderGrunnlag.inntektsgradering.uttaksgrad < TJUE_PROSENT && beregnGraderGrunnlag.inntektsgradering.uttaksgrad > NULL_PROSENT) {
                 TJUE_PROSENT
             } else {
-                beregnGraderGrunnlag.inntektsgradering.uttaksgrad
+                beregnGraderGrunnlag.inntektsgradering.uttaksgrad.setScale(0, RoundingMode.HALF_UP)
             }
         } else null
 
@@ -103,8 +103,8 @@ internal object BeregnGrader {
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
         uttaksgradResultat: UttaksgradResultat
     ) = beregnGraderGrunnlag.inntektsgradering != null &&
-            beregnGraderGrunnlag.inntektsgradering.uttaksgrad.setScale(2, RoundingMode.HALF_UP)
-                .compareTo(uttaksgradResultat.uttaksgrad.setScale(2, RoundingMode.HALF_UP)) < 0
+            beregnGraderGrunnlag.inntektsgradering.uttaksgrad.setScale(0, RoundingMode.HALF_UP)
+                .compareTo(uttaksgradResultat.uttaksgrad.setScale(0, RoundingMode.HALF_UP)) <= 0
 
     internal fun beregnMedMaksGrad(
         beregnGraderGrunnlag: BeregnGraderGrunnlag,
