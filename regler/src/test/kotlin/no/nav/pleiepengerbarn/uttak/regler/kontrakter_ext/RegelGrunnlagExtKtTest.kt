@@ -63,11 +63,11 @@ internal class RegelGrunnlagExtKtTest {
         return RegelGrunnlag(
             saksnummer = UUID.randomUUID().toString(),
             behandlingUUID = UUID.randomUUID(),
-            søker = Søker(aktørId = "123"),
             barn = Barn(aktørId = "456"),
+            søker = Søker(aktørId = "123"),
             pleiebehov = mapOf(),
             søktUttak = listOf(),
-            arbeid = listOf()
+            arbeid = listOf(),
         )
     }
 

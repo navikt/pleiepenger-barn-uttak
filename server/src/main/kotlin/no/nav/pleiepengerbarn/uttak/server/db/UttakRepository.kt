@@ -1,5 +1,6 @@
 package no.nav.pleiepengerbarn.uttak.server.db
 
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
@@ -103,6 +104,8 @@ internal class UttakRepository {
         }
     }
 
+
+
     internal fun slett(behandlingId: UUID) {
         slettTidligereUttaksplan(behandlingId)
     }
@@ -118,6 +121,25 @@ internal class UttakRepository {
     fun hentForrige(saksnummer: Saksnummer, behandlingUUID: UUID): Uttaksplan? {
         val forrigeBehandlingUUID = finnForrigeBehandlingUUID(saksnummer, behandlingUUID) ?: return null
         return hent(forrigeBehandlingUUID)
+    }
+
+    internal fun hentRegelGrunnlag(behandlingId: UUID): RegelGrunnlag? {
+        return try {
+            val regelGrunnlagJson = jdbcTemplate.queryForObject(
+                "select regel_grunnlag from uttaksresultat where behandling_id = :behandling_id and slettet=false",
+                mapOf("behandling_id" to behandlingId)
+            ) { resultSet, _ -> resultSet.getString("regel_grunnlag") }
+
+            regelGrunnlagJson?.let {
+                try {
+                    mapper.readValue(it, RegelGrunnlag::class.java)
+                } catch (e: JsonMappingException) {
+                    null
+                }
+            }
+        } catch (e: EmptyResultDataAccessException) {
+            null
+        }
     }
 
     private fun finnForrigeBehandlingUUID(saksnummer: Saksnummer, behandlingUUID: UUID?): UUID? {

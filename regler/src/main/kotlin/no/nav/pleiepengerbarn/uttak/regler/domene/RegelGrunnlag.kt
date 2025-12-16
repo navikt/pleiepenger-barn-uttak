@@ -23,6 +23,7 @@ data class RegelGrunnlag(
     val andrePartersUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
     val vedtatteUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
     val sisteVedtatteUttaksplanForBehandling: Map<UUID, UUID> = mapOf(),
+    val nyeReglerPrVedtatteBehandling: Map<UUID, LocalDate> = mapOf(),
     val forrigeUttaksplan: Uttaksplan? = null,
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
     val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),

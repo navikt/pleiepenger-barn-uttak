@@ -55,13 +55,13 @@ internal class SøkersDødRegelTest {
     private fun grunnlagMedDødSøker(dødsdato: LocalDate): RegelGrunnlag {
         return RegelGrunnlag(
             saksnummer = nesteSaksnummer(),
-            barn = Barn(aktørId = "123"),
-            //Feltene nedenfor er ikke relevante for testen
             behandlingUUID = UUID.randomUUID(),
+            //Feltene nedenfor er ikke relevante for testen
+            barn = Barn(aktørId = "123"),
             søker = Søker(aktørId = "456", dødsdato = dødsdato),
             pleiebehov = mapOf(),
             søktUttak = listOf(),
-            arbeid = listOf()
+            arbeid = listOf(),
         )
     }
 

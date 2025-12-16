@@ -369,14 +369,14 @@ internal class UttakRepositoryTest {
         return RegelGrunnlag(
             saksnummer = nesteSaksnummer(),
             behandlingUUID = behandlingUUID,
-            søker = Søker(
-                aktørId = aktørIdSøker
-            ),
             barn = Barn(
                 aktørId = aktørIdBarn
             ),
-            søktUttak = listOf(SøktUttak(periode)),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+            søktUttak = listOf(SøktUttak(periode)),
             arbeid = listOf(
                 Arbeid(
                     arbeidsforhold = arbeidsforhold1,
@@ -387,7 +387,7 @@ internal class UttakRepositoryTest {
                         )
                     )
                 )
-            )
+            ),
         )
     }
 
@@ -552,14 +552,14 @@ internal class UttakRepositoryTest {
             ytelseType = YtelseType.PLS,
             saksnummer = nesteSaksnummer(),
             behandlingUUID = behandlingUUID,
-            søker = Søker(
-                aktørId = aktørIdSøker
-            ),
             barn = Barn(
                 aktørId = aktørIdBarn
             ),
-            søktUttak = listOf(SøktUttak(periode)),
+            søker = Søker(
+                aktørId = aktørIdSøker
+            ),
             pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100),
+            søktUttak = listOf(SøktUttak(periode)),
             arbeid = listOf(
                 Arbeid(
                     arbeidsforhold = arbeidsforhold1,
@@ -570,7 +570,7 @@ internal class UttakRepositoryTest {
                         )
                     )
                 )
-            )
+            ),
         )
     }
 

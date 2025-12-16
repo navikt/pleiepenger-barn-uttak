@@ -5,8 +5,6 @@ import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkIkkeOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.UttaksperiodeAsserts.sjekkOppfylt
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -28,23 +26,23 @@ internal class UttakTjenesteTest {
     fun `Enkel uttaksperiode uten annen informasjon`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_200
-                ),
-                søktUttak = listOf(
-                        SøktUttak(helePerioden)
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingId(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    helePerioden to Pleiebehov.PROSENT_200
+            ),
+            søktUttak = listOf(
+                    SøktUttak(helePerioden)
+            ),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -69,26 +67,26 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som delvis overlapper med ferie`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_200
-                ),
-                søktUttak = listOf(
-                    SøktUttak(helePerioden)
-                ),
-                lovbestemtFerie = listOf(
-                        LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingId(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    helePerioden to Pleiebehov.PROSENT_200
+            ),
+            søktUttak = listOf(
+                SøktUttak(helePerioden)
+            ),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
+            lovbestemtFerie = listOf(
+                    LukketPeriode(LocalDate.of(2020, Month.JANUARY, 15), LocalDate.of(2020, Month.FEBRUARY, 15))
+            ),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -120,23 +118,23 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som fortsetter etter slutt på pleiebehov perioden, skal avslås fra slutt på pleiebehov perioden`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_200
-                ),
-                søktUttak = listOf(
-                    SøktUttak(LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7)))
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingId(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    helePerioden to Pleiebehov.PROSENT_200
+            ),
+            søktUttak = listOf(
+                SøktUttak(LukketPeriode(helePerioden.fom, helePerioden.tom.plusDays(7)))
+            ),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -162,26 +160,26 @@ internal class UttakTjenesteTest {
     fun `En uttaksperiode som overlapper med tilsyn slik at uttaksgraden blir under 20 prosent, skal avslås pga for høy tilsynsgrad`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                tilsynsperioder = mapOf(
-                        helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
-                ).somTilsynperioder(),
-                søktUttak = listOf(
-                        SøktUttak(helePerioden)
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-                ).somArbeid()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = UUID.randomUUID(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                    SøktUttak(helePerioden)
+            ),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                    helePerioden.copy(fom = helePerioden.fom.plusDays(15)) to Prosent(85)
+            ).somTilsynperioder(),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -215,24 +213,24 @@ internal class UttakTjenesteTest {
         val periode2 = LukketPeriode("2020-03-16/2020-03-20")
 
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        søknadsperiode to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(SøktUttak(søknadsperiode)),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(
-                                periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING),
-                                periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(20))
-                        )
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingId(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    søknadsperiode to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(SøktUttak(søknadsperiode)),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(
+                            periode1 to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING),
+                            periode2 to ArbeidsforholdPeriodeInfo(FULL_DAG, FULL_DAG.prosent(20))
+                    )
+            ).somArbeid(),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
@@ -258,26 +256,26 @@ internal class UttakTjenesteTest {
         val periode = LukketPeriode("2020-03-09/2020-03-15")
 
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                behandlingUUID = UUID.randomUUID(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                    aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        periode to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(SøktUttak(periode)),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(
-                                periode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)
-                        )
-                ).somArbeid(),
-                tilsynsperioder = mapOf(
-                        periode to Prosent(9)
-                ).somTilsynperioder()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = UUID.randomUUID(),
+            barn = Barn(
+                aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    periode to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(SøktUttak(periode)),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(
+                            periode to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO)
+                    )
+            ).somArbeid(),
+            tilsynsperioder = mapOf(
+                    periode to Prosent(9)
+            ).somTilsynperioder(),
         )
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)
 
@@ -297,23 +295,23 @@ internal class UttakTjenesteTest {
     fun `Livets sluttfase, En enkel uttaksperiode skal få 100 prosent utbetaling`() {
         val helePerioden = LukketPeriode(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 3))
         val grunnlag = RegelGrunnlag(
-                saksnummer = nesteSaksnummer(),
-                søker = Søker(
-                        aktørId = aktørIdSøker
-                ),
-                barn = Barn(
-                        aktørId = aktørIdBarn
-                ),
-                pleiebehov = mapOf(
-                        helePerioden to Pleiebehov.PROSENT_100
-                ),
-                søktUttak = listOf(
-                        SøktUttak(helePerioden)
-                ),
-                arbeid = mapOf(
-                        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
-                ).somArbeid(),
-                behandlingUUID = nesteBehandlingId()
+            saksnummer = nesteSaksnummer(),
+            behandlingUUID = nesteBehandlingId(),
+            barn = Barn(
+                    aktørId = aktørIdBarn
+            ),
+            søker = Søker(
+                    aktørId = aktørIdSøker
+            ),
+            pleiebehov = mapOf(
+                    helePerioden to Pleiebehov.PROSENT_100
+            ),
+            søktUttak = listOf(
+                    SøktUttak(helePerioden)
+            ),
+            arbeid = mapOf(
+                    arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, INGENTING))
+            ).somArbeid(),
         )
 
         val uttaksplan = UttakTjeneste.uttaksplan(grunnlag)

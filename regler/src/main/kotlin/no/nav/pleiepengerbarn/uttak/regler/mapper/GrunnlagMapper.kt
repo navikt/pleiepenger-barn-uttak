@@ -5,6 +5,7 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
+import java.time.LocalDate
 import java.util.*
 
 object GrunnlagMapper {
@@ -13,6 +14,7 @@ object GrunnlagMapper {
         uttaksgrunnlag: Uttaksgrunnlag,
         andrePartersUttakplanPerBehandling: Map<UUID, Uttaksplan>,
         vedtatteUttaksplanerPerBehandling: Map<UUID, Uttaksplan>,
+        nyeReglerPrVedtatteBehandling: Map<UUID, LocalDate>,
         forrigeUttaksplan: Uttaksplan?,
         commitId: String = ""
     ): RegelGrunnlag {
@@ -51,6 +53,7 @@ object GrunnlagMapper {
             andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
             vedtatteUttaksplanPerBehandling = vedtatteUttaksplanerPerBehandling,
             sisteVedtatteUttaksplanForBehandling = sisteVedtatteUttaksplanForBehandling,
+            nyeReglerPrVedtatteBehandling = nyeReglerPrVedtatteBehandling,
             forrigeUttaksplan = forrigeUttaksplan,
             beredskapsperioder = uttaksgrunnlag.beredskapsperioder,
             nattevåksperioder = uttaksgrunnlag.nattevåksperioder,

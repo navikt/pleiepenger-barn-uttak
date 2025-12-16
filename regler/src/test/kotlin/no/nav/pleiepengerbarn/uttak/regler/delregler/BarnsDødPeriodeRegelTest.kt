@@ -39,13 +39,13 @@ internal class BarnsDødPeriodeRegelTest {
     private fun grunnlagMedDødtBarn(dødsdatoBarn: LocalDate, rettVedDød: RettVedDød): RegelGrunnlag {
         return RegelGrunnlag(
             saksnummer = nesteSaksnummer(),
-            barn = Barn(aktørId = "123", dødsdato = dødsdatoBarn, rettVedDød = rettVedDød),
-            //Feltene nedenfor er ikke relevante for testen
             behandlingUUID = UUID.randomUUID(),
+            //Feltene nedenfor er ikke relevante for testen
+            barn = Barn(aktørId = "123", dødsdato = dødsdatoBarn, rettVedDød = rettVedDød),
             søker = Søker("456"),
             pleiebehov = mapOf(),
             søktUttak = listOf(),
-            arbeid = listOf()
+            arbeid = listOf(),
         )
     }
 

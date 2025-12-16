@@ -254,11 +254,12 @@ class MaxAntallDagerRegelTest {
         val grunnlag = RegelGrunnlag(
             ytelseType = YtelseType.PLS,
             saksnummer = nesteSaksnummer(),
-            søker = Søker(
-                aktørId = "123"
-            ),
+            behandlingUUID = nesteBehandlingUUID(),
             barn = Barn(
                 aktørId = "456"
+            ),
+            søker = Søker(
+                aktørId = "123"
             ),
             pleiebehov = mapOf(
                 helePerioden to Pleiebehov.PROSENT_100
@@ -266,6 +267,10 @@ class MaxAntallDagerRegelTest {
             søktUttak = listOf(
                 SøktUttak(helePerioden)
             ),
+            arbeid = mapOf(
+                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
+            ).somArbeid(),
+            tilsynsperioder = emptyMap(),
             andrePartersUttaksplanPerBehandling = mapOf(
                 annenPartsBehandlingUUID to Uttaksplan(
                     perioder = mapOf(
@@ -319,12 +324,7 @@ class MaxAntallDagerRegelTest {
                     trukketUttak = listOf()
                 )
             ),
-            tilsynsperioder = emptyMap(),
-            behandlingUUID = nesteBehandlingUUID(),
-            arbeid = mapOf(
-                arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-            ).somArbeid(),
-            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
+            kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID)),
         )
 
         val resultat = regel.kjør(søkersUttaksplan, grunnlag)
@@ -483,11 +483,12 @@ private val arbeidsforhold1 = UUID.randomUUID().toString()
 private fun dummyRegelGrunnlag(helePerioden: LukketPeriode) = RegelGrunnlag(
     ytelseType = YtelseType.PLS,
     saksnummer = nesteSaksnummer(),
-    søker = Søker(
-        aktørId = "123"
-    ),
+    behandlingUUID = nesteBehandlingUUID(),
     barn = Barn(
         aktørId = "456"
+    ),
+    søker = Søker(
+        aktørId = "123"
     ),
     pleiebehov = mapOf(
         helePerioden to Pleiebehov.PROSENT_100
@@ -495,11 +496,10 @@ private fun dummyRegelGrunnlag(helePerioden: LukketPeriode) = RegelGrunnlag(
     søktUttak = listOf(
         SøktUttak(helePerioden)
     ),
-    tilsynsperioder = emptyMap(),
-    behandlingUUID = nesteBehandlingUUID(),
     arbeid = mapOf(
         arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-    ).somArbeid()
+    ).somArbeid(),
+    tilsynsperioder = emptyMap(),
 )
 
 private fun dummyRegelGrunnlagMedAndreParter(
@@ -508,11 +508,12 @@ private fun dummyRegelGrunnlagMedAndreParter(
 ) = RegelGrunnlag(
     ytelseType = YtelseType.PLS,
     saksnummer = nesteSaksnummer(),
-    søker = Søker(
-        aktørId = "123"
-    ),
+    behandlingUUID = nesteBehandlingUUID(),
     barn = Barn(
         aktørId = "456"
+    ),
+    søker = Søker(
+        aktørId = "123"
     ),
     pleiebehov = mapOf(
         helePerioden to Pleiebehov.PROSENT_100
@@ -520,6 +521,10 @@ private fun dummyRegelGrunnlagMedAndreParter(
     søktUttak = listOf(
         SøktUttak(helePerioden)
     ),
+    arbeid = mapOf(
+        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
+    ).somArbeid(),
+    tilsynsperioder = emptyMap(),
     andrePartersUttaksplanPerBehandling = mapOf(
         annenPartsBehandlingUUID to Uttaksplan(
             perioder = mapOf(
@@ -543,12 +548,7 @@ private fun dummyRegelGrunnlagMedAndreParter(
             trukketUttak = listOf()
         )
     ),
-    tilsynsperioder = emptyMap(),
-    behandlingUUID = nesteBehandlingUUID(),
-    arbeid = mapOf(
-        arbeidsforhold1 to mapOf(helePerioden to ArbeidsforholdPeriodeInfo(FULL_DAG, Duration.ZERO))
-    ).somArbeid(),
-    kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID))
+    kravprioritetForBehandlinger = mapOf(helePerioden to listOf(annenPartsBehandlingUUID)),
 )
 
 

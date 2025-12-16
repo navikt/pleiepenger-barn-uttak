@@ -9,7 +9,6 @@ import no.nav.pleiepengerbarn.uttak.regler.*
 import no.nav.pleiepengerbarn.uttak.regler.mapper.GrunnlagMapper
 import no.nav.pleiepengerbarn.uttak.server.db.UttakRepository
 import no.nav.security.token.support.core.api.Protected
-import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -17,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -148,12 +148,14 @@ class UttakplanApi {
     ): Uttaksplan {
         val andrePartersUttaksplanerPerBehandling = hentAndrePartersUttaksplanerPerBehandling(uttaksgrunnlag)
         val vedtatteUttaksplanerPerBehandling = hentVedtatteUttaksplanerPerBehandling(uttaksgrunnlag)
+        val nyeReglerPrVedtatteBehandling = hentNyeReglerDatoPerVedtattBehandling(uttaksgrunnlag)
 
         val regelGrunnlag =
             GrunnlagMapper.tilRegelGrunnlag(
                 uttaksgrunnlag,
                 andrePartersUttaksplanerPerBehandling,
                 vedtatteUttaksplanerPerBehandling,
+                nyeReglerPrVedtatteBehandling,
                 forrigeUttaksplan,
                 commitId?: ""
             )
@@ -203,6 +205,23 @@ class UttakplanApi {
             }
         }
         return andrePartersUttaksplanerPerBehandling
+    }
+
+    private fun hentNyeReglerDatoPerVedtattBehandling(uttaksgrunnlag: Uttaksgrunnlag): Map<UUID, LocalDate> {
+        val vedtatteBehandlinger = uttaksgrunnlag.sisteVedtatteUttaksplanForBehandling.filterValues { it != null }
+            .values.toSet()
+            .map { UUID.fromString(it) }
+        val andrePartersRegelgrunnlagPerBehandling = mutableMapOf<UUID, LocalDate>()
+
+        vedtatteBehandlinger.forEach { behandlingUUID ->
+            if (!andrePartersRegelgrunnlagPerBehandling.containsKey(behandlingUUID)) {
+                val regelgrunnlag = uttakRepository.hentRegelGrunnlag(behandlingUUID)
+                if (regelgrunnlag != null && regelgrunnlag.nyeReglerUtbetalingsgrad != null) {
+                    andrePartersRegelgrunnlagPerBehandling[behandlingUUID] = regelgrunnlag.nyeReglerUtbetalingsgrad!!
+                }
+            }
+        }
+        return andrePartersRegelgrunnlagPerBehandling
     }
 
     @GetMapping(UttaksplanPath, produces = [MediaType.APPLICATION_JSON_VALUE])

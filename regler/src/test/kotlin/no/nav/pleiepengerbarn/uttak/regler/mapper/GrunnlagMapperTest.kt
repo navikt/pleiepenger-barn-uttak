@@ -29,6 +29,7 @@ internal class GrunnlagMapperTest {
                 ),
                 andrePartersUttakplanPerBehandling = mapOf(),
                 vedtatteUttaksplanerPerBehandling = mapOf(),
+                nyeReglerPrVedtatteBehandling = nyeReglerPrVedtatteBehandling,
                 forrigeUttaksplan = null
             )
         }
@@ -46,6 +47,7 @@ internal class GrunnlagMapperTest {
                 ),
                 andrePartersUttakplanPerBehandling = mapOf(),
                 vedtatteUttaksplanerPerBehandling = mapOf(),
+                nyeReglerPrVedtatteBehandling = nyeReglerPrVedtatteBehandling,
                 forrigeUttaksplan = null
             )
         }
@@ -64,6 +66,7 @@ internal class GrunnlagMapperTest {
             ),
             andrePartersUttakplanPerBehandling = mapOf(),
             vedtatteUttaksplanerPerBehandling = mapOf(),
+            nyeReglerPrVedtatteBehandling = nyeReglerPrVedtatteBehandling,
             forrigeUttaksplan = null
         )
     }
