@@ -6,6 +6,8 @@ import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sjekkOmOverlapp
 import org.postgresql.util.PGobject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
@@ -42,6 +44,8 @@ internal class UttakRepository {
         private val uttaksplanRowMapper = RowMapper {resultSet, _ ->
             Uttaksresultat(resultSet.getLong("id"), resultSet.getString("commit_id"))
         }
+
+        private val logger = LoggerFactory.getLogger(this::class.java)
     }
 
     internal fun lagre(regelGrunnlag: RegelGrunnlag, uttaksplan: Uttaksplan) {
@@ -134,10 +138,12 @@ internal class UttakRepository {
                 try {
                     mapper.readValue(it, RegelGrunnlag::class.java)
                 } catch (e: JsonMappingException) {
+                    logger.warn("Kunne ikke mappe regelgrunnlag for behandlingId=$behandlingId", e)
                     null
                 }
             }
         } catch (e: EmptyResultDataAccessException) {
+            logger.warn("Fant ikke regelgrunnlag for behandlingId=$behandlingId", e)
             null
         }
     }
