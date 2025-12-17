@@ -54,7 +54,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -88,7 +88,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -125,7 +125,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -162,7 +162,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -189,7 +189,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -215,7 +215,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -241,7 +241,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -268,7 +268,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -296,7 +296,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -324,7 +324,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -353,7 +353,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 
@@ -384,7 +384,7 @@ internal class BeregnGraderNyeReglerTest {
                 ),
                 ytelseType = YtelseType.PSB,
                 periode = PERIODE,
-                nyeReglerUtbetalingsgrad = NYE_REGLER_UTBETALINGSGRAD_DATO,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
             )
         )
 

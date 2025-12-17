@@ -64,7 +64,7 @@ object BeregnUtbetalingsgrader {
                     beregnGraderGrunnlag.arbeid.harSpesialhåndteringstilfelleForGamleRegler(
                         brukNyeRegler,
                         beregnGraderGrunnlag.periode,
-                        beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
+                        beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet
                     )
                 // Finner utbetalingsgrad for spesialgruppe
                 val utbetalingsgraderForSpesialhåndtering =
@@ -88,8 +88,8 @@ object BeregnUtbetalingsgrader {
     ) = aktivitetsgruppe == getGruppeSomSkalSpesialhåndteres(brukNyeRegler) && !brukNyeRegler
 
     private fun gjelderNyeRegler(beregnGraderGrunnlag: BeregnGraderGrunnlag) =
-        (beregnGraderGrunnlag.nyeReglerUtbetalingsgrad != null
-                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.nyeReglerUtbetalingsgrad))
+        (beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet != null
+                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet))
 
     private fun finnTotalNormalarbeidstid(
         beregnGraderGrunnlag: BeregnGraderGrunnlag,

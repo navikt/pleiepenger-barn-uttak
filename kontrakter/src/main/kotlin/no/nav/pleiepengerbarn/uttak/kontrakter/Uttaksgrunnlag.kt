@@ -22,8 +22,8 @@ data class Uttaksgrunnlag (
     @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
     @JsonProperty("arbeid") val arbeid: List<Arbeid>,
     @JsonProperty("pleiebehov") val pleiebehov: Map<LukketPeriode, Pleiebehov>,
+    @Deprecated(message = "Bruk virkningstidspunktForRegelPrBehandling", replaceWith = ReplaceWith("virkningstidspunktForRegelPrBehandling"), level = DeprecationLevel.WARNING)
     @JsonProperty("nyeReglerUtbetalingsgrad") val nyeReglerUtbetalingsgrad: LocalDate? = null,
-
     @JsonProperty("overstyrtInput") val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
     @JsonProperty("inntektsgradering") val inntektsgradering: Map<LukketPeriode, Inntektsgradering> = mapOf(),
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
@@ -33,8 +33,9 @@ data class Uttaksgrunnlag (
     @JsonProperty("nattevåksperioder") val nattevåksperioder: Map<LukketPeriode, Utfall> = mapOf(),
     @JsonProperty("kravprioritetForBehandlinger") val kravprioritetForBehandlinger: Map<LukketPeriode, List<BehandlingUUID>> = mapOf(),
     @JsonProperty("sisteVedtatteUttaksplanForBehandling") val sisteVedtatteUttaksplanForBehandling: Map<BehandlingUUID, BehandlingUUID?> = mapOf(),
-    @JsonProperty("utenlandsoppholdperioder") val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf()
-)
+    @JsonProperty("utenlandsoppholdperioder") val utenlandsoppholdperioder: Map<LukketPeriode, UtenlandsoppholdInfo> = mapOf(),
+    @JsonProperty("virkningstidspunktForRegelPrBehandling") val virkningstidspunktForRegelPrBehandling: Map<BehandlingUUID, VirkningstidspunktForRegler> = mapOf(),
+    )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -88,5 +89,19 @@ data class OverstyrtUtbetalingsgradPerArbeidsforhold(
 data class Inntektsgradering(
     @JsonProperty("uttaksgrad") val uttaksgrad: BigDecimal,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+data class VirkningstidspunktForRegler(
+    @JsonProperty("virkningstidspunktPrRegelsett") val virkningstidspunktPrRegelsett: Map<RegelSett, LocalDate> = mapOf()
+) {
+    operator fun get(regelSett: RegelSett): LocalDate? {
+        return virkningstidspunktPrRegelsett[regelSett]
+    }
+}
+
+
+
 
 

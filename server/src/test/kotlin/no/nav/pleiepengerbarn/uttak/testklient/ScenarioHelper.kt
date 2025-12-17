@@ -77,7 +77,12 @@ internal fun lagGrunnlag(
         tilsynsperioder = tilsynsperioder,
         nattevåksperioder = nattevåk,
         beredskapsperioder = bereskap,
-        nyeReglerUtbetalingsgrad = nyeReglerUtbetalingsgrad
+        virkningstidspunktForRegelPrBehandling = nyeReglerUtbetalingsgrad?.let {
+            mapOf(
+                behandlingUUID to
+                        VirkningstidspunktForRegler(mapOf(RegelSett.NY_ELLER_BORTFALT_AKTIVITET to it))
+            )
+        } ?: emptyMap()
     )
 }
 

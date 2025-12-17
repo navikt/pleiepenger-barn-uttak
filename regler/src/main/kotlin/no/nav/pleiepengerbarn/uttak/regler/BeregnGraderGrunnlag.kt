@@ -15,7 +15,7 @@ data class BeregnGraderGrunnlag(
     val arbeid: Map<Arbeidsforhold, ArbeidsforholdPeriodeInfo>,
     val ytelseType: YtelseType,
     val periode: LukketPeriode,
-    val nyeReglerUtbetalingsgrad: LocalDate?,
+    val virkningstidspunktRegelNyEllerBortfaltAktivitet: LocalDate?,
     val overstyrtInput: OverstyrtInput? = null,
     val inntektsgradering: Inntektsgradering? = null,
 )

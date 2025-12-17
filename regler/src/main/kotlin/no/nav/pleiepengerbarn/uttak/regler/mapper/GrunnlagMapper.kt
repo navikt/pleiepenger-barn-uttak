@@ -1,8 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.regler.mapper
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.LukketPeriode
+import no.nav.pleiepengerbarn.uttak.kontrakter.RegelSett
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksgrunnlag
 import no.nav.pleiepengerbarn.uttak.kontrakter.Uttaksplan
+import no.nav.pleiepengerbarn.uttak.kontrakter.VirkningstidspunktForRegler
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.sortertPåFom
 import java.util.*
@@ -34,6 +36,14 @@ object GrunnlagMapper {
                 sisteVedtatteUttaksplanForBehandling[UUID.fromString(behandling)] = UUID.fromString(originalBehandling)
             }
 
+        var virkningstidspunktForReglerPrBehandling = uttaksgrunnlag.nyeReglerUtbetalingsgrad?.let {
+            mapOf(
+                UUID.fromString(uttaksgrunnlag.behandlingUUID) to
+                        VirkningstidspunktForRegler(mapOf(RegelSett.NY_ELLER_BORTFALT_AKTIVITET to it))
+            )
+        } ?: uttaksgrunnlag.virkningstidspunktForRegelPrBehandling
+            .mapKeys { UUID.fromString(it.key) }
+
         return RegelGrunnlag(
             ytelseType = uttaksgrunnlag.ytelseType,
             saksnummer = uttaksgrunnlag.saksnummer,
@@ -41,7 +51,7 @@ object GrunnlagMapper {
             barn = uttaksgrunnlag.barn,
             søker = uttaksgrunnlag.søker,
             pleiebehov = uttaksgrunnlag.pleiebehov.sortertPåFom(),
-            nyeReglerUtbetalingsgrad = uttaksgrunnlag.nyeReglerUtbetalingsgrad,
+            virkningstidspunktForRegelPrBehandling = virkningstidspunktForReglerPrBehandling,
             søktUttak = søknadsperioderSortert,
             trukketUttak = uttaksgrunnlag.trukketUttak,
             arbeid = uttaksgrunnlag.arbeid,
