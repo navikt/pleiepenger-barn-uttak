@@ -39,7 +39,7 @@ internal object KnekkpunktUtleder {
         finnForSøkersDød(knekkpunkMap, regelGrunnlag.søker)
         finnForTrukketUttak(knekkpunkMap, regelGrunnlag.trukketUttak)
         finnForUtenlandsopphold(knekkpunkMap, regelGrunnlag.utenlandsoppholdperioder.keys)
-        finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.nyeReglerUtbetalingsgrad)
+        finnForStartSpesialhåndteringTilkommenAktivitet(knekkpunkMap, regelGrunnlag.finnVirkningsdatoForRegelsett(RegelSett.NY_ELLER_BORTFALT_AKTIVITET))
         finnForOverstyrtInput(knekkpunkMap, regelGrunnlag.overstyrtInput)
         finnForInntektsgradering(knekkpunkMap, regelGrunnlag.inntektsgradering)
 

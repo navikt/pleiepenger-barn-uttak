@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -1796,6 +1797,88 @@ class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(uttaksplan1Søker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(26))
         assertThat(uttaksplan1Søker2.perioder.values.first().graderingMotTilsyn?.andreSøkeresTilsynReberegnet).isTrue
     }
+
+    @Test
+    internal fun `To søkere - Første søker har inntektsgradering på nye regler - andre søker oppgir tilsyn - Regberegner annen parts uttak med nye regler`() {
+        val periode = LukketPeriode("2020-10-12/2020-10-16")
+        // Søker nr 1 har inntektsgradering og nye regler
+        // Får reduksjon i uttaksgrad pga inntektsgradering fra 50% til 35%
+        val behandlingUUID1 = UUID.randomUUID().toString()
+        val grunnlagSøker1 = lagGrunnlag(
+            søknadsperiode = periode,
+            behandlingUUID = behandlingUUID1,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(
+                        periode to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG,
+                            jobberNå = FULL_DAG.dividedBy(2)
+                        )
+                    )
+                ),
+                Arbeid(
+                    ARBEIDSFORHOLD2,
+                    mapOf(
+                        periode to ArbeidsforholdPeriodeInfo(
+                            jobberNormalt = FULL_DAG,
+                            jobberNå = FULL_DAG.dividedBy(4),
+                            tilkommet = true
+                        )
+                    )
+                )
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
+        ).copy(
+            saksnummer = "1",
+            inntektsgradering = mapOf(periode to Inntektsgradering(BigDecimal.valueOf(35))),
+            nyeReglerUtbetalingsgrad = periode.fom,
+            kravprioritetForBehandlinger = mapOf(periode to listOf(behandlingUUID1))
+        )
+
+        grunnlagSøker1.opprettUttaksplan()
+
+
+        // Søker nr 2 oppgir tilsyn
+        // Tilsynet fører til reberegning av uttaket for søker 1
+        // Reberegning gjøres med nye regler siden dette ble spesifisert i behandling for søker 1
+        // Uttak for søker nr 1 blir det samme siden inntektsgradering gir lavere uttak enn tilsynet
+        val behandlingUUID2 = UUID.randomUUID().toString()
+        val grunnlagSøker2 = lagGrunnlag(
+            søknadsperiode = periode,
+            behandlingUUID = behandlingUUID2,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(periode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(periode to Pleiebehov.PROSENT_100)
+        ).copy(
+            tilsynsperioder = mapOf(periode to FULL_DAG.prosent(40)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(grunnlagSøker1.behandlingUUID to grunnlagSøker1.behandlingUUID),
+            saksnummer = "2",
+            kravprioritetForBehandlinger = mapOf(periode to listOf(behandlingUUID1, behandlingUUID2)),
+        )
+
+        val uttaksplanSøker2 = grunnlagSøker2.opprettUttaksplan()
+
+        assertThat(uttaksplanSøker2.perioder.keys).hasSize(1)
+        assertThat(uttaksplanSøker2.perioder.keys.first()).isEqualTo(periode)
+        assertThat(uttaksplanSøker2.perioder.values.first().uttaksgrad).isEqualByComparingTo(Prosent(25))
+        assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn!!.andreSøkeresTilsyn).isEqualByComparingTo(
+            Prosent(35)
+        )
+        assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn!!.etablertTilsyn).isEqualByComparingTo(
+            Prosent(40)
+        )
+        assertThat(uttaksplanSøker2.perioder.values.first().graderingMotTilsyn!!.tilgjengeligForSøker).isEqualByComparingTo(
+            Prosent(25)
+        )
+
+
+    }
+
 
     @Test
     internal fun `Endringsøknad som inkluderer at en periode er trukket`() {

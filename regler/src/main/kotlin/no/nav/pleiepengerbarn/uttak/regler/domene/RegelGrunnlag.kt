@@ -13,7 +13,6 @@ data class RegelGrunnlag(
     val barn: Barn,
     val søker: Søker,
     val pleiebehov: Map<LukketPeriode, Pleiebehov>,
-    val nyeReglerUtbetalingsgrad: LocalDate? = null,
     val søktUttak: List<SøktUttak>,
     val trukketUttak: List<LukketPeriode> = listOf(),
     val arbeid: List<Arbeid>,
@@ -22,6 +21,7 @@ data class RegelGrunnlag(
     val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     val andrePartersUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
     val vedtatteUttaksplanPerBehandling: Map<UUID, Uttaksplan> = mapOf(),
+    val virkningstidspunktForRegelPrBehandling: Map<UUID, VirkningstidspunktForRegler> = mapOf(),
     val sisteVedtatteUttaksplanForBehandling: Map<UUID, UUID> = mapOf(),
     val forrigeUttaksplan: Uttaksplan? = null,
     val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
@@ -123,6 +123,9 @@ data class RegelGrunnlag(
         val søktUttak = this.søktUttak.firstOrNull { it.periode.overlapperHelt(periode) }
         return søktUttak?.oppgittTilsyn
     }
+
+    fun finnVirkningsdatoForRegelsett(regelsett: RegelSett)
+    = virkningstidspunktForRegelPrBehandling[behandlingUUID]?.get(regelsett)
 
     private fun inngangsvilkårForPeriode(periode: LukketPeriode): Map<String, Utfall> {
         val inngangsvilkårForPeriode = mutableMapOf<String, Utfall>()

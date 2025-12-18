@@ -14,7 +14,7 @@ internal object BeregnGrader {
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper =
             beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(
                 beregnGraderGrunnlag.periode,
-                beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
+                beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet
             )
         val søkersTapteArbeidstid =
             beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper, gjelderNyeRegler(beregnGraderGrunnlag))
@@ -115,7 +115,7 @@ internal object BeregnGrader {
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper =
             beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(
                 beregnGraderGrunnlag.periode,
-                beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
+                beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet
             )
         val søkersTapteArbeidstid =
             beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(
@@ -160,8 +160,8 @@ internal object BeregnGrader {
     }
 
     private fun gjelderNyeRegler(beregnGraderGrunnlag: BeregnGraderGrunnlag): Boolean {
-        val nyeReglerGjelder = beregnGraderGrunnlag.nyeReglerUtbetalingsgrad != null
-                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.nyeReglerUtbetalingsgrad)
+        val nyeReglerGjelder = beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet != null
+                && !beregnGraderGrunnlag.periode.fom.isBefore(beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet)
         return nyeReglerGjelder
     }
 
@@ -174,7 +174,7 @@ internal object BeregnGrader {
         val skalSeBortIfraArbeidstidFraSpesialhåndterteArbeidtyper =
             beregnGraderGrunnlag.arbeid.seBortFraAndreArbeidsforhold(
                 beregnGraderGrunnlag.periode,
-                beregnGraderGrunnlag.nyeReglerUtbetalingsgrad
+                beregnGraderGrunnlag.virkningstidspunktRegelNyEllerBortfaltAktivitet
             )
         val søkersTapteArbeidstid =
             beregnGraderGrunnlag.arbeid.finnSøkersTapteArbeidstid(

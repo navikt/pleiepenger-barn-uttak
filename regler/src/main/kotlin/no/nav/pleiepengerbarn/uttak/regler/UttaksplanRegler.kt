@@ -6,7 +6,6 @@ import no.nav.pleiepengerbarn.uttak.regler.domene.GraderBeregnet
 import no.nav.pleiepengerbarn.uttak.regler.domene.RegelGrunnlag
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.annenPart
 import no.nav.pleiepengerbarn.uttak.regler.kontrakter_ext.overlapperDelvis
-import org.springframework.beans.factory.annotation.Value
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
@@ -211,9 +210,9 @@ internal object UttaksplanRegler {
                 overseEtablertTilsynÅrsak = overseEtablertTilsynÅrsak,
                 ytelseType = grunnlag.ytelseType,
                 periode = periode,
-                nyeReglerUtbetalingsgrad = grunnlag.nyeReglerUtbetalingsgrad,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = grunnlag.finnVirkningsdatoForRegelsett(RegelSett.NY_ELLER_BORTFALT_AKTIVITET),
                 overstyrtInput = overstyrtInput,
-                inntektsgradering = inntektsgradering
+                inntektsgradering = inntektsgradering,
             )
         )
         return beregnet;
