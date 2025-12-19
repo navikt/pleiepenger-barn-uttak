@@ -106,6 +106,16 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                 } else {
                     Prosent.valueOf(100)
                 }
+                val virkningstidspunktRegelNyEllerBortfaltAktivitet =
+                    if (virkningstidspunktForRegelPrBehandling[uttaksplanMedUUIDMedKrav.behandlingUUID] != null)
+                        virkningstidspunktForRegelPrBehandling[uttaksplanMedUUIDMedKrav.behandlingUUID]?.get(RegelSett.NY_ELLER_BORTFALT_AKTIVITET)
+                    else if (inntektsgradering != null)
+                    // Dersom vi ikke finner noen virkningstidspunkt for regel ny eller bortfalt aktivitet for annen part bruker vi inntektsgraderingen til å utlede om vi skal kjøre på nye eller gamle regler
+                        periode.fom
+                    else
+                        // Fallback til gammel håndtering
+                       finnVirkningsdatoForRegelsett(RegelSett.NY_ELLER_BORTFALT_AKTIVITET)
+
                 val beregnGraderGrunnlag = BeregnGraderGrunnlag(
                     pleiebehov = pleiebehov,
                     etablertTilsyn = etablertTilsyn,
@@ -116,7 +126,7 @@ private fun RegelGrunnlag.reberegnAndreSøkeresTilsynKravprioritetBehandling(
                     arbeid = annenPartsOverlappendePeriodeInfo.utbetalingsgrader.tilArbeid(),
                     ytelseType = ytelseType,
                     periode = periode,
-                    virkningstidspunktRegelNyEllerBortfaltAktivitet = virkningstidspunktForRegelPrBehandling[uttaksplanMedUUIDMedKrav.behandlingUUID]?.get(RegelSett.NY_ELLER_BORTFALT_AKTIVITET),
+                    virkningstidspunktRegelNyEllerBortfaltAktivitet = virkningstidspunktRegelNyEllerBortfaltAktivitet ,
                     inntektsgradering = inntektsgradering,
                 )
                 val graderBeregnet = BeregnGrader.beregnMedMaksGrad(
