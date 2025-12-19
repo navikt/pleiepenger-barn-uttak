@@ -755,6 +755,181 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
     }
 
+    @Test
+    internal fun `Annen parts uttak med nedjustert søkers uttaksgrad over 20% - Uttaksplan for behandling med nedjustering - annen parts sak revurderes`() {
+        val søknadsperiode = LukketPeriode("2020-01-01/2020-01-10")
+
+        // Første søknad, Part 1, nedjustering av kvote fra 100 til 51
+        val part1Behandling1 = UUID.randomUUID().toString()
+        val part1Sak = RandomStringUtils.random(4)
+        val part1Grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part1Behandling1,
+            saksnummer = part1Sak
+        ).copy(
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.valueOf(51.26)),
+            )
+        )
+
+        testClient.opprettUttaksplan(part1Grunnlag)
+
+
+        // Første søknad, Part 2, nedjustering av kvote, får 100 - 51 = 49% i første periode, ellers avslag
+        val part2Behandling = UUID.randomUUID().toString()
+        val part2Sak = RandomStringUtils.random(4)
+        val part2Grunnlag = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part2Behandling,
+            saksnummer = part2Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling1, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(part1Behandling1 to part1Behandling1)
+        )
+
+        val part2Uttaksplan = testClient.opprettUttaksplan(part2Grunnlag).body ?: fail("Mangler uttaksplan")
+
+        part2Uttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(49),
+            Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-03/2020-01-03"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(),
+            endringsstatus = Endringsstatus.NY
+        )
+        part2Uttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(KnekkpunktType.PLEIEBEHOV, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.NY
+        )
+
+        // Revurdering part 1, ingen endring
+        val part1Behandling2 = UUID.randomUUID().toString()
+        val part2Grunnlag2 = lagGrunnlag(
+            søknadsperiode = søknadsperiode,
+            arbeid = listOf(
+                Arbeid(
+                    ARBEIDSFORHOLD1,
+                    mapOf(søknadsperiode to ArbeidsforholdPeriodeInfo(jobberNormalt = FULL_DAG, jobberNå = INGENTING))
+                )
+            ),
+            pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
+            behandlingUUID = part1Behandling2,
+            saksnummer = part1Sak
+        ).copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(
+                part1Behandling2 to part1Behandling2,
+                part2Behandling to part2Behandling
+            ),
+            inntektsgradering = mapOf(
+                LukketPeriode("2020-01-01/2020-01-02") to
+                        Inntektsgradering(uttaksgrad = BigDecimal.valueOf(51.26)),
+            )
+        )
+
+        val part2Uttaksplan2 = testClient.opprettUttaksplan(part2Grunnlag2).body ?: fail("Mangler uttaksplan")
+
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            BigDecimal.valueOf(51),
+            BigDecimal.valueOf(51),
+            Endringsstatus.ENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-03/2020-01-03"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertOppfylt(
+            LukketPeriode("2020-01-06/2020-01-08"),
+            null,
+            HUNDRE_PROSENT,
+            Endringsstatus.UENDRET
+        )
+        part2Uttaksplan2.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+
+
+        // Simulering part 2, gir ingen endring
+        val grunnlagForrigeBehandling = part2Grunnlag.copy(
+            kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(part1Behandling2, part2Behandling)),
+            sisteVedtatteUttaksplanForBehandling = mapOf(
+                part1Behandling2 to part1Behandling2,
+                part2Behandling to part2Behandling
+            )
+        )
+        val simulerUttaksplan = grunnlagForrigeBehandling.simulering();
+
+        simulerUttaksplan.simulertUttaksplan.assertOppfylt(
+            LukketPeriode("2020-01-01/2020-01-02"),
+            null,
+            BigDecimal.valueOf(49),
+            Endringsstatus.UENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-03/2020-01-03"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(KnekkpunktType.FORRIGE_UTTAKPLAN, KnekkpunktType.ANNEN_PARTS_UTTAK),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-06/2020-01-08"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.FOR_LAV_REST_PGA_ANDRE_SØKERE),
+            knekkpunktTyper = setOf(),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+        simulerUttaksplan.simulertUttaksplan.assertIkkeOppfylt(
+            periode = LukketPeriode("2020-01-09/2020-01-10"),
+            ikkeOppfyltÅrsaker = setOf(Årsak.UTENOM_PLEIEBEHOV),
+            knekkpunktTyper = setOf(
+                KnekkpunktType.FORRIGE_UTTAKPLAN,
+                KnekkpunktType.PLEIEBEHOV,
+                KnekkpunktType.ANNEN_PARTS_UTTAK
+            ),
+            endringsstatus = Endringsstatus.UENDRET
+        )
+
+        assertThat(simulerUttaksplan.uttakplanEndret).isFalse();
+
+    }
+
+
 
 
     private fun Uttaksgrunnlag.simulering(): Simulering {
