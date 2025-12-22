@@ -18,4 +18,4 @@ jobs:
           java-version: '21'
           build-token: ${{ secrets.READER_TOKEN }}
           release-token: ${{ secrets.GITHUB_TOKEN }}
-          mvn-projects: '-am -pl :kontrakt'
+          mvn-projects: '-am -pl :kontrakter'
