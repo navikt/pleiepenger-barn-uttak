@@ -12,12 +12,12 @@
     <artifactId>server</artifactId>
 
     <properties>
-        <springdoc.version>2.8.14</springdoc.version>
+        <springdoc.version>3.0.1</springdoc.version>
         <logback.logstash.version>9.0</logback.logstash.version>
         <postgres.version>42.7.8</postgres.version>
         <micrometer.version>1.16.1</micrometer.version>
         <tokensupport.version>5.0.40</tokensupport.version>        
-        <flyway.version>11.17.1</flyway.version>
+        <flyway.version>11.20.0</flyway.version>
     </properties>
 
     <dependencies>
@@ -173,7 +173,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <delimiters>
                         <delimiter>@</delimiter>
