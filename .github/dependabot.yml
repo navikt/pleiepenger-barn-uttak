@@ -15,8 +15,15 @@ updates:
       exclude:
         - "no.nav.*"
     open-pull-requests-limit: 20
-    registries:
-      - pleiepenger-barn-uttak
+    groups:
+      nav-deps:
+        patterns:
+          - "*no.nav*"
+      annet-deps:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "*no.nav*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
