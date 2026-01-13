@@ -13,10 +13,14 @@ updates:
       nav-deps:
         patterns:
           - "*no.nav*"
+      spring-deps:
+        patterns:
+          - "*spring*"
       annet-deps:
         patterns:
           - "*"
         exclude-patterns:
+          - "*spring*"
           - "*no.nav*"
   - package-ecosystem: github-actions
     directory: "/"
