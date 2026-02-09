@@ -1,9 +1,11 @@
 package no.nav.pleiepengerbarn.uttak.server
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
-import no.nav.pleiepengerbarn.uttak.regler.*
+import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.TJUE_PROSENT
+import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
-import no.nav.pleiepengerbarn.uttak.testklient.FULL_DAG
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
@@ -11,15 +13,16 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,6 +30,7 @@ import kotlin.test.fail
 @ActiveProfiles("postgres")
 @Tag("integration")
 @EnableMockOAuth2Server
+@AutoConfigureTestRestTemplate
 class UttakplanApiTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Autowired

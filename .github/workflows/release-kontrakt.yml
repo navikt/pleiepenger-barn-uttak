@@ -15,7 +15,7 @@ jobs:
         uses: navikt/sif-gha-workflows/.github/actions/maven/release@main
         with:
           release-version: ${{ github.event.release.tag_name }}
-          java-version: '21'
+          java-version: '25'
           build-token: ${{ secrets.READER_TOKEN }}
           release-token: ${{ secrets.GITHUB_TOKEN }}
           mvn-projects: '-am -pl :kontrakter'

@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import javax.sql.DataSource
 
 @Configuration
@@ -41,14 +41,11 @@ class DbTestConfig {
 
     companion object {
         // Lazy because we only want it to be initialized when accessed
-        private val postgres: KPostgreSQLContainer by lazy {
-            KPostgreSQLContainer("postgres:12.11")
+        private val postgres: PostgreSQLContainer by lazy {
+            PostgreSQLContainer("postgres:12.11")
                     .withDatabaseName("databasename")
                     .withUsername("pleiepengerbarn_unit")
                     .withPassword("pleiepengerbarn_unit")
         }
     }
 }
-
-// Hack needed because testcontainers use of generics confuses Kotlin
-class KPostgreSQLContainer(imageName: String) : PostgreSQLContainer<KPostgreSQLContainer>(imageName)

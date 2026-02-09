@@ -3,25 +3,23 @@ package no.nav.pleiepengerbarn.uttak.server
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.HUNDRE_PROSENT
 import no.nav.pleiepengerbarn.uttak.regler.NULL_PROSENT
-import no.nav.pleiepengerbarn.uttak.regler.ÅTTI_PROSENT
 import no.nav.pleiepengerbarn.uttak.testklient.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils
 import java.math.BigDecimal
 import java.util.*
+import kotlin.random.Random
 import kotlin.test.fail
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,6 +27,7 @@ import kotlin.test.fail
 @ActiveProfiles("postgres")
 @Tag("integration")
 @EnableMockOAuth2Server
+@AutoConfigureTestRestTemplate
 class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Autowired
@@ -55,7 +54,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = UUID.randomUUID().toString(),
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = "SAK1234"
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
@@ -101,7 +100,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = UUID.randomUUID().toString(),
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
@@ -182,7 +181,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = originalBehandlingUUID,
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
@@ -281,7 +280,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = annenPartsBehandling,
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-03") to
@@ -303,7 +302,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = nyBehandling,
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)),
             sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling)
@@ -352,7 +351,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = annenPartsBehandling,
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             inntektsgradering = mapOf(
                 LukketPeriode("2020-01-01/2020-01-02") to
@@ -373,7 +372,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
             ),
             pleiebehov = mapOf(LukketPeriode("2020-01-01/2020-01-08") to Pleiebehov.PROSENT_100),
             behandlingUUID = nyBehandling,
-            saksnummer = RandomStringUtils.random(4)
+            saksnummer = nyttSaksnummer()
         ).copy(
             kravprioritetForBehandlinger = mapOf(søknadsperiode to listOf(annenPartsBehandling)),
             sisteVedtatteUttaksplanForBehandling = mapOf(annenPartsBehandling to annenPartsBehandling)
@@ -415,7 +414,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 1, nedjustering av kvote fra 100 til 10
         val part1Behandling1 = UUID.randomUUID().toString()
-        val part1Sak = RandomStringUtils.random(4)
+        val part1Sak = nyttSaksnummer()
         val part1Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -439,7 +438,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 20 = 80% i første periode, ellers avslag
         val part2Behandling = UUID.randomUUID().toString()
-        val part2Sak = RandomStringUtils.random(4)
+        val part2Sak = nyttSaksnummer()
         val part2Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -586,7 +585,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 1, nedjustering av kvote fra 100 til 10
         val part1Behandling1 = UUID.randomUUID().toString()
-        val part1Sak = RandomStringUtils.random(4)
+        val part1Sak = nyttSaksnummer()
         val part1Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -610,7 +609,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 2, ingen nedjustering av kvote, får 100 - 40 = 60% i første periode, ellers avslag
         val part2Behandling = UUID.randomUUID().toString()
-        val part2Sak = RandomStringUtils.random(4)
+        val part2Sak = nyttSaksnummer()
         val part2Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -761,7 +760,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 1, nedjustering av kvote fra 100 til 51
         val part1Behandling1 = UUID.randomUUID().toString()
-        val part1Sak = RandomStringUtils.random(4)
+        val part1Sak = nyttSaksnummer()
         val part1Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -785,7 +784,7 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
 
         // Første søknad, Part 2, nedjustering av kvote, får 100 - 51 = 49% i første periode, ellers avslag
         val part2Behandling = UUID.randomUUID().toString()
-        val part2Sak = RandomStringUtils.random(4)
+        val part2Sak = nyttSaksnummer()
         val part2Grunnlag = lagGrunnlag(
             søknadsperiode = søknadsperiode,
             arbeid = listOf(
@@ -990,4 +989,5 @@ class NedjusteringAvUttaksgradTest(@Autowired val restTemplate: TestRestTemplate
         }
     }
 
+    private fun nyttSaksnummer(): String = "SAK${Random.nextInt(9999)}"
 }
