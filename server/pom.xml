@@ -15,7 +15,6 @@
         <springdoc.version>3.0.1</springdoc.version>
         <logback.logstash.version>9.0</logback.logstash.version>
         <tokensupport.version>6.0.2</tokensupport.version>
-        <flyway.version>11.20.1</flyway.version>
     </properties>
 
     <dependencies>
