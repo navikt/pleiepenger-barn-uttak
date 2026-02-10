@@ -1,7 +1,10 @@
 package no.nav.pleiepengerbarn.uttak.testklient
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.PropertyAccessor
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.regler.Arbeidstype
@@ -26,13 +29,15 @@ internal val SELVSTENDIG1 = Arbeidsforhold(type = "SN",organisasjonsnummer = "12
 internal val FRILANS1 = Arbeidsforhold(type = "FL")
 internal val ARBEIDSFORHOLD4 = Arbeidsforhold(type="AT", organisasjonsnummer = "987654321")
 
-internal val mapper = ObjectMapper().registerModule(JavaTimeModule())
-    .setVisibility(com.fasterxml.jackson.annotation .PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-    .setVisibility(com.fasterxml.jackson.annotation .PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE)
-    .setVisibility(com.fasterxml.jackson.annotation .PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-    .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    .setVisibility(com.fasterxml.jackson.annotation .PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
+internal val mapper = ObjectMapper().apply {
+    registerModule(JavaTimeModule())
+    setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
+    setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE)
+    setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+    setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
+    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+}
 
 internal fun lagGrunnlag(saksnummer: Saksnummer = nesteSaksnummer(), periode: String, ytelseType: YtelseType = YtelseType.PSB): Uttaksgrunnlag {
     val søknadsperiode = LukketPeriode(periode)

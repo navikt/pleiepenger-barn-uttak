@@ -2,16 +2,12 @@ package no.nav.pleiepengerbarn.uttak.testklient
 
 import no.nav.pleiepengerbarn.uttak.kontrakter.*
 import no.nav.pleiepengerbarn.uttak.server.UttakplanApi
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
+import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Component
 
 internal class PleiepengerBarnUttakTestClient(
     private val restTemplate: TestRestTemplate,
