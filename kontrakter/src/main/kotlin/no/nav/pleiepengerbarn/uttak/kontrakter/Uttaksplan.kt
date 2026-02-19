@@ -43,12 +43,14 @@ enum class Endringsstatus {
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 data class Uttaksplan @JsonCreator constructor(
-    @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo> = mapOf(),
-    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode> = listOf(),
-    @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo? = null,
-    @JsonProperty("commitId") val commitId: String = ""
+    @JsonProperty("perioder") val perioder: Map<LukketPeriode, UttaksperiodeInfo>,
+    @JsonProperty("trukketUttak") val trukketUttak: List<LukketPeriode>,
+    @JsonProperty("kvoteInfo") val kvoteInfo: KvoteInfo?,
+    @JsonProperty("commitId") val commitId: String
 ) {
     constructor(perioder: Map<LukketPeriode, UttaksperiodeInfo>, trukketUttak: List<LukketPeriode>) : this(perioder, trukketUttak, null, "")
+    constructor(perioder: Map<LukketPeriode, UttaksperiodeInfo>) : this(perioder, listOf())
+    constructor() : this(mapOf())
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
