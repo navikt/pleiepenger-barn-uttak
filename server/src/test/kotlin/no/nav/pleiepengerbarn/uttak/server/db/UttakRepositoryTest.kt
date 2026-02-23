@@ -543,7 +543,8 @@ internal class UttakRepositoryTest {
 
             ),
             trukketUttak = listOf(),
-            kvoteInfo = kvoteInfo
+            kvoteInfo = kvoteInfo,
+            ""
         )
     }
 
