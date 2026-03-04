@@ -27,7 +27,19 @@ data class Uttaksgrunnlag (
     @JsonProperty("overstyrtInput") val overstyrtInput: Map<LukketPeriode, OverstyrtInput> = mapOf(),
     @JsonProperty("inntektsgradering") val inntektsgradering: Map<LukketPeriode, Inntektsgradering> = mapOf(),
     @JsonProperty("lovbestemtFerie") val lovbestemtFerie: List<LukketPeriode> = listOf(),
+
+    /**
+     * Perioder der søker mottar 100% foreldrepenger.
+     *
+     * Perioder som overlapper med en søkt uttaksperiode vil gi avslag
+     * med årsak [Årsak.INGEN_TAPT_INNTEKT_PGA_FP] ref ftrl § 9-3 første ledd (se også rundskriv).
+     *
+     * Feltet er valgfritt og defaulter til en tom liste dersom det ikke er oppgitt.
+     *
+     * @see Årsak.INGEN_TAPT_INNTEKT_PGA_FP
+     */
     @JsonProperty("foreldrepengeperioder") val foreldrepengeperioder: List<LukketPeriode> = listOf(),
+
     @JsonProperty("inngangsvilkår") val inngangsvilkår: Map<String, List<Vilkårsperiode>> = mapOf(),
     @JsonProperty("tilsynsperioder") val tilsynsperioder: Map<LukketPeriode, Duration> = mapOf(),
     @JsonProperty("beredskapsperioder") val beredskapsperioder: Map<LukketPeriode, Utfall> = mapOf(),
