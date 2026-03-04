@@ -14,6 +14,7 @@ enum class Årsak(val oppfylt: Boolean)  {
     FULL_DEKNING(true),
 
     //Ikke oppfylt årsaker
+    INGEN_TAPT_INNTEKT_PGA_FP(false),
     UTENOM_PLEIEBEHOV(false),
     FOR_LAV_REST_PGA_ETABLERT_TILSYN(false),
     FOR_LAV_REST_PGA_ANDRE_SØKERE(false),

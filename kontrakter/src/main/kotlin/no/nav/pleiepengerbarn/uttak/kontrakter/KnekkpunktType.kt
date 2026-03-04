@@ -2,6 +2,7 @@ package no.nav.pleiepengerbarn.uttak.kontrakter
 
 enum class KnekkpunktType {
     LOVBESTEMT_FERIE,
+    FORELDREPENGER,
     PLEIEBEHOV,
     TILSYNSPERIODE,
     BEREDSKAPSPERIODE,

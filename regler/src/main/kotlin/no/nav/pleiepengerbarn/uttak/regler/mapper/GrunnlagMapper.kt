@@ -57,6 +57,7 @@ object GrunnlagMapper {
             arbeid = uttaksgrunnlag.arbeid,
             tilsynsperioder = uttaksgrunnlag.tilsynsperioder,
             lovbestemtFerie = uttaksgrunnlag.lovbestemtFerie.sortedBy { it.fom },
+            foreldrepengeperioder = uttaksgrunnlag.foreldrepengeperioder.sortedBy { it.fom },
             inngangsvilkår = uttaksgrunnlag.inngangsvilkår,
             andrePartersUttaksplanPerBehandling = andrePartersUttakplanPerBehandling,
             vedtatteUttaksplanPerBehandling = vedtatteUttaksplanerPerBehandling,
