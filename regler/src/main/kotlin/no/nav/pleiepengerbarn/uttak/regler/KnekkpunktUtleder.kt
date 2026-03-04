@@ -23,6 +23,7 @@ internal object KnekkpunktUtleder {
         val knekkpunkMap = mutableMapOf<LocalDate, MutableSet<KnekkpunktType>>()
 
         finnForFerie(knekkpunkMap, regelGrunnlag.lovbestemtFerie)
+        finnForForeldrepenger(knekkpunkMap, regelGrunnlag.foreldrepengeperioder)
         finnForIkkeOppfyltInngangsvilkår(knekkpunkMap, regelGrunnlag.inngangsvilkår)
         finnForPleiebehov(knekkpunkMap, regelGrunnlag.pleiebehov)
         finnForAnnenPartsUttaksplan(knekkpunkMap, regelGrunnlag.andrePartersUttaksplanPerBehandling)
@@ -114,6 +115,10 @@ internal object KnekkpunktUtleder {
 
     private fun finnForFerie(knekkpunktMap: KnekkpunktMap, ferier:List<LukketPeriode>) {
         ferier.forEach {finnForPeriode(knekkpunktMap, it, KnekkpunktType.LOVBESTEMT_FERIE)}
+    }
+
+    private fun finnForForeldrepenger(knekkpunktMap: KnekkpunktMap, foreldrepengeperioder: List<LukketPeriode>) {
+        foreldrepengeperioder.forEach { finnForPeriode(knekkpunktMap, it, KnekkpunktType.FORELDREPENGER) }
     }
 
     private fun finnForIkkeOppfyltInngangsvilkår(knekkpunktMap: KnekkpunktMap, inngangsvilkår: Map<String, List<Vilkårsperiode>>) {

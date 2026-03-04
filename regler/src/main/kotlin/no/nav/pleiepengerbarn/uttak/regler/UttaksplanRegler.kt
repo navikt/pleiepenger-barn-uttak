@@ -19,6 +19,7 @@ internal object UttaksplanRegler {
 
     private val PeriodeRegler = linkedSetOf(
         FerieRegel(),
+        ForeldrepengerRegel(),
         SøkersDødRegel(),
         BarnsDødPeriodeRegel()
     )

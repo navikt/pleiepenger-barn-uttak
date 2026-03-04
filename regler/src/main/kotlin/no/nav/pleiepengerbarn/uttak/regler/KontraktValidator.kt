@@ -27,6 +27,8 @@ internal fun Uttaksgrunnlag.sjekk(): Set<Valideringsfeil> {
     sjekkOverlappInngangsvilkår(inngangsvilkår) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_INNGANGSVILKÅRPERIODER)}
     // Sjekk ferie
     if (sjekkOmDetFinnesOverlappendePerioder(lovbestemtFerie)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_FERIEPERIODER)}
+    // Sjekk foreldrepengeperioder
+    if (sjekkOmDetFinnesOverlappendePerioder(foreldrepengeperioder)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_FORELDREPENGEPERIODER)}
     // Sjekk pleiebehov
     if (sjekkOmDetFinnesOverlappendePerioder(pleiebehov.keys)) {valideringsfeil.add(Valideringsfeil.OVERLAPP_MELLOM_PLEIEBEHOVPERIODER)}
     // Sjekk tilsynsperioder
