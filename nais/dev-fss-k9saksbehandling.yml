@@ -57,8 +57,6 @@ spec:
       destinations:
         - id: "grafana-lgtm"
         - id: "elastic-apm"
-  secureLogs:
-    enabled: true
   ingresses:
     - https://k9-psb-uttak.dev.intern.nav.no
   env:
