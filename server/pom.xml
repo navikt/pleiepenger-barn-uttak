@@ -12,7 +12,7 @@
     <artifactId>server</artifactId>
 
     <properties>
-        <springdoc.version>3.0.1</springdoc.version>
+        <springdoc.version>3.0.2</springdoc.version>
         <logback.logstash.version>9.0</logback.logstash.version>
         <tokensupport.version>6.0.5</tokensupport.version>
     </properties>
