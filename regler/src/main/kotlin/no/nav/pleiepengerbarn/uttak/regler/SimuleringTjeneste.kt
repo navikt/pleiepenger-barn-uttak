@@ -73,15 +73,12 @@ private data class ForenkletUttaksgrad(val utbetalingsgrad: Prosent) {
 
         other as ForenkletUttaksgrad
 
-        if (utbetalingsgrad.compareTo(other.utbetalingsgrad) != 0) return false
-
-        return true
+        return utbetalingsgrad.compareTo(other.utbetalingsgrad) == 0
     }
 
     override fun hashCode(): Int {
-        //equals-metoden over anser 0 og 0.0 som like, da MÅ de også ha samme hash code
-        //det enkleste er da å ikke ta med utbetalingsgrad her
-        return 1
+        //equals-metoden over anser 0 og 0.0 som like, da MÅ de også ha samme hash code. Fjerner derfor desimaler
+        return utbetalingsgrad.toBigInteger().hashCode()
     }
 }
 
