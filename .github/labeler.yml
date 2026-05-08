@@ -1,0 +1,4 @@
+flyway:
+  - changed-files:
+      - any-glob-to-any-file: 'server/src/main/kotlin/db/migration/**'
+      - any-glob-to-any-file: 'server/src/main/resources/db/migration/**'
