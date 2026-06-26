@@ -396,6 +396,38 @@ internal class BeregnGraderNyeReglerTest {
         )
     }
 
+    @Test
+    internal fun `AT uten fravær skal ikke blåse opp utbetalingsgraden til AT med fravær ved delvis uttaksgrad`() {
+        val grader = BeregnGrader.beregn(
+            BeregnGraderGrunnlag(
+                pleiebehov = PROSENT_100,
+                etablertTilsyn = IKKE_ETABLERT_TILSYN,
+                andreSøkeresTilsyn = Prosent(50),
+                andreSøkeresTilsynReberegnet = false,
+                arbeid = mapOf(
+                    ARBEIDSGIVER1 to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = FULL_DAG,
+                        jobberNå = FULL_DAG
+                    ),
+                    ARBEIDSGIVER2 to ArbeidsforholdPeriodeInfo(
+                        jobberNormalt = FULL_DAG,
+                        jobberNå = INGENTING
+                    )
+                ),
+                ytelseType = YtelseType.OLP,
+                periode = PERIODE,
+                virkningstidspunktRegelNyEllerBortfaltAktivitet = NYE_REGLER_UTBETALINGSGRAD_DATO,
+            )
+        )
+
+        grader.assert(
+            Årsak.AVKORTET_MOT_INNTEKT,
+            Prosent(50),
+            ARBEIDSGIVER1 to Prosent(0),
+            ARBEIDSGIVER2 to Prosent(50)
+        )
+    }
+
     private fun GraderBeregnet.assert(
         årsak: Årsak,
         uttaksgrad: Prosent,

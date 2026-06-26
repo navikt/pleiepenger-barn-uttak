@@ -101,6 +101,9 @@ object BeregnUtbetalingsgrader {
                 Arbeidstype.values().find { arbeidstype -> arbeidstype.kode == it.key.type })
         }.filter {
             it.value.tilkommet != true || !brukNyeRegler
+        }.filter {
+            it.value.taptArbeid(brukNyeRegler) > Duration.ZERO ||
+                Arbeidstype.entries.find { arbeidstype -> arbeidstype.kode == it.key.type } != Arbeidstype.ARBEIDSTAKER
         }.forEach {
             sumJobberNormalt1 += it.value.jobberNormalt
         }
