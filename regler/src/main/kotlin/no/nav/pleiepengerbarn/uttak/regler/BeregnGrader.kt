@@ -8,6 +8,10 @@ import java.time.Duration
 import java.time.LocalDate
 
 internal object BeregnGrader {
+    private var ikkeReduserUttakVedTilsynForOlp = false
+    init {
+        ikkeReduserUttakVedTilsynForOlp = System.getenv("IKKE_REDUSER_UTTAK_VED_TILSYN_FOR_OLP").toBoolean()
+    }
 
     internal fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
@@ -311,7 +315,7 @@ internal object BeregnGrader {
             return Prosent.ZERO
         }
         val pleiebehovprosent = pleiebehov.prosent
-        if (ytelseType == YtelseType.OLP) {
+        if (ikkeReduserUttakVedTilsynForOlp && ytelseType == YtelseType.OLP) {
             return pleiebehovprosent
         }
         if (overseEtablertTilsynÅrsak != null) {
