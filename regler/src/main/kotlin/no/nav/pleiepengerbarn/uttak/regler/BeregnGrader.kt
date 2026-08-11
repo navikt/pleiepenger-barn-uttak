@@ -187,7 +187,8 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.pleiebehov,
                 etablertTilsynprosent,
                 beregnGraderGrunnlag.andreSøkeresTilsyn,
-                beregnGraderGrunnlag.overseEtablertTilsynÅrsak
+                beregnGraderGrunnlag.overseEtablertTilsynÅrsak,
+                beregnGraderGrunnlag.ytelseType
             )
 
         val overstyrtUttak =
@@ -303,12 +304,16 @@ internal object BeregnGrader {
         pleiebehov: Pleiebehov,
         etablertTilsynsprosent: Prosent,
         andreSøkeresTilsyn: Prosent,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
+        ytelseType: YtelseType
     ): BigDecimal {
         if (pleiebehov == Pleiebehov.PROSENT_0) {
             return Prosent.ZERO
         }
         val pleiebehovprosent = pleiebehov.prosent
+        if (ytelseType == YtelseType.OLP) {
+            return pleiebehovprosent
+        }
         if (overseEtablertTilsynÅrsak != null) {
             return pleiebehovprosent - andreSøkeresTilsyn
         }
