@@ -8,6 +8,10 @@ import java.time.Duration
 import java.time.LocalDate
 
 internal object BeregnGrader {
+    private var ikkeReduserUttakVedTilsynForOlp = false
+    init {
+        ikkeReduserUttakVedTilsynForOlp = System.getenv("IKKE_REDUSER_UTTAK_VED_TILSYN_FOR_OLP").toBoolean()
+    }
 
     internal fun beregn(beregnGraderGrunnlag: BeregnGraderGrunnlag): GraderBeregnet {
         val etablertTilsynsprosent = finnEtablertTilsynsprosent(beregnGraderGrunnlag.etablertTilsyn)
@@ -187,7 +191,8 @@ internal object BeregnGrader {
                 beregnGraderGrunnlag.pleiebehov,
                 etablertTilsynprosent,
                 beregnGraderGrunnlag.andreSøkeresTilsyn,
-                beregnGraderGrunnlag.overseEtablertTilsynÅrsak
+                beregnGraderGrunnlag.overseEtablertTilsynÅrsak,
+                beregnGraderGrunnlag.ytelseType
             )
 
         val overstyrtUttak =
@@ -303,12 +308,16 @@ internal object BeregnGrader {
         pleiebehov: Pleiebehov,
         etablertTilsynsprosent: Prosent,
         andreSøkeresTilsyn: Prosent,
-        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?
+        overseEtablertTilsynÅrsak: OverseEtablertTilsynÅrsak?,
+        ytelseType: YtelseType
     ): BigDecimal {
         if (pleiebehov == Pleiebehov.PROSENT_0) {
             return Prosent.ZERO
         }
         val pleiebehovprosent = pleiebehov.prosent
+        if (ikkeReduserUttakVedTilsynForOlp && ytelseType == YtelseType.OLP) {
+            return pleiebehovprosent
+        }
         if (overseEtablertTilsynÅrsak != null) {
             return pleiebehovprosent - andreSøkeresTilsyn
         }
