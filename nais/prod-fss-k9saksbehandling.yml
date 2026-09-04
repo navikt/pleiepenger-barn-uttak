@@ -77,4 +77,4 @@ spec:
     - name: IKKE_OVERSTYR_IKKE_OPPFYLT_PERIODE_REGEL
       value: "false"
     - name: IKKE_REDUSER_UTTAK_VED_TILSYN_FOR_OLP
-      value: "false"
+      value: "true"
