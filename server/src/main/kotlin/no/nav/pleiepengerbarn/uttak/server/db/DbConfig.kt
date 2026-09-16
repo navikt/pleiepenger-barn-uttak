@@ -9,9 +9,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import java.util.*
 import javax.sql.DataSource
+
 
 @Configuration
 @EnableTransactionManagement
@@ -31,6 +34,11 @@ class DbConfig {
     @Profile("prodConfig")
     fun applicationDataConnection(): JdbcTemplate {
         return JdbcTemplate(getDataSource())
+    }
+
+    @Bean
+    fun txManager(): PlatformTransactionManager {
+        return DataSourceTransactionManager(getDataSource())
     }
 
     fun createDatasource(datasourceName: String, role: DatasourceRole, environmentClass: EnvironmentClass, maxPoolSize: Int): DataSource {
