@@ -65,9 +65,13 @@ class DbConfig {
         config.maximumPoolSize = maxPoolSize
         config.connectionTestQuery = "select 1"
         config.driverClassName = "org.postgresql.Driver"
+
         if (dbRole != null) {
-            config.connectionInitSql = "SET ROLE \"$dbRole\""
+            config.connectionInitSql = "SET ROLE \"$dbRole\"; SET idle_in_transaction_session_timeout = '10s'"
+        } else {
+            config.connectionInitSql = "SET idle_in_transaction_session_timeout = '10s'"
         }
+
 
         // optimaliserer inserts for postgres
         val dsProperties = Properties()
