@@ -67,9 +67,9 @@ class DbConfig {
         config.driverClassName = "org.postgresql.Driver"
 
         if (dbRole != null) {
-            config.connectionInitSql = "SET ROLE \"$dbRole\"; SET idle_in_transaction_session_timeout = '10s'"
+            config.connectionInitSql = "SET ROLE \"$dbRole\"; SET idle_in_transaction_session_timeout = '10s'; COMMIT"
         } else {
-            config.connectionInitSql = "SET idle_in_transaction_session_timeout = '10s'"
+            config.connectionInitSql = "SET idle_in_transaction_session_timeout = '10s'; COMMIT"
         }
 
 
