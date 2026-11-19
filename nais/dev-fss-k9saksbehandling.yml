@@ -40,9 +40,6 @@ spec:
       memory: 400Mi
   vault:
     enabled: true
-    paths:
-      - kvPath: /kv/preprod/fss/pleiepenger-barn-uttak/k9saksbehandling
-        mountPath: /var/run/secrets/nais.io/vault
   prometheus:
     enabled: true
     path: /pleiepenger-barn-uttak/internal/actuator/prometheus
