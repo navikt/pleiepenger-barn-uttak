@@ -57,6 +57,8 @@ spec:
   ingresses:
     - https://k9-psb-uttak.dev.intern.nav.no
   env:
+    - name: JAVA_TOOL_OPTIONS
+      value: $(JAVA_PROXY_OPTIONS)
     - name: APP_NAME
       value: "pleiepenger-barn-uttak"
     - name: SPRING_PROFILES_ACTIVE
